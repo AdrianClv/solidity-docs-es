@@ -1,8 +1,8 @@
 #################
-Solidity in Depth
+Solidity a fondo
 #################
 
-This section should provide you with all you need to know about Solidity.
+Esta sección debería proveerte de todo lo que necesitas saber sobre Solidity.
 If something is missing here, please contact us on
 `Gitter <https://gitter.im/ethereum/solidity>`_ or make a pull request on
 `Github <https://github.com/ethereum/solidity/pulls>`_.
