@@ -3,8 +3,8 @@ Solidity a fondo
 #################
 
 Esta sección debería proveerte de todo lo que necesitas saber sobre Solidity.
-If something is missing here, please contact us on
-`Gitter <https://gitter.im/ethereum/solidity>`_ or make a pull request on
+Si falta algo, por favor, ponte en contacto con nosotros en
+`Gitter <https://gitter.im/ethereum/solidity>`_ o haz un pull request en
 `Github <https://github.com/ethereum/solidity/pulls>`_.
 
 .. toctree::
