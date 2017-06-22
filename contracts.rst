@@ -4,6 +4,8 @@
 Contratos
 #########
 
+Los contratos en Solidity son similares a las clases en los lenguajes orientados a objeto. Los contratos contienen datos persistentes almacenados en variables de estados y funciones que pueden modificar estas variables. Llamar a una función de un contrato diferente (instancia) realizará una llamada a la función EVM
+
 Contracts in Solidity are similar to classes in object-oriented languages. They
 contain persistent data in state variables and functions that can modify these
 variables. Calling a function on a different contract (instance) will perform
