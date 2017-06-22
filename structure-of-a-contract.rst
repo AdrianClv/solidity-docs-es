@@ -1,17 +1,16 @@
-.. index:: contract, state variable, function, event, struct, enum, function;modifier
+.. index:: contrato, variable de estado, funcion, evento, struct, enum, funcion;modificador
 
-.. _contract_structure:
+.. _estructura-contrato:
 
 *************************
 Estructura de un Contrato
 *************************
 
 Los Contratos en Solidity son similares a las clases de los lenguajes orientados a objeto.
-Cualquier contrato puede contener declaraciones del tipo :ref:`structure-state-variables`, :ref:`structure-functions`,
-:ref:`structure-function-modifiers`, :ref:`structure-events`, :ref:`structure-structs-types` and :ref:`structure-enum-types`.
+Cualquier contrato puede contener declaraciones del tipo :ref:`variables de estado <structure-state-variables>`, :ref:`funciones <structure-functions>`, :ref:`modificadores de funcion <structure-function-modifiers>`, :ref:`eventos <structure-events>`, :ref:`structs <structure-structs-types>` and :ref:`enum <structure-enum-types>`.
 Además, los contratos pueden heredar de otros contratos.
 
-.. _structure-state-variables:
+.. _estructura-variables-de-estado:
 
 Variables de Estado
 ===================
@@ -27,9 +26,9 @@ Las Variables de Estado son valores que están permanentemente almacenados en un
       // ...
   }
 
-Véase la sección :ref:`types` para conocer los diferentes tipos válidos de variables de estado y :ref:`visibility-and-getters` para conocer las distintas posibilidades de visibilidad que pueden tener las variables de estado.
+Véase la sección :ref:`tipos <types>` para conocer los diferentes tipos válidos de variables de estado y :ref:`visibilidad y ??? <visibility-and-getters>` para conocer las distintas posibilidades de visibilidad que pueden tener las variables de estado.
 
-.. _structure-functions:
+.. _estructura-funciones:
 
 Funciones
 =========
@@ -46,14 +45,14 @@ Las Funciones son las unidades ejecutables del código dentro de un contrato.
       }
   }
 
-Las llamadas a las funciones (:ref:`function-calls`) pueden ocurrir dentro o fuera de la misma. Una función puede tener varios niveles de visibilidad (:ref:`visibility-and-getters`) con respecto a otros contratos.
+Las :ref:`llamadas a una función <function-calls>` pueden ocurrir dentro o fuera de la misma. Una función puede tener varios niveles de :ref:`visibilidad <visibility-and-getters>` con respecto a otros contratos.
 
-.. _structure-function-modifiers:
+.. _estructura-modificadores-funcion:
 
 Modificadores de Función
 ========================
 
-Los Modificadores de función se usan para enmendar de un modo declarativo la semántica de las funciones (véase :ref:`modifiers` en la sección sobre contratos).
+Los Modificadores de función se usan para enmendar de un modo declarativo la semántica de las funciones (véase s:ref:`modificadores <modifiers>` en la sección sobre contratos).
 
 ::
 
@@ -72,7 +71,7 @@ Los Modificadores de función se usan para enmendar de un modo declarativo la se
       }
   }
 
-.. _structure-events:
+.. _estructura-eventos:
 
 Eventos
 =======
@@ -92,14 +91,14 @@ Los Eventos son interfaces de conveniencia con los servicios de registro del EVM
       }
   }
 
-Véase :ref:`events` en la sección sobre contratos para tener más información sobre cómo se declaran los eventos y cómo se pueden usar dentro de una dapp.
+Véase :ref:`eventos <events>` en la sección sobre contratos para tener más información sobre cómo se declaran los eventos y cómo se pueden usar dentro de una dapp.
 
-.. _structure-structs-types:
+.. _estructura-tipos-structs:
 
 Tipos de Structs
 ================
 
-Los Structs son tipos definidos por el propio usuario y pueden agrupar mútiples variables (véase :ref:`structs` en la sección sobre tipos).
+Los Structs son tipos definidos por el propio usuario y pueden agrupar mútiples variables (véase :ref:`structs <structs>` en la sección sobre tipos).
 
 ::
 
@@ -114,12 +113,12 @@ Los Structs son tipos definidos por el propio usuario y pueden agrupar mútiples
       }
   }
 
-.. _structure-enum-types:
+.. _estructura-tipos-enum:
 
 Tipos de Enum
 =============
 
-Los Enums se usan para crear tipos con un conjunto de valores finitos y están definidos por el propio usuario (véase :ref:`enums` en la sección sobre tipos).
+Los Enums se usan para crear tipos con un conjunto de valores finitos y están definidos por el propio usuario (véase :ref:`enums <enums>` en la sección sobre tipos).
 
 ::
 
