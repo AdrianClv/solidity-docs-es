@@ -4,8 +4,10 @@ Unidades y Variables Disponibles Globalmente
 
 .. index:: wei, finney, szabo, ether
 
-Ether Units
-===========
+Unidades de Ether
+=================
+
+Un numero literal puede tomar un sufijo como el ``wei``, el ``finney``, el ``szabo`` o el ``ether`` para convertirlo entre 
 
 A literal number can take a suffix of ``wei``, ``finney``, ``szabo`` or ``ether`` to convert between the subdenominations of Ether, where Ether currency numbers without a postfix are assumed to be Wei, e.g. ``2 ether == 2000 finney`` evaluates to ``true``.
 
