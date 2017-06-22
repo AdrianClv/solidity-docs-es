@@ -1,5 +1,5 @@
 ###############################
-Introduction to Smart Contracts
+Introducción a los Contratos Inteligentes
 ###############################
 
 .. _simple-smart-contract:
