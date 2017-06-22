@@ -7,18 +7,14 @@ Unidades y Variables Disponibles Globalmente
 Unidades de Ether
 =================
 
-Un numero literal puede tomar un sufijo como el ``wei``, el ``finney``, el ``szabo`` o el ``ether`` para convertirlo entre 
+Un numero literal puede tomar un sufijo como el ``wei``, el ``finney``, el ``szabo`` o el ``ether`` para convertirlo entre las subdenominaciones del Ether. Se asume que un numero sin sufijo para representar la moneda Ether está expresado en Wei, por ejemplo, ``2 ether == 2000 finney`` devolverá ``true``.
 
-A literal number can take a suffix of ``wei``, ``finney``, ``szabo`` or ``ether`` to convert between the subdenominations of Ether, where Ether currency numbers without a postfix are assumed to be Wei, e.g. ``2 ether == 2000 finney`` evaluates to ``true``.
+.. index:: tiempo, segundos, minutos, horas, días, semanas, años
 
-.. index:: time, seconds, minutes, hours, days, weeks, years
+Unidades de Tiempo
+==================
 
-Time Units
-==========
-
-Suffixes like ``seconds``, ``minutes``, ``hours``, ``days``, ``weeks`` and
-``years`` after literal numbers can be used to convert between units of time where seconds are the base
-unit and units are considered naively in the following way:
+Sufijos como ``seconds``, ``minutes``, ``hours``, ``days``, ``weeks`` y ``years`` utilizados después de numeros literales pueden usarse para convertir unidades de tiempo donde los segundos son la unidad de base. Se consideran las unidades de la forma ingénua siguiente:
 
  * ``1 == 1 seconds``
  * ``1 minutes == 60 seconds``
@@ -27,60 +23,50 @@ unit and units are considered naively in the following way:
  * ``1 weeks == 7 days``
  * ``1 years == 365 days``
 
-Take care if you perform calendar calculations using these units, because
-not every year equals 365 days and not even every day has 24 hours
-because of `leap seconds <https://en.wikipedia.org/wiki/Leap_second>`_.
-Due to the fact that leap seconds cannot be predicted, an exact calendar
-library has to be updated by an external oracle.
+Ójo si utiliza esta unidades para realizar calculos de calendario, porque no todos los años tienen 365 días y no todos los días tienen 24 horas, por culpa de los `_segundos intercalares <https://es.wikipedia.org/wiki/Segundo_intercalar>`_. Debido a que los segundos intercalares no son predecibles, la librería del calendario extacto tiene que estar actualizada por un oráculo externo.
 
-These suffixes cannot be applied to variables. If you want to
-interpret some input variable in e.g. days, you can do it in the following way::
+Estos sufijos no pueden aplicarse a variables. Si desea interpretar algunas variables de entrada, como por ejemplo días, puede hacerlo de siguiente forma::
 
     function f(uint start, uint daysAfter) {
         if (now >= start + daysAfter * 1 days) { ... }
     }
 
-Special Variables and Functions
-===============================
+Variables y Funciones Especiales
+================================
 
-There are special variables and functions which always exist in the global
-namespace and are mainly used to provide information about the blockchain.
+Existen variables y funciones especiales que siempre están disponibles en el espacio de nombre global y que se usan principalmente para proporcionar información sobre la blockchain.
 
-.. index:: block, coinbase, difficulty, number, block;number, timestamp, block;timestamp, msg, data, gas, sender, value, now, gas price, origin
+**(NO SÉ SI TRADUCIR EL ÍNDICE)**
+.. index:: bloque, coinbase, dificultad, número, bloque;número, sello de tiempo, bloque;sello de tiempo, msg, dato, gas, remitente, valor, now, precio del gas, orígen
 
 
-Block and Transaction Properties
---------------------------------
+Bloque y Propiedades de las Transacciones
+-----------------------------------------
 
-- ``block.blockhash(uint blockNumber) returns (bytes32)``: hash of the given block - only works for 256 most recent blocks excluding current
-- ``block.coinbase`` (``address``): current block miner's address
-- ``block.difficulty`` (``uint``): current block difficulty
-- ``block.gaslimit`` (``uint``): current block gaslimit
-- ``block.number`` (``uint``): current block number
-- ``block.timestamp`` (``uint``): current block timestamp as seconds since unix epoch
-- ``msg.data`` (``bytes``): complete calldata
-- ``msg.gas`` (``uint``): remaining gas
-- ``msg.sender`` (``address``): sender of the message (current call)
-- ``msg.sig`` (``bytes4``): first four bytes of the calldata (i.e. function identifier)
-- ``msg.value`` (``uint``): number of wei sent with the message
-- ``now`` (``uint``): current block timestamp (alias for ``block.timestamp``)
-- ``tx.gasprice`` (``uint``): gas price of the transaction
-- ``tx.origin`` (``address``): sender of the transaction (full call chain)
-
-.. note::
-    The values of all members of ``msg``, including ``msg.sender`` and
-    ``msg.value`` can change for every **external** function call.
-    This includes calls to library functions.
-
-    If you want to implement access restrictions in library functions using
-    ``msg.sender``, you have to manually supply the value of
-    ``msg.sender`` as an argument.
+- ``block.blockhash(uint blockNumber) returns (bytes32)``: el hash de un bloque dado - sólo funciona para los 256 bloques más recientes, excluyendo el actual
+- ``block.coinbase`` (``address``): devuelve la dirección del minero que está procesando el bloque actual
+- ``block.difficulty`` (``uint``): devuelve la dificultad del bloque actual
+- ``block.gaslimit`` (``uint``): devuelve el límite de gas del bloque actual
+- ``block.number`` (``uint``): devuelve el numero del bloque actual
+- ``block.timestamp`` (``uint``): devuelve el sello de tiempo (timestamp) del bloque actual en forma de segundos desde (unix epoch???)
+- ``msg.data`` (``bytes``): ??? (complete calldata)
+- ``msg.gas`` (``uint``): devuelve el gas que queda
+- ``msg.sender`` (``address``): devuelve remitente del mensaje (de la llamada actual)
+- ``msg.sig`` (``bytes4``): devuelve los primeros cuatro bytes de la ??? (calldata) (p.ej. la función identifier)
+- ``msg.value`` (``uint``): devuelve el numero de Wei enviado con el mensaje
+- ``now`` (``uint``): devuelve el sello de tiempo del bloque actual (es un alias de ``block.timestamp``)
+- ``tx.gasprice`` (``uint``): devuelve el precio del gas de la transacción
+- ``tx.origin`` (``address``): devuelve el remitente de la transacción (??? (full call chain))
 
 .. note::
-    The block hashes are not available for all blocks for scalability reasons.
-    You can only access the hashes of the most recent 256 blocks, all other
-    values will be zero.
+    Los valores de todos los (???miembros) de ``msg``, incluido ``msg.sender`` y ``msg.value`` pueden cambiar para cada llamada a una función **externa**. Eso incluye las llamadas a funciones de una librería también.
+    
+    Si desea implementar restricciones de acceso para funciones de una librería utilizando ``msg.sender``, tiene que proporcionar manualmente el valor de ``msg.sender`` como argumento.
+    
+.. note::
+    Los hashes de los bloques no están disponibles para todos los bloques por motivos de escalabilidad. Sólo se puede acceder a los hashes de los 256 bloques más recientes. El valor del hash para bloques más antiguos será cero.
 
+**(NO SÉ SI TRADUCIR EL ÍNDICE)**
 .. index:: assert, revert, keccak256, ripemd160, sha256, ecrecover, addmod, mulmod, cryptography, this, super, selfdestruct, balance, send
 
 Mathematical and Cryptographic Functions
