@@ -36,7 +36,6 @@ Variables y Funciones Especiales
 
 Existen variables y funciones especiales que siempre están disponibles en el espacio de nombre global y que se usan principalmente para proporcionar información sobre la blockchain.
 
-**(NO SÉ SI TRADUCIR EL ÍNDICE)**
 .. index:: bloque, coinbase, dificultad, número, bloque;número, sello de tiempo, bloque;sello de tiempo, msg, dato, gas, remitente, valor, now, precio del gas, orígen
 
 
@@ -66,7 +65,6 @@ Bloque y Propiedades de las Transacciones
 .. note::
     Los hashes de los bloques no están disponibles para todos los bloques por motivos de escalabilidad. Sólo se puede acceder a los hashes de los 256 bloques más recientes. El valor del hash para bloques más antiguos será cero.
 
-**(NO SÉ SI TRADUCIR EL ÍNDICE)**
 .. index:: assert, revert, keccak256, ripemd160, sha256, ecrecover, addmod, mulmod, cryptography, this, super, selfdestruct, balance, send
 
 Mathematical and Cryptographic Functions
