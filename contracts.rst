@@ -4,11 +4,7 @@
 Contratos
 #########
 
-Los contratos en Solidity son similares a las clases en los lenguajes orientados a objeto. 
-Los contratos contienen datos persistentes almacenados en variables de estados y funciones 
-que pueden modificar estas variables. Llamar a una función de un contrato diferente (instancia) 
-realizará una llamada a una función del EVM (Máquina Virtual de Ethereum) para que cambie 
-el contexto de manera que las variables de estado no esten accesibles.
+Los contratos en Solidity son similares a las clases en los lenguajes orientados a objeto. Los contratos contienen datos persistentes almacenados en variables de estados y funciones que pueden modificar estas variables. Llamar a una función de un contrato diferente (instancia) realizará una llamada a una función del EVM (Máquina Virtual de Ethereum) para que cambie el contexto de manera que las variables de estado no esten accesibles.
 
 .. index:: ! contrato;creacion
 
@@ -16,18 +12,13 @@ el contexto de manera que las variables de estado no esten accesibles.
 Crear Contratos
 ***************
 
-Contratos pueden crearse "desde fuera" o desde contratos en Solidity. 
-Cunando se crea un contrato, su constructor (una función con el mismo 
-nombre que el contrato) se ejecuta una sola vez.
+Contratos pueden crearse "desde fuera" o desde contratos en Solidity. Cunando se crea un contrato, su constructor (una función con el mismo nombre que el contrato) se ejecuta una sola vez.
 
-El contructor es opcional. Se admite un solo contsructor, lo que significa
-que sobrecargar no está soportado.
+El contructor es opcional. Se admite un solo contsructor, lo que significa que sobrecargar no está soportado.
 
-Desde ``web3.js``, es decir la API de JavaScript,
-esto se hace de la siguiente manera::
+Desde ``web3.js``, es decir la API de JavaScript, esto se hace de la siguiente manera::
 
-    // Es necesario especificar alguna fuente, incluido el nombre del contrato 
-    // para los parametros de abajo
+    // Es necesario especificar alguna fuente, incluido el nombre del contrato para los parametros de abajo
     var source = "contract CONTRACT_NAME { function CONTRACT_NAME(uint a, uint b) {} }";
 
     // La matriz abi en json generada por el compilador
@@ -60,20 +51,16 @@ esto se hace de la siguiente manera::
 
 .. index:: constructor;argumentos
 
-Internamente, los argumentos del constructor son transmitidos después
-del propio código del contrato, pero no se tiene que preocupar de eso
-si utiliza ``web3.js``.
+Internamente, los argumentos del constructor son transmitidos después del propio código del contrato, pero no se tiene que preocupar de eso si utiliza ``web3.js``.
 
-Si un contrato quiere crear otros contrato, el creador del código fuente 
-(y el binario) del contrato nuevamente creado tiene que estar informado. 
-Eso significa que la creación de dependencias cíclicas es imposible.
+Si un contrato quiere crear otros contrato, el creador del código fuente (y el binario) del contrato nuevamente creado tiene que estar informado. Eso significa que la creación de dependencias cíclicas es imposible.
 
 ::
 
     pragma solidity ^0.4.0;
 
     contract OwnedToken {
-        // TokenCreator es un contrato que està definido más abajo.
+        // TokenCreator es un contrato que està definido más abajo. 
         // No hay problema en referenciarlo, siempre y cuando no está 
         // siendo utilizado para crear un contrato nuevo.
         TokenCreator creator;
@@ -153,29 +140,15 @@ Eso significa que la creación de dependencias cíclicas es imposible.
 Visibilidad y Getters
 *********************
 
-Ya que Solidity sólo conoce dos tipos de llamadas a una función
-(las internas que no generan una llamada al EVM (también llamadas
-"llamadas mensaje") y las externas que si generan una llamada al EVM),
-hay cuatro tipos de visibilidades para las funciones y las variables
-de estado.
+Ya que Solidity sólo conoce dos tipos de llamadas a una función (las internas que no generan una llamada al EVM (también llamadas "llamadas mensaje") y las externas que si generan una llamada al EVM), hay cuatro tipos de visibilidades para las funciones y las variables de estado.
 
-Una función puede especificarse como ``externa``, ``pública``, 
-``interna`` o ``privada``. Por defecto una función es ``pública``.
-Para las variables de estado, el tipo ``externa`` no es posible y el tipo 
-por defecto es ``interna``.
+Una función puede especificarse como ``externa``, ``pública``, ``interna`` o ``privada``. Por defecto una función es ``pública``. Para las variables de estado, el tipo ``externa`` no es posible y el tipo por defecto es ``interna``.
 
 ``externa``:
-    Funciones externas son parte de la interfaz del contrato,
-    lo que significa que pueden llamarse desde otros contratos
-    y vía transacciones. Una función externa ``f`` no puede llamarse
-    internamente (por ejemplo ``f()`` no funciona, pero ``this.f()`` 
-    funciona). Las funciones externas son a veces más eficientes cuando
-    reciben grandes matrices de datos.
+    Funciones externas son parte de la interfaz del contrato, lo que significa que pueden llamarse desde otros contratos y vía transacciones. Una función externa ``f`` no puede llamarse internamente (por ejemplo ``f()`` no funciona, pero ``this.f()`` funciona). Las funciones externas son a veces más eficientes cuando reciben grandes matrices de datos.
     
 ``pública``:
-    Funciones públicas son parte de la interfaz del contrato y 
-    pueden llarmarse internamente o vía mensajes. Para las variables
-    de estado públicas, se genera una función getter automática (ver más abajo).
+    Funciones públicas son parte de la interfaz del contrato y pueden llarmarse internamente o vía mensajes. Para las variables de estado públicas, se genera una función getter automática (ver más abajo).
 
 ``interna``:
     Those functions and state variables can only be
