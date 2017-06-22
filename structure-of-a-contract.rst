@@ -2,9 +2,9 @@
 
 .. _contract_structure:
 
-***********************
-Structure of a Contract
-***********************
+*************************
+Estructura de un Contrato
+*************************
 
 Contracts in Solidity are similar to classes in object-oriented languages.
 Each contract can contain declarations of :ref:`structure-state-variables`, :ref:`structure-functions`,
