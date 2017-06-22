@@ -2,14 +2,13 @@
 Introducción a los Contratos Inteligentes
 ###############################
 
-.. _simple-smart-contract:
+.. _contrato-inteligente-simple:
 
 ***********************
-A Simple Smart Contract
+Un contrato inteligente simple
 ***********************
 
-Let us begin with the most basic example. It is fine if you do not understand everything
-right now, we will go into more detail later.
+Vamos a comenzar con el ejemplo más básico. No pasa nada si no entiendes nada ahora, entraremos más en detalle posteriormente.
 
 Storage
 =======
