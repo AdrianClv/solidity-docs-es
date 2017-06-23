@@ -5,21 +5,21 @@ Consideraciones de Seguridad
 #######################
 
 Aunque en general es bastante fácil de hacer software que funciona como esperamos,
-es mucho mas difícil de chequear que nadie lo puede usar de alguna forma que **no**
+es mucho más difícil de chequear que nadie lo puede usar de alguna forma que **no**
 fue anticipada.
 
 En solidity, esto es aún más importante ya que se pueden usar los contratos
-inteligentes para mover tokens, o posiblemente, cosas aún mas valiosas. Además,
-cada ejecución de de un contrato inteligente ocurre en público y, a ello se suma
+inteligentes para mover tokens, o posiblemente, cosas aún más valiosas. Además,
+cada ejecución de un contrato inteligente ocurre en público y, a ello se suma
 que el código fuente muchas veces está disponible.
 
 Por supuesto siempre se tiene que considerar lo que está en juego:
-Puedes comprarar un contrato inteligente con un servicio web que está abierto
+Puedes comparar un contrato inteligente con un servicio web que está abierto
 al público (y por lo tanto, a malos intencionados también) y quizá
 de código abierto.
 Si solo se guarda la lista de compras en ese servicio web, puede que no tengas
 que tener mucho cuidado, pero si accedes a tu cuenta bancaria usando ese servicio,
-deberíás tener mas cuidado.
+deberíás tener más cuidado.
 
 
 Esta sección va nombrar algunos errores comunes y recomendaciones de seguridad
@@ -78,7 +78,7 @@ siempre incluye ejecución de código, así que el recipiente puede ser un
 contrato que vuelve a llamar ``withdraw``. Esto lo permitiría obtener
 multiples devoluciones y por lo tanto vaciar el Ether del contrato.
 
-Para evitar reingresos, puedes usar el diseño Checks-Effects-Interactions
+Para evitar reingresos, puedes usar el orden Checks-Effects-Interactions
 como detallamos aquí:
 
 ::
@@ -117,7 +117,7 @@ Enviando y Recibiendo Ether
 
 - Ni contratos ni cuentas externas ("external accoutns"), son actualmente capaces de prevenir que alguien
   les envíe Ether. Contratos pueden reaccionar y rechazar una transferencia normal, pero hay maneras de mover
-  Ether sin crear un mensaje de llamado (message call). Una manera de de simplemente "minando" a la
+  Ether sin crear un mensaje de llamado (message call). Una manera de simplemente "minando" a la
   cuenta del contrato y la otra es usando ``selfdestruct(x)``.
 
 - Si un contrato recibe Ether (sin que una función sea llamada), la función de respaldo es ejecutada.
@@ -139,14 +139,14 @@ Enviando y Recibiendo Ether
   1. Si el recipiente es un contrato, causa que la función de respaldo sea ejecutada lo cual puede, a su vez, llamar de vuelta el contraro que envía Ether.
   2. Enviar Ether puede fallar debido a la profundidad de la llamada (call depth) subiendo por sobre 1024. Ya que el que llama está
      en control total de la profundidad de llamada, pueden forzar la transferencia a fallas; tener en consideración está posibilidad
-     o utilizar siempre ``send`` y asegurarse siempre de revisar el valor de retorno. O mejor aún, escrbir el contrato con un diseño en
+     o utilizar siempre ``send`` y asegurarse siempre de revisar el valor de retorno. O mejor aún, escrbir el contrato con un orden en
      que el recipiente pueda retirar Ether.
   3. Enviar Ether también puede fallar, porque la ejecución del contrato de recipiente necesita mas gas
      que la cantidad asignada dejándolo sin gas (OOG, por sus siglas en inglés "Out of Gas"). Esto ocurre porque
      explícitamente se usó ``require``, ``assert``, ``revert``, ``throw``, o simplemente porque la operación es demasiado cara.
      Si usas ``transfer`` o ``send`` con revisión de la valor de retorno, esto puede proveer una manera para el recipiente
      de bloquear el progreso en el contrato de envío. Pero volviendo a insistir, aquí lo mejor es usar
-     un diseño de retiro :ref:`"withdraw" en vez de "diseño de envío" <withdrawal_pattern>`.
+     un orden de retiro :ref:`"withdraw" en vez de "orden de envío" <withdrawal_pattern>`.
 
 Profundidad de Pila de Llamadas (Callstack)
 ==================================
@@ -208,85 +208,87 @@ Si tu billetera hubiera checkeado ``msg.sender`` para autorización, recibiría 
 Detalles Menores
 ================
 
-- In ``for (var i = 0; i < arrayName.length; i++) { ... }``, the type of ``i`` will be ``uint8``, because this is the smallest type that is required to hold the value ``0``. If the array has more than 255 elements, the loop will not terminate.
-- The ``constant`` keyword for functions is currently not enforced by the compiler.
-  Furthermore, it is not enforced by the EVM, so a contract function that "claims"
-  to be constant might still cause changes to the state.
-- Types that do not occupy the full 32 bytes might contain "dirty higher order bits".
-  This is especially important if you access ``msg.data`` - it poses a malleability risk:
-  You can craft transactions that call a function ``f(uint8 x)`` with a raw byte argument
-  of ``0xff000001`` and with ``0x00000001``. Both are fed to the contract and both will
-  look like the number ``1`` as far as ``x`` is concerned, but ``msg.data`` will
-  be different, so if you use ``keccak256(msg.data)`` for anything, you will get different results.
+- En ``for (var i = 0; i < arrayName.length; i++) { ... }``, el tipo de ``i`` será ``uint8``, porque este es el mas pequeño tipo que es requerido para guardar el valor ``0``. Si el vector (array) tiene mas de 255 elementos, la bucle no se terminará.
+- La palabra reservada ``constant`` para funciones no es actualmente forzada por compliadores.
+  Además, no está forzada por la EVM, entonces una función de contrato que "pretende" ser constante,
+  puede aún hacer cambios al estado.
+- Tipos que no utilizan totalmente los 32 bytes pueden contener "dirty high order bits".
+  Esto es especialmente importante si se accede a ``msg.data`` ya que supone un riesgo de maleabilidad:
+  Puedes crear transacciones que llaman una función ``f(uint8 x)`` con un argumeto raw byte
+  de ``0xff000001`` y con ``0x00000001``. Ambos son pasados al contrato y ambos se verán como
+  números como ``1``. Pero ``msg.data`` es diferente, asíque si se usa ``keccak246(msg.data)`` para
+  algo, tendrás resultados diferentes.
 
 ***************
-Recommendations
+Recomendaciones
 ***************
 
-Restrict the Amount of Ether
-============================
+Restringir la cantidad de Ether
+===============================
 
-Restrict the amount of Ether (or other tokens) that can be stored in a smart
-contract. If your source code, the compiler or the platform has a bug, these
-funds may be lost. If you want to limit your loss, limit the amount of Ether.
+Restringir la cantidad de Ether (o otros tokens) que pueden ser almacenados
+en un contrato inteligente. Si el código fuente, el compilador o la plataforma
+tiene un error, estos fondos pueden ser perdidos. Si quieres limitar la pérdida,
+limita la cantidad de Ether.
 
-Keep it Small and Modular
-=========================
 
-Keep your contracts small and easily understandable. Single out unrelated
-functionality in other contracts or into libraries. General recommendations
-about source code quality of course apply: Limit the amount of local variables,
-the length of functions and so on. Document your functions so that others
-can see what your intention was and whether it is different than what the code does.
+Pequeño y modular
+=================
 
-Use the Checks-Effects-Interactions Pattern
-===========================================
+Manten tus contratos pequeños y faciles de entender. Separar funcionalidad
+no relacionada en otros contratos o en librerías. Recomendaciones generales de
+calidad de otras fuentes de código pueden aplicarse: Limitar la cantidad de variables
+locales, limitar el largo de la funciones, y mas. Documenta tus funciones para que
+otros puedan ver cual era la intención del código y para ver si hace algo diferente de
+lo que pretendía.
 
-Most functions will first perform some checks (who called the function,
-are the arguments in range, did they send enough Ether, does the person
-have tokens, etc.). These checks should be done first.
+Usa el orden Checks-Effects-Interactions
+=========================================
 
-As the second step, if all checks passed, effects to the state variables
-of the current contract should be made. Interaction with other contracts
-should be the very last step in any function.
+La mayoria de las funciones primero ejecutan algunos checkeos (¿quién ha llamado
+la función? ¿los argumentos están en el rango? ¿mandaron suficiente Ether?
+¿La cuenta tiene tokens? etc) Estos checkeos deben se hacerse primero.
 
-Early contracts delayed some effects and waited for external function
-calls to return in a non-error state. This is often a serious mistake
-because of the re-entrancy problem explained above.
+Como segundo paso, si es que todos los checkeos pasaron, los efectos a las
+variables de estado del contrato actual deben hacerse. Interacción con otros
+contratos debe hacerse como el último paso en cualquier función.
+
+Algunos primeros contratos retrasaban algunos efectos y esperaban a una función
+externa que retorne un estado sin errores. Esto es un error serio ya que se puede
+hacer un reingreso, como explicamos arriba.
+
+Notar que, también, llamadas a contratos conocidos pueden a su vez causar llamadas
+a otros contratos no conocidos, así que siempre es mejor de aplicar este orden.
 
 Note that, also, calls to known contracts might in turn cause calls to
 unknown contracts, so it is probably better to just always apply this pattern.
 
-Include a Fail-Safe Mode
-========================
+Incluir un modo a Prueba de Fallos (Fail-Safe)
+==============================================
 
-While making your system fully decentralised will remove any intermediary,
-it might be a good idea, especially for new code, to include some kind
-of fail-safe mechanism:
+Aunque hacer que tu sistema sea completamente decentralizado eliminará cualquier intermediario,
+puede que sea una buena idea, especialmente para nuevo código, de incluir un sistema
+a prueba de fallos:
 
-You can add a function in your smart contract that performs some
-self-checks like "Has any Ether leaked?",
-"Is the sum of the tokens equal to the balance of the contract?" or similar things.
-Keep in mind that you cannot use too much gas for that, so help through off-chain
-computations might be needed there.
+Puedes agregar una función a tu contrato que se revise a sí mismo como
+"¿Se ha filtrado Ether?", "¿Es igual la suma de los tokens al balance de la cuenta?"
+o cosas similares. Recordar que no se puede usar mucho gas para eso, así que ayuda con
+compuaciones off-chain podrán ser necesarias.
 
-If the self-check fails, the contract automatically switches into some kind
-of "failsafe" mode, which, for example, disables most of the features, hands over
-control to a fixed and trusted third party or just converts the contract into
-a simple "give me back my money" contract.
+Si los checkeos fallan, el contrato automaticamente cambia a modo prueba de fallos, donde,
+por ejemplo, se desactivan muchas funciones, da el control a una entidad tercera de confianza
+o se convierte en un contrato "devuelveme mi dinero".
 
 
 *******************
-Formal Verification
+Verificación Formal
 *******************
 
-Using formal verification, it is possible to perform an automated mathematical
-proof that your source code fulfills a certain formal specification.
-The specification is still formal (just as the source code), but usually much
-simpler. There is a prototype in Solidity that performs formal verification and
-it will be better documented soon.
+Usando verficiación formal, es posible realizar pruebas matemáticas automatizadas
+que el código haga una cierta especificación formal.
+La especificación aún es formal (como el código fuente), pero usualmente mucho mas simple.
+Hay un prototipo en Solidity que realiza verificación formal y será mejor documentada pronto.
 
-Note that formal verification itself can only help you understand the
-difference between what you did (the specification) and how you did it
-(the actual implementation). You still need to check whether the specification
-is what you wanted and that you did not miss any unintended effects of it.
+Notar que la verficiación formal en sí mismo, solo puede ayudarte a entender la diferencia
+entre lo que hiciste (la especificación) y cómo lo hiciste (la implementación real). Aún necesitas
+checkear si la especificación es lo que querías y que no hayas olvidado efectos inesperados de ello.
