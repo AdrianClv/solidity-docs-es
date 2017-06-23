@@ -17,7 +17,7 @@ Por supuesto siempre se tiene que considerar lo que está en juego:
 Puedes comprarar un contrato inteligente con un servicio web que está abierto
 al público (y por lo tanto, a malos intencionados también) y quizá
 de código abierto.
-Si sólo se guarda la lista de compras en ese servicio web, puede que no tengas
+Si solo se guarda la lista de compras en ese servicio web, puede que no tengas
 que tener mucho cuidado, pero si accedes a tu cuenta bancaria usando ese servicio,
 deberíás tener mas cuidado.
 
@@ -54,7 +54,7 @@ Reingreso (Re-entry)
 Cualquier interacción desde un contrato (A) con otro contrato (B) y cualquier
 transferencia de Ether le da el control a ese contrato (B). Esto hace posible
 que B vuelva a llamar a A antes de terminar la interacción. Para dar un ejemplo,
-el siguiente código contiene un error (esto es sólo un snippet y no un contrato
+el siguiente código contiene un error (esto es solo un snippet y no un contrato
 completo):
 
 ::
@@ -96,7 +96,7 @@ como detallamos aquí:
       }
   }
 
-Nótese que reingreso no sólo es un riesgo de transferencia de Ether, pero
+Nótese que los reingresos no solo son un riesgo de transferencia de Ether, pero
 de cualquier ejecución de una función de otro contrato. Además, también tienes que
 considerar situaciones de multi-contrato. Un contrato ejecutado podría modificar el
 estado de otro contrato del cual dependes.
@@ -108,7 +108,7 @@ Bucles que no tienen un número fijo de iteraciones, por ejemplo, bucles que dep
 usarse con cuidado:
 Dado al límite de gas del bloque, las transacciones pueden sólamente consumir una cierta cantidad de gas. Ya sea explícitamente,
 o por une operación normal, el número de iteraciones en un loop puede crecer más allá del límite de gas que puede causar el
-contrato completo a detenerse a un cierto punto. Esto no se aplica a funciones ``constant`` que son sólo llamadas para
+contrato completo a detenerse a un cierto punto. Esto no se aplica a funciones ``constant`` que son solo llamadas para
 leer data de la blockchain. Pero aún así, estas funciones pueden ser llamadas por otros contratos como parte de operaciones
 en la cadena (on-chain) y detenerlas a ellas. Por favor ser explícito con estos casos en la documentación de tus contratos.
 
@@ -118,7 +118,7 @@ Enviando y Recibiendo Ether
 - Ni contratos ni cuentas externas ("external accoutns"), son actualmente capaces de prevenir que alguien
   les envíe Ether. Contratos pueden reaccionar y rechazar una transferencia normal, pero hay maneras de mover
   Ether sin crear un mensaje de llamado (message call). Una manera de de simplemente "minando" a la
-  dirección del contrato y la otra es usando ``selfdestruct(x)``.
+  cuenta del contrato y la otra es usando ``selfdestruct(x)``.
 
 - Si un contrato recibe Ether (sin que una función sea llamada), la función de respaldo es ejecutada.
   Si no tiene función de respaldo, el Ether será rechazado (lanzando una excepción).
@@ -127,52 +127,50 @@ Enviando y Recibiendo Ether
   el almacenimiento de ningua forma. Para asegurarte que tu contrato puede recibir Ether en ese modo, verifica los
   requerimientos de gas de la función de respaldo (por ejemplo en la sección de "details" de Remix).
 
-# TODO: continue from here.
+- Hay una manera de enviar mas gas a contrato receptor usando ``addr.call.value(x)()``.
+  Esto es escencialmente lo mismo que ``addr.transfer(x)``, solo que envía todo el gas restante
+  y permite la posibilidad al recipiente de hacer acciones mas caras (y solo devuelve un código
+  de error y no propaga automáticamente el error). Esto puede incluir volviendo a llamar al contrato
+  que envía o otros cambios de estado que nofueron imaginados. Así que permite mas flexibilidad para
+  usuarios honestos pero también para los usuarios maliciosos.
 
-- There is a way to forward more gas to the receiving contract using
-  ``addr.call.value(x)()``. This is essentially the same as ``addr.transfer(x)``,
-  only that it forwards all remaining gas and opens up the ability for the
-  recipient to perform more expensive actions (and it only returns a failure code
-  and does not automatically propagate the error). This might include calling back
-  into the sending contract or other state changes you might not have thought of.
-  So it allows for great flexibility for honest users but also for malicious actors.
+- Si quieres envíar Ether usando ``address.transfer``, hay ciertos detalles de los que hay que saber:
 
-- If you want to send Ether using ``address.transfer``, there are certain details to be aware of:
+  1. Si el recipiente es un contrato, causa que la función de respaldo sea ejecutada lo cual puede, a su vez, llamar de vuelta el contraro que envía Ether.
+  2. Enviar Ether puede fallar debido a la profundidad de la llamada (call depth) subiendo por sobre 1024. Ya que el que llama está
+     en control total de la profundidad de llamada, pueden forzar la transferencia a fallas; tener en consideración está posibilidad
+     o utilizar siempre ``send`` y asegurarse siempre de revisar el valor de retorno. O mejor aún, escrbir el contrato con un diseño en
+     que el recipiente pueda retirar Ether.
+  3. Enviar Ether también puede fallar, porque la ejecución del contrato de recipiente necesita mas gas
+     que la cantidad asignada dejándolo sin gas (OOG, por sus siglas en inglés "Out of Gas"). Esto ocurre porque
+     explícitamente se usó ``require``, ``assert``, ``revert``, ``throw``, o simplemente porque la operación es demasiado cara.
+     Si usas ``transfer`` o ``send`` con revisión de la valor de retorno, esto puede proveer una manera para el recipiente
+     de bloquear el progreso en el contrato de envío. Pero volviendo a insistir, aquí lo mejor es usar
+     un diseño de retiro :ref:`"withdraw" en vez de "diseño de envío" <withdrawal_pattern>`.
 
-  1. If the recipient is a contract, it causes its fallback function to be executed which can, in turn, call back the sending contract.
-  2. Sending Ether can fail due to the call depth going above 1024. Since the caller is in total control of the call
-     depth, they can force the transfer to fail; take this possibility into account or use ``send`` and make sure to always check its return value. Better yet,
-     write your contract using a pattern where the recipient can withdraw Ether instead.
-  3. Sending Ether can also fail because the execution of the recipient contract
-     requires more than the allotted amount of gas (explicitly by using ``require``,
-     ``assert``, ``revert``, ``throw`` or
-     because the operation is just too expensive) - it "runs out of gas" (OOG).
-     If you use ``transfer`` or ``send`` with a return value check, this might provide a
-     means for the recipient to block progress in the sending contract. Again, the best practice here is to use
-     a :ref:`"withdraw" pattern instead of a "send" pattern <withdrawal_pattern>`.
+Profundidad de Pila de Llamadas (Callstack)
+==================================
 
-Callstack Depth
-===============
+Llamadas externas de funciones pueden fallas en cualquier momento porque
+exceden la pila de llamadas de 1024. En tales situaciones, Solidity lanza
+una excepción. Usuarios maliciosos podrían forzar la pila a un valor alto
+antes de interactuar con el contrato.
 
-External function calls can fail any time because they exceed the maximum
-call stack of 1024. In such situations, Solidity throws an exception.
-Malicious actors might be able to force the call stack to a high value
-before they interact with your contract.
+Notar que ``.send()`` **no** lanza una excepción si la pila esta vacía si no
+que retorna ``false`` en ese caso. Las funciones de bajo nivel de ``.call()``,
+``.callcode()``  ``.delegatecall()`` se comportan de la misma manera.
 
-Note that ``.send()`` does **not** throw an exception if the call stack is
-depleted but rather returns ``false`` in that case. The low-level functions
-``.call()``, ``.callcode()`` and ``.delegatecall()`` behave in the same way.
 
 tx.origin
 =========
 
-Never use tx.origin for authorization. Let's say you have a wallet contract like this:
+Nunca usar tx.origin para autorización. Digamos que tienes un contrato de billetera como esta:
 
 ::
 
     pragma solidity ^0.4.11;
 
-    // THIS CONTRACT CONTAINS A BUG - DO NOT USE
+    // ESTE CONTRATO CONTIENE UN ERROR - NO USAR
     contract TxUserWallet {
         address owner;
 
@@ -186,7 +184,7 @@ Never use tx.origin for authorization. Let's say you have a wallet contract like
         }
     }
 
-Now someone tricks you into sending ether to the address of this attack wallet:
+Ahora alguien te engaña para que le envíes Ether a esta billetera de ataque:
 
 ::
 
@@ -204,11 +202,11 @@ Now someone tricks you into sending ether to the address of this attack wallet:
         }
     }
 
-If your wallet had checked ``msg.sender`` for authorization, it would get the address of the attack wallet, instead of the owner address. But by checking ``tx.origin``, it gets the original address that kicked off the transaction, which is still the owner address. The attack wallet instantly drains all your funds.
+Si tu billetera hubiera checkeado ``msg.sender`` para autorización, recibiría la cuenta de la billetera de ataque, en vez de la billetera del 'owner'. Pero al checkear ``tx.origin``, recibe la cuenta original que envió la transacción, quien aún es la cuenta owner. La billetera atacante immediatamente vacía todos tus fondos.
 
 
-Minor Details
-=============
+Detalles Menores
+================
 
 - In ``for (var i = 0; i < arrayName.length; i++) { ... }``, the type of ``i`` will be ``uint8``, because this is the smallest type that is required to hold the value ``0``. If the array has more than 255 elements, the loop will not terminate.
 - The ``constant`` keyword for functions is currently not enforced by the compiler.
