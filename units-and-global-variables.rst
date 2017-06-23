@@ -7,7 +7,7 @@ Unidades y Variables Disponibles Globalmente
 Unidades de Ether
 =================
 
-Un numero literal puede tomar un sufijo como el ``wei``, el ``finney``, el ``szabo`` o el ``ether`` para convertirlo entre las subdenominaciones del Ether. Se asume que un numero sin sufijo para representar la moneda Ether está expresado en Wei, por ejemplo, ``2 ether == 2000 finney`` devolverá ``true``.
+Un numero literal puede tomar un sufijo como el ``wei``, el ``finney``, el ``szabo`` o el ``ether`` para convertirlo entre las subdenominaciones del Ether. Se asume que un numero sin sufijo para representar la moneda Ether está expresado en Wei, por ejemplo, ``2 ether == 2000 finney`` devuelve ``true``.
 
 .. index:: tiempo, segundos, minutos, horas, días, semanas, años
 
@@ -67,31 +67,21 @@ Bloque y Propiedades de las Transacciones
 
 .. index:: assert, revert, keccak256, ripemd160, sha256, ecrecover, addmod, mulmod, cryptography, this, super, selfdestruct, balance, send
 
-Mathematical and Cryptographic Functions
-----------------------------------------
+Funciones Matemátcias y Criptográficas
+--------------------------------------
 
-``assert(bool condition)``:
-    throws if the condition is not met.
-``addmod(uint x, uint y, uint k) returns (uint)``:
-    compute ``(x + y) % k`` where the addition is performed with arbitrary precision and does not wrap around at ``2**256``.
-``mulmod(uint x, uint y, uint k) returns (uint)``:
-    compute ``(x * y) % k`` where the multiplication is performed with arbitrary precision and does not wrap around at ``2**256``.
-``keccak256(...) returns (bytes32)``:
-    compute the Ethereum-SHA-3 (Keccak-256) hash of the (tightly packed) arguments
-``sha3(...) returns (bytes32)``:
-    alias to ``keccak256()``
-``sha256(...) returns (bytes32)``:
-    compute the SHA-256 hash of the (tightly packed) arguments
-``ripemd160(...) returns (bytes20)``:
-    compute RIPEMD-160 hash of the (tightly packed) arguments
-``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``:
-    recover the address associated with the public key from elliptic curve signature or return zero on error
-    (`example usage <https://ethereum.stackexchange.com/q/1777/222>`_)
-``revert()``:
-    abort execution and revert state changes
+``assert(bool condición)``: desechar si la condición no está satisfecha.
+``addmod(uint x, uint y, uint k) returns (uint)``: computa ``(x + y) % k`` donde la suma se realiza con una precisión arbitraria y no ???envuelve (wrap around) en ``2**256``.
+``mulmod(uint x, uint y, uint k) returns (uint)``: computa ``(x * y) % k`` donde la multiplicación se realiza con una precisión arbitraria y no ???envuelve (wrap around) en ``2**256``.
+``keccak256(...) returns (bytes32)``: computa el hash de Ethereum-SHA-3 (Keccak-256) de los argumentos ???bien compactados (tightly packed).
+``sha3(...) returns (bytes32)``: equivalente a ``keccak256()``.
+``sha256(...) returns (bytes32)``: computa el hash de SHA-256 de los argumentos ???bien compactados (tightly packed).
+``ripemd160(...) returns (bytes20)``: computa el hash de RIPEMD-160 de los argumentos ???bien compactados (tightly packed).
+``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``: recupera la dirección asociada a la clave pública de la firma de tipo curva elíptica o devuelve cero si hay un error (`ejempo de uso <https://ethereum.stackexchange.com/q/1777/222>`_).
+``revert()``: aborta la ejecución y revierte los cambios de estado a como estaban. 
 
-In the above, "tightly packed" means that the arguments are concatenated without padding.
-This means that the following are all identical::
+Más arriba, "bien compactado" significa que los argumentos están concatenados sin relleno (padding).
+Esto significa que las siguientes llamadas son todas identicas::
 
     keccak256("ab", "c")
     keccak256("abc")
@@ -99,51 +89,36 @@ This means that the following are all identical::
     keccak256(6382179)
     keccak256(97, 98, 99)
 
-If padding is needed, explicit type conversions can be used: ``keccak256("\x00\x12")`` is the
-same as ``keccak256(uint16(0x12))``.
+Si acaso se necesito relleno (padding), se pueden usar las conversiones explícitas de tipo: ``keccak256("\x00\x12")`` es lo mismo que ``keccak256(uint16(0x12))``.
 
-Note that constants will be packed using the minimum number of bytes required to store them.
-This means that, for example, ``keccak256(0) == keccak256(uint8(0))`` and
-``keccak256(0x12345678) == keccak256(uint32(0x12345678))``.
+Note que las constantes se compactarán usando el mínimo numero de bytes requeridos para almacenarlas.
+Eso significa por ejemplo que ``keccak256(0) == keccak256(uint8(0))`` y ``keccak256(0x12345678) == keccak256(uint32(0x12345678))``.
 
-It might be that you run into Out-of-Gas for ``sha256``, ``ripemd160`` or ``ecrecover`` on a *private blockchain*. The reason for this is that those are implemented as so-called precompiled contracts and these contracts only really exist after they received the first message (although their contract code is hardcoded). Messages to non-existing contracts are more expensive and thus the execution runs into an Out-of-Gas error. A workaround for this problem is to first send e.g. 1 Wei to each of the contracts before you use them in your actual contracts. This is not an issue on the official or test net.
+Podría pasar que le falte gas para llamar a las funciones ``sha256``, ``ripemd160`` or ``ecrecover`` en *blockchain privadas*. La razón de ser así se debe a que esas funciones están implementadas como contratos precompilados y estos contratos sólo existen depués de recibir el primer mensaje (a pesar de que el contrato está ???puesto a fuego (hardcoded)). Los mensajes que se envían a contratos que todavía no existen son más caros y por lo tanto su ejecución puede llevar a un error por una falta de gas (Out-of-Gas error). Una solución a este problema consiste por ejemplo en mandar 1 Wei a todos los contratos antes de empezar a usarlos en sus propios contratos. Note que esto no llevará a un error en la red oficial o en la red de testeo.
 
-.. _address_related:
+.. _relacionado_direccion:
 
-Address Related
----------------
+Relacionado con Dirección
+-------------------------
 
-``<address>.balance`` (``uint256``):
-    balance of the :ref:`address` in Wei
-``<address>.transfer(uint256 amount)``:
-    send given amount of Wei to :ref:`address`, throws on failure
-``<address>.send(uint256 amount) returns (bool)``:
-    send given amount of Wei to :ref:`address`, returns ``false`` on failure
-``<address>.call(...) returns (bool)``:
-    issue low-level ``CALL``, returns ``false`` on failure
-``<address>.callcode(...) returns (bool)``:
-    issue low-level ``CALLCODE``, returns ``false`` on failure
-``<address>.delegatecall(...) returns (bool)``:
-    issue low-level ``DELEGATECALL``, returns ``false`` on failure
+``<address>.balance`` (``uint256``): balance en Wei de la :ref:`direccion`.
+``<address>.transfer(uint256 amount)``: mandar el importe deseado en Wei a la :ref:`direccion` o desechar si falla.
+``<address>.send(uint256 amount) returns (bool)``: mandar el importe deseado en Wei a la :ref:`direccion` o devolver ``false`` si falla.
+``<address>.call(...) returns (bool)``: ???emitir ``CALL`` a bajo nivel o devolver ``false`` si falla.
+``<address>.callcode(...) returns (bool)``: emitir ``CALLCODE`` a bajo nivel o devolver ``false`` si falla.
+``<address>.delegatecall(...) returns (bool)``: emitir ``DELEGATECALL`` a bajo nivel o devolver ``false`` si falla.
 
-For more information, see the section on :ref:`address`.
+Para más información, véase la sección :ref:`direccion`.
 
 .. warning::
-    There are some dangers in using ``send``: The transfer fails if the call stack depth is at 1024
-    (this can always be forced by the caller) and it also fails if the recipient runs out of gas. So in order
-    to make safe Ether transfers, always check the return value of ``send``, use ``transfer`` or even better:
-    Use a pattern where the recipient withdraws the money.
+    Existe un peligro a la hora de usar ``send``: la transferencia falla si la ??? profundidad de la pila de llamadas (call stack depth) es de 1024 (esto siempre lo puede forzar el que hace la llamada); también falla si el destinatorio se queda sin gas. Entonces, para asegurarse de hacer transferencias seguras en Ether, fíjese siempre en el valor devuelto por ``send``, use ``transfer`` en lugar de ``send``, o mejor aún, use un patrón donde es el destinatario quien retira los fondos.
 
 .. index:: this, selfdestruct
 
-Contract Related
-----------------
+Relacionado con Contratos
+-------------------------
 
-``this`` (current contract's type):
-    the current contract, explicitly convertible to :ref:`address`
+``this`` (el tipo del contrato actual): el contrato actual, explicitamente convertible en :ref:`direccion`.
+``selfdestruct(dirección del destinatario)``: destruir el contrato actual y enviar los fondos que tiene a una :ref:`direccion` especificada.
 
-``selfdestruct(address recipient)``:
-    destroy the current contract, sending its funds to the given :ref:`address`
-
-Furthermore, all functions of the current contract are callable directly including the current function.
-
+Además, todas las funciones del contrato actual se pueden llamar directamente, incluida la función actual.
