@@ -6,44 +6,43 @@
 Installando Solidity
 ####################
 
-Versioning
-==========
+Control de Version
+==================
 
-Solidity versions follow `semantic versioning <https://semver.org>`_ and in addition to
-releases, **nightly development builds** are also made available.  The nightly builds
-are not guaranteed to be working and despite best efforts they might contain undocumented
-and/or broken changes. We recommend using the latest release. Package installers below
-will use the latest release.
+Las versiones de Solidity siguen `versioning semantica <https://semver.org>`_ y además
+de los releases, también hay **nightly developement builds**. Los nightly builds no están
+garantizados a funcionar y puede que contengan cambios no documentados o que no funcionen.
+Recomendamos usar la última release. Los instaladores de paquetes siguientes usarán la release
+más actual.
 
 Remix
 =====
 
-If you just want to try Solidity for small contracts, you
-can try `Remix <https://remix.ethereum.org/>`_
-which does not need any installation. If you want to use it
-without connection to the Internet, you can go to
-https://github.com/ethereum/browser-solidity/tree/gh-pages and
-download the .ZIP file as explained on that page.
+Si sólo quieres probar Solidity para pequeños contratos, puedes usar
+`Remix <https://remix.ethereum.org/>`_
+que no necesita instalación. Si quieres usarlo sin conexión a internet,
+puedes ir a https://github.com/ethereum/browser-solidity/tree/gh-pages
+y bajar el .ZIP como se explica en esa página.
 
 npm / Node.js
 =============
 
-This is probably the most portable and most convenient way to install Solidity locally.
+Esto es probablemente la manera mas portable y conveniente de instalar Solidity localmente.
 
-A platform-independent JavaScript library is provided by compiling the C++ source
-into JavaScript using Emscripten. It can be used in projects directly (such as Remix).
-Please refer to the `solc-js <https://github.com/ethereum/solc-js>`_ repository for instructions.
+Una librería Javascript independiente de plataforma está proporcionada compilando la fuente C++
+a Javascript usando Emscripten. Puede ser usado en proyectos directamente (como Remix).
+Refiérete al repositorio `solc-js <https://github.com/ethereum/solc-js>`_ para ver las instrucciones.
 
-It also contains a commandline tool called `solcjs`, which can be installed via npm:
+También contiene una herramienta de línea de comando llamada `solcjs` que puede ser instala vía npm:
 
 .. code:: bash
 
     npm install -g solc
 
-.. note::
+.. nota::
 
-    The comandline options of `solcjs` are not compatible with `solc` and tools (such as `geth`)
-    expecting the behaviour of `solc` will not work with `solcjs`.
+    Las opciones de línea de comando de `solcjs` no son compatibles con `solc` y herramientas
+    (tales como `geth`) esperando que el comportamiento de `solc` no funcione con `solcjs`.
 
 Docker
 ======
