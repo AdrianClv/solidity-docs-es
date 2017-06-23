@@ -22,10 +22,10 @@ que tener mucho cuidado, pero si accedes a tu cuenta bancaria usando ese servici
 deberíás tener más cuidado.
 
 
-Esta sección va nombrar algunos errores comunes y recomendaciones de seguridad
+Esta sección nombrará algunos errores comunes y recomendaciones de seguridad
 generales pero no puede, por supuesto, ser una lista completa. Además, recordar
 que incluso si tu contrato inteligente está libre de errores (bug-free), el complilador
-o la plataforma puede que tenga uno. Una lista de errores de seguridad pulicamente
+o la plataforma puede que tenga uno. Una lista de errores de seguridad públicamente
 conocidos del compilador puede encontrarse en: :ref:`lista de errores conocidos<known_bugs>`,
 la lista también es legible por maquina (machine-readable). Nótese que hay una recompensa
 por errores (bug-bounty) que cubre el generador de código del compliador de Solidity.
@@ -42,7 +42,7 @@ Información Privada y Aleatoriedad
 ==================================
 
 Todo lo que usas en un contrato inteligente es públicamente visible, incluso
-variables locales y variables de estado maracadas como ``private``.
+variables locales y variables de estado marcadas como ``private``.
 
 Usando números aleatorios en contratos inteligentes es bastante difícil si no
 quieres que los mineros puedan hacer trampa.
@@ -73,10 +73,10 @@ completo):
   }
 
 El problema aquí no es tan grave por los límites del gas como parte
-de ``send``, pero aún así, expone una debilidad: transferencia de Ether
+de ``send``, pero aun así, expone una debilidad: transferencia de Ether
 siempre incluye ejecución de código, así que el recipiente puede ser un
 contrato que vuelve a llamar ``withdraw``. Esto lo permitiría obtener
-multiples devoluciones y por lo tanto vaciar el Ether del contrato.
+múltiples devoluciones y por lo tanto vaciar el Ether del contrato.
 
 Para evitar reingresos, puedes usar el orden Checks-Effects-Interactions
 como detallamos aquí:
@@ -104,12 +104,12 @@ estado de otro contrato del cual dependes.
 Límite de Gas y Bucles (Loops)
 ==============================
 
-Bucles que no tienen un número fijo de iteraciones, por ejemplo, bucles que dependen de valores de almacenamiento, tienen que
+Los bucles que no tienen un número fijo de iteraciones, por ejemplo, bucles que dependen de valores de almacenamiento, tienen que
 usarse con cuidado:
 Dado al límite de gas del bloque, las transacciones pueden sólamente consumir una cierta cantidad de gas. Ya sea explícitamente,
-o por une operación normal, el número de iteraciones en un loop puede crecer más allá del límite de gas que puede causar el
+o por una operación normal, el número de iteraciones en un loop puede crecer más allá del límite de gas que puede causar el
 contrato completo a detenerse a un cierto punto. Esto no se aplica a funciones ``constant`` que son solo llamadas para
-leer data de la blockchain. Pero aún así, estas funciones pueden ser llamadas por otros contratos como parte de operaciones
+leer data de la blockchain. Pero aun así, estas funciones pueden ser llamadas por otros contratos como parte de operaciones
 en la cadena (on-chain) y detenerlas a ellas. Por favor ser explícito con estos casos en la documentación de tus contratos.
 
 Enviando y Recibiendo Ether
@@ -124,24 +124,25 @@ Enviando y Recibiendo Ether
   Si no tiene función de respaldo, el Ether será rechazado (lanzando una excepción).
   Durante la ejecución de la función de respaldo, el contrato solo puede depender del
   "estipendio de gas" (2300 gas) que tiene disponible en ese momento. Esto estipendio no es suficiente para acceder
-  el almacenimiento de ningua forma. Para asegurarte que tu contrato puede recibir Ether en ese modo, verifica los
+  el almacenamiento de ninguna forma. Para asegurarte que tu contrato puede recibir Ether en ese modo, verifica los
   requerimientos de gas de la función de respaldo (por ejemplo en la sección de "details" de Remix).
 
-- Hay una manera de enviar mas gas a contrato receptor usando ``addr.call.value(x)()``.
+- Hay una manera de enviar más gas a contrato receptor usando ``addr.call.value(x)()``.
   Esto es escencialmente lo mismo que ``addr.transfer(x)``, solo que envía todo el gas restante
-  y permite la posibilidad al recipiente de hacer acciones mas caras (y solo devuelve un código
+  y permite la posibilidad al recipiente de hacer acciones más caras (y solo devuelve un código
   de error y no propaga automáticamente el error). Esto puede incluir volviendo a llamar al contrato
-  que envía o otros cambios de estado que nofueron imaginados. Así que permite mas flexibilidad para
+  enviador o otros cambios de estado que nofueron imaginados. Así que permite más flexibilidad para
   usuarios honestos pero también para los usuarios maliciosos.
 
 - Si quieres envíar Ether usando ``address.transfer``, hay ciertos detalles de los que hay que saber:
 
-  1. Si el recipiente es un contrato, causa que la función de respaldo sea ejecutada lo cual puede, a su vez, llamar de vuelta el contraro que envía Ether.
+  1. Si el recipiente es un contrato, causa que la función de respaldo sea ejecutada lo cual puede, a su vez, llamar de vuelta el
+  contrato que envía Ether.
   2. Enviar Ether puede fallar debido a la profundidad de la llamada (call depth) subiendo por sobre 1024. Ya que el que llama está
      en control total de la profundidad de llamada, pueden forzar la transferencia a fallas; tener en consideración está posibilidad
-     o utilizar siempre ``send`` y asegurarse siempre de revisar el valor de retorno. O mejor aún, escrbir el contrato con un orden en
+     o utilizar siempre ``send`` y asegurarse siempre de revisar el valor de retorno. O mejor aún, escribir el contrato con un orden en
      que el recipiente pueda retirar Ether.
-  3. Enviar Ether también puede fallar, porque la ejecución del contrato de recipiente necesita mas gas
+  3. Enviar Ether también puede fallar, porque la ejecución del contrato de recipiente necesita más gas
      que la cantidad asignada dejándolo sin gas (OOG, por sus siglas en inglés "Out of Gas"). Esto ocurre porque
      explícitamente se usó ``require``, ``assert``, ``revert``, ``throw``, o simplemente porque la operación es demasiado cara.
      Si usas ``transfer`` o ``send`` con revisión de la valor de retorno, esto puede proveer una manera para el recipiente
@@ -202,13 +203,13 @@ Ahora alguien te engaña para que le envíes Ether a esta billetera de ataque:
         }
     }
 
-Si tu billetera hubiera checkeado ``msg.sender`` para autorización, recibiría la cuenta de la billetera de ataque, en vez de la billetera del 'owner'. Pero al checkear ``tx.origin``, recibe la cuenta original que envió la transacción, quien aún es la cuenta owner. La billetera atacante immediatamente vacía todos tus fondos.
+Si tu billetera hubiera checkeado ``msg.sender`` para autorización, recibiría la cuenta de la billetera de ataque, en vez de la billetera del 'owner'. Pero al chequear ``tx.origin``, recibe la cuenta original que envió la transacción, quien aún es la cuenta owner. La billetera atacante immediatamente vacía todos tus fondos.
 
 
 Detalles Menores
 ================
 
-- En ``for (var i = 0; i < arrayName.length; i++) { ... }``, el tipo de ``i`` será ``uint8``, porque este es el mas pequeño tipo que es requerido para guardar el valor ``0``. Si el vector (array) tiene mas de 255 elementos, la bucle no se terminará.
+- En ``for (var i = 0; i < arrayName.length; i++) { ... }``, el tipo de ``i`` será ``uint8``, porque este es el más pequeño tipo que es requerido para guardar el valor ``0``. Si el vector (array) tiene más de 255 elementos, el bucle no se terminará.
 - La palabra reservada ``constant`` para funciones no es actualmente forzada por compliadores.
   Además, no está forzada por la EVM, entonces una función de contrato que "pretende" ser constante,
   puede aún hacer cambios al estado.
@@ -216,7 +217,7 @@ Detalles Menores
   Esto es especialmente importante si se accede a ``msg.data`` ya que supone un riesgo de maleabilidad:
   Puedes crear transacciones que llaman una función ``f(uint8 x)`` con un argumeto raw byte
   de ``0xff000001`` y con ``0x00000001``. Ambos son pasados al contrato y ambos se verán como
-  números como ``1``. Pero ``msg.data`` es diferente, asíque si se usa ``keccak246(msg.data)`` para
+  números como ``1``. Pero ``msg.data`` es diferente, así que si se usa ``keccak246(msg.data)`` para
   algo, tendrás resultados diferentes.
 
 ***************
@@ -235,21 +236,21 @@ limita la cantidad de Ether.
 Pequeño y modular
 =================
 
-Manten tus contratos pequeños y faciles de entender. Separar funcionalidad
+Mantén tus contratos pequeños y fáciles de entender. Separar funcionalidad
 no relacionada en otros contratos o en librerías. Recomendaciones generales de
 calidad de otras fuentes de código pueden aplicarse: Limitar la cantidad de variables
-locales, limitar el largo de la funciones, y mas. Documenta tus funciones para que
+locales, limitar el largo de la funciones, y más. Documenta tus funciones para que
 otros puedan ver cual era la intención del código y para ver si hace algo diferente de
 lo que pretendía.
 
 Usa el orden Checks-Effects-Interactions
 =========================================
 
-La mayoria de las funciones primero ejecutan algunos checkeos (¿quién ha llamado
+La mayoría de las funciones primero ejecutan algunos chequeos (¿quién ha llamado
 la función? ¿los argumentos están en el rango? ¿mandaron suficiente Ether?
-¿La cuenta tiene tokens? etc) Estos checkeos deben se hacerse primero.
+¿La cuenta tiene tokens? etc) Estos chequeos deben se hacerse primero.
 
-Como segundo paso, si es que todos los checkeos pasaron, los efectos a las
+Como segundo paso, si es que todos los chequeos pasaron, los efectos a las
 variables de estado del contrato actual deben hacerse. Interacción con otros
 contratos debe hacerse como el último paso en cualquier función.
 
@@ -260,35 +261,32 @@ hacer un reingreso, como explicamos arriba.
 Notar que, también, llamadas a contratos conocidos pueden a su vez causar llamadas
 a otros contratos no conocidos, así que siempre es mejor de aplicar este orden.
 
-Note that, also, calls to known contracts might in turn cause calls to
-unknown contracts, so it is probably better to just always apply this pattern.
-
 Incluir un modo a Prueba de Fallos (Fail-Safe)
 ==============================================
 
-Aunque hacer que tu sistema sea completamente decentralizado eliminará cualquier intermediario,
+Aunque hacer que tu sistema sea completamente descentralizado eliminará cualquier intermediario,
 puede que sea una buena idea, especialmente para nuevo código, de incluir un sistema
 a prueba de fallos:
 
 Puedes agregar una función a tu contrato que se revise a sí mismo como
 "¿Se ha filtrado Ether?", "¿Es igual la suma de los tokens al balance de la cuenta?"
 o cosas similares. Recordar que no se puede usar mucho gas para eso, así que ayuda con
-compuaciones off-chain podrán ser necesarias.
+computaciones off-chain podrán ser necesarias.
 
-Si los checkeos fallan, el contrato automaticamente cambia a modo prueba de fallos, donde,
+Si los chequeos fallan, el contrato automáticamente cambia a modo prueba de fallos, donde,
 por ejemplo, se desactivan muchas funciones, da el control a una entidad tercera de confianza
-o se convierte en un contrato "devuelveme mi dinero".
+o se convierte en un contrato "devuélveme mi dinero".
 
 
 *******************
 Verificación Formal
 *******************
 
-Usando verficiación formal, es posible realizar pruebas matemáticas automatizadas
+Usando verficación formal, es posible realizar pruebas matemáticas automatizadas
 que el código haga una cierta especificación formal.
-La especificación aún es formal (como el código fuente), pero usualmente mucho mas simple.
+La especificación aún es formal (como el código fuente), pero usualmente mucho más simple.
 Hay un prototipo en Solidity que realiza verificación formal y será mejor documentada pronto.
 
-Notar que la verficiación formal en sí mismo, solo puede ayudarte a entender la diferencia
+Notar que la verficación formal en sí mismo, solo puede ayudarte a entender la diferencia
 entre lo que hiciste (la especificación) y cómo lo hiciste (la implementación real). Aún necesitas
-checkear si la especificación es lo que querías y que no hayas olvidado efectos inesperados de ello.
+chequear si la especificación es lo que querías y que no hayas olvidado efectos inesperados de ello.
