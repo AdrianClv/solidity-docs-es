@@ -31,14 +31,7 @@ Almacenamiento
 
 La primera línea simplemente dice que el código fuente se ha escrito en la versión 0.4.0 de Solidity o en otra superior totalmente compatible (cualquiera anterior a la 0.5.0). Esto es para garantizar que el contrato no se va a compartar de una forma diferente con una versión más nueva del compilador. La palabra reservada ``pragma`` es llamada de esa manera porque, en general, los "pragmas" son instrucciones para el compilador que indican como este debe operar con el código fuente (p.ej.: `pragma once <https://en.wikipedia.org/wiki/Pragma_once>`_).  .
 
-A contract in the sense of Solidity is a collection of code (its *functions*) and
-data (its *state*) that resides at a specific address on the Ethereum
-blockchain. The line ``uint storedData;`` declares a state variable called ``storedData`` of
-type ``uint`` (unsigned integer of 256 bits). You can think of it as a single slot
-in a database that can be queried and altered by calling functions of the
-code that manages the database. In the case of Ethereum, this is always the owning
-contract. And in this case, the functions ``set`` and ``get`` can be used to modify
-or retrieve the value of the variable.
+Un contrato para Solidity es una colección de código (sus *funciones*) y datos (su *estado*) que residen en una dirección específica en la blockchain de Ethereum. La línea ``uint storedData;`` declara una variable de estado llamada ``storedData`` del tipo ``uint`` (unsigned integer de 256 bits). Esta se puede entender como una parte única en una base de datos que puede ser consultada o modificada llamando a funciones del código que gestiona dicha base de datos. En el caso de Ethereum, este es siempre el contrato propietario. Y en este caso, las funciones ``set`` y ``get`` se pueden usar para modificar o consultar el valor de la variable.
 
 To access a state variable, you do not need the prefix ``this.`` as is common in
 other languages.
