@@ -1,90 +1,94 @@
 .. _security_considerations:
 
 #######################
-Security Considerations
+Consideraciones de Seguridad
 #######################
 
-While it is usually quite easy to build software that works as expected,
-it is much harder to check that nobody can use it in a way that was **not** anticipated.
+Aunque en general es bastante fácil de hacer software que funciona como esperamos,
+es mucho mas difícil de chequear que nadie lo puede usar de alguna forma que **no**
+fue anticipada.
 
-In Solidity, this is even more important because you can use smart contracts
-to handle tokens or, possibly, even more valuable things. Furthermore, every
-execution of a smart contract happens in public and, in addition to that,
-the source code is often available.
+En solidity, esto es aún más importante ya que se pueden usar los contratos
+inteligentes para mover tokens, o posiblemente, cosas aún mas valiosas. Además,
+cada ejecución de de un contrato inteligente ocurre en público y, a ello se suma
+que el código fuente muchas veces está disponible.
 
-Of course you always have to consider how much is at stake:
-You can compare a smart contract with a web service that is open to the
-public (and thus, also to malicous actors) and perhaps even open source.
-If you only store your grocery list on that web service, you might not have
-to take too much care, but if you manage your bank account using that web service,
-you should be more careful.
+Por supuesto siempre se tiene que considerar lo que está en juego:
+Puedes comprarar un contrato inteligente con un servicio web que está abierto
+al público (y por lo tanto, a malos intencionados también) y quizá
+de código abierto.
+Si sólo se guarda la lista de compras en ese servicio web, puede que no tengas
+que tener mucho cuidado, pero si accedes a tu cuenta bancaria usando ese servicio,
+deberíás tener mas cuidado.
 
-This section will list some pitfalls and general security recommendations but
-can, of course, never be complete. Also, keep in mind that even if your
-smart contract code is bug-free, the compiler or the platform itself might
-have a bug. A list of some publicly known security-relevant bugs of the compiler
-can be found in the
-:ref:`list of known bugs<known_bugs>`, which is also machine-readable. Note
-that there is a bug bounty program that covers the code generator of the
-Solidity compiler.
 
-As always, with open source documentation, please help us extend this section
-(especially, some examples would not hurt)!
+Esta sección va nombrar algunos errores comunes y recomendaciones de seguridad
+generales pero no puede, por supuesto, ser una lista completa. Además, recordar
+que incluso si tu contrato inteligente está libre de errores (bug-free), el complilador
+o la plataforma puede que tenga uno. Una lista de errores de seguridad pulicamente
+conocidos del compilador puede encontrarse en: :ref:`lista de errores conocidos<known_bugs>`,
+la lista también es legible por maquina (machine-readable). Nótese que hay una recompensa
+por errores (bug-bounty) que cubre el generador de código del compliador de Solidity.
 
-********
-Pitfalls
-********
+Como siempre es el caso con documentación de código abierto, por favor ayúdanos a extender
+esta sección, especialmente con algunos ejemplos!
 
-Private Information and Randomness
+
+***************
+Errores Comunes
+***************
+
+Información Privada y Aleatoriedad
 ==================================
 
-Everything you use in a smart contract is publicly visible, even
-local variables and state variables marked ``private``.
+Todo lo que usas en un contrato inteligente es públicamente visible, incluso
+variables locales y variables de estado maracadas como ``private``.
 
-Using random numbers in smart contracts is quite tricky if you do not want
-miners to be able to cheat.
+Usando números aleatorios en contratos inteligentes es bastante difícil si no
+quieres que los mineros puedan hacer trampa.
 
-Re-Entrancy
-===========
 
-Any interaction from a contract (A) with another contract (B) and any transfer
-of Ether hands over control to that contract (B). This makes it possible for B
-to call back into A before this interaction is completed. To give an example,
-the following code contains a bug (it is just a snippet and not a
-complete contract):
+Reingreso (Re-entry)
+====================
+
+Cualquier interacción desde un contrato (A) con otro contrato (B) y cualquier
+transferencia de Ether le da el control a ese contrato (B). Esto hace posible
+que B vuelva a llamar a A antes de terminar la interacción. Para dar un ejemplo,
+el siguiente código contiene un error (esto es sólo un snippet y no un contrato
+completo):
 
 ::
 
   pragma solidity ^0.4.0;
 
-  // THIS CONTRACT CONTAINS A BUG - DO NOT USE
+  // ESTE CONTRATO CONTIENE UN ERROR - NO USAR
   contract Fund {
-      /// Mapping of ether shares of the contract.
+      /// Mapping de shares de ether del contrato.
       mapping(address => uint) shares;
-      /// Withdraw your share.
+      /// Retira tu share.
       function withdraw() {
           if (msg.sender.send(shares[msg.sender]))
               shares[msg.sender] = 0;
       }
   }
 
-The problem is not too serious here because of the limited gas as part
-of ``send``, but it still exposes a weakness: Ether transfer always
-includes code execution, so the recipient could be a contract that calls
-back into ``withdraw``. This would let it get multiple refunds and
-basically retrieve all the Ether in the contract.
+El problema aquí no es tan grave por los límites del gas como parte
+de ``send``, pero aún así, expone una debilidad: transferencia de Ether
+siempre incluye ejecución de código, así que el recipiente puede ser un
+contrato que vuelve a llamar ``withdraw``. Esto lo permitiría obtener
+multiples devoluciones y por lo tanto vaciar el Ether del contrato.
 
-To avoid re-entrancy, you can use the Checks-Effects-Interactions pattern as
-outlined further below:
+Para evitar reingresos, puedes usar el diseño Checks-Effects-Interactions
+como detallamos aquí:
 
 ::
 
   pragma solidity ^0.4.11;
 
   contract Fund {
-      /// Mapping of ether shares of the contract.
+      /// Mapping de shares de ether del contrato.
       mapping(address => uint) shares;
-      /// Withdraw your share.
+      /// Retira tu share.
       function withdraw() {
           var share = shares[msg.sender];
           shares[msg.sender] = 0;
@@ -92,35 +96,38 @@ outlined further below:
       }
   }
 
-Note that re-entrancy is not only an effect of Ether transfer but of any
-function call on another contract. Furthermore, you also have to take
-multi-contract situations into account. A called contract could modify the
-state of another contract you depend on.
+Nótese que reingreso no sólo es un riesgo de transferencia de Ether, pero
+de cualquier ejecución de una función de otro contrato. Además, también tienes que
+considerar situaciones de multi-contrato. Un contrato ejecutado podría modificar el
+estado de otro contrato del cual dependes.
 
-Gas Limit and Loops
-===================
+Límite de Gas y Bucles (Loops)
+==============================
 
-Loops that do not have a fixed number of iterations, for example, loops that depend on storage values, have to be used carefully:
-Due to the block gas limit, transactions can only consume a certain amount of gas. Either explicitly or just due to
-normal operation, the number of iterations in a loop can grow beyond the block gas limit which can cause the complete
-contract to be stalled at a certain point. This may not apply to ``constant`` functions that are only executed
-to read data from the blockchain. Still, such functions may be called by other contracts as part of on-chain operations
-and stall those. Please be explicit about such cases in the documentation of your contracts.
+Bucles que no tienen un número fijo de iteraciones, por ejemplo, bucles que dependen de valores de almacenamiento, tienen que
+usarse con cuidado:
+Dado al límite de gas del bloque, las transacciones pueden sólamente consumir una cierta cantidad de gas. Ya sea explícitamente,
+o por une operación normal, el número de iteraciones en un loop puede crecer más allá del límite de gas que puede causar el
+contrato completo a detenerse a un cierto punto. Esto no se aplica a funciones ``constant`` que son sólo llamadas para
+leer data de la blockchain. Pero aún así, estas funciones pueden ser llamadas por otros contratos como parte de operaciones
+en la cadena (on-chain) y detenerlas a ellas. Por favor ser explícito con estos casos en la documentación de tus contratos.
 
-Sending and Receiving Ether
+Enviando y Recibiendo Ether
 ===========================
 
-- Neither contracts nor "external accounts" are currently able to prevent that someone sends them Ether.
-  Contracts can react on and reject a regular transfer, but there are ways
-  to move Ether without creating a message call. One way is to simply "mine to"
-  the contract address and the second way is using ``selfdestruct(x)``. 
+- Ni contratos ni cuentas externas ("external accoutns"), son actualmente capaces de prevenir que alguien
+  les envíe Ether. Contratos pueden reaccionar y rechazar una transferencia normal, pero hay maneras de mover
+  Ether sin crear un mensaje de llamado (message call). Una manera de de simplemente "minando" a la
+  dirección del contrato y la otra es usando ``selfdestruct(x)``.
 
-- If a contract receives Ether (without a function being called), the fallback function is executed.
-  If it does not have a fallback function, the Ether will be rejected (by throwing an exception).
-  During the execution of the fallback function, the contract can only rely
-  on the "gas stipend" (2300 gas) being available to it at that time. This stipend is not enough to access storage in any way.
-  To be sure that your contract can receive Ether in that way, check the gas requirements of the fallback function
-  (for example in the "details" section in Remix).
+- Si un contrato recibe Ether (sin que una función sea llamada), la función de respaldo es ejecutada.
+  Si no tiene función de respaldo, el Ether será rechazado (lanzando una excepción).
+  Durante la ejecución de la función de respaldo, el contrato solo puede depender del
+  "estipendio de gas" (2300 gas) que tiene disponible en ese momento. Esto estipendio no es suficiente para acceder
+  el almacenimiento de ningua forma. Para asegurarte que tu contrato puede recibir Ether en ese modo, verifica los
+  requerimientos de gas de la función de respaldo (por ejemplo en la sección de "details" de Remix).
+
+# TODO: continue from here.
 
 - There is a way to forward more gas to the receiving contract using
   ``addr.call.value(x)()``. This is essentially the same as ``addr.transfer(x)``,
