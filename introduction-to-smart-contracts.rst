@@ -41,7 +41,7 @@ Este contrato no hace mucho todavía (debido a la infraestructura construída po
 Ejemplo de Submoneda
 ===================
 
-El siguiente contrato va a implementar la forma más sencilla de una cryptomoneda. Se pueden generar monedas de la nada, pero sólo la persona que creó el contrato estará habilitado para hacerlo (es trivial implementar un esquema diferente de emisión). Es más, cualquiera puede enviar monedas a otros sin necesidad de registrarse con usuario y clave - sólo hace falta un par de claves Ethereum.
+El siguiente contrato va a implementar la forma más sencilla de una cryptomoneda. Se pueden generar monedas de la nada, pero sólo la persona que creó el contrato estará habilitada para hacerlo (es trivial implementar un esquema diferente de emisión). Es más, cualquiera puede enviar monedas a otros sin necesidad de registrarse con usuario y clave - sólo hace falta un par de claves Ethereum.
 
 
 ::
@@ -77,16 +77,10 @@ El siguiente contrato va a implementar la forma más sencilla de una cryptomoned
         }
     }
 
-This contract introduces some new concepts, let us go through them one by one.
+Este contrato introduce algunos conceptos nuevos que vamos a detallar uno a uno.
 
-The line ``address public minter;`` declares a state variable of type address
-that is publicly accessible. The ``address`` type is a 160-bit value
-that does not allow any arithmetic operations. It is suitable for
-storing addresses of contracts or keypairs belonging to external
-persons. The keyword ``public`` automatically generates a function that
-allows you to access the current value of the state variable.
-Without this keyword, other contracts have no way to access the variable.
-The function will look something like this::
+La línea ``address public minter;`` declara una variable de estado de tipo address (dirección) que es públicamente accesible. El tipo ``address`` es un valor de 160-bit que no permite operaciones aritméticas. Es apropiado para almacenar direcciones de contratos o pares de claves pertenecientes a personas externas. La palabra reservada ``public`` genera automáticamente una función que permite el acceso al valor actual de la variable de estado. Sin esta palabra reservada, otros contratos no tienen manera de acceder a la variable.
+Está función sería algo como esto::
 
     function minter() returns (address) { return minter; }
 
