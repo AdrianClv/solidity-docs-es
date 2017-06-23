@@ -2,9 +2,9 @@
 
 .. _installing-solidity:
 
-###################
-Installing Solidity
-###################
+####################
+Installando Solidity
+####################
 
 Versioning
 ==========
@@ -102,13 +102,13 @@ We will re-add the pre-built bottles soon.
     brew install solidity
     brew linkapps solidity
 
-If you need a specific version of Solidity you can install a 
+If you need a specific version of Solidity you can install a
 Homebrew formula directly from Github.
 
-View 
+View
 `solidity.rb commits on Github <https://github.com/ethereum/homebrew-ethereum/commits/master/solidity.rb>`_.
 
-Follow the history links until you have a raw file link of a 
+Follow the history links until you have a raw file link of a
 specific commit of ``solidity.rb``.
 
 Install it using ``brew``:
@@ -229,7 +229,7 @@ Building Solidity is quite similar on Linux, macOS and other Unices:
 or even easier:
 
 .. code:: bash
-    
+
     #note: this will install binaries solc and soltest at usr/local/bin
     ./scripts/build.sh
 
