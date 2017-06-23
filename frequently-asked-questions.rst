@@ -1,27 +1,30 @@
-###########################
-Frequently Asked Questions
-###########################
+####################
+Preguntas frequentes
+####################
 
-This list was originally compiled by `fivedogit <mailto:fivedogit@gmail.com>`_.
+Esta lista fue originalmente compilada por `fivedogit  <mailto:fivedogit@gmail.com>`_.
 
 
-***************
-Basic Questions
-***************
+*****************
+Preguntas Básicas
+*****************
 
-Example contracts
-=================
+Ejemplos de contratos
+=====================
 
 There are some `contract examples <https://github.com/fivedogit/solidity-baby-steps/tree/master/contracts/>`_ by fivedogit and
 there should be a `test contract <https://github.com/ethereum/solidity/blob/develop/test/libsolidity/SolidityEndToEndTest.cpp>`_ for every single feature of Solidity.
 
-Create and publish the most basic contract possible
-===================================================
+Crear y publicar el contrato mas simple posible
+===============================================
 
-A quite simple contract is the `greeter <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/05_greeter.sol>`_
+Un contrato bastante simple es el `greeter <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/05_greeter.sol>`_
 
-Is it possible to do something on a specific block number? (e.g. publish a contract or execute a transaction)
-=============================================================================================================
+¿Es posible hacer algo en un bloque específico? (ej. publicar un contrato o ejecutar una transaction)
+=====================================================================================================
+
+Las transacciones no están garantizadas a ejecutarse en el próximo bloque o en cualquier
+bloque futuro, ya que depende de los mineros de incluir transacciones y no del
 
 Transactions are not guaranteed to happen on the next block or any future
 specific block, since it is up to the miners to include transactions and not up
