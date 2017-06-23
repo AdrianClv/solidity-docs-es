@@ -33,17 +33,9 @@ La primera línea simplemente dice que el código fuente se ha escrito en la ver
 
 Un contrato para Solidity es una colección de código (sus *funciones*) y datos (su *estado*) que residen en una dirección específica en la blockchain de Ethereum. La línea ``uint storedData;`` declara una variable de estado llamada ``storedData`` del tipo ``uint`` (unsigned integer de 256 bits). Esta se puede entender como una parte única en una base de datos que puede ser consultada o modificada llamando a funciones del código que gestiona dicha base de datos. En el caso de Ethereum, este es siempre el contrato propietario. Y en este caso, las funciones ``set`` y ``get`` se pueden usar para modificar o consultar el valor de la variable.
 
-To access a state variable, you do not need the prefix ``this.`` as is common in
-other languages.
+Para acceder a una variable de estado, no es necesario el uso del prefijo ``this.`` como es habitual en otros lenguajes.
 
-This contract does not do much yet (due to the infrastructure
-built by Ethereum) apart from allowing anyone to store a single number that is accessible by
-anyone in the world without a (feasible) way to prevent you from publishing
-this number. Of course, anyone could just call ``set`` again with a different value
-and overwrite your number, but the number will still be stored in the history
-of the blockchain. Later, we will see how you can impose access restrictions
-so that only you can alter the number.
-
+Este contrato no hace mucho todavía (debido a la infraestructura construída por Ethereum), simplemente permite a cualquiera almacenar un número accesible para todos sin un (factible) modo de prevenir la posibilidad de publicar este número. Por supuesto, cualquiera podría simplemente hacer una llamada ``set`` de nuevo con un valor diferente y sobreescribir el número inicial, pero este número siempre permanecería almacenado en la historía de la blockchain. Más adelante, veremos como imponer restricciones de acceso de tal manera que sólo tú puedas cambiar el número.
 .. index:: ! subcurrency
 
 Subcurrency Example
