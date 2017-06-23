@@ -144,32 +144,17 @@ Ya que Solidity sólo conoce dos tipos de llamadas a una función (las internas 
 
 Una función puede especificarse como ``externa``, ``pública``, ``interna`` o ``privada``. Por defecto una función es ``pública``. Para las variables de estado, el tipo ``externa`` no es posible y el tipo por defecto es ``interna``.
 
-``externa``:
-    Funciones externas son parte de la interfaz del contrato, lo que significa que pueden llamarse desde otros contratos y vía transacciones. Una función externa ``f`` no puede llamarse internamente (por ejemplo ``f()`` no funciona, pero ``this.f()`` funciona). Las funciones externas son a veces más eficientes cuando reciben grandes matrices de datos.
+``externa``: Funciones externas son parte de la interfaz del contrato, lo que significa que pueden llamarse desde otros contratos y vía transacciones. Una función externa ``f`` no puede llamarse internamente (por ejemplo ``f()`` no funciona, pero ``this.f()`` funciona). Las funciones externas son a veces más eficientes cuando reciben grandes matrices de datos.
     
-``pública``:
-    Funciones públicas son parte de la interfaz del contrato y pueden llarmarse internamente o vía mensajes. Para las variables de estado públicas, se genera una función getter automática (ver más abajo).
+``pública``: Funciones públicas son parte de la interfaz del contrato y pueden llarmarse internamente o vía mensajes. Para las variables de estado públicas, se genera una función getter automática (ver más abajo).
 
-``interna``:
-    Those functions and state variables can only be
-    accessed internally (i.e. from within the current contract
-    or contracts deriving from it), without using ``this``.
+``interna``: Estas funciones y variables de estado sólo pueden llamarse internamente (es decir desde dentro del contrato actual o desde contratos de derivan del mismo), sin poder usarse ``this``.
 
-``private``:
-    Private functions and state variables are only
-    visible for the contract they are defined in and not in
-    derived contracts.
+``private``: Las funciones y variables de estado privadas sólo están visibles para el contrato en el que se han definido y no para contratos de derivan del mismo.
 
-.. note::
-    Everything that is inside a contract is visible to
-    all external observers. Making something ``private``
-    only prevents other contracts from accessing and modifying
-    the information, but it will still be visible to the
-    whole world outside of the blockchain.
+.. note:: Todo lo que está definido dentro de un contrato es visible para todos los observadores externos. Definir algo como ``privado`` sólo impide que otros contratos puedan acceder y modificar la información, pero esta información siempre será visible para todo el mundo, incluso fuera de la blockchain.
 
-The visibility specifier is given after the type for
-state variables and between parameter list and
-return parameter list for functions.
+Es especificador de visibilidad se pone después del tipo para las variables de estado y entre la lista de parametros y la lista de parametros que devuelven información para las funciones.
 
 ::
 
@@ -181,9 +166,7 @@ return parameter list for functions.
         uint public data;
     }
 
-In the following example, ``D``, can call ``c.getData()`` to retrieve the value of
-``data`` in state storage, but is not able to call ``f``. Contract ``E`` is derived from
-``C`` and, thus, can call ``compute``.
+En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el valor de ``data`` en el almacén de estado, pero no puede llamar a ``f``. El contrato ``E`` deriva de ``C`` y, por lo tanto, puede llamar a ``compute``.
 
 ::
 
@@ -202,10 +185,10 @@ In the following example, ``D``, can call ``c.getData()`` to retrieve the value 
     contract D {
         function readData() {
             C c = new C();
-            uint local = c.f(7); // error: member "f" is not visible
+            uint local = c.f(7); // error: el ???miembro (member) "f" no es visible
             c.setData(3);
             local = c.getData();
-            local = c.compute(3, 5); // error: member "compute" is not visible
+            local = c.compute(3, 5); // error: el ???miembro (member) "compute" no es visible
         }
     }
 
@@ -213,13 +196,13 @@ In the following example, ``D``, can call ``c.getData()`` to retrieve the value 
     contract E is C {
         function g() {
             C c = new C();
-            uint val = compute(3, 5);  // acces to internal member (from derivated to parent contract)
+            uint val = compute(3, 5);  // acceso a un miembro interno ???(from derivated to parent contract)
         }
     }
 
-.. index:: ! getter;function, ! function;getter
+.. index:: ! getter;funcion, ! funcion;getter
 
-Getter Functions
+Funciones Getter
 ================
 
 The compiler automatically creates getter functions for
