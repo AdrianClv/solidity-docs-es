@@ -12,13 +12,13 @@ para manejar tokens o, posiblemente, incluso cosas más valiosas. Además, cada
 ejecución de un contrato inteligente ocurre en público y, además de eso,
 el código fuente está a menudo disponible.
 
+Por supuesto que siempre hay que considerar cuánto está en juego:
+Puedes comparar un contrato inteligente con un servicio web abierto al
+público (y por lo tanto, también a los actores maliciosos) y tal vez incluso de código abierto.
+Si solo almacenas tu lista de la compra en ese servicio web, es posible que no tengas
+que tener demasiado cuidado, pero si gestionas tu cuenta bancaria utilizando ese servicio web,
+deberías tener más cuidado.
 
-Of course you always have to consider how much is at stake:
-You can compare a smart contract with a web service that is open to the
-public (and thus, also to malicous actors) and perhaps even open source.
-If you only store your grocery list on that web service, you might not have
-to take too much care, but if you manage your bank account using that web service,
-you should be more careful.
 
 This section will list some pitfalls and general security recommendations but
 can, of course, never be complete. Also, keep in mind that even if your
