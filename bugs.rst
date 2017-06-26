@@ -12,26 +12,26 @@ en el compilador Solidity. El archivo en sí está hosteado en el repositorio gi
 La lista comienza con la versión 0.3.0, y sólo los errores conocidos antes de esa versíon no
 están listados.
 
-Hay otro archivo llamado `bugs_by_version.json
+Hay otro archivo llamado `bugs_by_versión.json
 <https://github.com/ethereum/solidity/blob/develop/docs/bugs_by_version.json>`_,
-que puede usarse para revisar que errores afectan una versión específica del compilador.
+que puede usarse para revisar qué errores afectan una versión específica del compilador.
 
 Herramientas de verificación de código fuente y otras herramientas para contratos
-deben consultar esta lista con los suientes criterios:
+deben consultar esta lista con los siguientes criterios:
 
- - Es relativamente sospechoso que un contrato se haya compilado con una version
+ - Es relativamente sospechoso que un contrato se haya compilado con una versión
    nightly y no con una release. Esta lista no mantiene un registro de la versiones
    nightly.
- - También es sospechoso cuando un contrato fue compilado con una version que no fue
-   la máß reciente en el momento que el contrato due creado. Para contratos
+ - También es sospechoso cuando un contrato fue compilado con una versión que no fue
+   la máß reciente en el momento que el contrato fue creado. Para contratos
    creados de otros contratos, tienes que seguir la cadena de creación de
    de vuelta a una transacción y revisar la fecha de esa transacción.
  - Es muy sospechoso que un contrato haya sido compilado con un compilador que contiene
-   un erro conocido y que el contrato fue creado a un momento donde una versión del
+   un error conocido y que el contrato fue creado a un momento donde una versión del
    compilador con un fix ya tiene release.
 
 El archivo JSON es una lista de objetos, una para cada error,
-con la siguiete información:
+con la siguiente información:
 
 nombre (name)
     Nombre único asignado al error
