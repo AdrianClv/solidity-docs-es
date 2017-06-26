@@ -2,60 +2,60 @@
 
 .. _known_bugs:
 
-##################
-List of Known Bugs
-##################
+#########################
+Lista de errore conocidos
+#########################
 
-Below, you can find a JSON-formatted list of some of the known security-relevant bugs in the
-Solidity compiler. The file itself is hosted in the `Github repository
-<https://github.com/ethereum/solidity/blob/develop/docs/bugs.json>`_.
-The list stretches back as far as version 0.3.0, bugs known to be present only
-in versions preceding that are not listed.
+Abajo encontrarás una lista en formato JSON de algunos de los errores de seguridad
+en el compilador Solidity. El archivo en sí está hosteado en el repositorio github
+`<https://github.com/ethereum/solidity/blob/develop/docs/bugs.json>`_.
+La lista comienza con la versión 0.3.0, y sólo los errores conocidos antes de esa versíon no
+están listados.
 
-There is another file called `bugs_by_version.json
+Hay otro archivo llamado `bugs_by_version.json
 <https://github.com/ethereum/solidity/blob/develop/docs/bugs_by_version.json>`_,
-which can be used to check which bugs affect a specific version of the compiler.
+que puede usarse para revisar que errores afectan una versión específica del compilador.
 
-Contract source verification tools and also other tools interacting with
-contracts should consult this list according to the following criteria:
+Herramientas de verificación de código fuente y otras herramientas para contratos
+deben consultar esta lista con los suientes criterios:
 
- - It is mildly suspicious if a contract was compiled with a nightly
-   compiler version instead of a released version. This list does not keep
-   track of unreleased or nightly versions.
- - It is also mildly suspicious if a contract was compiled with a version that was
-   not the most recent at the time the contract was created. For contracts
-   created from other contracts, you have to follow the creation chain
-   back to a transaction and use the date of that transaction as creation date.
- - It is highly suspicious if a contract was compiled with a compiler that
-   contains a known bug and the contract was created at a time where a newer
-   compiler version containing a fix was already released.
+ - Es relativamente sospechoso que un contrato se haya compilado con una version
+   nightly y no con una release. Esta lista no mantiene un registro de la versiones
+   nightly.
+ - También es sospechoso cuando un contrato fue compilado con una version que no fue
+   la máß reciente en el momento que el contrato due creado. Para contratos
+   creados de otros contratos, tienes que seguir la cadena de creación de
+   de vuelta a una transacción y revisar la fecha de esa transacción.
+ - Es muy sospechoso que un contrato haya sido compilado con un compilador que contiene
+   un erro conocido y que el contrato fue creado a un momento donde una versión del
+   compilador con un fix ya tiene release.
 
-The JSON file of known bugs below is an array of objects, one for each bug,
-with the following keys:
+El archivo JSON es una lista de objetos, una para cada error,
+con la siguiete información:
 
-name
-    Unique name given to the bug
-summary
-    Short description of the bug
-description
-    Detailed description of the bug
-link
-    URL of a website with more detailed information, optional
-introduced
-    The first published compiler version that contained the bug, optional
-fixed
-    The first published compiler version that did not contain the bug anymore
-publish
-    The date at which the bug became known publicly, optional
-severity
-    Severity of the bug: low, medium, high. Takes into account
-    discoverability in contract tests, likelihood of occurrence and
-    potential damage by exploits.
-conditions
-    Conditions that have to be met to trigger the bug. Currently, this
-    is an object that can contain a boolean value ``optimizer``, which
-    means that the optimizer has to be switched on to enable the bug.
-    If no conditions are given, assume that the bug is present.
+nombre (name)
+    Nombre único asignado al error
+resumen (summary)
+    Pequeño resumen del error
+descripción (description)
+    Descripción detallada del error
+enlace (link)
+    URL de un sitio web con más información, opcional
+introducido (introduced)
+    La primera versión del compilador que contiene ese error, opcional
+corregido (fixed)
+    La primera versión del compilador que ya no contiene el error
+publicado (publish)
+    La fecha cuando el error se hizo públicamente conocido, opcional
+gravedad (severity)
+    Gravedad del error: baja, media, alta. Considera
+    la descubribilidad en tests de contratos, probabilidad de ocurrir
+    y potencial daño hecho por él.
+condiciones (conditions)
+    Condiciones que tienen que cumplirse para iniciar el error. Actualmente
+    eso es un objeto que puede contener un valor booleano ``optimizer``. que
+    significa que el optimizador tiene que ser activado para repetir el error.
+    Si ninguna condición es alcanzada, presumir que el error está presente.
 
 .. literalinclude:: bugs.json
    :language: js
