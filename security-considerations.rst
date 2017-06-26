@@ -7,10 +7,11 @@ Consideraciones de Seguridad
 Aunque normalmente es bastante fácil escribir codigo que funcione como se espera,
 es mucho más difícil comprobar que nadie lo pueda usar de una manera que **no** anticipasemos.
 
-In Solidity, this is even more important because you can use smart contracts
-to handle tokens or, possibly, even more valuable things. Furthermore, every
-execution of a smart contract happens in public and, in addition to that,
-the source code is often available.
+En Solidity, esto es aún más importante porque puedes usar contratos inteligentes
+para manejar tokens o, posiblemente, incluso cosas más valiosas. Además, cada
+ejecución de un contrato inteligente ocurre en público y, además de eso,
+el código fuente está a menudo disponible.
+
 
 Of course you always have to consider how much is at stake:
 You can compare a smart contract with a web service that is open to the
