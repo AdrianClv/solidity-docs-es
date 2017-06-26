@@ -6,19 +6,14 @@ Solidity
     :alt: Solidity logo
     :align: center
 
-Solidity is a contract-oriented, high-level language whose syntax is similar to that of JavaScript
-and it is designed to target the Ethereum Virtual Machine (EVM).
+Solidity es un lenguaje de alto nivel orientado a escribir contratos. Su sintaxis es similar a la de JavaScript y está diseñado para enfocarse a la Máquina Virtual de Etehreum (EVM).
 
-Solidity is statically typed, supports inheritance, libraries and complex
-user-defined types among other features.
+Solidity está ???tipificado(typed) de manera estática y acepta, entre otras cosas, las herencias, las librerías y tipos complejos definidos por el usuario.
 
-As you will see, it is possible to create contracts for voting,
-crowdfunding, blind auctions, multi-signature wallets and more.
+Como lo verá, es posible crear contratos para votar, para el crowdfunding, para subastas a ciegas, para monederos muti firmas, y mucho más.
 
 .. note::
-    The best way to try out Solidity right now is using
-    `Remix <https://remix.ethereum.org/>`_
-    (it can take a while to load, please be patient).
+    La mejor manera de probar Solidity ahora mismo es usando `Remix <https://remix.ethereum.org/>`_ (puede tardar un rato en cargarse, por favor sea paciente).
 
 Useful links
 ------------
