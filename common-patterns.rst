@@ -1,14 +1,14 @@
-###############
-Common Patterns
-###############
+################
+Patrones comunes
+################
 
 .. index:: withdrawal
 
 .. _withdrawal_pattern:
 
-*************************
-Withdrawal from Contracts
-*************************
+**********************
+Retiro desde Contratos
+**********************
 
 The recommended method of sending funds after an effect
 is using the withdrawal pattern. Although the most intuitive
