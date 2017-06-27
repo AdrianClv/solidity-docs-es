@@ -29,7 +29,7 @@ Ten en cuenta que existe un programa bounty de errores que cubre el generador de
 codigo fuente del compilador de Solidity.
 
 Como siempre, con la documentación de código abierto, por favor, ayúdanos a ampliar esta sección
-(sspecialmente, algunos ejemplos nos vendiran bien)!
+(especialmente, con algunos ejemplos que nos vendrian bien)!
 
 ********
 Trampas
@@ -38,11 +38,11 @@ Trampas
 Información Privada y Aleatoria
 ==================================
 
-Everything you use in a smart contract is publicly visible, even
-local variables and state variables marked ``private``.
+Todo lo que puedes utilizar en un contrato integigente es publico y visible, aunque 
+tengas variables locales y variables en estado ``privado``.
 
-Using random numbers in smart contracts is quite tricky if you do not want
-miners to be able to cheat.
+Utilizar numeros aleatorios en contratos inteligentes tienes su truco si no quieres 
+que los mineros tengan la posibilidad de hacer trampa.
 
 Re-Entrancy
 ===========
