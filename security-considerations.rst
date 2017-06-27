@@ -1,48 +1,48 @@
 .. _security_considerations:
 
 #######################
-Security Considerations
+Consideraciones de Seguridad
 #######################
 
-While it is usually quite easy to build software that works as expected,
-it is much harder to check that nobody can use it in a way that was **not** anticipated.
+Aunque normalmente es bastante fácil escribir codigo que funcione como se espera,
+es mucho más difícil comprobar que nadie lo pueda usar de una manera que **no** anticipasemos.
 
-In Solidity, this is even more important because you can use smart contracts
-to handle tokens or, possibly, even more valuable things. Furthermore, every
-execution of a smart contract happens in public and, in addition to that,
-the source code is often available.
+En Solidity, esto es aún más importante porque puedes usar contratos inteligentes
+para manejar tokens o, posiblemente, incluso cosas más valiosas. Además, cada
+ejecución de un contrato inteligente ocurre en público y, además de eso,
+el código fuente está a menudo disponible.
 
-Of course you always have to consider how much is at stake:
-You can compare a smart contract with a web service that is open to the
-public (and thus, also to malicous actors) and perhaps even open source.
-If you only store your grocery list on that web service, you might not have
-to take too much care, but if you manage your bank account using that web service,
-you should be more careful.
+Por supuesto que siempre hay que considerar cuánto está en juego:
+Puedes comparar un contrato inteligente con un servicio web abierto al
+público (y por lo tanto, también a los actores maliciosos) y tal vez incluso de código abierto.
+Si solo almacenas tu lista de la compra en ese servicio web, es posible que no tengas
+que tener demasiado cuidado, pero si gestionas tu cuenta bancaria utilizando ese servicio web,
+deberías tener más cuidado.
 
-This section will list some pitfalls and general security recommendations but
-can, of course, never be complete. Also, keep in mind that even if your
-smart contract code is bug-free, the compiler or the platform itself might
-have a bug. A list of some publicly known security-relevant bugs of the compiler
-can be found in the
-:ref:`list of known bugs<known_bugs>`, which is also machine-readable. Note
-that there is a bug bounty program that covers the code generator of the
-Solidity compiler.
+En esta sección sacaremos una lista de algunas trampas y recomendaciones generales de seguridad, pero,
+por supuesto, nunca puede ser completa. Además, ten en cuenta que incluso si el codigo de tu
+ contrato inteligente es libre de errores, el compilador o la propia plataforma puede tener un error. 
 
-As always, with open source documentation, please help us extend this section
-(especially, some examples would not hurt)!
+Una lista de algunos de los públicamente conocidos errores relevantes de seguridad del compilador, se pueden encontrar en 
+:ref:`list of known bugs<known_bugs>`, que también es legible por máquina. 
+Ten en cuenta que existe un programa bounty de errores que cubre el generador de 
+codigo fuente del compilador de Solidity.
+
+Como siempre, con la documentación de código abierto, por favor, ayúdanos a ampliar esta sección
+(especialmente, con algunos ejemplos que nos vendrian bien)!
 
 ********
-Pitfalls
+Trampas
 ********
 
-Private Information and Randomness
+Información Privada y Aleatoria
 ==================================
 
-Everything you use in a smart contract is publicly visible, even
-local variables and state variables marked ``private``.
+Todo lo que puedes utilizar en un contrato integigente es publico y visible, aunque 
+tengas variables locales y variables en estado ``privado``.
 
-Using random numbers in smart contracts is quite tricky if you do not want
-miners to be able to cheat.
+Utilizar numeros aleatorios en contratos inteligentes tienes su truco si no quieres 
+que los mineros tengan la posibilidad de hacer trampa.
 
 Re-Entrancy
 ===========
