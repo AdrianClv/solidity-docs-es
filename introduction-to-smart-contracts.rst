@@ -118,11 +118,7 @@ Es interesante como la función generada automáticamente ``balances`` es llamad
 
 .. index:: coin
 
-The special function ``Coin`` is the
-constructor which is run during creation of the contract and
-cannot be called afterwards. It permanently stores the address of the person creating the
-contract: ``msg`` (together with ``tx`` and ``block``) is a magic global variable that
-contains some properties which allow access to the blockchain. ``msg.sender`` is
+La función especial ``Coin`` es el constructor que es ejecutado durante la creación de un contrato y no puede ser llamada con posterioridad. Almacena permanentemente la dirección de la persona que crea el contrato: ``msg`` (junto con ``tx`` y ``block``) es una variable global mágica que contiene propiedades que permiten el acceso a la blockchain. ``msg.sender`` es siempre la dirección donde la función is
 always the address where the current (external) function call came from.
 
 Finally, the functions that will actually end up with the contract and can be called
