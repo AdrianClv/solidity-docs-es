@@ -19,7 +19,6 @@ Si solo almacenas tu lista de la compra en ese servicio web, es posible que no t
 que tener demasiado cuidado, pero si gestionas tu cuenta bancaria utilizando ese servicio web,
 deberías tener más cuidado.
 
-
 This section will list some pitfalls and general security recommendations but
 can, of course, never be complete. Also, keep in mind that even if your
 smart contract code is bug-free, the compiler or the platform itself might
@@ -28,6 +27,13 @@ can be found in the
 :ref:`list of known bugs<known_bugs>`, which is also machine-readable. Note
 that there is a bug bounty program that covers the code generator of the
 Solidity compiler.
+
+En esta sección sacaremos una lista de algunas trampas y recomendaciones generales de seguridad, pero,
+por supuesto, nunca puede ser completa. Además, ten en cuenta que incluso si el codigo de tu
+ contrato inteligente es libre de errores, el compilador o la propia plataforma puede tener un error. 
+
+Una lista de algunos de los públicamente conocidos errores relevantes de seguridad del compilador, se pueden encontrar en :ref:`list of known bugs<known_bugs>`, que también es legible por máquina. Ten en cuenta que existe un programa bounty de errores que cubre el generador de codigo fuente del compilador de Solidity.
+
 
 As always, with open source documentation, please help us extend this section
 (especially, some examples would not hurt)!
