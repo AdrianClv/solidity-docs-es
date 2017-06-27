@@ -88,19 +88,9 @@ Por supuesto, añadir una función exactamente como esa no funcionará porque de
 
 .. index:: mapping
 
-The next line, ``mapping (address => uint) public balances;`` also
-creates a public state variable, but it is a more complex datatype.
-The type maps addresses to unsigned integers.
-Mappings can be seen as `hash tables <https://en.wikipedia.org/wiki/Hash_table>`_ which are
-virtually initialized such that every possible key exists and is mapped to a
-value whose byte-representation is all zeros. This analogy does not go
-too far, though, as it is neither possible to obtain a list of all keys of
-a mapping, nor a list of all values. So either keep in mind (or
-better, keep a list or use a more advanced data type) what you
-added to the mapping or use it in a context where this is not needed,
-like this one. The getter function created by the ``public`` keyword
-is a bit more complex in this case. It roughly looks like the
-following::
+La siguiente línea, ``mapping (address => uint) public balances;`` también crea unavariable de estado pública, pero se trata de un tipo de datos más complejo. El tipo mapea direcciones a enteros sin signo.
+Los mapeos (Mappings) pueden ser vistos como tablas hash `hash tables <https://en.wikipedia.org/wiki/Hash_table>`_ que son virtualmente inicializadas de tal forma que cada clave candidata existe y es mapeada a un valor cuya representación en bytes es todo ceros. 
+Esta anología no va mucho más allá, ya que no es posible obtener una lista de todas las claves de un mapeo, ni tampoco una lista de todos los valores. Por eso hay que tener en cuenta (o mejor, conservar una lista o usar un tipo de datos más avanzado) lo que se añade al mapping o usarlo en un contexto donde no es necesario, como este caso. La función getter creada mediante la palabra reservada ``public`` es un poco más compleja en este caso. De forma aproximada, es algo parecido a lo siguiente::
 
     function balances(address _account) returns (uint) {
         return balances[_account];
