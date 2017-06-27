@@ -29,7 +29,7 @@ Almacenamiento
         }
     }
 
-La primera línea simplemente dice que el código fuente se ha escrito en la versión 0.4.0 de Solidity o en otra superior totalmente compatible (cualquiera anterior a la 0.5.0). Esto es para garantizar que el contrato no se va a compartar de una forma diferente con una versión más nueva del compilador. La palabra reservada ``pragma`` es llamada de esa manera porque, en general, los "pragmas" son instrucciones para el compilador que indican como este debe operar con el código fuente (p.ej.: `pragma once <https://en.wikipedia.org/wiki/Pragma_once>`_).  .
+La primera línea simplemente dice que el código fuente se ha escrito en la versión 0.4.0 de Solidity o en otra superior totalmente compatible (cualquiera anterior a la 0.5.0). Esto es para garantizar que el contrato no se va a comportar de una forma diferente con una versión más nueva del compilador. La palabra reservada ``pragma`` es llamada de esa manera porque, en general, los "pragmas" son instrucciones para el compilador que indican como este debe operar con el código fuente (p.ej.: `pragma once <https://en.wikipedia.org/wiki/Pragma_once>`_).  .
 
 Un contrato para Solidity es una colección de código (sus *funciones*) y datos (su *estado*) que residen en una dirección específica en la blockchain de Ethereum. La línea ``uint storedData;`` declara una variable de estado llamada ``storedData`` del tipo ``uint`` (unsigned integer de 256 bits). Esta se puede entender como una parte única en una base de datos que puede ser consultada o modificada llamando a funciones del código que gestiona dicha base de datos. En el caso de Ethereum, este es siempre el contrato propietario. Y en este caso, las funciones ``set`` y ``get`` se pueden usar para modificar o consultar el valor de la variable.
 
@@ -39,9 +39,9 @@ Este contrato no hace mucho todavía (debido a la infraestructura construída po
 .. index:: ! submoneda
 
 Ejemplo de Submoneda
-===================
+====================
 
-El siguiente contrato va a implementar la forma más sencilla de una cryptomoneda. Se pueden generar monedas de la nada, pero sólo la persona que creó el contrato estará habilitada para hacerlo (es trivial implementar un esquema diferente de emisión). Es más, cualquiera puede enviar monedas a otros sin necesidad de registrarse con usuario y clave - sólo hace falta un par de claves Ethereum.
+El siguiente contrato va a implementar la forma más sencilla de una criptomoneda. Se pueden generar monedas de la nada, pero sólo la persona que creó el contrato estará habilitada para hacerlo (es trivial implementar un esquema diferente de emisión). Es más, cualquiera puede enviar monedas a otros sin necesidad de registrarse con usuario y clave - sólo hace falta un par de claves Ethereum.
 
 
 ::
@@ -88,7 +88,7 @@ Por supuesto, añadir una función exactamente como esa no funcionará porque de
 
 .. index:: mapping
 
-La siguiente línea, ``mapping (address => uint) public balances;`` también crea unavariable de estado pública, pero se trata de un tipo de datos más complejo. El tipo mapea direcciones a enteros sin signo.
+La siguiente línea, ``mapping (address => uint) public balances;`` también crea una variable de estado pública, pero se trata de un tipo de datos más complejo. El tipo mapea direcciones a enteros sin signo.
 Los mapeos (Mappings) pueden ser vistos como tablas hash `hash tables <https://en.wikipedia.org/wiki/Hash_table>`_ que son virtualmente inicializadas de tal forma que cada clave candidata existe y es mapeada a un valor cuya representación en bytes es todo ceros. 
 Esta anología no va mucho más allá, ya que no es posible obtener una lista de todas las claves de un mapeo, ni tampoco una lista de todos los valores. Por eso hay que tener en cuenta (o mejor, conservar una lista o usar un tipo de datos más avanzado) lo que se añade al mapping o usarlo en un contexto donde no es necesario, como este caso. La función getter creada mediante la palabra reservada ``public`` es un poco más compleja en este caso. De forma aproximada, es algo parecido a lo siguiente::
 
@@ -96,18 +96,12 @@ Esta anología no va mucho más allá, ya que no es posible obtener una lista de
         return balances[_account];
     }
 
-As you see, you can use this function to easily query the balance of a
-single account.
+Como se puede ver, se puede usar esta función para, de forma sencilla, consultar el balance de una única cuenta.
 
 .. index:: event
 
-The line ``event Sent(address from, address to, uint amount);`` declares
-a so-called "event" which is fired in the last line of the function
-``send``. User interfaces (as well as server applications of course) can
-listen for those events being fired on the blockchain without much
-cost. As soon as it is fired, the listener will also receive the
-arguments ``from``, ``to`` and ``amount``, which makes it easy to track
-transactions. In order to listen for this event, you would use ::
+La línea ``event Sent(address from, address to, uint amount);`` declara un evento que es disparado en la última línea de la ejecución 
+``send``. Las interfaces de ususario (como las de servidor, por supuesto) pueden escuchar esos eventos que están siendo disparados en la blockchain sin mucho coste. Tan pronto son disparados, el listener tambiñen recibirá los argumentos ``from``, ``to`` y ``amount``, que hacen más fácil trazar las transacciones. Con el fin de escuchar este evento, se podría usar ::
 
     Coin.Sent().watch({}, '', function(error, result) {
         if (!error) {
@@ -120,8 +114,7 @@ transactions. In order to listen for this event, you would use ::
         }
     })
 
-Note how the automatically generated function ``balances`` is called from
-the user interface.
+Es interesante como la función generada automáticamente ``balances`` es llamada desde la interfaz de usuario.
 
 .. index:: coin
 
