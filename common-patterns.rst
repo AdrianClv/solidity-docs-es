@@ -198,44 +198,44 @@ hace estas restricciones altamente lisibles.
             costs(200 ether)
         {
             owner = _newOwner;
-            // just some example condition
+            // sólo una condición de ejemplo
             if (uint(owner) & 0 == 1)
-                // This did not refund for Solidity
-                // before version 0.4.0.
+                // Esto no se hacía antes de Solidity
+                // 0.4.0
                 return;
-            // refund overpaid fees
+            // reembolsar los fees excesivos
         }
     }
 
-A more specialised way in which access to function
-calls can be restricted will be discussed
-in the next example.
+Una manera más especializada de acceder a funciones
+que pueden ser restringidas será visto en el próximo
+ejemplo.
 
 .. index:: state machine
 
-*************
-State Machine
-*************
+*****************
+Máquina de Estado
+*****************
 
-Contracts often act as a state machine, which means
-that they have certain **stages** in which they behave
-differently or in which different functions can
-be called. A function call often ends a stage
-and transitions the contract into the next stage
-(especially if the contract models **interaction**).
-It is also common that some stages are automatically
-reached at a certain point in **time**.
+Los contratos a menudo actúan como una máquina de estado,
+que significa que tienen ciertas **etapas** en donde se
+comportan de manera diferente o en donde distintas funciones
+pueden ser llamadas. Una llamada de función a menudo
+termina una estapa y pasa el contrato a la siguiente
+etapa (especialmente si el contrato modela **interaction**).
+También es común que algunas etapas sera automaticamente
+alcanzadas a cierto punto en el **tiempo**.
 
-An example for this is a blind auction contract which
-starts in the stage "accepting blinded bids", then
-transitions to "revealing bids" which is ended by
-"determine auction outcome".
+Como un ejemplo de esto es el contrao ciego de contrato
+que comienza en la etapa "aceptando ofertas ciegas", luego
+pasa a "revelando ofertas" que es finalizado por
+"determinar resultado de subasta".
 
 .. index:: function;modifier
 
-Function modifiers can be used in this situation
-to model the states and guard against
-incorrect usage of the contract.
+Modificadores de funciónes pueden ser usado en esta
+situación para modelar los estados y cuidar
+el uso incorrecto del contrato.
 
 Example
 =======
