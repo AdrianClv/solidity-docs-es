@@ -1,5 +1,5 @@
 ################
-Patrones comunes
+Patrones Comunes
 ################
 
 .. index:: withdrawal
@@ -9,6 +9,10 @@ Patrones comunes
 **********************
 Retiro desde Contratos
 **********************
+
+El método recomendado de envío de fondos después de un efecto
+es usando el patrón de retiro (withdrawal pattern). Aunque el método
+más intuitivo
 
 The recommended method of sending funds after an effect
 is using the withdrawal pattern. Although the most intuitive
