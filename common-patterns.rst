@@ -12,23 +12,18 @@ Retiro desde Contratos
 
 El método recomendado de envío de fondos después de un efecto
 es usando el patrón de retiro (withdrawal pattern). Aunque el método
-más intuitivo
+más intuitivo de envío de Ether, del resultado de un efecto, es
+un llamado directo de ``send``, esto no es recomendado ya que
+introduce un potencial riesgo de seguridad. Puedes leer más
+de esto en la página :ref:`security_considerations`.
 
-The recommended method of sending funds after an effect
-is using the withdrawal pattern. Although the most intuitive
-method of sending Ether, as a result of an effect, is a
-direct ``send`` call, this is not recommended as it
-introduces a potential security risk. You may read
-more about this on the :ref:`security_considerations` page.
-
-This is an example of the withdrawal pattern in practice in
-a contract where the goal is to send the most money to the
-contract in order to become the "richest", inspired by
+Este es un ejemplo del patrón de retiro in práctica en un
+contrato donde el objetivo es enviar la mayor cantidad del Ether
+al contrato a fin de convertirse en el mas "adinerado", inspirado por
 `King of the Ether <https://www.kingoftheether.com/>`_.
 
-In the following contract, if you are usurped as the richest,
-you will receive the funds of the person who has gone on to
-become the new richest.
+En el siguiente contrato, si dejas de ser el más adinerado,
+recibes los fondos de la persona quien te destronó.
 
 ::
 
@@ -65,7 +60,7 @@ become the new richest.
         }
     }
 
-This is as opposed to the more intuitive sending pattern:
+Esto en lugar de el patrón mas intuitivo de envío:
 
 ::
 
@@ -82,7 +77,7 @@ This is as opposed to the more intuitive sending pattern:
 
         function becomeRichest() payable returns (bool) {
             if (msg.value > mostSent) {
-                // This line can cause problems (explained below).
+                // Esta línea puede causar problemas (explicado abajo).
                 richest.transfer(msg.value);
                 richest = msg.sender;
                 mostSent = msg.value;
@@ -92,6 +87,9 @@ This is as opposed to the more intuitive sending pattern:
             }
         }
     }
+
+Nótese que, en este ejemplo, un atacante puede atrapar
+en un estado inútil
 
 Notice that, in this example, an attacker could trap the
 contract into an unusable state by causing ``richest`` to be
