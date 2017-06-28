@@ -132,29 +132,30 @@ hace estas restricciones altamente lisibles.
     pragma solidity ^0.4.11;
 
     contract AccessRestriction {
-        // These will be assigned at the construction
-        // phase, where `msg.sender` is the account
-        // creating this contract.
+        // Estas serán asignadas en la fase de
+        // construcción, donde `msg.sender` es
+        // el account que crea este contrato.
         address public owner = msg.sender;
         uint public creationTime = now;
 
-        // Modifiers can be used to change
-        // the body of a function.
-        // If this modifier is used, it will
-        // prepend a check that only passes
-        // if the function is called from
-        // a certain address.
+        // Modificadores pueden usarse para
+        // cambiar el cuerpo de una función.
+        // Si el modificador es usado, agregará
+        // un chequeo que sólo pasa si la
+        // función es llamada desde una cierta
+        // dirección.
         modifier onlyBy(address _account)
         {
             require(msg.sender == _account);
-            // Do not forget the "_;"! It will
-            // be replaced by the actual function
-            // body when the modifier is used.
+            // No olvides el "_;"!
+            // Esto será remplazado por el cuerpo
+            // de la función cuando el modificador
+            // será activado.
             _;
         }
 
-        /// Make `_newOwner` the new owner of this
-        /// contract.
+        /// Hacer `_newOwner` el nuevo owner de
+        /// este contrato.
         function changeOwner(address _newOwner)
             onlyBy(owner)
         {
@@ -166,9 +167,10 @@ hace estas restricciones altamente lisibles.
             _;
         }
 
-        /// Erase ownership information.
-        /// May only be called 6 weeks after
-        /// the contract has been created.
+        /// Borrar información de ownership.
+        /// Sólo puede llamarse 6 semanas
+        /// después que el contrato hay sido
+        /// creado.
         function disown()
             onlyBy(owner)
             onlyAfter(creationTime + 6 weeks)
@@ -176,12 +178,15 @@ hace estas restricciones altamente lisibles.
             delete owner;
         }
 
-        // This modifier requires a certain
-        // fee being associated with a function call.
-        // If the caller sent too much, he or she is
-        // refunded, but only after the function body.
-        // This was dangerous before Solidity version 0.4.0,
-        // where it was possible to skip the part after `_;`.
+        // Este modificador requiere un cierto pago
+        // de fee que sea asociado con una llamada
+        // de función.
+        // Si el llamador envió demasiado, será
+        // reebolsado, pero sólo depués del cuerpo
+        // de la función.
+        // Esto era peligroso antes de la versión
+        // 0.4.0 de solidity, donde era posible
+        // de saltar la parte después de `_;`.
         modifier costs(uint _amount) {
             require(msg.value >= _amount);
             _;
