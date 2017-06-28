@@ -88,47 +88,44 @@ Esto en lugar de el patrón mas intuitivo de envío:
         }
     }
 
-Nótese que, en este ejemplo, un atacante puede atrapar
-en un estado inútil
+Nótese que, en este ejemplo, un atacante puede bloquear
+el contrato en un estado inútil haciendo que ``richest``
+sea la dirección de un contrato que tiene como función una
+respaldo (ej. usando ``revert()`` o solo consumiendo más de
+2300 estipendio de gas). De esa forma, cuando ``transfer``
+es llamado para enviar fondos al contrato "envenenado", fallará
+y también fallará la función ``becomeRichest``, bloqueando el
+contraro para siempre.
 
-Notice that, in this example, an attacker could trap the
-contract into an unusable state by causing ``richest`` to be
-the address of a contract that has a fallback function
-which fails (e.g. by using ``revert()`` or by just
-conssuming more than the 2300 gas stipend). That way,
-whenever ``transfer`` is called to deliver funds to the
-"poisoned" contract, it will fail and thus also ``becomeRichest``
-will fail, with the contract being stuck forever.
-
-In contrast, if you use the "withdraw" pattern from the first example,
-the attacker can only cause his or her own withdraw to fail and not the
-rest of the contract's workings.
+Por el contraro, si usas el patrón "withdrawl" del primer ejemplo,
+el ataquante sólo puede causar que su propio withdrawl falle y no
+el resto del contrato.
 
 .. index:: access;restricting
 
-******************
-Restricting Access
-******************
+********************
+Restringiendo Acceso
+********************
 
-Restricting access is a common pattern for contracts.
-Note that you can never restrict any human or computer
-from reading the content of your transactions or
-your contract's state. You can make it a bit harder
-by using encryption, but if your contract is supposed
-to read the data, so will everyone else.
+Restringiendo acceso es un patrón común para contratos.
+Nótese que nunca se puede restringir un humano o ordenador
+de leer el contenido de una transacción o del estado de un
+contrato. Lo puedes hacer un poco más difícil de leer usando
+criptografía, pero si tu contrato debe leer los datos, todos
+podrán leerlo también.
 
-You can restrict read access to your contract's state
-by **other contracts**. That is actually the default
-unless you declare make your state variables ``public``.
+Puedes restringir acceso de lectura al estado de tu contrato
+por **otros contratos**. Esto es, en realidad, por defecto
+al menos que declares tus variables ``public``.
 
-Furthermore, you can restrict who can make modifications
-to your contract's state or call your contract's
-functions and this is what this page is about.
+Además, puedes restringir quien puede hacer modificaciones
+al estado de tu contrado o quien puede llamar las funciones
+y de eso se trata esta sección.
 
 .. index:: function;modifier
 
-The use of **function modifiers** makes these
-restrictions highly readable.
+El uso de **modificadores de funciones** (function modifiers)
+hace estas restricciones altamente lisibles.
 
 ::
 
