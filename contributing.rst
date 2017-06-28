@@ -34,7 +34,7 @@ reportes un issue, por favor menciona los siguientes detalles:
 * Cuál fue el resultado esperado
 
 Reducir el código fuente que causó el issue a lo mínimo es siempre muy
-útil y aveces incluso aclara un malentendido.
+útil y a veces incluso aclara un malentendido.
 
 Flujo de trabajo para Pull Requests
 ===================================
@@ -50,9 +50,9 @@ en lugar de ``git rebase`` para tu rama.
 Adicionalmente, si estás escribiendo una nueva funcionalidad, porfavor asegúrate de
 hacer tests unitarios Boost y ponerlos en ``test/``.
 
-Sin embargo, si estás haciendo cambios mas grandes, consulta con el canal Gitter primero.
+Sin embargo, si estás haciendo cambios más grandes, consulta con el canal Gitter primero.
 
-Finalmente, siempre asegúrate de respectar los `estándares de coding
+Finalmente, siempre asegúrate de respetar los `estándares de coding
 <https://raw.githubusercontent.com/ethereum/cpp-ethereum/develop/CodingStandards.txt>`_
 de este proyecto. También, aunque hacemos testing CI, hace tests de tu código y asegúrate que
 puedas hacer un build localmente antes de enviar un pull request.
@@ -69,7 +69,7 @@ Para correr ``cpp-ethereum`` en modo test: ``eth --test -d /tmp/testeth``.
 
 Para lanzar los tests: ``soltest -- --ipcpath /tmp/testeth/geth.ipc``.
 
-Para correr un subconjunto de los tests, se puden usar filtros:
+Para correr un subconjunto de los tests, se pueden usar filtros:
 ``soltest -t TestSuite/TestName -- --ipcpath /tmp/testeth/geth.ipc``, donde ``TestName`` puede ser un comodín ``*``.
 
 Alternativamente, hay un script de testing en ``scripts/test.sh`` que ejecuta todos los tests.
