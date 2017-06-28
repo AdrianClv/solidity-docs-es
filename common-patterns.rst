@@ -237,39 +237,40 @@ Modificadores de funciónes pueden ser usado en esta
 situación para modelar los estados y cuidar
 el uso incorrecto del contrato.
 
-Example
+Ejemplo
 =======
 
-In the following example,
-the modifier ``atStage`` ensures that the function can
-only be called at a certain stage.
+En el siguiente ejemplo,
+el modificador ``atStage`` asegura que la función
+pueda sólo ser llamada desde una cierta etapa.
 
-Automatic timed transitions
-are handled by the modifier ``timeTransitions``, which
-should be used for all functions.
+Trancisiones automáticas temporizadas son manejadas
+por el modificador ``timeTransitions``, quien
+debe usarse para toas las funciones.
 
-.. note::
-    **Modifier Order Matters**.
-    If atStage is combined
-    with timedTransitions, make sure that you mention
-    it after the latter, so that the new stage is
-    taken into account.
+.. nota::
+    **EL Ordén del Modificador Importa**.
+    Si atStage es combinado
+    con timesTransitions, asegúrate que puedas
+    mencionarlo después de éste, para que la nueva
+    etapa sea tomada en cuenta.
 
-Finally, the modifier ``transitionNext`` can be used
-to automatically go to the next stage when the
-function finishes.
+Finalmente, el modificador ``transitionNext`` puede
+ser usado automaticamente para ir a la próxima etapa
+cuando la función termina.
 
-.. note::
-    **Modifier May be Skipped**.
-    This only applies to Solidity before version 0.4.0:
-    Since modifiers are applied by simply replacing
-    code and not by using a function call,
-    the code in the transitionNext modifier
-    can be skipped if the function itself uses
-    return. If you want to do that, make sure
-    to call nextStage manually from those functions.
-    Starting with version 0.4.0, modifier code
-    will run even if the function explicitly returns.
+.. nota::
+    **El Modificador Puede Ser Omitido**.
+    Esto sólo se aplica a Solidity antes de la versión
+    0.4.0:
+    Ya que los modificadores son aplicados simplemente
+    remplazando código y no usando llamados de funciones,
+    el código puede ser omitido si la función en sí usa
+    return. Si es lo que quieres hacer, asegúrate
+    de llamar nextStage manualmente desde esas funciones.
+    Comenzando con la versión 0.4.0 ,modificar código
+    correrá incluso si la función explícitamente
+    retorna.
 
 ::
 
@@ -284,7 +285,7 @@ function finishes.
             Finished
         }
 
-        // This is the current stage.
+        // Ésta es la etapa actual.
         Stages public stage = Stages.AcceptingBlindedBids;
 
         uint public creationTime = now;
@@ -298,9 +299,9 @@ function finishes.
             stage = Stages(uint(stage) + 1);
         }
 
-        // Perform timed transitions. Be sure to mention
-        // this modifier first, otherwise the guards
-        // will not take the new stage into account.
+        // Hacer transiciones temporizadas. Asegúrate de
+        // mencionar este modificador primero, si no, la
+        // seguridad no tomará en cuenta la nueva etapa.
         modifier timedTransitions() {
             if (stage == Stages.AcceptingBlindedBids &&
                         now >= creationTime + 10 days)
@@ -308,17 +309,17 @@ function finishes.
             if (stage == Stages.RevealBids &&
                     now >= creationTime + 12 days)
                 nextStage();
-            // The other stages transition by transaction
+            // Las otras etapas transición por transición
             _;
         }
 
-        // Order of the modifiers matters here!
+        // ¡El orden de los modificadores importa aquí!
         function bid()
             payable
             timedTransitions
             atStage(Stages.AcceptingBlindedBids)
         {
-            // We will not implement that here
+            // No impmlementaremos eso aquí
         }
 
         function reveal()
@@ -327,8 +328,8 @@ function finishes.
         {
         }
 
-        // This modifier goes to the next stage
-        // after the function is done.
+        // Este modificador pasa a la próxima etapa
+        // una vez terminada la función.
         modifier transitionNext()
         {
             _;
