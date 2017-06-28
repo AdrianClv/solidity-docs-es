@@ -19,7 +19,7 @@ de esto en la página :ref:`security_considerations`.
 
 Este es un ejemplo del patrón de retiro in práctica en un
 contrato donde el objetivo es enviar la mayor cantidad del Ether
-al contrato a fin de convertirse en el mas "adinerado", inspirado por
+al contrato a fin de convertirse en el más "adinerado", inspirado por
 `King of the Ether <https://www.kingoftheether.com/>`_.
 
 En el siguiente contrato, si dejas de ser el más adinerado,
@@ -60,7 +60,7 @@ recibes los fondos de la persona quien te destronó.
         }
     }
 
-Esto en lugar de el patrón mas intuitivo de envío:
+Esto en lugar de el patrón más intuitivo de envío:
 
 ::
 
@@ -95,10 +95,10 @@ respaldo (ej. usando ``revert()`` o solo consumiendo más de
 2300 estipendio de gas). De esa forma, cuando ``transfer``
 es llamado para enviar fondos al contrato "envenenado", fallará
 y también fallará la función ``becomeRichest``, bloqueando el
-contraro para siempre.
+contrario para siempre.
 
-Por el contraro, si usas el patrón "withdrawl" del primer ejemplo,
-el ataquante sólo puede causar que su propio withdrawl falle y no
+Por el contrario, si usas el patrón "withdrawl" del primer ejemplo,
+el atacante sólo puede causar que su propio withdrawl falle y no
 el resto del contrato.
 
 .. index:: access;restricting
@@ -118,8 +118,8 @@ Puedes restringir acceso de lectura al estado de tu contrato
 por **otros contratos**. Esto es, en realidad, por defecto
 al menos que declares tus variables ``public``.
 
-Además, puedes restringir quien puede hacer modificaciones
-al estado de tu contrado o quien puede llamar las funciones
+Además, puedes restringir quién puede hacer modificaciones
+al estado de tu contrato o quien puede llamar las funciones
 y de eso se trata esta sección.
 
 .. index:: function;modifier
@@ -148,7 +148,7 @@ hace estas restricciones altamente lisibles.
         {
             require(msg.sender == _account);
             // No olvides el "_;"!
-            // Esto será remplazado por el cuerpo
+            // Esto será reemplazado por el cuerpo
             // de la función cuando el modificador
             // será activado.
             _;
@@ -182,7 +182,7 @@ hace estas restricciones altamente lisibles.
         // de fee que sea asociado con una llamada
         // de función.
         // Si el llamador envió demasiado, será
-        // reebolsado, pero sólo depués del cuerpo
+        // reembolsado, pero sólo después del cuerpo
         // de la función.
         // Esto era peligroso antes de la versión
         // 0.4.0 de solidity, donde era posible
@@ -221,19 +221,19 @@ Los contratos a menudo actúan como una máquina de estado,
 que significa que tienen ciertas **etapas** en donde se
 comportan de manera diferente o en donde distintas funciones
 pueden ser llamadas. Una llamada de función a menudo
-termina una estapa y pasa el contrato a la siguiente
+termina una etapa y pasa el contrato a la siguiente
 etapa (especialmente si el contrato modela **interaction**).
-También es común que algunas etapas sera automaticamente
+También es común que algunas etapas será automáticamente
 alcanzadas a cierto punto en el **tiempo**.
 
-Como un ejemplo de esto es el contrao ciego de contrato
+Como un ejemplo de esto es el contrato ciego de contrato
 que comienza en la etapa "aceptando ofertas ciegas", luego
 pasa a "revelando ofertas" que es finalizado por
 "determinar resultado de subasta".
 
 .. index:: function;modifier
 
-Modificadores de funciónes pueden ser usado en esta
+Modificadores de funciones pueden ser usado en esta
 situación para modelar los estados y cuidar
 el uso incorrecto del contrato.
 
@@ -244,7 +244,7 @@ En el siguiente ejemplo,
 el modificador ``atStage`` asegura que la función
 pueda sólo ser llamada desde una cierta etapa.
 
-Trancisiones automáticas temporizadas son manejadas
+Transiciones automáticas temporizadas son manejadas
 por el modificador ``timeTransitions``, quien
 debe usarse para toas las funciones.
 
@@ -256,7 +256,7 @@ debe usarse para toas las funciones.
     etapa sea tomada en cuenta.
 
 Finalmente, el modificador ``transitionNext`` puede
-ser usado automaticamente para ir a la próxima etapa
+ser usado automáticamente para ir a la próxima etapa
 cuando la función termina.
 
 .. nota::
@@ -319,7 +319,7 @@ cuando la función termina.
             timedTransitions
             atStage(Stages.AcceptingBlindedBids)
         {
-            // No impmlementaremos eso aquí
+            // No implementaremos esto aquí
         }
 
         function reveal()
