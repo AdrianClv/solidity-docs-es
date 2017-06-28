@@ -3,7 +3,7 @@
 .. _types:
 
 *****
-Types
+Tipos
 *****
 
 Solidity is a statically typed language, which means that the type of each
@@ -404,7 +404,7 @@ Example that shows how to use internal function types::
         }
       }
     }
-    
+
     contract Pyramid {
       using ArrayUtils for *;
       function pyramid(uint l) returns (uint) {
@@ -938,4 +938,3 @@ parameters or return parameters.
     the loop in the following snippet is infinite, as ``i`` will have the type
     ``uint8`` and any value of this type is smaller than ``2000``.
     ``for (var i = 0; i < 2000; i++) { ... }``
-
