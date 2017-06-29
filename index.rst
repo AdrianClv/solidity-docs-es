@@ -6,17 +6,17 @@ Solidity
     :alt: Solidity logo
     :align: center
 
-Solidity es un lenguaje de alto nivel orientado a escribir contratos. Su sintaxis es similar a la de JavaScript y está diseñado para enfocarse a la Máquina Virtual de Etehreum (EVM).
+Solidity es un lenguaje de alto nivel orientado a contratos. Su sintaxis es similar a la de JavaScript y está enfocado especificamente a la Máquina Virtual de Etehreum (EVM).
 
-Solidity está ???tipificado(typed) de manera estática y acepta, entre otras cosas, las herencias, las librerías y tipos complejos definidos por el usuario.
+Solidity está ???tipificado(typed) de manera estática y acepta, entre otras cosas, herencias, librerías y tipos complejos definidos por el usuario.
 
 Como lo verá, es posible crear contratos para votar, para el crowdfunding, para subastas a ciegas, para monederos muti firmas, y mucho más.
 
 .. note::
     La mejor manera de probar Solidity ahora mismo es usando `Remix <https://remix.ethereum.org/>`_ (puede tardar un rato en cargarse, por favor sea paciente).
 
-Useful links
-------------
+Enlaces útiles
+--------------
 
 * `Ethereum <https://ethereum.org>`_
 
@@ -30,10 +30,11 @@ Useful links
 
 * `Gitter Chat <https://gitter.im/ethereum/solidity/>`_
 
-Available Solidity Integrations
--------------------------------
+Integraciones disponibles para Solidity
+---------------------------------------
 
 * `Remix <https://remix.ethereum.org/>`_
+    
     Browser-based IDE with integrated compiler and Solidity runtime environment without server-side components.
 
 * `Ethereum Studio <https://live.ether.camp/>`_
