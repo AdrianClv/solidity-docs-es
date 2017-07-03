@@ -85,21 +85,21 @@ Si un contrato quiere crear otros contrato, el creador del código fuente (y el 
         }
 
         function changeName(bytes32 newName) {
-            // Only the creator can alter the name --
-            // the comparison is possible since contracts
-            // are implicitly convertible to addresses.
+            // Solo el creador puede modificar el nombre --
+            // la comparación es posible ya que los contratos 
+            // se pueden implicitamente convertir a direcciones.
             if (msg.sender == address(creator))
                 name = newName;
         }
 
         function transfer(address newOwner) {
-            // Only the current owner can transfer the token.
+            // Solo el creador actual puede transferir el token.
             if (msg.sender != owner) return;
-            // We also want to ask the creator if the transfer
-            // is fine. Note that this calls a function of the
-            // contract defined below. If the call fails (e.g.
-            // due to out-of-gas), the execution here stops
-            // immediately.
+            // También vamos a querer preguntar al creador 
+            // si la transferencia ha salido bien. Note que esto
+            // tiene como efecto llamar a una función del contrato 
+            // que está definido más abajo. Si la llamada no funciona
+            // (p.ej si no queda gas), la ejecución para aquí inmediatamente.
             if (creator.isTokenTransferOK(owner, newOwner))
                 owner = newOwner;
         }
@@ -109,16 +109,16 @@ Si un contrato quiere crear otros contrato, el creador del código fuente (y el 
         function createToken(bytes32 name)
            returns (OwnedToken tokenAddress)
         {
-            // Create a new Token contract and return its address.
-            // From the JavaScript side, the return type is simply
-            // "address", as this is the closest type available in
-            // the ABI.
+            // Crea un contrato para crear un nuevo Token.
+            // Del lado de JavaScript, el tipo que se nos devuelve
+            // simplemente es la dirección ("address"), ya que ese
+            // es el tipo más cerca disponible en el ABI.
             return new OwnedToken(name);
         }
 
         function changeName(OwnedToken tokenAddress, bytes32 name) {
-            // Again, the external type of "tokenAddress" is
-            // simply "address".
+            // De nuevo, el tipo externo de "tokenAddress" 
+            // simplemente es "address".
             tokenAddress.changeName(name);
         }
 
@@ -126,7 +126,7 @@ Si un contrato quiere crear otros contrato, el creador del código fuente (y el 
             address currentOwner,
             address newOwner
         ) returns (bool ok) {
-            // Check some arbitrary condition.
+            // Verifica un condición arbitraria
             address tokenAddress = msg.sender;
             return (keccak256(newOwner) & 0xff) == (bytes20(tokenAddress) & 0xff);
         }
