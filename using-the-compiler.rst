@@ -9,9 +9,10 @@ Uso del Compilador
 Utilizar el Compilador de Línea de Comandos
 ******************************
 
-One of the build targets of the Solidity repository is ``solc``, the solidity commandline compiler.
-Using ``solc --help`` provides you with an explanation of all options. The compiler can produce various outputs, ranging from simple binaries and assembly over an abstract syntax tree (parse tree) to estimations of gas usage.
-If you only want to compile a single file, you run it as ``solc --bin sourceFile.sol`` and it will print the binary. Before you deploy your contract, activate the optimizer while compiling using ``solc --optimize --bin sourceFile.sol``. If you want to get some of the more advanced output variants of ``solc``, it is probably better to tell it to output everything to separate files using ``solc -o outputDirectory --bin --ast --asm sourceFile.sol``.
+Uno de los objetivos de compilación del repositorio de Solidity es ``solc``, el compilador de línea de comandos de solidity.
+
+Utilizando ``solc --help`` proporciona una explicación de todas las opciones. El compilador puede producir varias salidas, desde binarios simples y ensamblaje sobre un árbol de sintaxis abstracto (árbol de análisis) hasta estimaciones de uso de gas.
+Si sólo deseas compilar un único archivo, lo ejecutas como ``solc --bin sourceFile.sol`` y se imprimirá el binario. Antes de implementar tu contrato, activa el optimizador mientras compilas usando ``solc --optimize --bin sourceFile.sol``. Si deseas obtener algunas de las variantes de salida más avanzadas de ``solc``, probablemente sea mejor decirle que salga todo por ficheros separados usando``solc -o outputDirectory --bin --ast --asm sourceFile.sol``.
 
 The commandline compiler will automatically read imported files from the filesystem, but
 it is also possible to provide path redirects using ``prefix=path`` in the following way:
