@@ -1,5 +1,5 @@
 ******************
-Using the compiler
+Uso del Compilador
 ******************
 
 .. index:: ! commandline compiler, compiler;commandline, ! solc, ! linker
