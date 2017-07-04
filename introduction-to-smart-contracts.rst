@@ -142,30 +142,18 @@ Como un ejemplo, imagine una tabla que lista los balances de todas las cuentas e
 
 Yendo más allá, una transacción es siempre firmada criptográficamente por el remitente (creador). Esto la hace más robusta para garantizar el acceso a modificaciones específicas de la base de datos. En el ejemplo de divisas electrónicas, un simple chequeo asegura que sólo la persona que posee las claves de la cuenta puede transferir dinero desde ella.
 
-.. index:: ! block
+.. index:: ! bloque
 
-Blocks
-======
+Bloques
+=======
 
-One major obstacle to overcome is what, in Bitcoin terms, is called a "double-spend attack":
-What happens if two transactions exist in the network that both want to empty an account,
-a so-called conflict?
+Un obstáculo mayor que sobrepasar es el que, en términos de Bitcoin, es llamado un ataque de "doble gasto": ¿qué ocurre si dos transacciones existentes en la red quieren borrar una cuenta?, ¿un conflicto?.
 
-The abstract answer to this is that you do not have to care. An order of the transactions
-will be selected for you, the transactions will be bundled into what is called a "block"
-and then they will be executed and distributed among all participating nodes.
-If two transactions contradict each other, the one that ends up being second will
-be rejected and not become part of the block.
+La respuesta abstracta a esto es que no tienes de qué preocuparte. Un orden para estas transacciones será seleccitonado por tí, las transacciones se aglutinarán en lo que es llamado "bloque" y entonces serán ejecutadas y distribuídas entre todos los nodos participantes. Si dos transacciones se contradicen, la que concluye en segundo lugar será rechazada y no formará parte del bloque.
 
-These blocks form a linear sequence in time and that is where the word "blockchain"
-derives from. Blocks are added to the chain in rather regular intervals - for
-Ethereum this is roughly every 17 seconds.
+Estos bloques forman una secuencia lineal en el tiempo y del que viene la palabra cadema de bloques o "blockchain". Los bloques son añadidos a la cadena en intervalos regulares - para Ethereum esto viene a significar cada 17 segundos.
 
-As part of the "order selection mechanism" (which is called "mining") it may happen that
-blocks are reverted from time to time, but only at the "tip" of the chain. The more
-blocks that are added on top, the less likely it is. So it might be that your transactions
-are reverted and even removed from the blockchain, but the longer you wait, the less
-likely it will be.
+Como parte del "mecanismo de selcción de orden" (que se conoce como minería), tiene que pasar que los bloques sean revertidos de cuando en cuando, pero sólo en el extremo o "tip" de la cadena. Cuanto más bloques se añaden encima, menos problable es. Entonces, sucedería que tus transacciones sean revertidas e incluso borradas de la blockchain, y cuanto más esperes, menos problable será.
 
 
 .. _the-ethereum-virtual-machine:
