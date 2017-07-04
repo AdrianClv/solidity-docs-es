@@ -6,7 +6,7 @@ Uso del Compilador
 
 .. _commandline-compiler:
 
-Using the Commandline Compiler
+Utilizar el Compilador de Línea de Comandos
 ******************************
 
 One of the build targets of the Solidity repository is ``solc``, the solidity commandline compiler.
