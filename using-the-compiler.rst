@@ -14,8 +14,7 @@ Uno de los objetivos de compilación del repositorio de Solidity es ``solc``, el
 Utilizando ``solc --help`` proporciona una explicación de todas las opciones. El compilador puede producir varias salidas, desde binarios simples y ensamblaje sobre un árbol de sintaxis abstracto (árbol de análisis) hasta estimaciones de uso de gas.
 Si sólo deseas compilar un único archivo, lo ejecutas como ``solc --bin sourceFile.sol`` y se imprimirá el binario. Antes de implementar tu contrato, activa el optimizador mientras compilas usando ``solc --optimize --bin sourceFile.sol``. Si deseas obtener algunas de las variantes de salida más avanzadas de ``solc``, probablemente sea mejor decirle que salga todo por ficheros separados usando``solc -o outputDirectory --bin --ast --asm sourceFile.sol``.
 
-The commandline compiler will automatically read imported files from the filesystem, but
-it is also possible to provide path redirects using ``prefix=path`` in the following way:
+El compilador de línea de comandos leerá automáticamente los archivos importados del sistema de archivos, aunque es posible proporcionar un redireccionamiento de ruta utilizando ``prefix=path`` de la siguiente manera:
 
 ::
 
