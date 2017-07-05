@@ -20,10 +20,8 @@ El compilador de línea de comandos leerá automáticamente los archivos importa
 
     solc github.com/ethereum/dapp-bin/=/usr/local/lib/dapp-bin/ =/usr/local/lib/fallback file.sol
 
-This essentially instructs the compiler to search for anything starting with
-``github.com/ethereum/dapp-bin/`` under ``/usr/local/lib/dapp-bin`` and if it does not
-find the file there, it will look at ``/usr/local/lib/fallback`` (the empty prefix
-always matches). ``solc`` will not read files from the filesystem that lie outside of
+Esencialmente esto instruye al compilador a buscar cualquier cosa que empeze con
+``github.com/ethereum/dapp-bin/`` bajo ``/usr/local/lib/dapp-bin`` y si no localiza el fichero ahí, mirará en ``/usr/local/lib/fallback`` (el prefijo vacío siempre coincide). ``solc`` will not read files from the filesystem that lie outside of
 the remapping targets and outside of the directories where explicitly specified source
 files reside, so things like ``import "/etc/passwd";`` only work if you add ``=/`` as a remapping.
 
