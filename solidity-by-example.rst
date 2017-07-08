@@ -10,29 +10,26 @@ Solidity mediante ejemplos
 Votación
 ********
 
-The following contract is quite complex, but showcases
-a lot of Solidity's features. It implements a voting
-contract. Of course, the main problems of electronic
-voting is how to assign voting rights to the correct
-persons and how to prevent manipulation. We will not
-solve all problems here, but at least we will show
-how delegated voting can be done so that vote counting
-is **automatic and completely transparent** at the
-same time.
+El siguiente contrato es bastante complejo, pero muestra
+muchas de las caractersticas de Solidity. Es un contrato
+de votación. Uno de los principales problemas de la votación
+electrónica es la asignación de los derechos de voto a las
+personas correctas para evitar la manipulación. No vamos a resolver
+todos los problemas, pero por lo menos vamos a ver cómo se puede
+hacer un sistema de votación delegado que permita contar votos
+de forma **automática y completamente transparente** al mismo tiempo.
 
-The idea is to create one contract per ballot,
-providing a short name for each option.
-Then the creator of the contract who serves as
-chairperson will give the right to vote to each
-address individually.
+La idea es crear un contrato por votación,
+junto con un breve nombre para cada opción.
+El creador del contrato, que ejercerá de presidente,
+será el encargado de dar derecho a voto a cada
+dirección una a una.
 
-The persons behind the addresses can then choose
-to either vote themselves or to delegate their
-vote to a person they trust.
+Las personas que controlen estas direcciones podrán
+votar o delegar su voto a una persona de confianza.
 
-At the end of the voting time, ``winningProposal()``
-will return the proposal with the largest number
-of votes.
+Cuando finalice el periodo de votación, ``winningProposal()``
+devolverá la propuesta más votada.
 
 ::
 
