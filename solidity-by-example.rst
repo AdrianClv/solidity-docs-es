@@ -35,45 +35,45 @@ devolverá la propuesta más votada.
 
     pragma solidity ^0.4.11;
 
-    /// @title Voting with delegation.
+    /// @title Votación con voto delegado
     contract Ballot {
-        // This declares a new complex type which will
-        // be used for variables later.
-        // It will represent a single voter.
+        // Declara un nuevo tipo de dato complejo, que será
+        // usado para almacenar variables.
+        // Representará a un único votante.
         struct Voter {
-            uint weight; // weight is accumulated by delegation
-            bool voted;  // if true, that person already voted
-            address delegate; // person delegated to
-            uint vote;   // index of the voted proposal
+            uint weight; // el peso del voto se acumula mediante la delegación de votos
+            bool voted;  // true si esa persona ya ha votado
+            address delegate; // persona a la que se delega el voto
+            uint vote;   // índice de la propuesta votada
         }
 
-        // This is a type for a single proposal.
+        // Representa una única propuesta.
         struct Proposal {
-            bytes32 name;   // short name (up to 32 bytes)
-            uint voteCount; // number of accumulated votes
+            bytes32 name;   // nombre corto (hasta 32 bytes)
+            uint voteCount; // número de votos acumulados
         }
 
         address public chairperson;
 
-        // This declares a state variable that
-        // stores a `Voter` struct for each possible address.
+        // Declara una variable de estado que
+        // almacena una estructura de datos `Voter` para cada posible dirección.
         mapping(address => Voter) public voters;
 
-        // A dynamically-sized array of `Proposal` structs.
+        // Una array dinámico de estructuras de datos de tipo `Proposal`.
         Proposal[] public proposals;
 
-        /// Create a new ballot to choose one of `proposalNames`.
+        /// Crea una nueva votación para elegir uno de los `proposalNames`.
         function Ballot(bytes32[] proposalNames) {
             chairperson = msg.sender;
             voters[chairperson].weight = 1;
 
-            // For each of the provided proposal names,
-            // create a new proposal object and add it
-            // to the end of the array.
+            // Para cada nombre propuesto
+            // crea un nuevo objeto de tipo Proposal y lo añade
+            // al final del array.
             for (uint i = 0; i < proposalNames.length; i++) {
-                // `Proposal({...})` creates a temporary
-                // Proposal object and `proposals.push(...)`
-                // appends it to the end of `proposals`.
+                // `Proposal({...})` crea una nuevo objeto de tipo Proposal
+                // de forma temporal y añade al final de `proposals`
+                // mediante `proposals.push(...)`.
                 proposals.push(Proposal({
                     name: proposalNames[i],
                     voteCount: 0
@@ -81,16 +81,16 @@ devolverá la propuesta más votada.
             }
         }
 
-        // Give `voter` the right to vote on this ballot.
-        // May only be called by `chairperson`.
+        // Da a `voter` el derecho a votar en esta votación.
+        // Sólo puede ser ejecutado por `chairperson`.
         function giveRightToVote(address voter) {
-            // If the argument of `require` evaluates to `false`,
-            // it terminates and reverts all changes to
-            // the state and to Ether balances. It is often
-            // a good idea to use this if functions are
-            // called incorrectly. But watch out, this
-            // will currently also consume all provided gas
-            // (this is planned to change in the future).
+            // Si el argumento de `require` da como resultado `false`,
+            // finaliza la ejecución y revierte todos los cambios
+            // producidos en el estado y los balances de Ether.
+            // A veces es buena idea usar esto por si las funciones
+            // están siendo ejecutadas de forma incorrecta. Pero ten en cuenta
+            // que de esta forma se consumirá todo el gas enviado
+            // (está previsto que esto cambie en el futuro).
             require((msg.sender == chairperson) && !voters[voter].voted);
             voters[voter].weight = 1;
         }
@@ -613,8 +613,8 @@ Safe Remote Purchase
         }
     }
 
-********************
-Micropayment Channel
-********************
+*******************
+Canal de micropagos
+*******************
 
-To be written.
+Por escribir.
