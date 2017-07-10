@@ -22,28 +22,28 @@ El objetivo de esta guía * no * es ser la forma correcta o la mejor manera de e
 
 
 ***********
-Code Layout
+Diseño del código
 ***********
 
 
-Indentation
+Sangría
 ===========
 
-Use 4 spaces per indentation level.
+Utilice 4 espacios por nivel de sangría.
 
-Tabs or Spaces
+Tabulador o espacios
 ==============
 
-Spaces are the preferred indentation method.
+Los espacios son el método de indentación preferido.
 
-Mixing tabs and spaces should be avoided.
+Se deben evitar la mezcla del tabulador y los espacios.
 
-Blank Lines
+Líneas en blanco
 ===========
 
-Surround top level declarations in solidity source with two blank lines.
+Envuelva las declaraciones de nivel superior en el código de solidity con dos líneas en blanco.
 
-Yes::
+Sí::
 
     contract A {
         ...
@@ -72,11 +72,11 @@ No::
         ...
     }
 
-Within a contract surround function declarations with a single blank line.
+Dentro de un contrato rodeé las declaraciones de una función con una sola línea en blanco.
 
-Blank lines may be omitted between groups of related one-liners (such as stub functions for an abstract contract)
+Las líneas en blanco se pueden omitir entre grupos de una frase relacionada (tales como las funciones stub en un contrato abstracto)
 
-Yes::
+Sí::
 
     contract A {
         function spam();
@@ -105,17 +105,17 @@ No::
         }
     }
 
-Source File Encoding
+Codificación de archivos de origen
 ====================
 
-UTF-8 or ASCII encoding is preferred.
+Se prefiere codificación del texto en UTF-8 or ASCII.
 
-Imports
+Importacion
 =======
 
-Import statements should always be placed at the top of the file.
+Las declaraciones de importación siempre deben colocarse en la parte superior del archivo.
 
-Yes::
+Sí::
 
     import "owned";
 
