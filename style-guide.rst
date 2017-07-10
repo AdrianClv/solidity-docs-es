@@ -1,11 +1,11 @@
 .. index:: style, coding style
 
 #############
-Style Guide
+Guía de estilo
 #############
 
 ************
-Introduction
+Introducción
 ************
 
 This guide is intended to provide coding conventions for writing solidity code.
