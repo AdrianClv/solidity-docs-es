@@ -8,16 +8,12 @@ Guía de estilo
 Introducción
 ************
 
-This guide is intended to provide coding conventions for writing solidity code.
-This guide should be thought of as an evolving document that will change over
-time as useful conventions are found and old conventions are rendered obsolete.
+Esta guía pretende proporcionar convenciones de codificación para escribir código con solidity.
+Esta guía debe ser entendida como un documento en evolución que cambiará con el tiempo, mientras nuevas convenciones útiles se encuentran y antiguas convenciones se vuelven obsoletas.
 
-Many projects will implement their own style guides.  In the event of
-conflicts, project specific style guides take precedence.
+Muchos proyectos implementarán sus propias guías de estilo. En el caso de conflictos, las guías de estilo específicas del proyecto tendran prioridad.
 
-The structure and many of the recommendations within this style guide were
-taken from python's
-`pep8 style guide <https://www.python.org/dev/peps/pep-0008/>`_.
+La estructura y muchas de las recomendaciones de esta guía de estilo fueron tomadas de Python: `pep8 style guide <https://www.python.org/dev/peps/pep-0008/>`_.
 
 The goal of this guide is *not* to be the right way or the best way to write
 solidity code.  The goal of this guide is *consistency*.  A quote from python's
