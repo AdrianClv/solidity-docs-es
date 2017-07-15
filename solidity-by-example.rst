@@ -95,62 +95,62 @@ devolverá la propuesta más votada.
             voters[voter].weight = 1;
         }
 
-        /// Delegate your vote to the voter `to`.
+        /// Delega tu voto a `to`.
         function delegate(address to) {
-            // assigns reference
+            // Asignación por referencia
             Voter sender = voters[msg.sender];
             require(!sender.voted);
 
-            // Self-delegation is not allowed.
+            // No se permite la delegación a uno mismo.
             require(to != msg.sender);
 
-            // Forward the delegation as long as
-            // `to` also delegated.
-            // In general, such loops are very dangerous,
-            // because if they run too long, they might
-            // need more gas than is available in a block.
-            // In this case, the delegation will not be executed,
-            // but in other situations, such loops might
-            // cause a contract to get "stuck" completely.
+            // Propaga la delegación en tanto que
+            // `to` también delegue.
+            // Por norma general, los bucles son muy peligrosos
+            // porque si tienen muchas iteracciones puede darse el caso
+            // de que empleen más gas del disponible en un boque.
+            // En este caso, eso implica que la delegación no será ejecutada,
+            // pero en otros casos puede suponer que un
+            // contrato se quede completamente bloqueado.
             while (voters[to].delegate != address(0)) {
                 to = voters[to].delegate;
 
-                // We found a loop in the delegation, not allowed.
+                // Encontramos un bucle en la delegación. No está permitido.
                 require(to != msg.sender);
             }
 
-            // Since `sender` is a reference, this
-            // modifies `voters[msg.sender].voted`
+            // Dado que `sender` es una referencia, esto
+            // modifica `voters[msg.sender].voted`
             sender.voted = true;
             sender.delegate = to;
             Voter delegate = voters[to];
             if (delegate.voted) {
-                // If the delegate already voted,
-                // directly add to the number of votes
+                // Si la persona en la que se ha delegado el voto ya ha votado,
+                // se añade directamente al número de votos.
                 proposals[delegate.vote].voteCount += sender.weight;
             } else {
-                // If the delegate did not vote yet,
-                // add to her weight.
+                // Si la persona en la que se ha delegado el voto todavía no ha votado,
+                // se añade al peso de su voto.
                 delegate.weight += sender.weight;
             }
         }
 
-        /// Give your vote (including votes delegated to you)
-        /// to proposal `proposals[proposal].name`.
+        /// Da tu voto (incluyendo los votos que te han delegado)
+        /// a la propuesta `proposals[proposal].name`.
         function vote(uint proposal) {
             Voter sender = voters[msg.sender];
             require(!sender.voted);
             sender.voted = true;
             sender.vote = proposal;
 
-            // If `proposal` is out of the range of the array,
-            // this will throw automatically and revert all
-            // changes.
+            // Si `proposal` está fuera del rango del array,
+            // esto lanzará automáticamente una excepción y
+            // se revocarán todos los cambios
             proposals[proposal].voteCount += sender.weight;
         }
 
-        /// @dev Computes the winning proposal taking all
-        /// previous votes into account.
+        /// @dev Calcula la propuesta ganadora teniendo en cuenta
+        // todos los votos realizados.
         function winningProposal() constant
                 returns (uint winningProposal)
         {
@@ -162,10 +162,10 @@ devolverá la propuesta más votada.
                 }
             }
         }
-        
-        // Calls winningProposal() function to get the index
-        // of the winner contained in the proposals array and then
-        // returns the name of the winner
+
+        // Llama a la función winningProposal() para obtener
+        // el índice de la propuesta ganadora y así luego
+        // devolver el nombre.
         function winnerName() constant
                 returns (bytes32 winnerName)
         {
@@ -173,76 +173,74 @@ devolverá la propuesta más votada.
         }
     }
 
-Possible Improvements
-=====================
+Posibles mejoras
+================
 
-Currently, many transactions are needed to assign the rights
-to vote to all participants. Can you think of a better way?
+Actualmente, hacen falta muchas transacciones para dar derecho
+a voto a todos los participantes. ¿Se te ocurre una forma mejor?
 
 .. index:: auction;blind, auction;open, blind auction, open auction
 
-*************
-Blind Auction
-*************
+****************
+Subasta a ciegas
+****************
 
-In this section, we will show how easy it is to create a
-completely blind auction contract on Ethereum.
-We will start with an open auction where everyone
-can see the bids that are made and then extend this
-contract into a blind auction where it is not
-possible to see the actual bid until the bidding
-period ends.
+En esta sección vamos a ver lo fácil que es crear
+un contrato para hacer una subasta a ciegas en Ethereum.
+Comenzaremos con una subasta en donde todo el mundo pueda
+ver las pujas que se van haciendo. Posteriormente, ampliaremos
+este contrato para convertirlo en una subasta a ciegas
+en donde no sea posible ver las pujas reales hasta que finalice el
+periodo de pujas.
 
 .. _simple_auction:
 
-Simple Open Auction
-===================
+Subasta abierta sencilla
+========================
 
-The general idea of the following simple auction contract
-is that everyone can send their bids during
-a bidding period. The bids already include sending
-money / ether in order to bind the bidders to their
-bid. If the highest bid is raised, the previously
-highest bidder gets her money back.
-After the end of the bidding period, the
-contract has to be called manually for the
-beneficiary to receive his money - contracts cannot
-activate themselves.
+La idea general del siguiente contrato de subasta es que
+cualquiera puede enviar sus pujas durante el periodo de pujas.
+Como parte de la puja se envía el dinero / ether para ligar
+a los pujadores con sus pujas. Si la puja más alta es superada,
+la anterior puja más alta recupera su dinero.
+Tras el periodo de pujas, el contrato tiene que ser llamado
+manualmente por parte de los beneficiarios para recuperar
+su dinero - los contratos no pueden activarse por sí mismos.
 
 ::
 
     pragma solidity ^0.4.11;
 
     contract SimpleAuction {
-        // Parameters of the auction. Times are either
-        // absolute unix timestamps (seconds since 1970-01-01)
-        // or time periods in seconds.
+        // Parámetros de la subasta. Los tiempos son
+        // o timestamps estilo unix (segundos desde 1970-01-01)
+        // o periodos de tiempo en segundos.
         address public beneficiary;
         uint public auctionStart;
         uint public biddingTime;
 
-        // Current state of the auction.
+        // Estado actual de la subasta.
         address public highestBidder;
         uint public highestBid;
 
-        // Allowed withdrawals of previous bids
+        // Retiradas de dinero permitidas de las anteriores pujas
         mapping(address => uint) pendingReturns;
 
-        // Set to true at the end, disallows any change
+        // Fijado como true al final, no permite ningún cambio.
         bool ended;
 
-        // Events that will be fired on changes.
+        // Eventos que serán emitidos al realizar algún cambio
         event HighestBidIncreased(address bidder, uint amount);
         event AuctionEnded(address winner, uint amount);
 
-        // The following is a so-called natspec comment,
-        // recognizable by the three slashes.
-        // It will be shown when the user is asked to
-        // confirm a transaction.
+        // Lo siguiente es lo que se conoce como un comentario natspec,
+        // se identifican por las tres barras inclinadas.
+        // Se mostrarán cuando se pregunte al usuario
+        // si quiere confirmar la transacción.
 
-        /// Create a simple auction with `_biddingTime`
-        /// seconds bidding time on behalf of the
-        /// beneficiary address `_beneficiary`.
+        /// Crea una subasta sencilla con un periodo de pujas
+        /// de `_biddingTime` segundos. El beneficiario de
+        /// las pujas es la dirección `_beneficiary`.
         function SimpleAuction(
             uint _biddingTime,
             address _beneficiary
@@ -252,25 +250,24 @@ activate themselves.
             biddingTime = _biddingTime;
         }
 
-        /// Bid on the auction with the value sent
-        /// together with this transaction.
-        /// The value will only be refunded if the
-        /// auction is not won.
+        /// Puja en la subasta con el valor enviado
+        /// en la misma transacción.
+        /// El valor pujado sólo será devuelto
+        /// si la puja no es ganadora.
         function bid() payable {
-            // No arguments are necessary, all
-            // information is already part of
-            // the transaction. The keyword payable
-            // is required for the function to
-            // be able to receive Ether.
+            // No hacen falta argumentos, toda
+            // la información necesaria es parte de
+            // la transacción. La palabra payable
+            // es necesaria para que la función pueda recibir Ether.
 
-            // Revert the call if the bidding
-            // period is over.
+            // Revierte la llamada si el periodo
+            // se pujas ha finalizado.
             require(now <= (auctionStart + biddingTime));
 
-            // If the bid is not higher, send the
-            // money back.
+            // Si la puja no es la más alta,
+            // envía el dinero de vuelta.
             require(msg.value > highestBid);
-            
+
             if (highestBidder != 0) {
                 // Sending back the money by simply using
                 // highestBidder.send(highestBid) is a security risk
@@ -293,7 +290,7 @@ activate themselves.
                 // before `send` returns.
                 pendingReturns[msg.sender] = 0;
 
-                if (!msg.sender.send(amount)) { 
+                if (!msg.sender.send(amount)) {
                     // No need to call throw here, just reset the amount owing
                     pendingReturns[msg.sender] = amount;
                     return false;
