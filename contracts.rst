@@ -205,12 +205,7 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
 Funciones Getter
 ================
 
-The compiler automatically creates getter functions for
-all **public** state variables. For the contract given below, the compiler will
-generate a function called ``data`` that does not take any
-arguments and returns a ``uint``, the value of the state
-variable ``data``. The initialization of state variables can
-be done at declaration.
+El compilador crea automaticamente funciones getter para todas las variables de estado **publicas**. En el contrato que se muestra abajo, el compilador va a generar una función llamada ``data`` que no lee ningún argumento y devuelve un ``unint``, el valor de la variable de estado ``data``. La inicialización de las variables de estado se puede hacer en el momento de la declaración. 
 
 ::
 
@@ -228,10 +223,7 @@ be done at declaration.
         }
     }
 
-The getter functions have external visibility. If the
-symbol is accessed internally (i.e. without ``this.``),
-it is evaluated as a state variable.  If it is accessed externally
-(i.e. with ``this.``), it is evaluated as a function.
+Las funciones getter tienen visibilidad externa. Si se accede al símbolo internamente (es decir sin ``this.``), entonces se evalua como un variables de estado. Si se accede al símbolo externamente, (es decir con ``this.``), entonces se evalua como una función.
 
 ::
 
@@ -240,12 +232,12 @@ it is evaluated as a state variable.  If it is accessed externally
     contract C {
         uint public data;
         function x() {
-            data = 3; // internal access
-            uint val = this.data(); // external access
+            data = 3; // acceso interno
+            uint val = this.data(); // acceso externo
         }
     }
 
-The next example is a bit more complex:
+El siguiente ejemplo es un poco más complejo:
 
 ::
 
@@ -260,27 +252,26 @@ The next example is a bit more complex:
         mapping (uint => mapping(bool => Data[])) public data;
     }
 
-It will generate a function of the following form::
+Nos va a generar una función de la siguiente forma:
+
+::
 
     function data(uint arg1, bool arg2, uint arg3) returns (uint a, bytes3 b) {
         a = data[arg1][arg2][arg3].a;
         b = data[arg1][arg2][arg3].b;
     }
 
-Note that the mapping in the struct is omitted because there
-is no good way to provide the key for the mapping.
+Notese que se ha omitido el mapeo en el struct porque no hay una buena manera de dar la clave para hacer el mapeo.
 
-.. index:: ! function;modifier
+.. index:: ! funcion;modifier
 
 .. _modifiers:
 
-******************
-Function Modifiers
-******************
+*******************
+Funciones Modifiers
+*******************
 
-Modifiers can be used to easily change the behaviour of functions.  For example,
-they can automatically check a condition prior to executing the function. Modifiers are
-inheritable properties of contracts and may be overridden by derived contracts.
+Se pueden usar los Modifiers para cambiar el comportamiento de las funciones de una manera ágil. Por ejemplo, los Modifiers son capaces de comprobar automaticamente una condición antes de ejecutar una función. Los Modifiers son propiedades heredables de los contratos y pueden ser sobreescritos por contratos derivados.
 
 ::
 
@@ -289,14 +280,10 @@ inheritable properties of contracts and may be overridden by derived contracts.
     contract owned {
         function owned() { owner = msg.sender; }
         address owner;
-
-        // This contract only defines a modifier but does not use
-        // it - it will be used in derived contracts.
-        // The function body is inserted where the special symbol
-        // "_;" in the definition of a modifier appears.
-        // This means that if the owner calls this function, the
-        // function is executed and otherwise, an exception is
-        // thrown.
+        
+        // Este contrato solo define un Modifier pero lo usa – se va a utilizar en un contrato derivado.
+        // El cuerpo de la función se incerta donde aparece el símbolo especial "_;" en la definición del Modifier.
+        // Esto significa que si el propietario llama a esta función, la función se ejecuta, pero en otros casos devolverá un error (???exception).
         modifier onlyOwner {
             require(msg.sender == owner);
             _;
@@ -305,10 +292,7 @@ inheritable properties of contracts and may be overridden by derived contracts.
 
 
     contract mortal is owned {
-        // This contract inherits the "onlyOwner"-modifier from
-        // "owned" and applies it to the "close"-function, which
-        // causes that calls to "close" only have an effect if
-        // they are made by the stored owner.
+        // Este contrato hereda del Modifier "onlyOwner" desde "owned" y lo aplica a la función "close", lo que tiene como efecto que las llamadas a "close" solamente tienen efecto si las hacen el propietario registrado.
         function close() onlyOwner {
             selfdestruct(owner);
         }
@@ -316,7 +300,7 @@ inheritable properties of contracts and may be overridden by derived contracts.
 
 
     contract priced {
-        // Modifiers can receive arguments:
+        // Los Modifiers pueden recibir argumentos:
         modifier costs(uint price) {
             if (msg.value >= price) {
                 _;
@@ -331,9 +315,7 @@ inheritable properties of contracts and may be overridden by derived contracts.
 
         function Register(uint initialPrice) { price = initialPrice; }
 
-        // It is important to also provide the
-        // "payable" keyword here, otherwise the function will
-        // automatically reject all Ether sent to it.
+        // Aquí es importante facilitar también la palabra clave "payable", de lo contrario la función rechazaría automaticamente todos los Ether que le mandemos. 
         function register() payable costs(price) {
             registeredAddresses[msg.sender] = true;
         }
@@ -352,33 +334,24 @@ inheritable properties of contracts and may be overridden by derived contracts.
             locked = false;
         }
 
-        /// This function is protected by a mutex, which means that
-        /// reentrant calls from within msg.sender.call cannot call f again.
-        /// The `return 7` statement assigns 7 to the return value but still
-        /// executes the statement `locked = false` in the modifier.
+        /// Esta función está protegida por un mutex, lo que significa que llamdas reentrantes desde dentro del msg.sender.call no pueden llamar a f de nuevo.
+        /// La declaración `return 7` asigna 7 al valor devuelto, pero aún así ejecuta la declaración `locked = false` en el Modifier.
         function f() noReentrancy returns (uint) {
             require(msg.sender.call());
             return 7;
         }
     }
 
-Multiple modifiers are applied to a function by specifying them in a
-whitespace-separated list and are evaluated in the order presented.
+Múltiples Modifiers pueden ser aplicados a una misma función especificándolos en una lista separada por espacios en blanco. Serán evaluados en el orden presentado en la lista.
 
 .. warning::
-    In an earlier version of Solidity, ``return`` statements in functions
-    having modifiers behaved differently.
+    En una versión anterior de Solidity, declaraciones del tipo ``return`` dentro de funciones que contienen Modifiers se comportaban de otra manera. 
 
-Explicit returns from a modifier or function body only leave the current
-modifier or function body. Return variables are assigned and
-control flow continues after the "_" in the preceding modifier.
+Lo que se devuelve explicitamente de un Modifier o del cuerpo de una función solo sale del Modifier actual o del cuerpo de la función actual. Las variables que se devuelven están asignadas y el control de flujo continúa después del "_" en el Modifier que precede.
 
-Arbitrary expressions are allowed for modifier arguments and in this context,
-all symbols visible from the function are visible in the modifier. Symbols
-introduced in the modifier are not visible in the function (as they might
-change by overriding).
+Se aceptan expresiones arbitrarias para los argumentos del Modifier y en ese contexto, todos los símbolos visibles desde la función son visibles en el Modifier. Símbolos introducidos en el Modifier no son visibles en la función (ya que pueden cambiar por sobreescritura).
 
-.. index:: ! constant
+.. index:: ! constante
 
 ************************
 Constant State Variables
