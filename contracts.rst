@@ -353,29 +353,17 @@ Se aceptan expresiones arbitrarias para los argumentos del Modifier y en ese con
 
 .. index:: ! constante
 
-************************
-Constant State Variables
-************************
+******************************
+Variables de Estado Constantes
+******************************
 
-State variables can be declared as ``constant``. In this case, they have to be
-assigned from an expression which is a constant at compile time. Any expression
-that accesses storage, blockchain data (e.g. ``now``, ``this.balance`` or
-``block.number``) or
-execution data (``msg.gas``) or make calls to external contracts are disallowed. Expressions
-that might have a side-effect on memory allocation are allowed, but those that
-might have a side-effect on other memory objects are not. The built-in functions
-``keccak256``, ``sha256``, ``ripemd160``, ``ecrecover``, ``addmod`` and ``mulmod``
-are allowed (even though they do call external contracts).
+Las variables de estado pueden declarase como ``constantes``. En este caso, se tienen que asignar desde una expresión que es una constante en momento de compilación. Las expresiones que acceden al almacenamiento, datos sobre la blockchain (p.ej ``now``, ``this.balance`` o ``block.number``), datos sobre la ejecución (``msg.gas``) o que hacen llamadas a contratos externos, están prohibidas. Las expresiones que puedan tener efectos colaterales en el reparto de memoria están permitidas, pero las que puedan tener efectos colaterales en otros objetos de memoria no lo son. Las funciones por defecto ``keccak256``, ``sha256``, ``ripemd160``, ``ecrecover``, ``addmod`` y ``mulmod`` están permitidas (aunque hacen llamadas a contratos externos).
 
-The reason behind allowing side-effects on the memory allocator is that it
-should be possible to construct complex objects like e.g. lookup-tables.
-This feature is not yet fully usable.
+Se permiten efectos colaterales en el repartidor de memoria porque debe ser posible construir objetos complejos como p.ej lookup-tables. Esta funcionalidad todavía no se puede usar tal cual. 
 
-The compiler does not reserve a storage slot for these variables, and every occurrence is
-replaced by the respective constant expression (which might be computed to a single value by the optimizer).
+El compilador no guarda un espacio de almacenamiento para estas variables, y se remplaza cada ocurrencia por su respectiva expresión constante (que puede ser compilada como un valor simple por el optimizador).
 
-Not all types for constants are implemented at this time. The only supported types are
-value types and strings.
+En este momento, no todos los tipos para las constantes están implementados. Los únicos tipos implementados por ahora son los tipos de valor y las cadenas de texto (string).
 
 ::
 
@@ -388,13 +376,13 @@ value types and strings.
     }
 
 
-.. _constant-functions:
+.. _funciones-constantes:
 
-******************
-Constant Functions
-******************
+********************
+Funciones Constantes
+********************
 
-Functions can be declared constant in which case they promise not to modify the state.
+En el caso en que un función se declare como constante, promete no modificar el estado.
 
 ::
 
@@ -407,10 +395,10 @@ Functions can be declared constant in which case they promise not to modify the 
     }
 
 .. note::
-  Getter methods are marked constant.
+  Los metodos getter están marcados como constantes. 
 
 .. warning::
-  The compiler does not enforce yet that a constant method is not modifying state.
+  El compilador todavía no impone que un método constante no modifica el estado.
 
 .. index:: ! fallback function, function;fallback
 
