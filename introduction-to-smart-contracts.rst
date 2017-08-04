@@ -219,18 +219,9 @@ No es posible enumerar el almacenamiento interno a un contrato y es comparativam
 
 La segunda área de memoria se conoce como **memoria**, de la que un contrato obtiene de forma ágil una instancia clara de cada llamada mensaje. La memoria es lineal y puede tratada a nivel byte, pero las lecturas están limitadas a un ancho de 256 bits, mientras que las escrituras puden ser tanto de 8 bits como de 256 bits de ancho. La memoria se expande por palabras (256-bit), cuando se accede (tanto para leer o escribir) a una palabra de memoria sin modificar previamente (p.ej.: cualquier offset de una palabra). En el momento de expansión, se debe pagar el coste en gas. La memoria es más costosa cuanto más crece (escala cuadraticamente).
 
-The EVM is not a register machine but a stack machine, so all
-computations are performed on an area called the **stack**. It has a maximum size of
-1024 elements and contains words of 256 bits. Access to the stack is
-limited to the top end in the following way:
-It is possible to copy one of
-the topmost 16 elements to the top of the stack or swap the
-topmost element with one of the 16 elements below it.
-All other operations take the topmost two (or one, or more, depending on
-the operation) elements from the stack and push the result onto the stack.
-Of course it is possible to move stack elements to storage or memory,
-but it is not possible to just access arbitrary elements deeper in the stack
-without first removing the top of the stack.
+La EVM no es una máquina a modo registro, es una máquina a modo pila por lo que todas las operaciones se hacen en un área llamada la **pila**. Tiene un espacio máximo de 1024 elementos y contiene palabras de 256 bits. El acceso a la pila está limitado a su cima de la siguiente manera:
+Es posible copiar uno de los 16 elementos superiores a la cima de la pila o intercambiar el elemento superior justo después de uno de los 16 elementos superiores.
+El resto de operaciones cogen los dos elementos más superiores (o uno, o más, dependiendo de la operación) de la pila y ponen el resultado en ella. Por supuesto, es posible mover elementos de la pila al almacenamiento o a la memoria, pero no es posible acceder simplemente a elementos arbitrarios más profundos dentro de la pila sin, primeramente, borrar los que ya están encima.
 
 .. index:: ! instruction
 
