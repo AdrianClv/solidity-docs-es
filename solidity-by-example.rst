@@ -269,11 +269,12 @@ su dinero - los contratos no pueden activarse por sí mismos.
             require(msg.value > highestBid);
 
             if (highestBidder != 0) {
-                // Sending back the money by simply using
-                // highestBidder.send(highestBid) is a security risk
-                // because it can be prevented by the caller by e.g.
-                // raising the call stack to 1023. It is always safer
-                // to let the recipients withdraw their money themselves.
+                // Devolver el dinero usando
+                // highestBidder.send(highestBid) es un riesgo
+                // para la seguridad, porque la llamada puede ser evitada
+                // por el usuario elevando la pila de llamadas a 1023.
+                // Siempre es más seguro dejar que los receptores
+                // saquen su propio dinero.
                 pendingReturns[highestBidder] += highestBid;
             }
             highestBidder = msg.sender;
@@ -281,17 +282,18 @@ su dinero - los contratos no pueden activarse por sí mismos.
             HighestBidIncreased(msg.sender, msg.value);
         }
 
-        /// Withdraw a bid that was overbid.
+        /// Retira una puja que fue superada.
         function withdraw() returns (bool) {
             var amount = pendingReturns[msg.sender];
             if (amount > 0) {
-                // It is important to set this to zero because the recipient
-                // can call this function again as part of the receiving call
-                // before `send` returns.
+                // Es importante poner esto a cero porque el receptor
+                // puede llamar de nuevo a esta función como parte
+                // de la recepción antes de que `send` devuelva su valor.
                 pendingReturns[msg.sender] = 0;
 
                 if (!msg.sender.send(amount)) {
-                    // No need to call throw here, just reset the amount owing
+                    // Aquí no es necesario lanzar una excepción.
+                    // Basta con devolver la cantidad a su valor anterior.
                     pendingReturns[msg.sender] = amount;
                     return false;
                 }
@@ -299,31 +301,30 @@ su dinero - los contratos no pueden activarse por sí mismos.
             return true;
         }
 
-        /// End the auction and send the highest bid
-        /// to the beneficiary.
+        /// Finaliza la subasta y envía la puja más alta
+        /// al beneficiario.
         function auctionEnd() {
-            // It is a good guideline to structure functions that interact
-            // with other contracts (i.e. they call functions or send Ether)
-            // into three phases:
-            // 1. checking conditions
-            // 2. performing actions (potentially changing conditions)
-            // 3. interacting with other contracts
-            // If these phases are mixed up, the other contract could call
-            // back into the current contract and modify the state or cause
-            // effects (ether payout) to be performed multiple times.
-            // If functions called internally include interaction with external
-            // contracts, they also have to be considered interaction with
-            // external contracts.
+            // Es una buena práctica estructurar las funciones que interactúan
+            // con otros contratos (i.e. llaman a funciones o envían ether)
+            // en tres fases:
+            // 1. comprobación de las condiciones
+            // 2. ejecución de las acciones (pudiendo cambiar las condiciones)
+            // 3. interacción con otros contratos
+            // Si estas fases se entremezclasen, otros contratos podrían 
+            // volver a llamar a este contrato y modificar el estado
+            // o hacer que algunas partes (pago de ether) se ejecute multiples veces.
+            // Si se llama a funciones internas que interactúan con otros contratos,
+            // deben considerarse como interacciones con contratos externos.
 
-            // 1. Conditions
-            require(now >= (auctionStart + biddingTime)); // auction did not yet end
-            require(!ended); // this function has already been called
+            // 1. Condiciones
+            require(now >= (auctionStart + biddingTime)); // la subasta aún no ha acabado
+            require(!ended); // esta función ya ha sido llamada
 
-            // 2. Effects
+            // 2. Ejecución
             ended = true;
             AuctionEnded(highestBidder, highestBid);
 
-            // 3. Interaction
+            // 3. Interacción
             beneficiary.transfer(highestBid);
         }
     }
