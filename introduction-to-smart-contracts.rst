@@ -195,43 +195,29 @@ Si la cuenta destino contiene código, este es ejecutado y la carga de pago se p
 
 Si la cuenta destino es la cuenta-cero (la cuenta con dirección ``0``), la transacción crea un **nuevo contrato**. Como se ha mancionado, la dirección del contrato no es la dirección cero, pero sí una dirección derivada del que envía y su número de transacciones enviadas (el "nonce"). Los datos binarios de la transacción que crea el contrato son obtenidos como bytecode por la EVM y ejecutados. La salida de esta ejecución es permanentemente almacenada como el código del contrato. Esto significa que para crear un contrato, no se envía el código actual del contrato, realmente se envía código que nos devuelve ese código final.
 
-.. index:: ! gas, ! gas price
+.. index:: ! gas, ! precio gas
 
 Gas
 ===
 
-Upon creation, each transaction is charged with a certain amount of **gas**,
-whose purpose is to limit the amount of work that is needed to execute
-the transaction and to pay for this execution. While the EVM executes the
-transaction, the gas is gradually depleted according to specific rules.
+En cuanto se crean, cada transacción se carga con una determinada cantidad de **gas**,
+cuyo propósito es limitar la cantidad de trabajo que se necesita para ejecutar la transacción y pagar por esta ejecución. Mientras la EVM ejecuta la transacción, el gas es gradualemnte gastado según unas reglas específicas.
 
-The **gas price** is a value set by the creator of the transaction, who
-has to pay ``gas_price * gas`` up front from the sending account.
-If some gas is left after the execution, it is refunded in the same way.
+El **precio gas** es un valor establecido por el que crea la transacción, quién tiene que pagar el ``gas_price * gas`` desde la cuenta de envío. Si queda algo de gas después de la ejecución, se le reembolsa.
 
-If the gas is used up at any point (i.e. it is negative),
-an out-of-gas exception is triggered, which reverts all modifications
-made to the state in the current call frame.
+Si se ha gastado todo el gas en un punto (p.ej.: es negativo),
+se lanza una excepción de out-of-gas, que revierte todas las modificaciones hechas al estado en el frame llamado actualmente.
 
-.. index:: ! storage, ! memory, ! stack
+.. index:: ! almacenamiento, ! memoria, ! pila
 
-Storage, Memory and the Stack
-=============================
+Almacenamiento, Memoria y la Pila
+=================================
 
-Each account has a persistent memory area which is called **storage**.
-Storage is a key-value store that maps 256-bit words to 256-bit words.
-It is not possible to enumerate storage from within a contract
-and it is comparatively costly to read and even more so, to modify
-storage. A contract can neither read nor write to any storage apart
-from its own.
+Cada cuenta tiene un área de memoria persistente que se llama **almacenamiento**.
+Almacenamiento es un almacén clave-valor que mapea palabras 256-bit con palabras 256-bit.
+No es posible enumerar el almacenamiento interno a un contrato y es comparativamente costoso leer y, más todavía, modificar el almacenamiento. Un contrato no pueder leer ni escribir en otro almacenamiento que no sea el suyo.
 
-The second memory area is called **memory**, of which a contract obtains
-a freshly cleared instance for each message call. Memory is linear and can be
-addressed at byte level, but reads are limited to a width of 256 bits, while writes
-can be either 8 bits or 256 bits wide. Memory is expanded by a word (256-bit), when
-accessing (either reading or writing) a previously untouched memory word (ie. any offset
-within a word). At the time of expansion, the cost in gas must be paid. Memory is more
-costly the larger it grows (it scales quadratically).
+La segunda área de memoria se conoce como **memoria**, de la que un contrato obtiene de forma ágil una instancia clara de cada llamada mensaje. La memoria es lineal y puede tratada a nivel byte, pero las lecturas están limitadas a un ancho de 256 bits, mientras que las escrituras puden ser tanto de 8 bits como de 256 bits de ancho. La memoria se expande por palabras (256-bit), cuando se accede (tanto para leer o escribir) a una palabra de memoria sin modificar previamente (p.ej.: cualquier offset de una palabra). En el momento de expansión, se debe pagar el coste en gas. La memoria es más costosa cuanto más crece (escala cuadraticamente).
 
 The EVM is not a register machine but a stack machine, so all
 computations are performed on an area called the **stack**. It has a maximum size of
