@@ -156,48 +156,33 @@ Estos bloques forman una secuencia lineal en el tiempo y del que viene la palabr
 Como parte del "mecanismo de selcción de orden" (que se conoce como minería), tiene que pasar que los bloques sean revertidos de cuando en cuando, pero sólo en el extremo o "tip" de la cadena. Cuanto más bloques se añaden encima, menos problable es. Entonces, sucedería que tus transacciones sean revertidas e incluso borradas de la blockchain, y cuanto más esperes, menos problable será.
 
 
-.. _the-ethereum-virtual-machine:
+.. _maquina-virtual-ethereum:
 
 .. index:: !evm, ! ethereum virtual machine
 
-****************************
-The Ethereum Virtual Machine
-****************************
+************************
+Máquina Virtual Ethereum
+************************
 
-Overview
-========
+Introducción
+============
 
-The Ethereum Virtual Machine or EVM is the runtime environment
-for smart contracts in Ethereum. It is not only sandboxed but
-actually completely isolated, which means that code running
-inside the EVM has no access to network, filesystem or other processes.
-Smart contracts even have limited access to other smart contracts.
+La máquina virtual de Ethereum (EVM por sus siglas en inglés) es un entorno de ejecución de contratos inteligentes en Ethereum.Va más allá de una configuración tipo sandbox ya que se encuentra totalmente aislada, lo que significa que el código que se ejecuta en la EVM no tiene acceso a la red, ni al sistema de ficheros, ni a cualquier otro proceso. Incluso los contratos inteligentes tienen acceso limitado a otros contratos inteligentes.
 
-.. index:: ! account, address, storage, balance
+.. index:: ! cuentas, direcciones, almacenamiento, balance
 
-Accounts
-========
+Cuentas
+=======
 
-There are two kinds of accounts in Ethereum which share the same
-address space: **External accounts** that are controlled by
-public-private key pairs (i.e. humans) and **contract accounts** which are
-controlled by the code stored together with the account.
+Hay dos tipos de cuentas en Ethereum que comparten el mismo espacio de dirección: **Cuentas externas** que están controladas por un par de claves pública-privadas (p-ej.: humanos) y **Cuentas contrato** que están controladas por el código almacenado conjuntamente con la cuenta.
 
-The address of an external account is determined from
-the public key while the address of a contract is
-determined at the time the contract is created
-(it is derived from the creator address and the number
-of transactions sent from that address, the so-called "nonce").
+La dirección de una cuenta externa viene determinada por la clave pública mientras que la dirección de la cuenta contrato se define en el momento que se crea dicho contrato (se deriva de la dirección del creador y del número de transacciones enviadas desde esa dirección, el llamado "nonce").
 
-Regardless of whether or not the account stores code, the two types are
-treated equally by the EVM.
+Independientemente de que la cuenta almacene código, los dos tipos son tratados de forma equitativa por la EVM.
 
-Every account has a persistent key-value store mapping 256-bit words to 256-bit
-words called **storage**.
+Cada cuenta tiene un almacenamiento persistente clave-valor que mapea palabras de 256-bit a palabras de 256-bit llamado **almacenamiento**.
 
-Furthermore, every account has a **balance** in
-Ether (in "Wei" to be exact) which can be modified by sending transactions that
-include Ether.
+Más allá, cada cuenta tiene un **balance** en Ether (in "Wei" para ser exactos) que puede ser modificado enviando transacciones que incluyen Ether.
 
 .. index:: ! transaction
 
