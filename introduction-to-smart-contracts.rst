@@ -184,29 +184,16 @@ Cada cuenta tiene un almacenamiento persistente clave-valor que mapea palabras d
 
 Más allá, cada cuenta tiene un **balance** en Ether (in "Wei" para ser exactos) que puede ser modificado enviando transacciones que incluyen Ether.
 
-.. index:: ! transaction
+.. index:: ! transaccion
 
-Transactions
-============
+Transacciones
+=============
 
-A transaction is a message that is sent from one account to another
-account (which might be the same or the special zero-account, see below).
-It can include binary data (its payload) and Ether.
+Una transacción es un mensaje que se envía de una cuenta a otra (que debería ser lo mismo o la especial cuenta-cero, ver más adelante). Puede incluir datos binarios (payload) y Ether.
 
-If the target account contains code, that code is executed and
-the payload is provided as input data.
+Si la cuenta destino contiene código, este es ejecutado y la carga de pago se provee como dato de entrada.
 
-If the target account is the zero-account (the account with the
-address ``0``), the transaction creates a **new contract**.
-As already mentioned, the address of that contract is not
-the zero address but an address derived from the sender and
-its number of transactions sent (the "nonce"). The payload
-of such a contract creation transaction is taken to be
-EVM bytecode and executed. The output of this execution is
-permanently stored as the code of the contract.
-This means that in order to create a contract, you do not
-send the actual code of the contract, but in fact code that
-returns that code.
+Si la cuenta destino es la cuenta-cero (la cuenta con dirección ``0``), la transacción crea un **nuevo contrato**. Como se ha mancionado, la dirección del contrato no es la dirección cero, pero sí una dirección derivada del que envía y su número de transacciones enviadas (el "nonce"). Los datos binarios de la transacción que crea el contrato son obtenidos como bytecode por la EVM y ejecutados. La salida de esta ejecución es permanentemente almacenada como el código del contrato. Esto significa que para crear un contrato, no se envía el código actual del contrato, realmente se envía código que nos devuelve ese código final.
 
 .. index:: ! gas, ! gas price
 
