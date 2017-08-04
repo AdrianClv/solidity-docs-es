@@ -184,7 +184,7 @@ Cada cuenta tiene un almacenamiento persistente clave-valor que mapea palabras d
 
 Más allá, cada cuenta tiene un **balance** en Ether (in "Wei" para ser exactos) que puede ser modificado enviando transacciones que incluyen Ether.
 
-.. index:: ! transaccion
+.. index:: ! transacción
 
 Transacciones
 =============
