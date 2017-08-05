@@ -6,69 +6,70 @@
 Tipos
 *****
 
-Solidity is a statically typed language, which means that the type of each
-variable (state and local) needs to be specified (or at least known -
-see :ref:`type-deduction` below) at
-compile-time. Solidity provides several elementary types which can be combined
-to form complex types.
+Solidity es un lenguaje de tipado estátio, que significa que cada tipo de
+variable (estado y local) tiene ser especificada (o al menos conocida -
+ver :ref:`type-deduction` abajo) en tiempo de compilación.
+Solidity proporciona varios tipos elementales que pueden ser combinados para
+crear tipos mas complejos.
 
+Además, tipos puedes interactuar con
 In addition, types can interact with each other in expressions containing
 operators. For a quick reference of the various operators, see :ref:`order`.
 
 .. index:: ! value type, ! type;value
 
-Value Types
-===========
+Tipos de Valor
+==============
 
-The following types are also called value types because variables of these
-types will always be passed by value, i.e. they are always copied when they
-are used as function arguments or in assignments.
+Los siguientes tipos también son llamados tipos de valor porque las variables
+de este tipo serán siempre pasadas como valores, ej. siempre serán copiados cuando
+son usados como argumentos de funciones o en asignaciones.
 
 .. index:: ! bool, ! true, ! false
 
-Booleans
---------
+Booleanos
+---------
 
-``bool``: The possible values are constants ``true`` and ``false``.
+``bool``: Los posibles valores son las constantes ``true`` and ``false``.
 
-Operators:
+Operadores:
 
-*  ``!`` (logical negation)
-*  ``&&`` (logical conjunction, "and")
-*  ``||`` (logical disjunction, "or")
-*  ``==`` (equality)
-*  ``!=`` (inequality)
+*  ``!`` (negación lógica)
+*  ``&&`` (conjunción lógica, "y")
+*  ``||`` (disyunción lógica, "or")
+*  ``==`` (igualdad)
+*  ``!=`` (inigualdad)
 
-The operators ``||`` and ``&&`` apply the common short-circuiting rules. This means that in the expression ``f(x) || g(y)``, if ``f(x)`` evaluates to ``true``, ``g(y)`` will not be evaluated even if it may have side-effects.
+Los operadores ``||`` y ``&&`` aplican las reglas comunes de corto circuitos. Esto significa que en la expresión c, si ``f(x)`` evalúa a ``true``, ``g(y)`` no será evaluado incluso si tuviera efectos segundarios.
 
 .. index:: ! uint, ! int, ! integer
 
-Integers
---------
+Enteros
+-------
 
-``int`` / ``uint``: Signed and unsigned integers of various sizes. Keywords ``uint8`` to ``uint256`` in steps of ``8`` (unsigned of 8 up to 256 bits) and ``int8`` to ``int256``. ``uint`` and ``int`` are aliases for ``uint256`` and ``int256``, respectively.
+``int`` / ``uint``: Enteros con y sin signo de varios tamaños. Las palabras clave ``uint8`` a ``uint256`` en pasos de ``8`` (sin signo de 8 hasta 256 bits) y ``int8`` a ``int256``. ``uint`` y ``int`` son aliases para ``uint256`` y ``int256``, respectivamete.
 
-Operators:
+Operadores:
 
-* Comparisons: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evaluate to ``bool``)
-* Bit operators: ``&``, ``|``, ``^`` (bitwise exclusive or), ``~`` (bitwise negation)
-* Arithmetic operators: ``+``, ``-``, unary ``-``, unary ``+``, ``*``, ``/``, ``%`` (remainder), ``**`` (exponentiation), ``<<`` (left shift), ``>>`` (right shift)
+* Comparaciones: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evalúa a ``bool``)
+* Operadores bit: ``&``, ``|``, ``^`` (bitwise exclusivo or), ``~`` (negación bitwise)
+* Operadores aritméticos: ``+``, ``-``, unary ``-``, unary ``+``, ``*``, ``/``, ``%`` (restante), ``**`` (exponenciales), ``<<`` (shift izquiera), ``>>`` (shift derecha)
 
-Division always truncates (it just is compiled to the DIV opcode of the EVM), but it does not truncate if both
-operators are :ref:`literals<rational_literals>` (or literal expressions).
+La división siempre trunca (está compilado a la opcode DIV de la EVM), pero no trunca si los dos
+operadores son :ref:`literales<rational_literals>` (o expresiones literales).
 
-Division by zero and modulus with zero throws a runtime exception.
+División por cero y modulus con cero arrojan una excepcion runtime.
 
-The result of a shift operation is the type of the left operand. The
-expression ``x << y`` is equivalent to ``x * 2**y`` and ``x >> y`` is
-equivalent to ``x / 2**y``. This means that shifting negative numbers
-sign extends. Shifting by a negative amount throws a runtime exception.
+El resultado de una operación shift es el tipo de operador izquierdo. La
+expresión ``x << y`` es equivalente a ``x * 2**y`` y ``x >> y`` es
+equivalente a ``x / 2**y``. Esto significa que hacer un shift de números negativos
+extiende en signo. Haciendo shift por un número negativo arroja una excepción runtime.
 
 .. warning::
-    The results produced by shift right of negative values of signed integer types is different from those produced
-    by other programming languages. In Solidity, shift right maps to division so the shifted negative values
-    are going to be rounded towards zero (truncated). In other programming languages the shift right of negative values
-    works like division with rounding down (towards negative infinity).
+    Los resultados producidos por shift derecho de valores negativos de tipos de enteros con signo es diferente de esos producidos
+    por otros lenguajes de programación. En Solidity, shift derecho mapea la división para que los valores negativos de shift
+    serán redondeados hacia cero (truncado). En otros lenguajes de programacion el shift derecho de valores negativos
+    funciona como una división con redondeo hacia abajo (hacia infinito negativo).
 
 .. index:: address, balance, send, call, callcode, delegatecall, transfer
 
@@ -77,21 +78,21 @@ sign extends. Shifting by a negative amount throws a runtime exception.
 Address
 -------
 
-``address``: Holds a 20 byte value (size of an Ethereum address). Address types also have members and serve as base for all contracts.
+``address``: Contiene un valor de 20 byte (tamaño de una dirección Ethereum). Tipos de address también miembros y sirven como base para todos los contratos.
 
-Operators:
+Operadores:
 
 * ``<=``, ``<``, ``==``, ``!=``, ``>=`` and ``>``
 
-Members of Addresses
-^^^^^^^^^^^^^^^^^^^^
+Miembros de Address
+^^^^^^^^^^^^^^^^^^^
 
 * ``balance`` and ``transfer``
 
-For a quick reference, see :ref:`address_related`.
+Para una referencia rápida, ver :ref:`address_related`.
 
-It is possible to query the balance of an address using the property ``balance``
-and to send Ether (in units of wei) to an address using the ``transfer`` function:
+Es posible consultar el monto de una dirección usando la propiedad ``balance``
+y de enviar Ether (en unidades de wei) a una dirección usando la función ``transfer``:
 
 ::
 
@@ -100,22 +101,22 @@ and to send Ether (in units of wei) to an address using the ``transfer`` functio
     if (x.balance < 10 && myAddress.balance >= 10) x.transfer(10);
 
 .. note::
-    If ``x`` is a contract address, its code (more specifically: its fallback function, if present) will be executed together with the ``transfer`` call (this is a limitation of the EVM and cannot be prevented). If that execution runs out of gas or fails in any way, the Ether transfer will be reverted and the current contract will stop with an exception.
+    Si ``x`` es una dirección de contrato, su código (específicamente: su función de fallback, si es que está presente) será ejecutada con el llamado ``transfer`` (esta es la limitación de la EVM y no puede ser prevenida). Si esa ejecución acaba el gas o falla de cualquier forma, el Ether transferido será revertido y el contrato actual se detendrá con una excepción.
 
 * ``send``
 
-Send is the low-level counterpart of ``transfer``. If the execution fails, the current contract will not stop with an exception, but ``send`` will return ``false``.
+Send es la contrapartida de bajo nivel de ``transfer``. Si la ejecución falla, el contrato actual no se detendrá con una excepción, pero ``send`` devuelve ``false``.
 
 .. warning::
-    There are some dangers in using ``send``: The transfer fails if the call stack depth is at 1024
-    (this can always be forced by the caller) and it also fails if the recipient runs out of gas. So in order
-    to make safe Ether transfers, always check the return value of ``send``, use ``transfer`` or even better:
-    use a pattern where the recipient withdraws the money.
+    Hay algunos peligros en utiliza ``send``: La transferencia falla si la profundidad de la llamada es de 1024
+    (esto puede ser fozado por el llamador) y también falla si el recipiente se le acaba el gas. Entonces para
+    hacer transferencia de Ether seguras, siempre revisar el valor devuleto por ``send``, usar ``transfer`` o incluso mejor:
+    usa el patrón donde el recipiente retira el dinero.
 
 * ``call``, ``callcode`` and ``delegatecall``
 
-Furthermore, to interface with contracts that do not adhere to the ABI,
-the function ``call`` is provided which takes an arbitrary number of arguments of any type. These arguments are padded to 32 bytes and concatenated. One exception is the case where the first argument is encoded to exactly four bytes. In this case, it is not padded to allow the use of function signatures here.
+Además, para interfazar con contratos que no adhieren al ABI,
+la función ``call`` es provedida que toma un número arbitrario de argumentos de cualquier tipo. Estos argumentos son alcochados a 32 bytes y concatenados. Una excepción es el caso donde el primer argumento es codificado a exactamente 4 bytes. En este caso, no está acolchado para permitir el uso de firmas de función aquí.
 
 ::
 
@@ -123,17 +124,17 @@ the function ``call`` is provided which takes an arbitrary number of arguments o
     nameReg.call("register", "MyName");
     nameReg.call(bytes4(keccak256("fun(uint256)")), a);
 
-``call`` returns a boolean indicating whether the invoked function terminated (``true``) or caused an EVM exception (``false``). It is not possible to access the actual data returned (for this we would need to know the encoding and size in advance).
+``call`` devuelve un booleano indicando si la función llamada terminó (``true``) o causó una excepción del EVM (``false``). No es posible acceder a los datos reales devueltos (para esto necesitaremos saber el tamaño de codificación en avance).
 
-In a similar way, the function ``delegatecall`` can be used: The difference is that only the code of the given address is used, all other aspects (storage, balance, ...) are taken from the current contract. The purpose of ``delegatecall`` is to use library code which is stored in another contract. The user has to ensure that the layout of storage in both contracts is suitable for delegatecall to be used. Prior to homestead, only a limited variant called ``callcode`` was available that did not provide access to the original ``msg.sender`` and ``msg.value`` values.
+En una forma similar, ``delegatecall`` puede ser usado: La diferencia es que solo el código de la dirección dada es usado, todo otros aspectos (almacenamiento, saldo, ...) salen del contrato actual. El propósito de ``delegatecall`` es usar el código de librería que está almacenado en otro contrato. El usuario tiene que asegurarse que el layout del almacenamiento en ambos contratos es correcto para usar delegatecall. Antes de homestead, sólo una versión limitada llamada ``callcode`` estaba disponible que no daba acceso a los valores ``msg.sender`` y ``msg.value`` originales.
 
-All three functions ``call``, ``delegatecall`` and ``callcode`` are very low-level functions and should only be used as a *last resort* as they break the type-safety of Solidity.
+Las tres funciones ``call``, ``delegatecall`` y ``callcode`` son funciones de muy bajo nivel y deben usarse sólo como medida de último recurso ya que rompen la seguridad de tipo de Solidity.
 
-The ``.gas()`` option is available on all three methods, while the ``.value()`` option is not supported for ``delegatecall``.
+La opción ``.gas()`` está disponible en los 3 métodos, mientras la opción ``.value()`` no se admite para ``delegatecall``.
 
 .. note::
-    All contracts inherit the members of address, so it is possible to query the balance of the
-    current contract using ``this.balance``.
+    Todos los contratos heredan los miembros de address, así que es posible consultar el saldo del contrato actual
+    usando ``this.balance``.
 
 .. warning::
     All these functions are low-level functions and should be used with care.
