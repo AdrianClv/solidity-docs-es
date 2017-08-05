@@ -330,7 +330,7 @@ su dinero - los contratos no pueden activarse por sí mismos.
     }
 
 Subasta a ciegas
-=============
+================
 
 A continuación, se va a extender la subasta abierta anterior
 a una subasta a ciegas. La ventaja de una subasta a ciegas
@@ -390,11 +390,12 @@ inválidas con valores altos o bajos.
         mapping(address => uint) pendingReturns;
 
         event AuctionEnded(address winner, uint highestBid);
-
-        /// Modifiers are a convenient way to validate inputs to
-        /// functions. `onlyBefore` is applied to `bid` below:
-        /// The new function body is the modifier's body where
-        /// `_` is replaced by the old function body.
+        
+        /// Los modificadores son una forma cómoda de validar los
+        /// inputs de las funciones. Abajo se puede ver cómo
+        /// `onlyBefore` se aplica a `bid`.
+        /// El nuevo cuerpo de la función pasa a ser el del modificador,
+        /// sustituyendo `_` por el anterior cuerpo de la función.
         modifier onlyBefore(uint _time) { require(now < _time); _; }
         modifier onlyAfter(uint _time) { require(now > _time); _; }
 
@@ -408,16 +409,16 @@ inválidas con valores altos o bajos.
             biddingEnd = now + _biddingTime;
             revealEnd = biddingEnd + _revealTime;
         }
-
-        /// Place a blinded bid with `_blindedBid` = keccak256(value,
-        /// fake, secret).
-        /// The sent ether is only refunded if the bid is correctly
-        /// revealed in the revealing phase. The bid is valid if the
-        /// ether sent together with the bid is at least "value" and
-        /// "fake" is not true. Setting "fake" to true and sending
-        /// not the exact amount are ways to hide the real bid but
-        /// still make the required deposit. The same address can
-        /// place multiple bids.
+        
+        /// Efectúa la puja de manera oculta con `_blindedBid`=
+        /// keccak256(value, fake, secret).
+        /// El ether enviado sólo se recuperará si la puja se revela de 
+        /// forma correcta durante la fase de revelacin. La puja es
+        /// válida si el ether junto al que se envía es al menos "value"
+        /// y "fake" no es cierto. Poner "fake" como verdadero y no enviar
+        /// la cantidad exacta, son formas de ocultar la verdadera puja
+        /// y aún así realizar el depósito necesario. La misma dirección
+        /// puede realizar múltiples pujas.
         function bid(bytes32 _blindedBid)
             payable
             onlyBefore(biddingEnd)
@@ -427,10 +428,10 @@ inválidas con valores altos o bajos.
                 deposit: msg.value
             }));
         }
-
-        /// Reveal your blinded bids. You will get a refund for all
-        /// correctly blinded invalid bids and for all bids except for
-        /// the totally highest.
+    
+        /// Revela tus pujas ocultas. Recuperarás los fondos de todas 
+        /// las pujas inválidas ocultadas de forma correcta y de
+        /// todas las pujas salvo en aquellos casos en que sea la más alta.
         function reveal(
             uint[] _values,
             bool[] _fake,
@@ -450,8 +451,8 @@ inválidas con valores altos o bajos.
                 var (value, fake, secret) =
                         (_values[i], _fake[i], _secret[i]);
                 if (bid.blindedBid != keccak256(value, fake, secret)) {
-                    // Bid was not actually revealed.
-                    // Do not refund deposit.
+                    // La puja no ha sido correctamente revelada.
+                    // No se recuperan los fondos depositados.
                     continue;
                 }
                 refund += bid.deposit;
@@ -459,16 +460,16 @@ inválidas con valores altos o bajos.
                     if (placeBid(msg.sender, value))
                         refund -= value;
                 }
-                // Make it impossible for the sender to re-claim
-                // the same deposit.
+                // Hace que el emisor no pueda reclamar dos veces
+                // el mismo depósito.
                 bid.blindedBid = 0;
             }
             msg.sender.transfer(refund);
         }
-
-        // This is an "internal" function which means that it
-        // can only be called from the contract itself (or from
-        // derived contracts).
+        
+        // Esta función es "internal", lo que significa que sólo
+        // se podrá llamar desde el propio contrato (o contratos
+        // que deriven de él).
         function placeBid(address bidder, uint value) internal
                 returns (bool success)
         {
@@ -483,19 +484,21 @@ inválidas con valores altos o bajos.
             highestBidder = bidder;
             return true;
         }
-
-        /// Withdraw a bid that was overbid.
+        
+        /// Retira una puja que ha sido superada.
         function withdraw() returns (bool) {
             var amount = pendingReturns[msg.sender];
             if (amount > 0) {
-                // It is important to set this to zero because the recipient
-                // can call this function again as part of the receiving call
-                // before `send` returns (see the remark above about
-                // conditions -> effects -> interaction).
+                // Es importante poner esto a cero porque el receptor
+                // puede llamar a esta función de nuevo como parte
+                // de la recepción antes de que `send` devuelva su valor.
+                // (ver la observacin de arriba sobre condiciones -> efectos
+                // -> interacción).
                 pendingReturns[msg.sender] = 0;
 
                 if (!msg.sender.send(amount)){
-                    // No need to call throw here, just reset the amount owing
+                    // Aquí no es necesario lanzar una excepción.
+                    // Basta con devolver la cantidad a su valor anterior.
                     pendingReturns[msg.sender] = amount;
                     return false;
                 }
@@ -503,25 +506,25 @@ inválidas con valores altos o bajos.
             return true;
         }
 
-        /// End the auction and send the highest bid
-        /// to the beneficiary.
+        /// Finaliza la subasta y envía la puja más alta
+        /// al beneficiario.
         function auctionEnd()
             onlyAfter(revealEnd)
         {
             require(!ended);
             AuctionEnded(highestBidder, highestBid);
             ended = true;
-            // We send all the money we have, because some
-            // of the refunds might have failed.
+            // Enviamos todo el dinero que tenemos, porque
+            // parte de las devoluciones pueden haber fallado.
             beneficiary.transfer(this.balance);
         }
     }
 
 .. index:: purchase, remote purchase, escrow
 
-********************
-Safe Remote Purchase
-********************
+*************************
+Compra a distancia segura
+*************************
 
 ::
 
@@ -563,10 +566,10 @@ Safe Remote Purchase
         event Aborted();
         event PurchaseConfirmed();
         event ItemReceived();
-
-        /// Abort the purchase and reclaim the ether.
-        /// Can only be called by the seller before
-        /// the contract is locked.
+        
+        /// Aborta la compra y reclama el ether.
+        /// Sólo puede ser llamado por el vendedor
+        /// antes de que el contrato se cierre.
         function abort()
             onlySeller
             inState(State.Created)
@@ -575,11 +578,11 @@ Safe Remote Purchase
             state = State.Inactive;
             seller.transfer(this.balance);
         }
-
-        /// Confirm the purchase as buyer.
-        /// Transaction has to include `2 * value` ether.
-        /// The ether will be locked until confirmReceived
-        /// is called.
+        
+        /// Confirma la compra por parte del comprador.
+        /// La transacción debe incluir la cantidad de ether
+        /// multiplicada por 2. El ether quedará bloqueado
+        /// hasta que se llame a confirmReceived.
         function confirmPurchase()
             inState(State.Created)
             condition(msg.value == (2 * value))
@@ -589,21 +592,21 @@ Safe Remote Purchase
             buyer = msg.sender;
             state = State.Locked;
         }
-
-        /// Confirm that you (the buyer) received the item.
-        /// This will release the locked ether.
+        
+        /// Confirma que tú (el comprador) has recibido el
+        /// artículo. Esto desbloqueará el ether.
         function confirmReceived()
             onlyBuyer
             inState(State.Locked)
         {
             ItemReceived();
-            // It is important to change the state first because
-            // otherwise, the contracts called using `send` below
-            // can call in again here.
+            // Es importante que primero se cambie el estado para
+            // para evitar que los contratos a los que se llama
+            // abajo mediante `send` puedan volver a ejecutar esto.
             state = State.Inactive;
 
-            // NOTE: This actually allows both the buyer and the seller to
-            // block the refund - the withdraw pattern should be used.
+            // NOTA: Esto permite bloquear los fondos tanto al comprador
+            // como al vendedor - debe usarse el patrón withdraw.
 
             buyer.transfer(value);
             seller.transfer(this.balance);
