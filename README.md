@@ -1,8 +1,8 @@
 # Documentación de Solidity en español
-Repositorio para traducir la documentación oficial de Soldiity (en inglés) al español.
+Repositorio para traducir la [documentación oficial de Solidity (en inglés)](https://github.com/ethereum/solidity) al español.
 
 ## Versión
-Este repositorio es una copia de la documentación de Solidity con último commit: 26ea9ce07cf85849cd881465a4322f14bff87eb8
+Este repositorio es una copia de la documentación de Solidity con último commit: [26ea9ce07cf85849cd881465a4322f14bff87eb8](https://github.com/ethereum/solidity/tree/26ea9ce07cf85849cd881465a4322f14bff87eb8)
 
 ## Contribuciones
 Para editar un fichero, primero entra en la pestaña "Pull requests" para comprobar que no está siendo traducido por otra persona.
