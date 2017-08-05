@@ -13,7 +13,7 @@ Para mejor organización, sólo debe traducirse un fichero por Pull request.
 Algunas cosas a tener en cuenta cuando se traduzca un documento:
 * El código, nombres de funciones y variables no se traducen (los comentarios sí).
 * Palabras que pese a estar en inglés sean de uso común en español no se traducen (ej: blockchain, timestamp, etc.)
-* Los asteriscos (\*) y signos de igual (=) que acompañen a títulos, debern extender su longitud a la longitud del título. Ejemplo:
+* Los asteriscos (\*), signos de igual (=), almohadillas (#), guiones (-), etc.  que acompañen a títulos, deberán extender su longitud a la longitud del título. Ejemplo:
 ~~~
 ************
 Título corto
