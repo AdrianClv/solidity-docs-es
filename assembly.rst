@@ -1,6 +1,6 @@
-#################
-Solidity Assembly
-#################
+#######################
+Ensamblador de Solidity
+#######################
 
 .. index:: ! assembly, ! asm, ! evmasm
 
