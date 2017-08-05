@@ -218,35 +218,33 @@ juntas con una expresión no literal).
 Esto significa que las computaciones no se desbordan y las divisiones no se truncan
 en expresiones de números literales.
 
-This means that computations do not overflow and divisions do not truncate
-in number literal expressions.
+Por ejemplo, ``(2**800 + 1) - 2**800`` resulta en la constante ``1`` (de tipo ``uint8``)
+aunque resultados intermedios ni siquiera serían del tamaño de la palabra. Además, ``.5 * 8`` resulta
+en el entero ``4`` (aunque no enteros fueron usados entremedio).
 
-For example, ``(2**800 + 1) - 2**800`` results in the constant ``1`` (of type ``uint8``)
-although intermediate results would not even fit the machine word size. Furthermore, ``.5 * 8`` results
-in the integer ``4`` (although non-integers were used in between).
+Si el resultado no es un entero,
+un tipo apropiado ``ufixed`` o ``fixed`` es usado del cual el número de bits fraccionales es tan grande
+como se necesite (aproximando el número racional en el peor de los casos).
 
-If the result is not an integer,
-an appropriate ``ufixed`` or ``fixed`` type is used whose number of fractional bits is as large as
-required (approximating the rational number in the worst case).
+En ``var x = 1/4;``, ``x`` recibirá el tipo ``ufixed0x8`` mientras que en ``var x = 1/3`` recibirá
+el tipo ``ufixed0x256`` porque ``1/3`` no es finitamente representable en binario y entonces será
+aproximado.
 
-In ``var x = 1/4;``, ``x`` will receive the type ``ufixed0x8`` while in ``var x = 1/3`` it will receive
-the type ``ufixed0x256`` because ``1/3`` is not finitely representable in binary and will thus be
-approximated.
-
-Any operator that can be applied to integers can also be applied to number literal expressions as
-long as the operands are integers. If any of the two is fractional, bit operations are disallowed
-and exponentiation is disallowed if the exponent is fractional (because that might result in
-a non-rational number).
+Cualquier operador que puede ser aplicado a enteros también puede ser aplicado a una expresión de
+número literal con tal que los operadores sea enteros. Si cualquiera de los dos es fraccional, las
+operaciones de bit no son permitidas y la exponenciación no es permitida si el exponente es fraccional
+(porque eso puede resultar en un número no racional).
 
 .. note::
-    Solidity has a number literal type for each rational number.
-    Integer literals and rational number literals belong to number literal types.
-    Moreover, all number literal expressions (i.e. the expressions that
-    contain only number literals and operators) belong to number literal
-    types.  So the number literal expressions ``1 + 2`` and ``2 + 1`` both
-    belong to the same number literal type for the rational number three.
+    Solidity tiene tipo literal de número prar cada número racional.
+    Literales enteros y números racionales literales pertenecen a los tipos de numeros
+    literales. Por otra parte, todos las expreciones litereales (ej. las epresiones que
+    contienen sólo números literales y operadores) pertenecen a tipos de numeros literales.
+    Entonces las expresiones de números literales  ``1 + 2`` y ``2 + 1`` ambas
+    pertenecen al mismo tipo de numero literal para el número racional tres.
 
 .. note::
+    La mayoría de fracciones decimales finitas como ``5.3743`` no son finitamente representable en binario. 
     Most finite decimal fractions like ``5.3743`` are not finitely representable in binary. The correct type
     for ``5.3743`` is ``ufixed8x248`` because that allows to best approximate the number. If you want to
     use the number together with types like ``ufixed`` (i.e. ``ufixed128x128``), you have to explicitly
