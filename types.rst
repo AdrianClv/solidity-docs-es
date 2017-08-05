@@ -137,85 +137,87 @@ La opción ``.gas()`` está disponible en los 3 métodos, mientras la opción ``
     usando ``this.balance``.
 
 .. warning::
-    All these functions are low-level functions and should be used with care.
-    Specifically, any unknown contract might be malicious and if you call it, you
-    hand over control to that contract which could in turn call back into
-    your contract, so be prepared for changes to your state variables
-    when the call returns.
+    Todas estas funciones son funciones de bajo nivel y debe usarse con cuidado.
+    Específicamente, cualquier contrato desconocido puede ser malicioso y si se le llama,
+    se le da el controll a ese contrato que puede, luego llamar de vuelta a tu contrato,
+    así que prepárense para cambios a tus variables de estado cuando el llamado retorna.
 
 .. index:: byte array, bytes32
 
 
-Fixed-size byte arrays
-----------------------
+Colleción de byte de tamaño fijo
+--------------------------------
 
-``bytes1``, ``bytes2``, ``bytes3``, ..., ``bytes32``. ``byte`` is an alias for ``bytes1``.
+``bytes1``, ``bytes2``, ``bytes3``, ..., ``bytes32``. ``byte`` es un alias para ``bytes1``.
 
-Operators:
+Operadores:
 
-* Comparisons: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evaluate to ``bool``)
-* Bit operators: ``&``, ``|``, ``^`` (bitwise exclusive or), ``~`` (bitwise negation), ``<<`` (left shift), ``>>`` (right shift)
-* Index access: If ``x`` is of type ``bytesI``, then ``x[k]`` for ``0 <= k < I`` returns the ``k`` th byte (read-only).
+* Comparaciones: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evalúa a ``bool``)
+* Operadores Bit: ``&``, ``|``, ``^`` (exclusivo bitwise or), ``~`` (negación bitwise), ``<<`` (shift izquierdo), ``>>`` (shift derecho)
+* Acceso index: Si ``x`` es de tipo ``bytesI``, entonces ``x[k]`` para ``0 <= k < I`` devuelve el byte ``k`` (lectura sólo).
 
-The shifting operator works with any integer type as right operand (but will
-return the type of the left operand), which denotes the number of bits to shift by.
-Shifting by a negative amount will cause a runtime exception.
+El operador shift funciona con cualquier entero como operador derecho (pero
+devuelve el tipo del operador izquierdo, que denota el número de bits a desplazarse.
+Desplazarse por un número negativo arroja una excepción runtime.
 
-Members:
+Miembros:
 
-* ``.length`` yields the fixed length of the byte array (read-only).
+* ``.length`` devuelve el largo fijo del array byte (lectura sólo).
 
-Dynamically-sized byte array
-----------------------------
+Array byte de tamaño dinámico
+-----------------------------
 
 ``bytes``:
-    Dynamically-sized byte array, see :ref:`arrays`. Not a value-type!
+    Array byte de tamaño dinámico, ver :ref:`arrays`. No un tipo de valor!
 ``string``:
-    Dynamically-sized UTF-8-encoded string, see :ref:`arrays`. Not a value-type!
+    Cadena de caracteres UTF-8-codificado de tamaño dinámico, ver :ref:`arrays`. No un tipo de valor!
 
-As a rule of thumb, use ``bytes`` for arbitrary-length raw byte data and ``string``
-for arbitrary-length string (UTF-8) data. If you can limit the length to a certain
-number of bytes, always use one of ``bytes1`` to ``bytes32`` because they are much cheaper.
+Como regla general, usa ``bytes`` para data raw byte de tamaño arbitrario y ``string``
+para una cadena de caracteres (UTF-8) de tamaño arbitrario. Si puedes limitar el tamaño a un cierto
+número de bytes, siempre usa una de ``bytes1`` a ``bytes32`` porque son muchas mas baratas.
 
 .. index:: ! ufixed, ! fixed, ! fixed point number
 
-Fixed Point Numbers
--------------------
+Números de punto fijo
+---------------------
 
-**COMING SOON...**
+**PRÓXIMAMENTE...**
 
 .. index:: address, literal;address
 
 .. _address_literals:
 
-Address Literals
-----------------
+Address LIterales
+-----------------
 
-Hexadecimal literals that pass the address checksum test, for example
-``0xdCad3a6d3569DF655070DEd06cb7A1b2Ccd1D3AF`` are of ``address`` type.
-Hexadecimal literals that are between 39 and 41 digits
-long and do not pass the checksum test produce
-a warning and are treated as regular rational number literals.
+Literales hexadecimales que pasan el test checksum, por ejemplo
+``0xdCad3a6d3569DF655070DEd06cb7A1b2Ccd1D3AF`` es de tipo ``address``.
+Literales hexaecimales que estan entre 39 y 41 dígitos de largo y
+no pasan test de checksum producen una advetencia y son tratados como
+números racionales literales regulares.
 
 .. index:: literal, literal;rational
 
 .. _rational_literals:
 
-Rational and Integer Literals
------------------------------
+Literales racionales y enteros
+------------------------------
 
-Integer literals are formed from a sequence of numbers in the range 0-9.
-They are interpreted as decimals. For example, ``69`` means sixty nine.
-Octal literals do not exist in Solidity and leading zeros are invalid.
+Literales enteros son formados por una sequencia de números en el rango 0-9.
+Son interpretados como decimales. Por ejemplo, ``69`` significa sesenta y nueve.
+Literales octales no existen en Solidity y ceros a la izquierda son inválidos.
 
-Decimal fraction literals are formed by a ``.`` with at least one number on
-one side.  Examples include ``1.``, ``.1`` and ``1.3``.
+Literales de fracciones decimales son formados por un ``.`` con al menos un número en
+un lado. Ejemplos incluyen ``1.``, ``.1`` y ``1.3``.
 
-Scientific notation is also supported, where the base can have fractions, while the exponent cannot.
-Examples include ``2e10``, ``-2e10``, ``2e-10``, ``2.5e1``.
+La notación científica está también soportada, donde la base puede tener fracciones, mientras el exponente no puede.
+Ejemplos incluyen ``2e10``, ``-2e10``, ``2e-10``, ``2.5e1``.
 
-Number literal expressions retain arbitrary precision until they are converted to a non-literal type (i.e. by
-using them together with a non-literal expression).
+Expresiones de números literales retienen precisión arbitraria hasta que son convertidas a un tipo no literal (ej. usándolas
+juntas con una expresión no literal).
+Esto significa que las computaciones no se desbordan y las divisiones no se truncan
+en expresiones de números literales.
+
 This means that computations do not overflow and divisions do not truncate
 in number literal expressions.
 
