@@ -2,10 +2,33 @@
 Repositorio para traducir la documentación oficial de Soldiity (en inglés) al español.
 
 ## Versión
-Este repositorio es una copia de la documentación de Soldiity con último commit: 26ea9ce07cf85849cd881465a4322f14bff87eb8
+Este repositorio es una copia de la documentación de Solidity con último commit: 26ea9ce07cf85849cd881465a4322f14bff87eb8
 
 ## Contribuciones
 Para editar un fichero, primero entra en la pestaña "Pull requests" para comprobar que no está siendo traducido por otra persona.
+
+#### Estilo
+Algunas cosas a tener en cuenta cuando se traduzca un documento:
+* El código, nombres de funciones y variables no se traducen (los comentarios sí).
+* Palabras que pese a estar en inglés sean de uso común en español no se traducen (ej: blockchain, timestamp, etc.)
+* Los asteriscos (\*) y signos de igual (=) que acompañen a títulos, debern extender su longitud a la longitud del título. Ejemplo:
+~~~
+************
+Título corto
+************
+
+Títular más largo
+=================
+~~~
+* Las rutas de enlaces del siguiente estilo no se traducen:
+~~~
+-.. _structure-state-variables:
+~~~
+* En los enlaces a las rutas del apartado anterior, se traduce el nombre del enlace, no la ruta. Ejemplo:
+~~~
+:ref:`variables de estado <structure-state-variables>`
+~~~
+
 
 #### Pasos para editar
 Elige el fichero que quieras traducir y haz click en el logo del lapicero de arriba a la derecha, en donde pone "Edit this file":
