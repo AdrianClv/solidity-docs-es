@@ -7,7 +7,9 @@ Este repositorio es una copia de la documentación de Solidity con último commi
 ## Contribuciones
 Para editar un fichero, primero entra en la pestaña "Pull requests" para comprobar que no está siendo traducido por otra persona.
 
-#### Estilo
+Para mejor organización, sólo debe traducirse un fichero por Pull request.
+
+### Estilo
 Algunas cosas a tener en cuenta cuando se traduzca un documento:
 * El código, nombres de funciones y variables no se traducen (los comentarios sí).
 * Palabras que pese a estar en inglés sean de uso común en español no se traducen (ej: blockchain, timestamp, etc.)
@@ -29,8 +31,12 @@ Títular más largo
 :ref:`variables de estado <structure-state-variables>`
 ~~~
 
+### Etiquetas
+* work in progress: ya hay alguien trabajando en el fichero.
+* needs review: el fichero ya ha sido traducido, necesita al menos una revisión de una persona distinta al traductor para incorporarlo al repositorio final.
+* open: el fichero estaba siendo traducido por alguien, pero esa persona está inactiva. Puedes continuar con la traducción a partir de donde lo dejó el anterior.
 
-#### Pasos para editar
+### Pasos para editar
 Elige el fichero que quieras traducir y haz click en el logo del lapicero de arriba a la derecha, en donde pone "Edit this file":
 ![](http://i.imgur.com/B6jRrsZ.png)
 
