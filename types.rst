@@ -244,21 +244,20 @@ operaciones de bit no son permitidas y la exponenciación no es permitida si el 
     pertenecen al mismo tipo de numero literal para el número racional tres.
 
 .. note::
-    La mayoría de fracciones decimales finitas como ``5.3743`` no son finitamente representable en binario. 
-    Most finite decimal fractions like ``5.3743`` are not finitely representable in binary. The correct type
-    for ``5.3743`` is ``ufixed8x248`` because that allows to best approximate the number. If you want to
-    use the number together with types like ``ufixed`` (i.e. ``ufixed128x128``), you have to explicitly
-    specify the desired precision: ``x + ufixed(5.3743)``.
+    La mayoría de fracciones decimales finitas como ``5.3743`` no son finitamente representable en binario.
+    El tipo correcto para ``5.3743`` es ``ufixed8x248`` porque permite la mejor aproximación del número. Si
+    quieres usar el número junto con tipos como ``ufixed`` (ej. ``ufixed128x128``), tienes que explicitamente
+    espcificar la precisión buscada: ``x + ufixed(5.3743)``.
 
 .. warning::
-    Division on integer literals used to truncate in earlier versions, but it will now convert into a rational number, i.e. ``5 / 2`` is not equal to ``2``, but to ``2.5``.
+    División en enteros literales usados para truncar en versiones anteriores, pero ahora se convertirá en un número racional, ej. ``5 / 2`` no es igual a ``1``, mas bien a ``2.5``.
 
 .. note::
-    Number literal expressions are converted into a non-literal type as soon as they are used with non-literal
-    expressions. Even though we know that the value of the
-    expression assigned to ``b`` in the following example evaluates to an integer, it still
-    uses fixed point types (and not rational number literals) in between and so the code
-    does not compile
+    Expresiones de números literales son convertidas en tipos no literales tan pronto como ellas son usadas con expresiones
+    no literales. Aunque sabemos que el valor de la expresión
+    asignada a ``b`` en el siguiente ejemplo evalúa a un entero, sigue usando
+    tipos de punto fijo (y no numeros literales racionales) entremedio y entonces
+    el código no compila.
 
 ::
 
@@ -267,8 +266,8 @@ operaciones de bit no son permitidas y la exponenciación no es permitida si el 
 
 .. index:: literal, literal;string, string
 
-String Literals
----------------
+Cadena de carateres de literales
+--------------------------------
 
 String literals are written with either double or single-quotes (``"foo"`` or ``'bar'``).  They do not imply trailing zeroes as in C; ``"foo"`` represents three bytes not four.  As with integer literals, their type can vary, but they are implicitly convertible to ``bytes1``, ..., ``bytes32``, if they fit, to ``bytes`` and to ``string``.
 
