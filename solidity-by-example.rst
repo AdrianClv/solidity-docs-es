@@ -329,42 +329,41 @@ su dinero - los contratos no pueden activarse por sí mismos.
         }
     }
 
-Blind Auction
+Subasta a ciegas
 =============
 
-The previous open auction is extended to a blind auction
-in the following. The advantage of a blind auction is
-that there is no time pressure towards the end of
-the bidding period. Creating a blind auction on a
-transparent computing platform might sound like a
-contradiction, but cryptography comes to the rescue.
+A continuación, se va a extender la subasta abierta anterior
+a una subasta a ciegas. La ventaja de una subasta a ciegas
+es que conforme se acaba el plazo de pujas, no aumenta la presión.
+Crear una subasta a ciegas en una plataforma de computación
+transparente puede parecer contradictorio, pero la criptografía
+lo hace posible.
 
-During the **bidding period**, a bidder does not
-actually send her bid, but only a hashed version of it.
-Since it is currently considered practically impossible
-to find two (sufficiently long) values whose hash
-values are equal, the bidder commits to the bid by that.
-After the end of the bidding period, the bidders have
-to reveal their bids: They send their values
-unencrypted and the contract checks that the hash value
-is the same as the one provided during the bidding period.
+Durante el **periodo de puja**, una pujador no envía su puja
+como tal, sino una versión hasheada de la misma.
+Puesto que en la actualidad se considera que es prácticamente
+imposible encontrar dos valores (suficientemente largos)
+cuyos hashes son iguales, el pujador realiza la puja de esa forma.
+Tras el periodo de puja, los pujadores tienen que revelar
+sus pujas. Para ello, envían los valores descrifrados y el 
+contrato comprueba que el valor del hash se corresponde con
+el proporcionado durante el periodo de puja.
 
-Another challenge is how to make the auction
-**binding and blind** at the same time: The only way to
-prevent the bidder from just not sending the money
-after he won the auction is to make her send it
-together with the bid. Since value transfers cannot
-be blinded in Ethereum, anyone can see the value.
+Otra complicación es cómo hacer la subasta
+**vinculante y ciega** al mismo tiempo: la única manera de
+evitar que el pujador no envíe el dinero tras ganar
+la subasta, es haciendo que lo envíe junto con la puja.
+Puesto que las transferencias de valor no pueden ser
+ocultadas en Ethereum, cualquiera podrá ver la cantidad.
 
-The following contract solves this problem by
-accepting any value that is at least as large as
-the bid. Since this can of course only be checked during
-the reveal phase, some bids might be **invalid**, and
-this is on purpose (it even provides an explicit
-flag to place invalid bids with high value transfers):
-Bidders can confuse competition by placing several
-high or low invalid bids.
-
+El siguiente contrato soluciona este problema al
+aceptar cualquier valor que sea al menos tan alto como
+lo pujado. Puesto que esto sólo se podrá comprobar durante
+la fase de revelación, algunas pujas podrán ser **inválidas**.
+Esto es así a propósito (incluso sirve para prevenir errores
+en caso de envíar pujas con valores muy altos). Los pujadores
+pueden confundir a su competencia realizando multiples pujas
+inválidas con valores altos o bajos.
 
 ::
 
@@ -387,7 +386,7 @@ high or low invalid bids.
         address public highestBidder;
         uint public highestBid;
 
-        // Allowed withdrawals of previous bids
+        // Retiradas permitidas de pujas previas
         mapping(address => uint) pendingReturns;
 
         event AuctionEnded(address winner, uint highestBid);
