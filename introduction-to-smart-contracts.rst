@@ -2,7 +2,7 @@
 Introducción a los Contratos Inteligentes
 #########################################
 
-.. _contrato-inteligente-simple:
+-.. _simple-smart-contract:
 
 ******************************
 Un contrato inteligente simple
