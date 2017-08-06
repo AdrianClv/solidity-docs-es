@@ -459,37 +459,39 @@ Notar que los lambda o funciones inline están planeadas pero no están aún imp
 
 .. index:: ! type;reference, ! reference type, storage, memory, location, array, struct
 
-Reference Types
-==================
+Tipos de Referencia
+===================
 
-Complex types, i.e. types which do not always fit into 256 bits have to be handled
-more carefully than the value-types we have already seen. Since copying
-them can be quite expensive, we have to think about whether we want them to be
-stored in **memory** (which is not persisting) or **storage** (where the state
-variables are held).
+Tipos complejos, ej. tipos que no siempre caben en 256 bits tienen que ser manejadas
+cn más cuidado que los tipos de valores que ya hemos visto. Ya que copiarlas puede
+ser muy caro, tenemos que pensar sobre si queremos que se almacenen en **memory**
+(que no es persistente) o en **storage** (donde las variables de estado se guardan).
 
-Data location
--------------
+Ubicacion de datos
+------------------
 
-Every complex type, i.e. *arrays* and *structs*, has an additional
-annotation, the "data location", about whether it is stored in memory or in storage. Depending on the
-context, there is always a default, but it can be overridden by appending
-either ``storage`` or ``memory`` to the type. The default for function parameters (including return parameters) is ``memory``, the default for local variables is ``storage`` and the location is forced
-to ``storage`` for state variables (obviously).
+Cada tipo complejo, ej. *arrays* y *structs*, tienen anotaciones
+adicionales, la "data location", con respecto a si es almacenado
+en memoria o en almacenamiento. Dependiendo del contexto, siempre hay un
+valor por defecto, pero puede ser remplazada añadiendo o bien
+``storage`` o `memory`` al tipo. Por defecto para tipos parámetros de
+función (incluyendo parámetros de retorno) es ``memory``, por defecto para
+variables locales es ``storage`` y la ubicación es forzada a ``storage``
+para variables de estado (obviamente).
 
-There is also a third data location, "calldata", which is a non-modifyable
-non-persistent area where function arguments are stored. Function parameters
-(not return parameters) of external functions are forced to "calldata" and
-it behaves mostly like memory.
+Hay una tercera ubcación de datos, "calldata", un área que no es modificable
+y no persitente donde argumentos de función son almacenados. Parámetros de función
+(no parámetros de retorno) de funciones externas son forzados a "calldata" y
+se comporta casi como memoria.
 
-Data locations are important because they change how assignments behave:
-Assignments between storage and memory and also to a state variable (even from other state variables)
-always create an independent copy.
-Assignments to local storage variables only assign a reference though, and
-this reference always points to the state variable even if the latter is changed
-in the meantime.
-On the other hand, assignments from a memory stored reference type to another
-memory-stored reference type does not create a copy.
+Ubicaciones de datos son importantes porque cambien como las asignaciones se comportan:
+Las asignaciones entre almacenamiento y memoria y también de variables de estado (incluso desde otras
+variable de estado) siempre crean una copia independiente.
+Asignaciones a almacenamiento variable de almacenamiento local sólo asignan una referencia, y
+esta referencia siempre apunta a la variable de estado aunque la referencia cambie
+entretanto.
+En cambio, asignaciones de la referencia almacenada en memoria a otro tipo de referencia
+no crea una copia.
 
 ::
 
@@ -498,28 +500,29 @@ memory-stored reference type does not create a copy.
     contract C {
         uint[] x; // the data location of x is storage
 
-        // the data location of memoryArray is memory
+        // la ubicacion de datos de memoryArray es memory
         function f(uint[] memoryArray) {
-            x = memoryArray; // works, copies the whole array to storage
-            var y = x; // works, assigns a pointer, data location of y is storage
-            y[7]; // fine, returns the 8th element
-            y.length = 2; // fine, modifies x through y
-            delete x; // fine, clears the array, also modifies y
-            // The following does not work; it would need to create a new temporary /
-            // unnamed array in storage, but storage is "statically" allocated:
+            x = memoryArray; // funciona, copia el array entero al almacenamiento
+            var y = x; // funciona, asigna una referencia, ubicación de datos de y es almacenamiento
+            y[7]; // bien, devuelve el octavo elemento
+            y.length = 2; // bien, modifica de x a y
+            delete x; // bien, limpia el array, también modifica y
+            // Lo siguiente no funciona; debería crear un nuevo temporal/sin nombre
+            // array en almacenamiento, pero almacenamiento es asignado "estáticamente":
             // y = memoryArray;
-            // This does not work either, since it would "reset" the pointer, but there
-            // is no sensible location it could point to.
-            // delete y;
-            g(x); // calls g, handing over a reference to x
-            h(x); // calls h and creates an independent, temporary copy in memory
+            // Esto no funciona tampoco, ya que resetearía el apuntador, pero no hay
+            // ubicación donde podría apuntar
+            // borrar y;
+            g(x); // llama g, dando referencia a x
+            h(x); // llama h y y crea una copia endependiente y temporal en la memoria
         }
 
         function g(uint[] storage storageArray) internal {}
         function h(uint[] memoryArray) {}
     }
 
-Summary
+
+Resumen
 ^^^^^^^
 
 Forced data location:
