@@ -266,21 +266,25 @@ operaciones de bit no son permitidas y la exponenciación no es permitida si el 
 
 .. index:: literal, literal;string, string
 
-Cadena de carateres de literales
---------------------------------
+Literales cadenas
+-----------------
 
-String literals are written with either double or single-quotes (``"foo"`` or ``'bar'``).  They do not imply trailing zeroes as in C; ``"foo"`` represents three bytes not four.  As with integer literals, their type can vary, but they are implicitly convertible to ``bytes1``, ..., ``bytes32``, if they fit, to ``bytes`` and to ``string``.
+Las cadenas literales son cerrados con comillas simples o dobles (``"foo"`` or ``'bar'``). No hay ceros implícitos como en C; ``"foo"`` representa tres bytes, no cuatro. Como con lietrales enteros, su tpo puede variar, pero son implícitamente convvertibles a ``bytes1``, ..., ``bytes32``, si caben a ``bytes`` y a ``string``.
 
-String literals support escape characters, such as ``\n``, ``\xNN`` and ``\uNNNN``. ``\xNN`` takes a hex value and inserts the appropriate byte, while ``\uNNNN`` takes a Unicode codepoint and inserts an UTF-8 sequence.
+
+Las cadenas literales soportan caracteres de escape, tales como ``\n``, ``\xNN`` y ``\uNNNN``. ``\xNN`` toma un valor e inserta el byte apropiado, mientas que ``\uNNNN`` toma un codepoint Unicode e inserta una secuencia UTF-8.
+
 
 .. index:: literal, bytes
 
-Hexadecimal Literals
---------------------
 
-Hexademical Literals are prefixed with the keyword ``hex`` and are enclosed in double or single-quotes (``hex"001122FF"``). Their content must be a hexadecimal string and their value will be the binary representation of those values.
+Literales hexadecimales
+-----------------------
 
-Hexademical Literals behave like String Literals and have the same convertibility restrictions.
+Los literales hexadecimales son prefijos con la palabra clave ``hex`` y son cerrados por comillas simples o dobles (``hex"001122FF"``). Su contenido debe ser una cadena hexadecimal y su valor será la representación binaria de esos valores.
+
+Los literales hexadecimales se comportan como los literales de cadena y tienen los mismas restricciones de convetibilidad.
+
 
 .. index:: enum
 
@@ -289,9 +293,9 @@ Hexademical Literals behave like String Literals and have the same convertibilit
 Enums
 -----
 
-Enums are one way to create a user-defined type in Solidity. They are explicitly convertible
-to and from all integer types but implicit conversion is not allowed.  The explicit conversions
-check the value ranges at runtime and a failure causes an exception.  Enums needs at least one member.
+Enums son una manera de hacer tipos creados por usuario en Solidity. Son explícitamente convertibles
+a y desde todo tipos de enteros pero la conversión implícita no se permite. Las conversiones explícitas
+revisan los valores de rangos en runtime y una falla causa una excepción. Enums necesitan al menos un miembro.
 
 ::
 
@@ -306,11 +310,11 @@ check the value ranges at runtime and a failure causes an exception.  Enums need
             choice = ActionChoices.GoStraight;
         }
 
-        // Since enum types are not part of the ABI, the signature of "getChoice"
-        // will automatically be changed to "getChoice() returns (uint8)"
-        // for all matters external to Solidity. The integer type used is just
-        // large enough to hold all enum values, i.e. if you have more values,
-        // `uint16` will be used and so on.
+        // Ya que los tipos enum no son parte del ABI, la firma de "getChoice"
+        // automáticamente será cambiada a "getChoice() returns (unit8)"
+        // para todo lo externo a Solidity. El tipo entero usado es a penas
+        // suficientemente grande para guardar todos los valores enum, ej. si
+        // tienes más valores, `unit16` será utilizado y así.
         function getChoice() returns (ActionChoices) {
             return choice;
         }
@@ -324,58 +328,59 @@ check the value ranges at runtime and a failure causes an exception.  Enums need
 
 .. _function_types:
 
-Function Types
---------------
+Función
+-------
 
-Function types are the types of functions. Variables of function type
-can be assigned from functions and function parameters of function type
-can be used to pass functions to and return functions from function calls.
-Function types come in two flavours - *internal* and *external* functions:
+Los tipos función son tipos de función. Variables de tipo función
+pueden ser asignados desde funciones y parametros de funciones de tipo función
+pueden ser usadas para pasar funciones y retornar funciones de llamados de funciones.
+Los tipos de función hay de dos tipos - *internas* y *externas*:
 
-Internal functions can only be used inside the current contract (more specifically,
-inside the current code unit, which also includes internal library functions
-and inherited functions) because they cannot be executed outside of the
-context of the current contract. Calling an internal function is realized
-by jumping to its entry label, just like when calling a function of the current
-contract internally.
+Las funciones internas sólo pueden ser usadas dentro del contrato actual (específicamente,
+dentro de la unidad de code actual, que también incluye funciones libreríás internas
+y funciones heredadas) porque no pueden ser ejecutadas fuera del
+contexto del contrato actual. Llamando una función interna se realiza
+saltando a su label de entrada, tal como cuando se llama una función interna del
+contrato actual.
 
-External functions consist of an address and a function signature and they can
-be passed via and returned from external function calls.
+Funciones externas están compuestas de una dirección y una firma de función y pueden
+ser pasadas y devueltas desde una llamada de función externa.
 
-Function types are notated as follows::
+Los tipos de funciones son notadas como sigue::
 
     function (<parameter types>) {internal|external} [constant] [payable] [returns (<return types>)]
 
-In contrast to the parameter types, the return types cannot be empty - if the
-function type should not return anything, the whole ``returns (<return types>)``
-part has to be omitted.
+En contraste a los tipos de parámetros, los tipos de retorno no pueden estar vacíos - si
+el tipo función no debe retornar nada, la parte ``returns (<return types>)``
+tiene que ser omitida.
 
-By default, function types are internal, so the ``internal`` keyword can be
-omitted.
+Por defecto, las funciones son de tipo interna, así que la palabra clave ``internal``
+puede ser omitida.
 
-There are two ways to access a function in the current contract: Either directly
-by its name, ``f``, or using ``this.f``. The former will result in an internal
-function, the latter in an external function.
+Hay dos formas de acceder una función en el contrato actual: o bien directamente
+con su nombre, ``f``, o usando ``this.f``. Usando el nombre resultará en una función
+interna, y con ``this`` habrá una función externa.
 
-If a function type variable is not initialized, calling it will result
-in an exception. The same happens if you call a function after using ``delete``
-on it.
+Si una variable de tipo función no es inicializada, llamarla resultará
+resultar en una excepción. Lo mismo ocurre si llamas una función después de usar
+``delete`` en ella.
 
-If external function types are used outside of the context of Solidity,
-they are treated as the ``function`` type, which encodes the address
-followed by the function identifier together in a single ``bytes24`` type.
+Si funciones externas son usadas fuera del contexto de Solidity, son tratadas
+como tipo ``function``, que codifica la dirección seguida por el identificador
+de la función junto con un tipo ``bytes24``.
 
-Note that public functions of the current contract can be used both as an
-internal and as an external function. To use ``f`` as an internal function,
-just use ``f``, if you want to use its external form, use ``this.f``.
+Nótese que las funciones públicas del contrato actual pueden ser usado tanto
+como una función interna y externa. Para usar ``f`` como función interna, sólo
+se le llama como ``f``, y si se quiere usar como externa, usar ``this.f``.
 
-Example that shows how to use internal function types::
+
+Ejemplo que muestra como usar tipos de funcion internas::
 
     pragma solidity ^0.4.5;
 
     library ArrayUtils {
-      // internal functions can be used in internal library functions because
-      // they will be part of the same code context
+      // las funciones internas pueden ser usadas en funciones de librerías
+      // internas porque serán parte del mismo contexto de código
       function map(uint[] memory self, function (uint) returns (uint) f)
         internal
         returns (uint[] memory r)
@@ -418,7 +423,7 @@ Example that shows how to use internal function types::
       }
     }
 
-Another example that uses external function types::
+Otro ejemplo que usa tipos de función externa::
 
     pragma solidity ^0.4.11;
 
@@ -434,7 +439,7 @@ Another example that uses external function types::
         NewRequest(requests.length - 1);
       }
       function reply(uint requestID, bytes response) {
-        // Here goes the check that the reply comes from a trusted source
+        // Aquí se revisa que el respuesta viene de una fuente de confianza
         requests[requestID].callback(response);
       }
     }
@@ -446,11 +451,11 @@ Another example that uses external function types::
       }
       function oracleResponse(bytes response) {
         require(msg.sender == address(oracle));
-        // Use the data
+        // Usar los datos
       }
     }
 
-Note that lambda or inline functions are planned but not yet supported.
+Notar que los lambda o funciones inline están planeadas pero no están aún implementados.
 
 .. index:: ! type;reference, ! reference type, storage, memory, location, array, struct
 
