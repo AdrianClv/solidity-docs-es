@@ -156,7 +156,7 @@ Estos bloques forman una secuencia lineal en el tiempo y del que viene la palabr
 Como parte del "mecanismo de selcción de orden" (que se conoce como minería), tiene que pasar que los bloques sean revertidos de cuando en cuando, pero sólo en el extremo o "tip" de la cadena. Cuanto más bloques se añaden encima, menos problable es. Entonces, sucedería que tus transacciones sean revertidas e incluso borradas de la blockchain, y cuanto más esperes, menos problable será.
 
 
-.. _maquina-virtual-ethereum:
+.. _the-ethereum-virtual-machine:
 
 .. index:: !evm, ! ethereum virtual machine
 
@@ -225,44 +225,27 @@ El resto de operaciones cogen los dos elementos más superiores (o uno, o más, 
 
 .. index:: ! instruction
 
-Instruction Set
-===============
+Conjunto de instrucciones
+=========================
 
-The instruction set of the EVM is kept minimal in order to avoid
-incorrect implementations which could cause consensus problems.
-All instructions operate on the basic data type, 256-bit words.
-The usual arithmetic, bit, logical and comparison operations are present.
-Conditional and unconditional jumps are possible. Furthermore,
-contracts can access relevant properties of the current block
-like its number and timestamp.
+El conjunto de instrucciones de la EVM se mantiene mínimo con el objetivo de evitar implementaciones incorrectas que podrían causar problemas de consenso. Todas las intruciones operan con el tipo de datos básico, palabras de 256-bit.
+La aritmética habitual, bit, lógica y operaciones de comparación están presentes.
+Salton condicionales o no condicionales están permitidos. Es más, los contratos pueden acceder a propiedades relevantes del bloque actual como su número y timestamp.
 
 .. index:: ! message call, function;call
 
 Message Calls
 =============
 
-Contracts can call other contracts or send Ether to non-contract
-accounts by the means of message calls. Message calls are similar
-to transactions, in that they have a source, a target, data payload,
-Ether, gas and return data. In fact, every transaction consists of
-a top-level message call which in turn can create further message calls.
+Los contratos pueden llamar a otros contratos o enviar Ether a cuentas no-contrato usando message calls. Los Message calls son similares a las transacciones, en el sentido de que tienen un origen, un destino, datos, Ether, gas y datos de retorno. De hecho, cada transacción consiste en un message call de alto nivel que de forma consecutiva puede crear message calls posteriores.
 
-A contract can decide how much of its remaining **gas** should be sent
-with the inner message call and how much it wants to retain.
-If an out-of-gas exception happens in the inner call (or any
-other exception), this will be signalled by an error value put onto the stack.
-In this case, only the gas sent together with the call is used up.
-In Solidity, the calling contract causes a manual exception by default in
-such situations, so that exceptions "bubble up" the call stack.
+Un contrato puede decidir cuánto de su **gas** restante podría ser enviado con el message call interno y cuánto quiere retener. Si una excepción de out-of-gas ocurre en la llamada interna (o cualquier otra excepción), esto se firmará por un valor de error introducido dentro de la pila. En este caso, sólo se gasta el gas enviado junto con la llamada.
+En Solidity, el contrato que hace la llamada causa una excepción manual por defecto en estas situaciones, por lo que esas excepciones amplian la pila de llamada. 
 
-As already said, the called contract (which can be the same as the caller)
-will receive a freshly cleared instance of memory and has access to the
-call payload - which will be provided in a separate area called the **calldata**.
-After it has finished execution, it can return data which will be stored at
-a location in the caller's memory preallocated by the caller.
+Como se ha mencionado, el contrato llamado (que podría ser el mismo que el que hace la llamada) recivirá una instancia de memoria vacía y tendrá acceso a los datos de la llamada - que serán provistos en un área separada que se llama **calldata**.
+Después de finalizar su ejecución, puede devolver datos que serán almacenados en una localización en la memoria del que hace la llamada que éste ha reservado previamente.
 
-Calls are **limited** to a depth of 1024, which means that for more complex
-operations, loops should be preferred over recursive calls.
+Las llamadas están **limitadas** a la capacidad de 1024, lo que quiere decir que para operaciones más complejas, se debería preferir bucles sobre llamadas recursivas.
 
 .. index:: delegatecall, callcode, library
 
