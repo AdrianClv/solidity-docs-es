@@ -118,7 +118,7 @@ Es interesante como la función generada automáticamente ``balances`` es llamad
 
 .. index:: coin
 
-La función especial ``Coin`` es el constructor que es ejecutado durante la creación de un contrato y no puede ser llamada con posterioridad. Almacena permanentemente la dirección de la persona que crea el contrato: ``msg`` (junto con ``tx`` y ``block``) es una variable global mágica que contiene propiedades que permiten el acceso a la blockchain. ``msg.sender`` es siempre la dirección donde la función es siempre la dirección donde la llamada a la función actual (externa) es originada.
+La función especial ``Coin`` es el constructor que es ejecutado durante la creación de un contrato y no puede ser llamada con posterioridad. Almacena permanentemente la dirección de la persona que crea el contrato: ``msg`` (junto con ``tx`` y ``block``) es una variable global mágica que contiene propiedades que permiten el acceso a la blockchain. ``msg.sender`` es siempre la dirección donde la llamada a la función actual (externa) es originada.
 
 Finalmente, las funciones que actualmente concluirán con el contrato pueden ser llamadas por usuarios y contratos como son ``mint`` y ``send``. Si ``mint`` es llamado por cualquiera excepto la cuenta que creó el contrato, nada pasará. Por otro lado, ``send`` puede ser usado por todos (los que ya tienen algunas de estas monedas) para enviar monedas a cualquier otro. Hay que tener en cuenta que si se usa este contrato para enviar monedas a una dirección, no se verá reflejado cuando se busque la dirección en un explorador de la blockchain por el hecho de enviar monedas y que los balances sólo sean guardados en el almacenamiento particular de este contrato de moneda. Con el uso de eventos es relativamente sencillo crear un "explorador de la blockchain" que monitorice las transacciones y los balances de la nueva moneda.
 
@@ -135,7 +135,7 @@ Las blockchains son un concepto no muy difícil de entender para desarrolladores
 Transacciones
 =============
 
-Una blockchain es una base de datos transaccional globalmente compartida. Esto quiere decir que todos pueden leer las entradas en la base de datos simplemente participando en la red. Si quieres cambiar algo en la base de datos, tienes que crear una transacción a tal efecto que tiene qie ser aceptada por todos los demás.
+Una blockchain es una base de datos transaccional globalmente compartida. Esto quiere decir que todos pueden leer las entradas en la base de datos simplemente participando en la red. Si quieres cambiar algo en la base de datos, tienes que crear una transacción a tal efecto que tiene que ser aceptada por todos los demás.
 La palabra transacción implica que el cambio que quieres hacer (asumiendo que quieres cambiar dos valores al mismo tiempo) no se hace o no se aplica completamente. Es más, mientras tu transacción es aplicada en la base de datos, ninguna otra transacción puede modificarla. 
 
 Como un ejemplo, imagine una tabla que lista los balances de todas las cuentas en una divisa electrónica. Si una transferencia de una cuenta a otra es solicitada, la naturaleza transaccional de la base de datos garantiza que la cantidad que es sustraída de una cuenta, es añadida en la otra. Si por la razón que sea, añadir la cantidad a la cuenta de destino no es posible, la cuenta origen tampoco se modifica. 
@@ -153,7 +153,7 @@ La respuesta abstracta a esto es que no tienes de qué preocuparte. Un orden par
 
 Estos bloques forman una secuencia lineal en el tiempo y del que viene la palabra cadema de bloques o "blockchain". Los bloques son añadidos a la cadena en intervalos regulares - para Ethereum esto viene a significar cada 17 segundos.
 
-Como parte del "mecanismo de selcción de orden" (que se conoce como minería), tiene que pasar que los bloques sean revertidos de cuando en cuando, pero sólo en el extremo o "tip" de la cadena. Cuanto más bloques se añaden encima, menos problable es. Entonces, sucedería que tus transacciones sean revertidas e incluso borradas de la blockchain, y cuanto más esperes, menos problable será.
+Como parte del "mecanismo de selcción de orden" (que se conoce como minería), tiene que pasar que los bloques sean revertidos de cuando en cuando, pero sólo en el extremo o "tip" de la cadena. Cuanto más bloques se añaden encima, menos probable es. Entonces, sucedería que tus transacciones sean revertidas e incluso borradas de la blockchain, y cuanto más esperes, menos probable será.
 
 
 .. _the-ethereum-virtual-machine:
@@ -189,9 +189,9 @@ Más allá, cada cuenta tiene un **balance** en Ether (in "Wei" para ser exactos
 Transacciones
 =============
 
-Una transacción es un mensaje que se envía de una cuenta a otra (que debería ser lo mismo o la especial cuenta-cero, ver más adelante). Puede incluir datos binarios (payload) y Ether.
+Una transacción es un mensaje que se envía de una cuenta a otra (que debería ser la mismo o la especial cuenta-cero, ver más adelante). Puede incluir datos binarios (payload) y Ether.
 
-Si la cuenta destino contiene código, este es ejecutado y la carga de pago se provee como dato de entrada.
+Si la cuenta destino contiene código, este es ejecutado y la carga útil se provee como dato de entrada.
 
 Si la cuenta destino es la cuenta-cero (la cuenta con dirección ``0``), la transacción crea un **nuevo contrato**. Como se ha mancionado, la dirección del contrato no es la dirección cero, pero sí una dirección derivada del que envía y su número de transacciones enviadas (el "nonce"). Los datos binarios de la transacción que crea el contrato son obtenidos como bytecode por la EVM y ejecutados. La salida de esta ejecución es permanentemente almacenada como el código del contrato. Esto significa que para crear un contrato, no se envía el código actual del contrato, realmente se envía código que nos devuelve ese código final.
 
@@ -217,7 +217,7 @@ Cada cuenta tiene un área de memoria persistente que se llama **almacenamiento*
 Almacenamiento es un almacén clave-valor que mapea palabras 256-bit con palabras 256-bit.
 No es posible enumerar el almacenamiento interno a un contrato y es comparativamente costoso leer y, más todavía, modificar el almacenamiento. Un contrato no pueder leer ni escribir en otro almacenamiento que no sea el suyo.
 
-La segunda área de memoria se conoce como **memoria**, de la que un contrato obtiene de forma ágil una instancia clara de cada llamada mensaje. La memoria es lineal y puede tratada a nivel byte, pero las lecturas están limitadas a un ancho de 256 bits, mientras que las escrituras puden ser tanto de 8 bits como de 256 bits de ancho. La memoria se expande por palabras (256-bit), cuando se accede (tanto para leer o escribir) a una palabra de memoria sin modificar previamente (p.ej.: cualquier offset de una palabra). En el momento de expansión, se debe pagar el coste en gas. La memoria es más costosa cuanto más crece (escala cuadraticamente).
+La segunda área de memoria se conoce como **memoria**, de la que un contrato obtiene de forma ágil una instancia clara de cada message call (llamada mensaje). La memoria es lineal y puede ser tratada a nivel byte, pero las lecturas están limitadas a un ancho de 256 bits, mientras que las escrituras puden ser tanto de 8 bits como de 256 bits de ancho. La memoria se expande por palabras (256-bit), cuando se accede (tanto para leer o escribir) a una palabra de memoria sin modificar previamente (p.ej.: cualquier offset de una palabra). En el momento de expansión, se debe pagar el coste en gas. La memoria es más costosa cuanto más crece (escala cuadraticamente).
 
 La EVM no es una máquina a modo registro, es una máquina a modo pila por lo que todas las operaciones se hacen en un área llamada la **pila**. Tiene un espacio máximo de 1024 elementos y contiene palabras de 256 bits. El acceso a la pila está limitado a su cima de la siguiente manera:
 Es posible copiar uno de los 16 elementos superiores a la cima de la pila o intercambiar el elemento superior justo después de uno de los 16 elementos superiores.
@@ -230,7 +230,7 @@ Conjunto de instrucciones
 
 El conjunto de instrucciones de la EVM se mantiene mínimo con el objetivo de evitar implementaciones incorrectas que podrían causar problemas de consenso. Todas las intruciones operan con el tipo de datos básico, palabras de 256-bit.
 La aritmética habitual, bit, lógica y operaciones de comparación están presentes.
-Salton condicionales o no condicionales están permitidos. Es más, los contratos pueden acceder a propiedades relevantes del bloque actual como su número y timestamp.
+Saltos condicionales o no condicionales están permitidos. Es más, los contratos pueden acceder a propiedades relevantes del bloque actual como su número y timestamp.
 
 .. index:: ! message call, function;call
 
@@ -253,7 +253,7 @@ Delegatecall / Callcode y librerías
 ===================================
 
 Existe una variante especial de message call llamada **delegatecall**
-que es idéntica a un message call con excepción del hecho de que el código en la dirección destino se ejecuta en el contexto del que hace la llamada y ``msg.sender`` y ``msg.value`` no cambian sus valores.
+que es idéntica a un message call con la excepción del hecho de que el código en la dirección destino se ejecuta en el contexto del que hace la llamada y ``msg.sender`` y ``msg.value`` no cambian sus valores.
 
 Esto significa que un contrato puede dinámicamente cargar código desde una dirección diferente en tiempo de ejecución. El almacenamiento, la dirección actual y el balance siguen referenciando al contrato que realiza la llamada, sólo se coge el código desde la dirección llamada.
 
@@ -265,20 +265,20 @@ Código de librería reusable que se puede aplicar a un almacenamiento de contra
 Logs
 ====
 
-Es posible almacenar datos en una estructura de datos indexada que mapea todo el recorrido hasta el nivel de bloque. Esta funcionalida llamada **logs** se usa en Solidity para implementar **eventos**.
-Los contratos no pueden acceder a los datos del log después de crearse, pero pueden de forma eficiente ser accedidos desde fuera de la  blockchain. Como parte de los datos del log se guardan en  `bloom filters <https://en.wikipedia.org/wiki/Bloom_filter>`_, es posible buscar estos datos eficientemente y criptográficamente de manera segura, por lo que los otros miembros de la red que no han se han descargado la blockchain entera ("light clients") pueden todavía buscar estos.
+Es posible almacenar datos en una estructura de datos indexada que mapea todo el recorrido hasta el nivel de bloque. Esta funcionalidad llamada **logs** se usa en Solidity para implementar **eventos**.
+Los contratos no pueden acceder a los datos del log después de crearse, pero pueden de forma eficiente ser accedidos desde fuera de la  blockchain. Como parte de los datos del log se guardan en  `bloom filters <https://en.wikipedia.org/wiki/Bloom_filter>`_, es posible buscar estos datos eficientemente y criptográficamente de manera segura, por lo que los otros miembros de la red que no se han descargado la blockchain entera ("light clients") pueden todavía buscarlos.
 
 .. index:: contract creation
 
 Creación
 ========
 
-Los contratos pueden incluso crear otros contratos usando un opcode especial (p.ej.: ellos no llaman simplemente a la diección cero). La única diferencia entre estos **create calls** y los message calls normales es que los datos son ejecutados y el resultado almacenado como código y el llamador / creador recive la dirección del nuevo contrato en la pila.
+Los contratos pueden incluso crear otros contratos usando un opcode especial (p.ej.: ellos no llaman simplemente a la dirección cero). La única diferencia entre estos **create calls** y los message calls normales es que los datos son ejecutados y el resultado almacenado como código y el llamador / creador recibe la dirección del nuevo contrato en la pila.
 
 .. index:: selfdestruct
 
 Auto-destrucción
-=============
+================
 
 La única posibilidad de borrar el código de la blockchain es cuando un contrato en esa dirección realiza una operación de ``selfdestruct`. Los Ether restantes almacenados en esa dirección son enviados al destinatario designado y, entonces, se borran el almacenamiento y el código del estado.
 
