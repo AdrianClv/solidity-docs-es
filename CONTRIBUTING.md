@@ -16,6 +16,7 @@ Título corto
 Títular más largo
 =================
 ~~~
+* En inglés, existe la norma de empezar la primera letra de cada palabra "importante" de un título en mayúscula. En español esta norma no existe, así que mejor empezar con mayúscula sólo la primera letra (y nombres propios y demás).
 * Las rutas de enlaces del siguiente estilo no se traducen:
 ~~~
 -.. _structure-state-variables:
