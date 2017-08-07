@@ -249,21 +249,16 @@ Las llamadas están **limitadas** a la capacidad de 1024, lo que quiere decir qu
 
 .. index:: delegatecall, callcode, library
 
-Delegatecall / Callcode and Libraries
-=====================================
+Delegatecall / Callcode y librerías
+===================================
 
-There exists a special variant of a message call, named **delegatecall**
-which is identical to a message call apart from the fact that
-the code at the target address is executed in the context of the calling
-contract and ``msg.sender`` and ``msg.value`` do not change their values.
+Existe una variante especial de message call llamada **delegatecall**
+que es idéntica a un message call con excepción del hecho de que el código en la dirección destino se ejecuta en el contexto del que hace la llamada y ``msg.sender`` y ``msg.value`` no cambian sus valores.
 
-This means that a contract can dynamically load code from a different
-address at runtime. Storage, current address and balance still
-refer to the calling contract, only the code is taken from the called address.
+Esto significa que un contrato puede dinámicamente cargar código desde una dirección diferente en tiempo de ejecución. El almacenamiento, la dirección actual y el balance siguen referenciando al contrato que realiza la llamada, sólo se coge el código desde la dirección llamada.
 
-This makes it possible to implement the "library" feature in Solidity:
-Reusable library code that can be applied to a contract's storage, e.g. in
-order to  implement a complex data structure.
+Esto hace posible implementar la funcionalidad de "librería" en Solidity:
+Código de librería reusable que se puede aplicar a un almacenamiento de contrato, por ejemplo, con el fin de implementar una estructura de datos compleja.
 
 .. index:: log
 
