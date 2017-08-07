@@ -273,27 +273,18 @@ Los contratos no pueden acceder a los datos del log después de crearse, pero pu
 Creación
 ========
 
-Contracts can even create other contracts using a special opcode (i.e.
-they do not simply call the zero address). The only difference between
-these **create calls** and normal message calls is that the payload data is
-executed and the result stored as code and the caller / creator
-receives the address of the new contract on the stack.
+Los contratos pueden incluso crear otros contratos usando un opcode especial (p.ej.: ellos no llaman simplemente a la diección cero). La única diferencia entre estos **create calls** y los message calls normales es que los datos son ejecutados y el resultado almacenado como código y el llamador / creador recive la dirección del nuevo contrato en la pila.
 
 .. index:: selfdestruct
 
-Self-destruct
+Auto-destrucción
 =============
 
-The only possibility that code is removed from the blockchain is
-when a contract at that address performs the ``selfdestruct`` operation.
-The remaining Ether stored at that address is sent to a designated
-target and then the storage and code is removed from the state.
+La única posibilidad de borrar el código de la blockchain es cuando un contrato en esa dirección realiza una operación de ``selfdestruct`. Los Ether restantes almacenados en esa dirección son enviados al destinatario designado y, entonces, se borran el almacenamiento y el código del estado.
 
-.. warning:: Even if a contract's code does not contain a call to ``selfdestruct``,
-  it can still perform that operation using ``delegatecall`` or ``callcode``.
+.. warning:: Aunque un contrato no contenga una llamada a ``selfdestruct``,
+  todavía podría hacer esa operación mediante ``delegatecall`` o ``callcode``.
 
-.. note:: The pruning of old contracts may or may not be implemented by Ethereum
-  clients. Additionally, archive nodes could choose to keep the contract storage
-  and code indefinitely.
+.. note:: La depuración de contratos antiguos pueden o no ser implementados en clientes de Ethereum. Adicionalmente, los nodos de archivo podrían elegir mantener el almacenamiento del contrato y el código de forma indefinida.
 
-.. note:: Currently **external accounts** cannot be removed from the state.
+.. note:: Actualmente las **cuentas externas** no se pueden borrar del estado.
