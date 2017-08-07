@@ -265,20 +265,13 @@ Código de librería reusable que se puede aplicar a un almacenamiento de contra
 Logs
 ====
 
-It is possible to store data in a specially indexed data structure
-that maps all the way up to the block level. This feature called **logs**
-is used by Solidity in order to implement **events**.
-Contracts cannot access log data after it has been created, but they
-can be efficiently accessed from outside the blockchain.
-Since some part of the log data is stored in `bloom filters <https://en.wikipedia.org/wiki/Bloom_filter>`_, it is
-possible to search for this data in an efficient and cryptographically
-secure way, so network peers that do not download the whole blockchain
-("light clients") can still find these logs.
+Es posible almacenar datos en una estructura de datos indexada que mapea todo el recorrido hasta el nivel de bloque. Esta funcionalida llamada **logs** se usa en Solidity para implementar **eventos**.
+Los contratos no pueden acceder a los datos del log después de crearse, pero pueden de forma eficiente ser accedidos desde fuera de la  blockchain. Como parte de los datos del log se guardan en  `bloom filters <https://en.wikipedia.org/wiki/Bloom_filter>`_, es posible buscar estos datos eficientemente y criptográficamente de manera segura, por lo que los otros miembros de la red que no han se han descargado la blockchain entera ("light clients") pueden todavía buscar estos.
 
 .. index:: contract creation
 
-Create
-======
+Creación
+========
 
 Contracts can even create other contracts using a special opcode (i.e.
 they do not simply call the zero address). The only difference between
