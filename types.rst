@@ -1,4 +1,4 @@
-.. index:: type
+s.. index:: type
 
 .. _types:
 
@@ -525,13 +525,13 @@ no crea una copia.
 Resumen
 ^^^^^^^
 
-Forced data location:
- - parameters (not return) of external functions: calldata
- - state variables: storage
+Ubicación de datos forzada:
+ - parámetros (no de retorno) de funciones externas: calldata
+ - variables de estado: almacenamiento
 
-Default data location:
- - parameters (also return) of functions: memory
- - all other local variables: storage
+Ubicación de datos por defecto:
+ - parámetros (también de retorno) de funciones: memoria
+ - todas otras variables: almacenamiento
 
 .. index:: ! array
 
@@ -540,10 +540,17 @@ Default data location:
 Arrays
 ------
 
-Arrays can have a compile-time fixed size or they can be dynamic.
-For storage arrays, the element type can be arbitrary (i.e. also other
-arrays, mappings or structs). For memory arrays, it cannot be a mapping and
-has to be an ABI type if it is an argument of a publicly-visible function.
+Los array pueden tener tamaño fijo en compilación o pueden ser dinámicos.
+Para arrays de almacenamiento, el tipo elemento puede ser arbitrario (ej. también
+otros arryas, mappeos o structs). Para arrays de memoria, no puede ser un mapping
+tiene que ser un tipo ABI si es que es un argumento de una función públicamente
+visible.
+
+Un array de tamaño fijo ``k`` y elemento tipo ``T`` es escrito como ``T[k]``,
+un array de tamaño dinámico como ``T[]``. Como ejemplo, un array de 5 arrays
+dinmámicos de ``uint`` es ``uint[][]`` (nótese que la notación es invertida
+cuando comparada a otros lenguajes). Para acceder la segunda uint en el tercer
+array dinámico, se utiliza ``x[2][1]`` ()
 
 An array of fixed size ``k`` and element type ``T`` is written as ``T[k]``,
 an array of dynamic size as ``T[]``. As an example, an array of 5 dynamic
@@ -611,13 +618,13 @@ assigned to a variable right away.
         }
     }
 
-The type of an array literal is a memory array of fixed size whose base
-type is the common type of the given elements. The type of ``[1, 2, 3]`` is
-``uint8[3] memory``, because the type of each of these constants is ``uint8``.
-Because of that, it was necessary to convert the first element in the example
-above to ``uint``. Note that currently, fixed size memory arrays cannot
-be assigned to dynamically-sized memory arrays, i.e. the following is not
-possible:
+El tipo de array literal es un array de memoria de tamaño fijo de la cual el tipo
+base es el tipo común de los elementos dados. El tipo de ``[1, 2, 3]`` es
+``uint[3] memory``, porque el tipo de cada de estas constantes es ``uint8``.
+Por eso, fue necesario convertir el primer elemento en el ejemplo arriba
+a ``uint``. Nótese que actualmente, array de memoria de tamaño fijo no pueden
+ser asignados a arrays de memoria de tamaño dinámico, ej. lo siguiente
+no es posible:
 
 ::
 
@@ -625,36 +632,36 @@ possible:
 
     contract C {
         function f() {
-            // The next line creates a type error because uint[3] memory
-            // cannot be converted to uint[] memory.
+            // La próxima linea crea un tipo error porque uint[3] memory
+            // no puede ser conertido a uint[] memory.
             uint[] x = [uint(1), 3, 4];
     }
 
-It is planned to remove this restriction in the future but currently creates
-some complications because of how arrays are passed in the ABI.
+Esta restricción está planeada para ser eliminda en el futuro pero actualmente
+crea complicaciones por cómo los arrays son pasados en el ABI.
 
 .. index:: ! array;length, length, push, !array;push
 
-Members
-^^^^^^^
+Miembros
+^^^^^^^^
 
 **length**:
-    Arrays have a ``length`` member to hold their number of elements.
-    Dynamic arrays can be resized in storage (not in memory) by changing the
-    ``.length`` member. This does not happen automatically when attempting to access elements outside the current length. The size of memory arrays is fixed (but dynamic, i.e. it can depend on runtime parameters) once they are created.
+    Arrays tienen un miembro ``length`` para guardar su número de elementos.
+    Arrays dinámicos pueden ser modificados en almacenimiento (no en memoria) cambiando
+    el miembro ``.length``. Ésto no ocurre automáticamente cuando se intenta acceder los elementos fuera del length actual. El tamaño de arrays de memoria es fijo (pero dinámico, ej. puede depender de parámetros runtime) cuando son creados.
 **push**:
-     Dynamic storage arrays and ``bytes`` (not ``string``) have a member function called ``push`` that can be used to append an element at the end of the array. The function returns the new length.
+    Arrays de almacenimiento dinámico y ``bytes`` (no ``string``) tienen una función miembro llamada ``push`` que puede ser usada para agregar un elemento al final del array. La función devuelve el nuevo length.
 
-.. warning::
-    It is not yet possible to use arrays of arrays in external functions.
+.. advertencia::
+    Aún no es posible usar arrays en funciones externas.
 
-.. warning::
-    Due to limitations of the EVM, it is not possible to return
-    dynamic content from external function calls. The function ``f`` in
-    ``contract C { function f() returns (uint[]) { ... } }`` will return
-    something if called from web3.js, but not if called from Solidity.
+.. advertencia::
+    Dado a las limitaciones de la EVM, no es posibe retornar
+    contenido dinámico de las funciones externas . La función ``f`` en
+    ``contract C { function f() returns (uint[]) { ... } }`` devolverá
+    algo si es llamdo del web3.js, pero no si se llama desde Solidity.
 
-    The only workaround for now is to use large statically-sized arrays.
+    La única alternativa por ahora es usar grandes arrays de tamaño estático.
 
 
 ::
