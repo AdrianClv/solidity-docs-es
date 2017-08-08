@@ -652,10 +652,10 @@ Miembros
 **push**:
     Arrays de almacenimiento dinámico y ``bytes`` (no ``string``) tienen una función miembro llamada ``push`` que puede ser usada para agregar un elemento al final del array. La función devuelve el nuevo length.
 
-.. advertencia::
+.. warning::
     Aún no es posible usar arrays en funciones externas.
 
-.. advertencia::
+.. warning::
     Dado a las limitaciones de la EVM, no es posibe retornar
     contenido dinámico de las funciones externas . La función ``f`` en
     ``contract C { function f() returns (uint[]) { ... } }`` devolverá
@@ -811,23 +811,21 @@ Tipos mapping son declarados como ``mapping(_KeyType => _ValueType)``.
 Aquí ``_KeyType`` puede ser casi cualquier tipo excepto por mapping, un array de tamaño dinámico, un contrato, un enum y un struct.
 ``_ValueType`` puede ser cualquier tipo, incluyendo mappings.
 
+Mappings pueden verse como 'has tables <https://en.wikipedia.org/wiki/Hash_table>'_ que son virtualmente inicializadas ya que
+cada posible clase existe y es mapeada a un valor que su representación byte es
+todo ceros: el valor :ref:`por defecto <default-value> de un tipo. Aunque la similitud termina aquí: los datos clave no son realmente
+almacenados en el mapping, sólo su hash ``keccak256`` usado para buscar el valor.
 
-Mappings can be seen as `hash tables <https://en.wikipedia.org/wiki/Hash_table>`_ which are virtually initialized such that
-every possible key exists and is mapped to a value whose byte-representation is
-all zeros: a type's :ref:`default value <default-value>`. The similarity ends here, though: The key data is not actually stored
-in a mapping, only its ``keccak256`` hash used to look up the value.
+Por esto, mappings no tienen un length o un concepto de "fijar" clave o valor.
 
-Because of this, mappings do not have a length or a concept of a key or value being "set".
+Mappings sólo son permitidas para variables de estado (o como tipos de referencia
+en funciones internas).
 
-Mappings are only allowed for state variables (or as storage reference types
-in internal functions).
+Es posible marcar los mappings ``public`` y hacer que Solidity cree un getter.
+El ``_KeyType`` será un parámetro requerido par el getter y devolverá ``_ValueType``.
 
-It is possible to mark mappings ``public`` and have Solidity create a getter.
-The ``_KeyType`` will become a required parameter for the getter and it will
-return ``_ValueType``.
-
-The ``_ValueType`` can be a mapping too. The getter will have one parameter
-for each ``_KeyType``, recursively.
+El ``_ValueType`` puede ser un mapping también. El getter tendrá un parámetro
+para cada ``_KeyType``, recursivamente.
 
 ::
 
@@ -849,26 +847,26 @@ for each ``_KeyType``, recursively.
 
 
 .. note::
-  Mappings are not iterable, but it is possible to implement a data structure on top of them.
-  For an example, see `iterable mapping <https://github.com/ethereum/dapp-bin/blob/master/library/iterable_mapping.sol>`_.
+  Los mappings no son iterables, pero es posible implementar una estructura de datos encima de ellos.
+  Por ejemplo, ver `iterable mapping <https://github.com/ethereum/dapp-bin/blob/master/library/iterable_mapping.sol>`_.
 
 .. index:: assignment, ! delete, lvalue
 
-Operators Involving LValues
-===========================
+Operadores con LValues
+======================
 
-If ``a`` is an LValue (i.e. a variable or something that can be assigned to), the following operators are available as shorthands:
+Si ``a`` es un LValue (ej. una variable o algo que puede ser asignado), los siguientes operadoes son abreviaturas posibles:
 
-``a += e`` is equivalent to ``a = a + e``. The operators ``-=``, ``*=``, ``/=``, ``%=``, ``a |=``, ``&=`` and ``^=`` are defined accordingly. ``a++`` and ``a--`` are equivalent to ``a += 1`` / ``a -= 1`` but the expression itself still has the previous value of ``a``. In contrast, ``--a`` and ``++a`` have the same effect on ``a`` but return the value after the change.
+``a += e`` es equivalente a ``a = a + e`` . Los operadores ``-=``, ``*=``, ``/=``, ``%=``, ``a |=``, ``&=`` y ``^=`` son todos definidos de esa manera. ``a++`` y ``a--`` son equivalentes a ``a += 1`` / ``a -= 1`` pero la expresión en sí todavía tiene el valor anterior de ``a``. En contraste, ``--a`` y ``++a`` tienen el mismo efecto en ``a`` pero devuelven el valor después del cambio.
 
 delete
 ------
 
-``delete a`` assigns the initial value for the type to ``a``. I.e. for integers it is equivalent to ``a = 0``, but it can also be used on arrays, where it assigns a dynamic array of length zero or a static array of the same length with all elements reset. For structs, it assigns a struct with all members reset.
+``delete a`` asigna el valor inicial para el tipo a ``a``. Ej. para enteros, el equivalente es ``a = 0``, pero puede ser usado en arrays, onde el asigna un array dinámico de length cero o un array estático del mismo length con todos los elementos reseteados. Para structs, se asigna a struct con todos los miembros reseteados.
 
-``delete`` has no effect on whole mappings (as the keys of mappings may be arbitrary and are generally unknown). So if you delete a struct, it will reset all members that are not mappings and also recurse into the members unless they are mappings. However, individual keys and what they map to can be deleted.
+``delete`` no tiene efecto en mappings enteras (ya que las claves de los mappings pueden ser arbitrarias y generalmente desconocidas). Así que si se hace delete a un struct, reseteará todos los miembros que no son mappings y también recurrirá a los miembros al menos que sean mappings. Sin embargo, las claves individuales y lo que pueden mappear puede ser deleted.
 
-It is important to note that ``delete a`` really behaves like an assignment to ``a``, i.e. it stores a new object in ``a``.
+Es importante notar que ``delete a`` en realidad se comporta como una asignación a ``a``, ej. almacena un nuevo objecto en ``a``.
 
 ::
 
@@ -880,13 +878,14 @@ It is important to note that ``delete a`` really behaves like an assignment to `
 
         function f() {
             uint x = data;
-            delete x; // sets x to 0, does not affect data
-            delete data; // sets data to 0, does not affect x which still holds a copy
+            delete x; // setea x to 0, no afecta los datos
+            delete data; // setea data a 0, no afecta x que aún tiene una copia
             uint[] y = dataArray;
-            delete dataArray; // this sets dataArray.length to zero, but as uint[] is a complex object, also
-            // y is affected which is an alias to the storage object
-            // On the other hand: "delete y" is not valid, as assignments to local variables
-            // referencing storage objects can only be made from existing storage objects.
+            delete dataArray; // esto setea dataArray.length a cero, pero como uint[] es un objecto complejo,
+            // también y es afectado que es un alias al objeto de almacenamiento
+            // Por otra parte: "delete y" no es válido, ya que asignaciones a variables locales
+            // haciendo referencia a objetos de almacenamiento sólo pueden ser hechos de
+            // objetos de almacenamiento existentes.
         }
     }
 
