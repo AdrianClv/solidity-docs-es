@@ -670,40 +670,40 @@ Miembros
 
     contract ArrayContract {
         uint[2**20] m_aLotOfIntegers;
-        // Note that the following is not a pair of dynamic arrays but a
-        // dynamic array of pairs (i.e. of fixed size arrays of length two).
+        // Nótese que el siguiente no es un par de arrays dinámicos, sino
+        // array dinámico de pares (ej. de arrays de tamaño fijo de length 2).
         bool[2][] m_pairsOfFlags;
-        // newPairs is stored in memory - the default for function arguments
+        // newPairs es almacenado en memoria - el defecto para argumentos de función
 
         function setAllFlagPairs(bool[2][] newPairs) {
-            // assignment to a storage array replaces the complete array
+            // asignación a un array de almacenamiento remplaza el array completo
             m_pairsOfFlags = newPairs;
         }
 
         function setFlagPair(uint index, bool flagA, bool flagB) {
-            // access to a non-existing index will throw an exception
+            // acceso a un index que no existe arrojará una excepción
             m_pairsOfFlags[index][0] = flagA;
             m_pairsOfFlags[index][1] = flagB;
         }
 
         function changeFlagArraySize(uint newSize) {
-            // if the new size is smaller, removed array elements will be cleared
+            // si el tamaño nuevo es más pequeño, los elementos eliminados del array serán limpiados
             m_pairsOfFlags.length = newSize;
         }
 
         function clear() {
-            // these clear the arrays completely
+            // éstos limpian los arrays completamente
             delete m_pairsOfFlags;
             delete m_aLotOfIntegers;
-            // identical effect here
+            // efecto idéntico aquí
             m_pairsOfFlags.length = 0;
         }
 
         bytes m_byteData;
 
         function byteArrays(bytes data) {
-            // byte arrays ("bytes") are different as they are stored without padding,
-            // but can be treated identical to "uint8[]"
+            // byte arrays ("bytes") son diferentes ya que no son almacenados sin padding,
+            // pero pueden tratados idénticamente a "uint8[]"
             m_byteData = data;
             m_byteData.length += 7;
             m_byteData[3] = 8;
@@ -715,9 +715,9 @@ Miembros
         }
 
         function createMemoryArray(uint size) returns (bytes) {
-            // Dynamic memory arrays are created using `new`:
+            // Arrays de memoria dinámicos son creados usando `new`:
             uint[2][] memory arrayOfPairs = new uint[2][](size);
-            // Create a dynamic byte array:
+            // Crear un byte array dinámico:
             bytes memory b = new bytes(200);
             for (uint i = 0; i < b.length; i++)
                 b[i] = byte(i);
@@ -733,15 +733,15 @@ Miembros
 Structs
 -------
 
-Solidity provides a way to define new types in the form of structs, which is
-shown in the following example:
+Solidity provee una manera de definir nuevos tipos con structs, que es
+mostrado en el siguiente ejemplo:
 
 ::
 
     pragma solidity ^0.4.11;
 
     contract CrowdFunding {
-        // Defines a new type with two fields.
+        // Define un nuevo tipo con dos campos.
         struct Funder {
             address addr;
             uint amount;
@@ -760,15 +760,15 @@ shown in the following example:
 
         function newCampaign(address beneficiary, uint goal) returns (uint campaignID) {
             campaignID = numCampaigns++; // campaignID is return variable
-            // Creates new struct and saves in storage. We leave out the mapping type.
+            // Crea un nuevo sruct y guarda en almacenamiento. Dejamos fuera el tipo mapping.
             campaigns[campaignID] = Campaign(beneficiary, goal, 0, 0);
         }
 
         function contribute(uint campaignID) payable {
             Campaign c = campaigns[campaignID];
-            // Creates a new temporary memory struct, initialised with the given values
-            // and copies it over to storage.
-            // Note that you can also use Funder(msg.sender, msg.value) to initialise.
+            // Crea un nuevo struct de memoria temporal, inicializado con los valores dados
+            // y lo copia al almacenamiento.
+            // Nótese que también se puede usar Funder(msg.sender, msg.value) para inicializar
             c.funders[c.numFunders++] = Funder({addr: msg.sender, amount: msg.value});
             c.amount += msg.value;
         }
@@ -784,22 +784,22 @@ shown in the following example:
         }
     }
 
-The contract does not provide the full functionality of a crowdfunding
-contract, but it contains the basic concepts necessary to understand structs.
-Struct types can be used inside mappings and arrays and they can itself
-contain mappings and arrays.
+El contrato no provee funcionalidad total de un contrato crowdfunding,
+peor contiene los conceptos básciso necesaios para entender structs.
+Tipos structs pueden ser usados dentro de mappings y arrays y pueden ellos
+mismos, contener mappings y arrays.
 
-It is not possible for a struct to contain a member of its own type,
-although the struct itself can be the value type of a mapping member.
-This restriction is necessary, as the size of the struct has to be finite.
+No es posible para un struct de contener un miembro de su propio tipo,
+aunque el struct puede ser el tipo valor de un miembro mapping.
+Esta restricción es necesaria, ya que el tamaño del struct tiene que ser finito.
 
-Note how in all the functions, a struct type is assigned to a local variable
-(of the default storage data location).
-This does not copy the struct but only stores a reference so that assignments to
-members of the local variable actually write to the state.
+Nótese como en todas las funciones, un tipo struct es asignado a la variable local
+(de la ubicación por defecto del almacenamiento).
+Esto no copia el struct pero guarda una referencia para que las asignaciones
+a miembros de la vaiable local realmente escriban al estado.
 
-Of course, you can also directly access the members of the struct without
-assigning it to a local variable, as in
+Por supuesto, puedes diréctamente acceder los miembros del struct sin
+asignarlos a la variable local, como en
 ``campaigns[campaignID].amount = 0``.
 
 .. index:: !mapping
@@ -807,9 +807,10 @@ assigning it to a local variable, as in
 Mappings
 ========
 
-Mapping types are declared as ``mapping(_KeyType => _ValueType)``.
-Here ``_KeyType`` can be almost any type except for a mapping, a dynamically sized array, a contract, an enum and a struct.
-``_ValueType`` can actually be any type, including mappings.
+Tipos mapping son declarados como ``mapping(_KeyType => _ValueType)``.
+Aquí ``_KeyType`` puede ser casi cualquier tipo excepto por mapping, un array de tamaño dinámico, un contrato, un enum y un struct.
+``_ValueType`` puede ser cualquier tipo, incluyendo mappings.
+
 
 Mappings can be seen as `hash tables <https://en.wikipedia.org/wiki/Hash_table>`_ which are virtually initialized such that
 every possible key exists and is mapped to a value whose byte-representation is
