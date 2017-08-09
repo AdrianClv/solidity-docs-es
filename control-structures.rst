@@ -1,5 +1,5 @@
 #####################################
-Expressiones y Estructuras de Control
+Expresiones y Estructuras de Control
 #####################################
 
 .. index:: ! parámetro, parámetro;entrada, parámetro;salida
