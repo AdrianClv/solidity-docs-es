@@ -1,8 +1,8 @@
-##################################
-Expressions and Control Structures
-##################################
+#####################################
+Expressiones y Estructuras de Control
+#####################################
 
-.. index:: ! parameter, parameter;input, parameter;output
+.. index:: ! parámetro, parámetro;entrada, parámetro;salida
 
 Input Parameters and Output Parameters
 ======================================
