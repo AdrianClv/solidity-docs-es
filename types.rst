@@ -891,65 +891,65 @@ Es importante notar que ``delete a`` en realidad se comporta como una asignació
 
 .. index:: ! type;conversion, ! cast
 
-Conversions between Elementary Types
-====================================
+Converción entre tipos elementarios
+===================================
 
-Implicit Conversions
---------------------
+Conversiones implícitas
+-----------------------
 
-If an operator is applied to different types, the compiler tries to
-implicitly convert one of the operands to the type of the other (the same is
-true for assignments). In general, an implicit conversion between value-types
-is possible if it
-makes sense semantically and no information is lost: ``uint8`` is convertible to
-``uint16`` and ``int128`` to ``int256``, but ``int8`` is not convertible to ``uint256``
-(because ``uint256`` cannot hold e.g. ``-1``).
-Furthermore, unsigned integers can be converted to bytes of the same or larger
-size, but not vice-versa. Any type that can be converted to ``uint160`` can also
-be converted to ``address``.
+Si un operador es aplicado a diferentes tipos, el compilador intenta
+implícitamente convertir uno de los operadores al tipo del otro (lo mismo
+es verdad para asignaciones). En general, una conversión implícita entre tipos
+valores es posible si es tiene sentido semaitcamente y no hay información
+perdida: ``uint8`` es convertible a ``uint16`` y ``int128`` a ``int256``, pero
+``int8`` no es convertible a ``uint256`` (porque ``uint256`` no puede contener ``-1``).
+Además, enteros sin signo pueden ser convertidos a bytes del mismo tamaño o más grande
+pero no vice-versa. Cualquier tipo que puede ser onvertido a ``uint160`` puede también
+ser convertido a ``address``.
 
-Explicit Conversions
---------------------
 
-If the compiler does not allow implicit conversion but you know what you are
-doing, an explicit type conversion is sometimes possible. Note that this may
-give you some unexpected behaviour so be sure to test to ensure that the
-result is what you want! Take the following example where you are converting
-a negative ``int8`` to a ``uint``:
+Conversiones explícitas
+-----------------------
+
+Si el compilador no permite conversión implícita pero sabes lo que estás haciendo,
+una conversión explícita de tipo es aveces posible. Nótese que esto puede darte
+comportamiento inesperado así que asegúrate de probar que el resultado es lo que quieras!
+Este ejemplo es para convertir de un negativo ``int8`` a ``uint``:
 
 ::
 
     int8 y = -3;
     uint x = uint(y);
 
-At the end of this code snippet, ``x`` will have the value ``0xfffff..fd`` (64 hex
-characters), which is -3 in the two's complement representation of 256 bits.
+Al final de este snippet de código, ``x`` tendrá el valor ``0xfffff..fd`` (64
+caracteres hex), que es -3 en la representación de 256 bits de los complementos de dos.
 
-If a type is explicitly converted to a smaller type, higher-order bits are
-cut off::
+Si un tipo es explícitamente convertido a un tipo mas pequeño, los bits de ordern mayor son
+eliminados::
 
-    uint32 a = 0x12345678;
-    uint16 b = uint16(a); // b will be 0x5678 now
+uint32 a = 0x12345678;
+uint16 b = uint16(a); // b será 0x5678 ahora
+
 
 .. index:: ! type;deduction, ! var
 
 .. _type-deduction:
 
-Type Deduction
-==============
+Deducción de tipo
+=================
 
-For convenience, it is not always necessary to explicitly specify the type of a
-variable, the compiler automatically infers it from the type of the first
-expression that is assigned to the variable::
+Para conveniencia, no es siempre necesario de explícitamente espcificar el tipo de
+una variable, el compilador infiere automáticamente el tipo del tipo de la primera
+expresión al cual es asignado esa variable::
 
     uint24 x = 0x123;
     var y = x;
 
-Here, the type of ``y`` will be ``uint24``. Using ``var`` is not possible for function
-parameters or return parameters.
+Aquí, el tipo de ``y`` será ``uint24``. Usando ``var`` no es posible por parámetros de
+función de parámetros de devolución.
 
 .. warning::
-    The type is only deduced from the first assignment, so
-    the loop in the following snippet is infinite, as ``i`` will have the type
-    ``uint8`` and any value of this type is smaller than ``2000``.
+    El tipo es deducido sólo de la primera asignación, así que
+    el loop del siguiente snippet es infinito, ya que ``i`` tendrá el tipo
+    ``uint8`` y cualquier valor de este tipo es más pequeño que ``2000``.
     ``for (var i = 0; i < 2000; i++) { ... }``
