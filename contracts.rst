@@ -443,6 +443,451 @@ Los contratos que reciben Ether directamente (sin una llamada a una función, p.
 
 
     contract Caller {
+.. index:: ! contratos
+
+#########
+Contratos
+#########
+
+Los contratos en Solidity son similares a las clases en los lenguajes orientados a objeto. Los contratos contienen datos persistentes almacenados en variables de estados y funciones que pueden modificar estas variables. Llamar a una función de un contrato diferente (instancia) realizará una llamada a una función del EVM (Máquina Virtual de Ethereum) para que cambie el contexto de manera que las variables de estado no estén accesibles.
+
+.. index:: ! contrato;creacion
+
+***************
+Crear Contratos
+***************
+
+Contratos pueden crearse "desde fuera" o desde contratos en Solidity. Cuando se crea un contrato, su constructor (una función con el mismo nombre que el contrato) se ejecuta una sola vez.
+
+El constructor es opcional. Se admite un solo constructor, lo que significa que sobrecargar no está soportado.
+
+Desde ``web3.js``, es decir la API de JavaScript, esto se hace de la siguiente manera::
+
+    // Es necesario especificar alguna fuente, incluido el nombre del contrato para los parametros de abajo
+    var source = "contract CONTRACT_NAME { function CONTRACT_NAME(uint a, uint b) {} }";
+
+    // La matriz abi en json generada por el compilador
+    var abiArray = [
+        {
+            "inputs":[
+                {"name":"x","type":"uint256"},
+                {"name":"y","type":"uint256"}
+            ],
+            "type":"constructor"
+        },
+        {
+            "constant":true,
+            "inputs":[],
+            "name":"x",
+            "outputs":[{"name":"","type":"bytes32"}],
+            "type":"function"
+        }
+    ];
+
+    var MyContract_ = web3.eth.contract(source);
+    MyContract = web3.eth.contract(MyContract_.CONTRACT_NAME.info.abiDefinition);
+    
+    // Desplegar el nuevo contrato
+    var contractInstance = MyContract.new(
+        10,
+        11,
+        {from: myAccount, gas: 1000000}
+    );
+
+.. index:: constructor;argumentos
+
+Internamente, los argumentos del constructor son transmitidos después del propio código del contrato, pero no se tiene que preocupar de eso si utiliza ``web3.js``.
+
+Si un contrato quiere crear otros contrato, el creador del código fuente (y el binario) del contrato nuevamente creado tiene que estar informado. Eso significa que la creación de dependencias cíclicas es imposible.
+
+::
+
+    pragma solidity ^0.4.0;
+
+    contract OwnedToken {
+        // TokenCreator es un contrato que está definido más abajo. 
+        // No hay problema en referenciarlo, siempre y cuando no está 
+        // siendo utilizado para crear un contrato nuevo.
+        TokenCreator creator;
+        address owner;
+        bytes32 name;
+
+        // Esto es el constructor que registra el creador y el nombre 
+        // que se le ha asignado
+        function OwnedToken(bytes32 _name) {
+            // Se accede a las variables de estado por su nombre
+            // y no por ejemplo por this.owner. Eso también se aplica 
+            // a las funciones y, especialmente en los constructores, 
+            // solo está permitido llamarlas de esa manera ("internal"), 
+            // porque el propio contrato no existe todavía.
+            owner = msg.sender;
+            // Hacemos una conversión explícita de tipo, desde `address`
+            // a `TokenCreator` y asumimos que el tipo del contrato que hace
+            // la llamada es TokenCreator, ya que realmente no hay
+            // formas de corroborar eso.
+            creator = TokenCreator(msg.sender);
+            name = _name;
+        }
+
+        function changeName(bytes32 newName) {
+            // Solo el creador puede modificar el nombre --
+            // la comparación es posible ya que los contratos 
+            // se pueden implícitamente convertir a direcciones.
+            if (msg.sender == address(creator))
+                name = newName;
+        }
+
+        function transfer(address newOwner) {
+            // Solo el creador actual puede transferir el token.
+            if (msg.sender != owner) return;
+            // También vamos a querer preguntar al creador 
+            // si la transferencia ha salido bien. Note que esto
+            // tiene como efecto llamar a una función del contrato 
+            // que está definido más abajo. Si la llamada no funciona
+            // (p.ej si no queda gas), la ejecución para aquí inmediatamente.
+            if (creator.isTokenTransferOK(owner, newOwner))
+                owner = newOwner;
+        }
+    }
+
+    contract TokenCreator {
+        function createToken(bytes32 name)
+           returns (OwnedToken tokenAddress)
+        {
+            // Crea un contrato para crear un nuevo Token.
+            // Del lado de JavaScript, el tipo que se nos devuelve
+            // simplemente es la dirección ("address"), ya que ese
+            // es el tipo más cerca disponible en el ABI.
+            return new OwnedToken(name);
+        }
+
+        function changeName(OwnedToken tokenAddress, bytes32 name) {
+            // De nuevo, el tipo externo de "tokenAddress" 
+            // simplemente es "address".
+            tokenAddress.changeName(name);
+        }
+
+        function isTokenTransferOK(
+            address currentOwner,
+            address newOwner
+        ) returns (bool ok) {
+            // Verifica un condición arbitraria
+            address tokenAddress = msg.sender;
+            return (keccak256(newOwner) & 0xff) == (bytes20(tokenAddress) & 0xff);
+        }
+    }
+
+.. index:: ! visibilidad, externa, pública, privada, interna
+
+.. _visibilidad-y-getters:
+
+*********************
+Visibilidad y Getters
+*********************
+
+Ya que Solidity sólo conoce dos tipos de llamadas a una función (las internas que no generan una llamada al EVM (también llamadas "llamadas mensaje") y las externas que si generan una llamada al EVM), hay cuatro tipos de visibilidad para las funciones y las variables de estado.
+
+Una función puede especificarse como ``externa``, ``pública``, ``interna`` o ``privada``. Por defecto una función es ``pública``. Para las variables de estado, el tipo ``externa`` no es posible y el tipo por defecto es ``interna``.
+
+``externa``: Funciones externas son parte de la interfaz del contrato, lo que significa que pueden llamarse desde otros contratos y vía transacciones. Una función externa ``f`` no puede llamarse internamente (por ejemplo ``f()`` no funciona, pero ``this.f()`` funciona). Las funciones externas son a veces más eficientes cuando reciben grandes matrices de datos.
+    
+``pública``: Funciones públicas son parte de la interfaz del contrato y pueden llamarse internamente o vía mensajes. Para las variables de estado públicas, se genera una función getter automática (ver más abajo).
+
+``interna``: Estas funciones y variables de estado sólo pueden llamarse internamente (es decir desde dentro del contrato actual o desde contratos de derivan del mismo), sin poder usarse ``this``.
+
+``private``: Las funciones y variables de estado privadas sólo están visibles para el contrato en el que se han definido y no para contratos de derivan del mismo.
+
+.. note:: Todo lo que está definido dentro de un contrato es visible para todos los observadores externos. Definir algo como ``privado`` sólo impide que otros contratos puedan acceder y modificar la información, pero esta información siempre será visible para todo el mundo, incluso fuera de la blockchain.
+
+Es especificador de visibilidad se pone después del tipo para las variables de estado y entre la lista de parámetros y la lista de parámetros que devuelven información para las funciones.
+
+::
+
+    pragma solidity ^0.4.0;
+
+    contract C {
+        function f(uint a) private returns (uint b) { return a + 1; }
+        function setData(uint a) internal { data = a; }
+        uint public data;
+    }
+
+En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el valor de ``data`` en el almacén de estado, pero no puede llamar a ``f``. El contrato ``E`` deriva de ``C`` y, por lo tanto, puede llamar a ``compute``.
+
+::
+
+    pragma solidity ^0.4.0;
+
+    contract C {
+        uint private data;
+
+        function f(uint a) private returns(uint b) { return a + 1; }
+        function setData(uint a) { data = a; }
+        function getData() public returns(uint) { return data; }
+        function compute(uint a, uint b) internal returns (uint) { return a+b; }
+    }
+
+
+    contract D {
+        function readData() {
+            C c = new C();
+            uint local = c.f(7); // error: el ???miembro (member) "f" no es visible
+            c.setData(3);
+            local = c.getData();
+            local = c.compute(3, 5); // error: el ???miembro (member) "compute" no es visible
+        }
+    }
+
+
+    contract E is C {
+        function g() {
+            C c = new C();
+            uint val = compute(3, 5);  // acceso a un miembro interno ???(from derivated to parent contract)
+        }
+    }
+
+.. index:: ! getter;funcion, ! funcion;getter
+
+Funciones Getter
+================
+
+El compilador crea automáticamente funciones getter para todas las variables de estado **publicas**. En el contrato que se muestra abajo, el compilador va a generar una función llamada ``data`` que no lee ningún argumento y devuelve un ``unint``, el valor de la variable de estado ``data``. La inicialización de las variables de estado se puede hacer en el momento de la declaración. 
+
+::
+
+    pragma solidity ^0.4.0;
+
+    contract C {
+        uint public data = 42;
+    }
+
+
+    contract Caller {
+        C c = new C();
+        function f() {
+            uint local = c.data();
+        }
+    }
+
+Las funciones getter tienen visibilidad externa. Si se accede al símbolo internamente (es decir sin ``this.``), entonces se evalúa como un variables de estado. Si se accede al símbolo externamente, (es decir con ``this.``), entonces se evalúa como una función.
+
+::
+
+    pragma solidity ^0.4.0;
+
+    contract C {
+        uint public data;
+        function x() {
+            data = 3; // acceso interno
+            uint val = this.data(); // acceso externo
+        }
+    }
+
+El siguiente ejemplo es un poco más complejo:
+
+::
+
+    pragma solidity ^0.4.0;
+
+    contract Complex {
+        struct Data {
+            uint a;
+            bytes3 b;
+            mapping (uint => uint) map;
+        }
+        mapping (uint => mapping(bool => Data[])) public data;
+    }
+
+Nos va a generar una función de la siguiente forma:
+
+::
+
+    function data(uint arg1, bool arg2, uint arg3) returns (uint a, bytes3 b) {
+        a = data[arg1][arg2][arg3].a;
+        b = data[arg1][arg2][arg3].b;
+    }
+
+Notese que se ha omitido el mapeo en el struct porque no hay una buena manera de dar la clave para hacer el mapeo.
+
+.. index:: ! funcion;modifier
+
+.. _modifiers:
+
+*******************
+Funciones Modifiers
+*******************
+
+Se pueden usar los Modifiers para cambiar el comportamiento de las funciones de una manera ágil. Por ejemplo, los Modifiers son capaces de comprobar automáticamente una condición antes de ejecutar una función. Los Modifiers son propiedades heredables de los contratos y pueden ser sobrescritos por contratos derivados.
+
+::
+
+    pragma solidity ^0.4.11;
+
+    contract owned {
+        function owned() { owner = msg.sender; }
+        address owner;
+        
+        // Este contrato solo define un Modifier pero lo usa – se va a utilizar en un contrato derivado.
+        // El cuerpo de la función se inserta donde aparece el símbolo especial "_;" en la definición del Modifier.
+        // Esto significa que si el propietario llama a esta función, la función se ejecuta, pero en otros casos devolverá un error (???exception).
+        modifier onlyOwner {
+            require(msg.sender == owner);
+            _;
+        }
+    }
+
+
+    contract mortal is owned {
+        // Este contrato hereda del Modifier "onlyOwner" desde "owned" y lo aplica a la función "close", lo que tiene como efecto que las llamadas a "close" solamente tienen efecto si las hacen el propietario registrado.
+        function close() onlyOwner {
+            selfdestruct(owner);
+        }
+    }
+
+
+    contract priced {
+        // Los Modifiers pueden recibir argumentos:
+        modifier costs(uint price) {
+            if (msg.value >= price) {
+                _;
+            }
+        }
+    }
+
+
+    contract Register is priced, owned {
+        mapping (address => bool) registeredAddresses;
+        uint price;
+
+        function Register(uint initialPrice) { price = initialPrice; }
+
+        // Aquí es importante facilitar también la palabra clave "payable", de lo contrario la función rechazaría automáticamente todos los Ether que le mandemos. 
+        function register() payable costs(price) {
+            registeredAddresses[msg.sender] = true;
+        }
+
+        function changePrice(uint _price) onlyOwner {
+            price = _price;
+        }
+    }
+
+    contract Mutex {
+        bool locked;
+        modifier noReentrancy() {
+            require(!locked);
+            locked = true;
+            _;
+            locked = false;
+        }
+
+        /// Esta función está protegida por un mutex, lo que significa que llamadas reentrantes desde dentro del msg.sender.call no pueden llamar a f de nuevo.
+        /// La declaración `return 7` asigna 7 al valor devuelto, pero aún así ejecuta la declaración `locked = false` en el Modifier.
+        function f() noReentrancy returns (uint) {
+            require(msg.sender.call());
+            return 7;
+        }
+    }
+
+Múltiples Modifiers pueden ser aplicados a una misma función especificándolos en una lista separada por espacios en blanco. Serán evaluados en el orden presentado en la lista.
+
+.. warning::
+    En una versión anterior de Solidity, declaraciones del tipo ``return`` dentro de funciones que contienen Modifiers se comportaban de otra manera. 
+
+Lo que se devuelve explícitamente de un Modifier o del cuerpo de una función solo sale del Modifier actual o del cuerpo de la función actual. Las variables que se devuelven están asignadas y el control de flujo continúa después del "_" en el Modifier que precede.
+
+Se aceptan expresiones arbitrarias para los argumentos del Modifier y en ese contexto, todos los símbolos visibles desde la función son visibles en el Modifier. Símbolos introducidos en el Modifier no son visibles en la función (ya que pueden cambiar por sobreescritura).
+
+.. index:: ! constante
+
+******************************
+Variables de Estado Constantes
+******************************
+
+Las variables de estado pueden declarase como ``constantes``. En este caso, se tienen que asignar desde una expresión que es una constante en momento de compilación. Las expresiones que acceden al almacenamiento, datos sobre la blockchain (p.ej ``now``, ``this.balance`` o ``block.number``), datos sobre la ejecución (``msg.gas``) o que hacen llamadas a contratos externos, están prohibidas. Las expresiones que puedan tener efectos colaterales en el reparto de memoria están permitidas, pero las que puedan tener efectos colaterales en otros objetos de memoria no lo son. Las funciones por defecto ``keccak256``, ``sha256``, ``ripemd160``, ``ecrecover``, ``addmod`` y ``mulmod`` están permitidas (aunque hacen llamadas a contratos externos).
+
+Se permiten efectos colaterales en el repartidor de memoria porque debe ser posible construir objetos complejos como p.ej lookup-tables. Esta funcionalidad todavía no se puede usar tal cual. 
+
+El compilador no guarda un espacio de almacenamiento para estas variables, y se remplaza cada ocurrencia por su respectiva expresión constante (que puede ser compilada como un valor simple por el optimizador).
+
+En este momento, no todos los tipos para las constantes están implementados. Los únicos tipos implementados por ahora son los tipos de valor y las cadenas de texto (string).
+
+::
+
+    pragma solidity ^0.4.0;
+
+    contract C {
+        uint constant x = 32**22 + 8;
+        string constant text = "abc";
+        bytes32 constant myHash = keccak256("abc");
+    }
+
+
+.. _funciones-constantes:
+
+********************
+Funciones Constantes
+********************
+
+En el caso en que un función se declare como constante, promete no modificar el estado.
+
+::
+
+    pragma solidity ^0.4.0;
+
+    contract C {
+        function f(uint a, uint b) constant returns (uint) {
+            return a * (b + 42);
+        }
+    }
+
+.. note::
+  Los métodos getter están marcados como constantes. 
+
+.. warning::
+  El compilador todavía no impone que un método constante no modifica el estado.
+
+.. index:: ! funcion fallback, funcion;fallback
+
+.. _fallback-function:
+
+****************
+Función Fallback
+****************
+
+Un contrato puede tener exactamente una sola función sin nombre. Esta función no puede tener argumentos ni puede devolver nada. Se ejecuta si, al llamar al contrato, ninguna de las otras funciones del contrato se corresponde al identificador de función proporcionado (o si no se hubiera proporcionado ningún dato).
+
+Además, esta función se ejecutará siempre y cuando el contrato sólo recibe Ether (sin dato). En este caso en general hay muy poco gas disponible para una llamada a una función (para ser preciso, 2300 gas), por eso es importante hacer las funciones fallback las más baratas posible.
+
+En particular, las siguientes operaciones consumirán más gas que  lo que se paga (???stipend) para una función fallback.
+In particular, the following operations will consume more gas than the stipend provided to a fallback function:
+
+- Escribir al ???(storage)
+- Crear un contrato
+- Llamar a una función externa que consume una cantidad de gas significativa
+- Mandar Ether
+
+Asegúrese por favor de testear su función fallback meticulosamente antes de desplegar el contrato para asegurarse de que su coste de ejecución es menor de 2300 gas.
+
+.. warning::
+Los contratos que reciben Ether directamente (sin una llamada a una función, p.ej usando ``send`` o ``transfer``) pero que no tienen definida una función fallback, van a devolver una excepción (???exception), devolviendo el Ether (nótese que esto era diferente antes de la versión v0.4.0 de Solidity). Por lo tanto, si desea que su contrato reciba Ether, tiene que implementar una función fallback.
+
+::
+
+    pragma solidity ^0.4.0;
+
+    contract Test {
+		    // Se llama a esta función para todos los mensajes enviados a este contrato (no hay otra función). Enviar Ether a este contrato va a devolver una excepción, porque la función fallback no tiene el modificador "payable".
+        function() { x = 1; }
+        uint x;
+    }
+
+
+    // Este contrato guarda todo el Ether que se le envía sin posibilidad de recuperarlo.
+    contract Sink {
+        function() payable { }
+    }
+
+
+    contract Caller {
         function callTest(Test test) {
             test.call(0xabcdef01); // el hash no existe
             // resulta en que test.x se vuelve == 1.
@@ -456,23 +901,13 @@ Los contratos que reciben Ether directamente (sin una llamada a una función, p.
 
 .. _eventos:
 
-******
-Events
-******
+*******
+Eventos
+*******
 
-Events allow the convenient usage of the EVM logging facilities,
-which in turn can be used to "call" JavaScript callbacks in the user interface
-of a dapp, which listen for these events.
+Los eventos permiten el uso conveniente de la capacidad de registro del EVM, que a su vez puede "llamar" a callbacks de JavaScript en la interfaz de usuario de una dapp que escucha a esos eventos.
 
-Events are
-inheritable members of contracts. When they are called, they cause the
-arguments to be stored in the transaction's log - a special data structure
-in the blockchain. These logs are associated with the address of
-the contract and will be incorporated into the blockchain
-and stay there as long as a block is accessible (forever as of
-Frontier and Homestead, but this might change with Serenity). Log and
-event data is not accessible from within contracts (not even from
-the contract that created them).
+Los eventos son miembros heredables de los contratos. Cuando se les llama, hacen que los argumentos se guarden en el registro de transacciones - una estructura de datos especial en la blockchain. Estos registros están asociados con la dirección del contrato y serán incorporados en la blockchain y allí permanecerán siempre que un bloque esté accesible (eso es: para siempre con Frontier y con Homestead, pero puede cambiar con Serenity). Los datos de registros y de eventos no están disponibles desde dentro de los contratos (ni siquiera desde el contrato que los ha creado).
 
 SPV proofs for logs are possible, so if an external entity supplies
 a contract with such a proof, it can check that the log actually
