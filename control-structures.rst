@@ -101,38 +101,20 @@ Cuando se llama a funciones de otros contratos, la cantidad de Wei enviada con l
         function callFeed() { feed.info.value(10).gas(800)(); }
     }
 
-The modifier ``payable`` has to be used for ``info``, because otherwise, the `.value()`
-option would not be available.
+El modificador ``payable`` se tiene que usar para ``info``, porque de otra manera la opción `.value()`
+no estaría disponible.
 
-Note that the expression ``InfoFeed(addr)`` performs an explicit type conversion stating
-that "we know that the type of the contract at the given address is ``InfoFeed``" and
-this does not execute a constructor. Explicit type conversions have to be
-handled with extreme caution. Never call a function on a contract where you
-are not sure about its type.
+Destacar que la expresión ``InfoFeed(addr)`` realiza una conversión de tipo explícita afirmando que "sabemos que el tipo de contrato en la dirección dada es ``InfoFeed``" y este no ejecuta un constructor. Las conversiones de tipo explícitas tienen que ser gestionados con extrema precaución. Nunca se debe llamar a una función en un contrato donde no se tiene seguridad de cuál es su tipo.
 
-We could also have used ``function setFeed(InfoFeed _feed) { feed = _feed; }`` directly.
-Be careful about the fact that ``feed.info.value(10).gas(800)``
-only (locally) sets the value and amount of gas sent with the function call and only the
-parentheses at the end perform the actual call.
+También se podría usar ``function setFeed(InfoFeed _feed) { feed = _feed; }`` directamente.
+Hay que tener cuidado con el hecho de que ``feed.info.value(10).gas(800)``
+sólo (localmente) establece el valor y la cantidfad de gas enviado con la llamada de función y sólo el paréntesis al final realiza la llamada actual.
 
-Function calls cause exceptions if the called contract does not exist (in the
-sense that the account does not contain code) or if the called contract itself
-throws an exception or goes out of gas.
+Las llamadas de función provocan excepciones si el contrato invocado no existe (en el sentido de que la cuenta no contiene código) o si el contrato invocado por sí mismo dispara una excepción o se queda sin gas.
 
 .. warning::
-    Any interaction with another contract imposes a potential danger, especially
-    if the source code of the contract is not known in advance. The current
-    contract hands over control to the called contract and that may potentially
-    do just about anything. Even if the called contract inherits from a known parent contract,
-    the inheriting contract is only required to have a correct interface. The
-    implementation of the contract, however, can be completely arbitrary and thus,
-    pose a danger. In addition, be prepared in case it calls into other contracts of
-    your system or even back into the calling contract before the first
-    call returns. This means
-    that the called contract can change state variables of the calling contract
-    via its functions. Write your functions in a way that, for example, calls to
-    external functions happen after any changes to state variables in your contract
-    so your contract is not vulnerable to a reentrancy exploit.
+    Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente arbitrario y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama via sus funciones. Escribir tus funciones de esa manera, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato hace que este contrato no sea vulnerable a una código malicioso reejecutable.
+    
 
 Named Calls and Anonymous Function Parameters
 ---------------------------------------------
