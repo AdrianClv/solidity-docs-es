@@ -54,50 +54,41 @@ Hay que tener en cuenta que no hay conversión de tipos desde non-boolean a bool
 
 .. _multi-return:
 
-Returning Multiple Values
--------------------------
+Devolver múltiples valores
+--------------------------
 
-When a function has multiple output parameters, ``return (v0, v1, ...,
-vn)`` can return multiple values.  The number of components must be
-the same as the number of output parameters.
+Cuando una función tiene múltiples valores de salida, ``return (v0, v1, ...,
+vn)`` puede devolver múltiples valores. El número de componentes debe ser el mismo que el de parámetros de salida.
 
-.. index:: ! function;call, function;internal, function;external
+.. index:: ! función;llamada, función;interna, función;externa
 
 .. _function-calls:
 
-Function Calls
-==============
+Llamadas de función
+===================
 
-Internal Function Calls
------------------------
+Llamadas de función internas
+----------------------------
 
-Functions of the current contract can be called directly ("internally"), also recursively, as seen in
-this nonsensical example::
+Las funciones del conrtrato actual pueden ser llamadas directamente("internamente"), y también recursivamente, como se puede ver en este ejemplo sin sentido::
 
     contract C {
         function g(uint a) returns (uint ret) { return f(); }
         function f() returns (uint ret) { return g(7) + f(); }
     }
 
-These function calls are translated into simple jumps inside the EVM. This has
-the effect that the current memory is not cleared, i.e. passing memory references
-to internally-called functions is very efficient. Only functions of the same
-contract can be called internally.
+Estas llamadas de función son traducidas en simples saltos dentro de la máquina virtual de Ethereum (EVM). Esto tiene como consecuencia que la memoria actual no se limpia, p.ej.: pasando referencias de memoria a las funciones internamente llamadas es muy eficiente. Sólo las funciones del mismo contrato pueden ser llamadas internamente.
 
-External Function Calls
------------------------
+Llamadas de función externas
+----------------------------
 
-The expressions ``this.g(8);`` and ``c.g(2);`` (where ``c`` is a contract
-instance) are also valid function calls, but this time, the function
-will be called "externally", via a message call and not directly via jumps.
-Please note that function calls on ``this`` cannot be used in the constructor, as the
-actual contract has not been created yet.
+Las expresiones ``this.g(8);`` and ``c.g(2);`` (donde ``c`` es la instancia de un contrato) son también llamadas de función válidas, pero en esta ocasión, la función se llamará "externamente", mediante un message call y no directamente por saltos.
+Por favor, es importante tener en cuenta que las llamadas de función en ``this`` no pueden ser usadas en el constructor, ya que el contrato en cuestión no se ha creado todavía.
 
-Functions of other contracts have to be called externally. For an external call,
-all function arguments have to be copied to memory.
+Las funciones de otros contratos se tienen que llamar de forma externa. Para una llamada externa,
+todos los argumentos de la función tienen que ser copiados en memoria.
 
-When calling functions of other contracts, the amount of Wei sent with the call and
-the gas can be specified with special options ``.value()`` and ``.gas()``, respectively::
+Cuando se llama a funciones de otros contratos, la cantidad de Wei enviada con la llamada y el gas pueden especificarse con opciones especiales ``.value()`` y ``.gas()``, respectivamente::
 
     contract InfoFeed {
         function info() payable returns (uint ret) { return 42; }
