@@ -400,58 +400,43 @@ En el caso en que un función se declare como constante, promete no modificar el
 .. warning::
   El compilador todavía no impone que un método constante no modifica el estado.
 
-.. index:: ! fallback function, function;fallback
+.. index:: ! función fallback, función;fallback
 
 .. _fallback-function:
 
-*****************
-Fallback Function
-*****************
+****************
+Función Fallback
+****************
 
-A contract can have exactly one unnamed function. This function cannot have
-arguments and cannot return anything.
-It is executed on a call to the contract if none of the other
-functions match the given function identifier (or if no data was supplied at
-all).
+Un contrato puede tener exactamente una sola función sin nombre. Esta función no puede tener argumentos ni puede devolver nada. Se ejecuta si, al llamar al contrato, ninguna de las otras funciones del contrato se corresponde al identificador de función proporcionado (o si no se hubiera proporcionado ningún dato).
 
-Furthermore, this function is executed whenever the contract receives plain
-Ether (without data).  In such a context, there is usually very little gas available to
-the function call (to be precise, 2300 gas), so it is important to make fallback functions as cheap as
-possible.
+Además, esta función se ejecutará siempre y cuando el contrato sólo recibe Ether (sin dato). En este caso en general hay muy poco gas disponible para una llamada a una función (para ser preciso, 2300 gas), por eso es importante hacer las funciones fallback las más baratas posible.
 
+En particular, las siguientes operaciones consumirán más gas que  lo que se paga (???stipend) para una función fallback.
 In particular, the following operations will consume more gas than the stipend provided to a fallback function:
 
-- Writing to storage
-- Creating a contract
-- Calling an external function which consumes a large amount of gas
-- Sending Ether
+- Escribir al ???(storage)
+- Crear un contrato
+- Llamar a una función externa que consume una cantidad de gas significativa
+- Mandar Ether
 
-Please ensure you test your fallback function thoroughly to ensure the execution cost is less than 2300 gas before deploying a contract.
+Asegúrese por favor de testear su función fallback meticulosamente antes de desplegar el contrato para asegurarse de que su coste de ejecución es menor de 2300 gas.
 
 .. warning::
-    Contracts that receive Ether directly (without a function call, i.e. using ``send`` or ``transfer``)
-    but do not define a fallback function
-    throw an exception, sending back the Ether (this was different
-    before Solidity v0.4.0). So if you want your contract to receive Ether,
-    you have to implement a fallback function.
+Los contratos que reciben Ether directamente (sin una llamada a una función, p.ej usando ``send`` o ``transfer``) pero que no tienen definida una función fallback, van a devolver una excepción (???exception), devolviendo el Ether (nótese que esto era diferente antes de la versión v0.4.0 de Solidity). Por lo tanto, si desea que su contrato reciba Ether, tiene que implementar una función fallback.
 
 ::
 
     pragma solidity ^0.4.0;
 
     contract Test {
-        // This function is called for all messages sent to
-        // this contract (there is no other function).
-        // Sending Ether to this contract will cause an exception,
-        // because the fallback function does not have the "payable"
-        // modifier.
+		    // Se llama a esta función para todos los mensajes enviados a este contrato (no hay otra función). Enviar Ether a este contrato va a devolver una excepción, porque la función fallback no tiene el modificador "payable".
         function() { x = 1; }
         uint x;
     }
 
 
-    // This contract keeps all Ether sent to it with no way
-    // to get it back.
+    // Este contrato guarda todo el Ether que se le envía sin posibilidad de recuperarlo.
     contract Sink {
         function() payable { }
     }
@@ -459,18 +444,17 @@ Please ensure you test your fallback function thoroughly to ensure the execution
 
     contract Caller {
         function callTest(Test test) {
-            test.call(0xabcdef01); // hash does not exist
-            // results in test.x becoming == 1.
+            test.call(0xabcdef01); // el hash no existe
+            // resulta en que test.x se vuelve == 1.
 
-            // The following call will fail, reject the
-            // Ether and return false:
+            // La siguiente llamada falla, devuelve el Ether y devuelve un error:
             test.send(2 ether);
         }
     }
 
-.. index:: ! event
+.. index:: ! evento
 
-.. _events:
+.. _eventos:
 
 ******
 Events
