@@ -4,21 +4,16 @@ Expresiones y Estructuras de Control
 
 .. index:: ! parámetro, parámetro;entrada, parámetro;salida
 
-Input Parameters and Output Parameters
-======================================
+Parámetros de entrada y de salida
+=================================
 
-As in Javascript, functions may take parameters as input;
-unlike in Javascript and C, they may also return arbitrary number of
-parameters as output.
+Al igual que en Javascript, las funciones obtienen parámetros como entrada;
+al contrario que en Javascript y C, estas también deberían devolver un número arbitrario de parámetros como salida.
 
-Input Parameters
-----------------
+Parámetros de entrada
+---------------------
 
-The input parameters are declared the same way as variables are. As an
-exception, unused parameters can omit the variable name.
-For example, suppose we want our contract to
-accept one kind of external calls with two integers, we would write
-something like::
+Los parámetros de entrada se declaran de la misma forma que las variables. Como una excepción, los parámetros no usados pueden omitir el nombre de la variable. Por ejemplo, si quisiéramos que nuestro contrato acepte un tipo de llamadas externas con dos enteros, el código quedaría similar a este::
 
     contract Simple {
         function taker(uint _a, uint _b) {
@@ -26,13 +21,11 @@ something like::
         }
     }
 
-Output Parameters
------------------
+Parámetros de salida
+--------------------
 
-The output parameters can be declared with the same syntax after the
-``returns`` keyword. For example, suppose we wished to return two results:
-the sum and the product of the two given integers, then we would
-write::
+Los parámetros de salida se pueden declarar con la misma sintaxis después de la palabra reservada ``returns``. Por ejemplo, supongamos que deseamos devolver dos resultados:
+La suma y el producto de dos valores dados, entonces escribiríamos un código como este::
 
     contract Simple {
         function arithmetics(uint _a, uint _b) returns (uint o_sum, uint o_product) {
@@ -41,33 +34,23 @@ write::
         }
     }
 
-The names of output parameters can be omitted.
-The output values can also be specified using ``return`` statements.
-The ``return`` statements are also capable of returning multiple
-values, see :ref:`multi-return`.
-Return parameters are initialized to zero; if they are not explicitly
-set, they stay to be zero.
+Los nombres de los parámetros de salida se pueden omitir.
+Los valores de saluda se pueden especificar también usando sentencias ``return``.
+Las sentencias ``return`` también son capaces de devolver múltiples valores, ver :ref:`multi-return`.
+Los parámetros de retorno se inicializan a cero; si no se especifica esxplícitamente su valor, permanecen con dicho valor cero.
 
-Input parameters and output parameters can be used as expressions in
-the function body.  There, they are also usable in the left-hand side
-of assignment.
+Los parámetros de entrada y salida se pueden usar como expresiones en el cuerpo de la función. En este caso, también pueden ir en el lado izquierdo de una asignación.
 
 .. index:: if, else, while, do/while, for, break, continue, return, switch, goto
 
-Control Structures
-===================
+Estructuras de control
+======================
 
-Most of the control structures from JavaScript are available in Solidity
-except for ``switch`` and ``goto``. So
-there is: ``if``, ``else``, ``while``, ``do``, ``for``, ``break``, ``continue``, ``return``, ``? :``, with
-the usual semantics known from C or JavaScript.
+La mayoría de las estructuras de controlos disponibles en JavaScript, también lo están en Solidity exceptuando ``switch`` y ``goto``. Esto significa que tenemos: ``if``, ``else``, ``while``, ``do``, ``for``, ``break``, ``continue``, ``return``, ``? :``, con la semántica habitual conocida de C o JavaScript.
 
-Parentheses can *not* be omitted for conditionals, but curly brances can be omitted
-around single-statement bodies.
+Los paréntesis no se pueden omitir para condicionales, pero sí las llaves alrededor de los cuerpos de las sentencias sencillas.
 
-Note that there is no type conversion from non-boolean to boolean types as
-there is in C and JavaScript, so ``if (1) { ... }`` is *not* valid
-Solidity.
+Hay que tener en cuenta que no hay conversión de tipos desde non-boolean a boolean como hay en C y JavaScript, por loo que ``if (1) { ... }`` *no* es válido en Solidity.
 
 .. _multi-return:
 
