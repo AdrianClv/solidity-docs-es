@@ -113,16 +113,13 @@ sólo (localmente) establece el valor y la cantidfad de gas enviado con la llama
 Las llamadas de función provocan excepciones si el contrato invocado no existe (en el sentido de que la cuenta no contiene código) o si el contrato invocado por sí mismo dispara una excepción o se queda sin gas.
 
 .. warning::
-    Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente arbitrario y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama via sus funciones. Escribir tus funciones de esa manera, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato hace que este contrato no sea vulnerable a una código malicioso reejecutable.
+    Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente arbitrario y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama via sus funciones. Escribir tus funciones de esa manera, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato, hace que este contrato no sea vulnerable a una código malicioso reejecutable.
     
 
-Named Calls and Anonymous Function Parameters
----------------------------------------------
+Named Calls y parámetros de funciones anónimas
+----------------------------------------------
 
-Function call arguments can also be given by name, in any order,
-if they are enclosed in ``{ }`` as can be seen in the following
-example. The argument list has to coincide by name with the list of
-parameters from the function declaration, but can be in arbitrary order.
+Los argumentos de una llamada a una función pueden venir dados por el nombre, en cualquier orden, si están entre ``{ }`` como se puede ver en el siguiente ejemplo. La lista de argumentos tiene que coincidir por el nombre con la lista de parámetros de la declaración d ela función, pero pueden estar en orden aleatorio.
 
 ::
 
@@ -137,11 +134,11 @@ parameters from the function declaration, but can be in arbitrary order.
         }
     }
 
-Omitted Function Parameter Names
---------------------------------
+Nombres de parámetros de función omitidos
+-----------------------------------------
 
-The names of unused parameters (especially return parameters) can be omitted.
-Those names will still be present on the stack, but they are inaccessible.
+Los nombres de parámetros no usados (especialmente los de retorno) se pueden omitir.
+Esos nombres estarán presentes en la pila, pero serán inaccesibles.
 
 ::
 
@@ -155,16 +152,14 @@ Those names will still be present on the stack, but they are inaccessible.
     }
     
 
-.. index:: ! new, contracts;creating
+.. index:: ! nuevo, contratos;creación
 
 .. _creating-contracts:
 
-Creating Contracts via ``new``
-==============================
+Creando contratos via ``new``
+=============================
 
-A contract can create a new contract using the ``new`` keyword. The full
-code of the contract being created has to be known in advance, so recursive
-creation-dependencies are not possible.
+Un contrato puede crear un nuevo contrato usando la palabra reservada ``new``. El código completo del contrato que se está creando tiene que ser conocido de antemano, por lo que no son posibles las dependencias de creación recursivas.
 
 ::
 
@@ -191,31 +186,26 @@ creation-dependencies are not possible.
         }
     }
 
-As seen in the example, it is possible to forward Ether to the creation using the ``.value()`` option,
-but it is not possible to limit the amount of gas. If the creation fails
-(due to out-of-stack, not enough balance or other problems), an exception
-is thrown.
+Como se ve en el ejemplo, es posible traspasar Ether a la creación usando la opción ``.value()``,
+pero no es posible limitar la cantidad de gas. Si la creación falla
+(debido al desbordamiento de la pila, falta de balance o cualquier otro problema), se dispara una excepción.
 
-Order of Evaluation of Expressions
-==================================
+Orden de la evaluación de expresiones
+=====================================
 
-The evaluation order of expressions is not specified (more formally, the order
-in which the children of one node in the expression tree are evaluated is not
-specified, but they are of course evaluated before the node itself). It is only
-guaranteed that statements are executed in order and short-circuiting for
-boolean expressions is done. See :ref:`order` for more information.
+El orden de evaluación de expresiones no se especifica (más formalmente, el orden en el que los hijos de un nodo en el árbol de la expresión son evaluados no es especificado. Eso sí, son evaluados antes que el propio nodo). Sólo se garantiza que las sentencias son ejecutadas en orden y que se hace un cortocircuito para las expresiones booleanas. Ver :ref:`order` para más información.
 
-.. index:: ! assignment
+.. index:: ! asignación
 
-Assignment
+Asignación
 ==========
 
-.. index:: ! assignment;destructuring
+.. index:: ! asignación;desestructurar
 
-Destructuring Assignments and Returning Multiple Values
--------------------------------------------------------
+Asignaciones para desestructurar y retornar múltiples valores
+-------------------------------------------------------------
 
-Solidity internally allows tuple types, i.e. a list of objects of potentially different types whose size is a constant at compile-time. Those tuples can be used to return multiple values at the same time and also assign them to multiple variables (or LValues in general) at the same time::
+Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , potencialmente, diferentes tipos cuyo tamaño es constante en tiempo de compilación. Esas tuplas pueden ser usadas para retornar múltiples valores al mismo timepo y, también, asignarlos a múltiples variables (o lista de valores en general) al mismo tiempo::
 
     contract C {
         uint[] data;
