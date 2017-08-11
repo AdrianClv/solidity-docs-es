@@ -235,22 +235,21 @@ Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , pote
         }
     }
 
-Complications for Arrays and Structs
-------------------------------------
+Complicaciones en Arrays y Structs
+----------------------------------
 
-The semantics of assignment are a bit more complicated for non-value types like arrays and structs.
-Assigning *to* a state variable always creates an independent copy. On the other hand, assigning to a local variable creates an independent copy only for elementary types, i.e. static types that fit into 32 bytes. If structs or arrays (including ``bytes`` and ``string``) are assigned from a state variable to a local variable, the local variable holds a reference to the original state variable. A second assignment to the local variable does not modify the state but only changes the reference. Assignments to members (or elements) of the local variable *do* change the state.
+La sintaxis de asignación es algo más complicada por tipos sin valor como arrays y structs.
+Las asignaciones *a* variables de estado siempre crean una copia independiente. Por otro lado, asignar una variable local crea sólo una copia independiente para tipos elementales, como tipos estáticos que casan en 32 bytes. Si los structs o arrays (incluyendo ``bytes`` y ``string``) son asignados desde una variable de estado a una local, la variable local se queda una referencia a la variable de estado original. Una segunda asignación a la variable local no modifica el estado, sólo cambia la referencia. Las asignaciones a miembros (o elementos) de la variable local *hacen* cambiar el estado.
 
-.. index:: ! scoping, declarations, default value
+.. index:: ! scoping, declaraciones, valor por defecto
 
 .. _default-value:
 
-Scoping and Declarations
-========================
+Scoping and declaraciones
+=========================
 
-A variable which is declared will have an initial default value whose byte-representation is all zeros.
-The "default values" of variables are the typical "zero-state" of whatever the type is. For example, the default value for a ``bool``
-is ``false``. The default value for the ``uint`` or ``int`` types is ``0``. For statically-sized arrays and ``bytes1`` to ``bytes32``, each individual
+Una variable que es declarada tendrá una valor inicial por defecto cuyo valor, representado en bytes, será todo ceros.
+Los valorespor defecto de variables son los típicos "estado-cero" cualquiera que sea el tipo. por ejemplo, el valor por defecto para un ``bool`` es ``false``. El valor por defecto para un ``uint`` o ``int`` es ``0``. Para arrays For statically-sized arrays and ``bytes1`` to ``bytes32``, each individual
 element will be initialized to the default value corresponding to its type. Finally, for dynamically-sized arrays, ``bytes``
 and ``string``, the default value is an empty array or string.
 
