@@ -20,12 +20,16 @@ El compilador de línea de comandos leerá automáticamente los archivos importa
 
     solc github.com/ethereum/dapp-bin/=/usr/local/lib/dapp-bin/ =/usr/local/lib/fallback file.sol
 
-Esencialmente esto instruye al compilador a buscar cualquier cosa que empeze con
-``github.com/ethereum/dapp-bin/`` bajo ``/usr/local/lib/dapp-bin`` y si no localiza el fichero ahí, mirará en ``/usr/local/lib/fallback`` (el prefijo vacío siempre coincide). ``solc`` will not read files from the filesystem that lie outside of
-the remapping targets and outside of the directories where explicitly specified source
-files reside, so things like ``import "/etc/passwd";`` only work if you add ``=/`` as a remapping.
+Esencialmente esto instruye al compilador a buscar cualquier cosa que empiece con
+``github.com/ethereum/dapp-bin/`` bajo ``/usr/local/lib/dapp-bin`` y si no localiza el fichero ahí, mirará en ``/usr/local/lib/fallback`` (el prefijo vacío siempre coincide). ``solc`` no leerá ficheros del sistema de ficheros que se encuentren fuera de los objetivos de reasignación y fuera de los directorios donde se especifica explícitamente la fuente de ficheros donde residen, con lo cual cosas como 
 
-If there are multiple matches due to remappings, the one with the longest common prefix is selected.
+solo funcionan si le añades ``import "/etc/passwd";``, así que sólo funcionan si se añades ``=/`` como una reasignacion.
+
+Si hay coincidencias múltiples debido a reasignaciones, se selecciona el prefijo común más largo.
+
+
+Por razones de seguridad, el compilador tiene restricciones a qué directorios puede acceder. Las rutas de acceso (y sus subdirectorios) de los archivos de origen especificados en la línea de comandos y las rutas definidas por las reasignaciones se permiten para las instrucciones de importación, pero todo lo demás se rechaza
+
 
 For security reasons the compiler has restrictions what directories it can access. Paths (and their subdirectories) of source files specified on the commandline and paths defined by remappings are allowed for import statements, but everything else is rejected. Additional paths (and their subdirectories) can be allowed via the ``--allow-paths /sample/path,/another/sample/path`` switch.
 
