@@ -36,12 +36,13 @@ Un contrato para Solidity es una colección de código (sus *funciones*) y datos
 Para acceder a una variable de estado, no es necesario el uso del prefijo ``this.`` como es habitual en otros lenguajes.
 
 Este contrato no hace mucho todavía (debido a la infraestructura construída por Ethereum), simplemente permite a cualquiera almacenar un número accesible para todos sin un (factible) modo de prevenir la posibilidad de publicar este número. Por supuesto, cualquiera podría simplemente hacer una llamada ``set`` de nuevo con un valor diferente y sobreescribir el número inicial, pero este número siempre permanecería almacenado en la historía de la blockchain. Más adelante, veremos como imponer restricciones de acceso de tal manera que sólo tú puedas cambiar el número.
+
 .. index:: ! submoneda
 
 Ejemplo de Submoneda
 ====================
 
-El siguiente contrato va a implementar la forma más sencilla de una criptomoneda. Se pueden generar monedas de la nada, pero sólo la persona que creó el contrato estará habilitada para hacerlo (es trivial implementar un esquema diferente de emisión). Es más, cualquiera puede enviar monedas a otros sin necesidad de registrarse con usuario y clave - sólo hace falta un par de claves Ethereum.
+El siguiente contrato va a implementar la forma más sencilla de una criptomoneda. Se pueden generar monedas de la nada, pero sólo la persona que creó el contrato estará habilitada para hacerlo (es trivial implementar un esquema diferente de emisión). Es más, cualquiera puede enviar monedas a otros sin necesidad de registrarse con usuario y contraseña - sólo hace falta un par de claves de Ethereum.
 
 
 ::
@@ -49,17 +50,17 @@ El siguiente contrato va a implementar la forma más sencilla de una criptomoned
     pragma solidity ^0.4.0;
 
     contract Coin {
-        // The keyword "public" makes those variables
-        // readable from outside.
+        // La palabra clave "public" hace que dichas variables
+        // puedan ser leídas desde fuera.
         address public minter;
         mapping (address => uint) public balances;
-
-        // Events allow light clients to react on
-        // changes efficiently.
+        
+        // Los eventos permiten a los clientes ligeros reaccionar
+        // de forma eficiente a los cambios.
         event Sent(address from, address to, uint amount);
 
-        // This is the constructor whose code is
-        // run only when the contract is created.
+        // Este es el constructor cuyo código
+        // sólo se ejecutará cuando se cree el contrato.
         function Coin() {
             minter = msg.sender;
         }
@@ -79,8 +80,8 @@ El siguiente contrato va a implementar la forma más sencilla de una criptomoned
 
 Este contrato introduce algunos conceptos nuevos que vamos a detallar uno a uno.
 
-La línea ``address public minter;`` declara una variable de estado de tipo address (dirección) que es públicamente accesible. El tipo ``address`` es un valor de 160-bit que no permite operaciones aritméticas. Es apropiado para almacenar direcciones de contratos o pares de claves pertenecientes a personas externas. La palabra reservada ``public`` genera automáticamente una función que permite el acceso al valor actual de la variable de estado. Sin esta palabra reservada, otros contratos no tienen manera de acceder a la variable.
-Está función sería algo como esto::
+La línea ``address public minter;`` declara una variable de estado de tipo address (dirección) que es públicamente accesible. El tipo ``address`` es un valor de 160 bits que no permite operaciones aritméticas. Es apropiado para almacenar direcciones de contratos o pares de claves pertenecientes a personas externas. La palabra reservada ``public`` genera automáticamente una función que permite el acceso al valor actual de la variable de estado. Sin esta palabra reservada, otros contratos no tienen manera de acceder a la variable.
+Esta función sería algo como esto::
 
     function minter() returns (address) { return minter; }
 
@@ -100,8 +101,8 @@ Como se puede ver, se puede usar esta función para, de forma sencilla, consulta
 
 .. index:: event
 
-La línea ``event Sent(address from, address to, uint amount);`` declara un evento que es disparado en la última línea de la ejecución 
-``send``. Las interfaces de ususario (como las de servidor, por supuesto) pueden escuchar esos eventos que están siendo disparados en la blockchain sin mucho coste. Tan pronto son disparados, el listener tambiñen recibirá los argumentos ``from``, ``to`` y ``amount``, que hacen más fácil trazar las transacciones. Con el fin de escuchar este evento, se podría usar ::
+La línea ``event Sent(address from, address to, uint amount);`` declara un evento que es disparado en la última línea de la ejecución de 
+``send``. Las interfaces de ususario (como las de servidor, por supuesto) pueden escuchar esos eventos que están siendo disparados en la blockchain sin mucho coste. Tan pronto son disparados, el listener también recibirá los argumentos ``from``, ``to`` y ``amount``, que hacen más fácil trazar las transacciones. Con el fin de escuchar este evento, se podría usar ::
 
     Coin.Sent().watch({}, '', function(error, result) {
         if (!error) {
@@ -118,9 +119,9 @@ Es interesante como la función generada automáticamente ``balances`` es llamad
 
 .. index:: coin
 
-La función especial ``Coin`` es el constructor que es ejecutado durante la creación de un contrato y no puede ser llamada con posterioridad. Almacena permanentemente la dirección de la persona que crea el contrato: ``msg`` (junto con ``tx`` y ``block``) es una variable global mágica que contiene propiedades que permiten el acceso a la blockchain. ``msg.sender`` es siempre la dirección donde la llamada a la función actual (externa) es originada.
+La función especial ``Coin`` es el constructor que se ejecuta durante la creación de un contrato y no puede ser llamada con posterioridad. Almacena permanentemente la dirección de la persona que crea el contrato: ``msg`` (junto con ``tx`` y ``block``) es una variable global mágica que contiene propiedades que permiten el acceso a la blockchain. ``msg.sender`` es siempre la dirección desde donde se origina la llamada a la función actual (externa).
 
-Finalmente, las funciones que actualmente concluirán con el contrato pueden ser llamadas por usuarios y contratos como son ``mint`` y ``send``. Si ``mint`` es llamado por cualquiera excepto la cuenta que creó el contrato, nada pasará. Por otro lado, ``send`` puede ser usado por todos (los que ya tienen algunas de estas monedas) para enviar monedas a cualquier otro. Hay que tener en cuenta que si se usa este contrato para enviar monedas a una dirección, no se verá reflejado cuando se busque la dirección en un explorador de la blockchain por el hecho de enviar monedas y que los balances sólo sean guardados en el almacenamiento particular de este contrato de moneda. Con el uso de eventos es relativamente sencillo crear un "explorador de la blockchain" que monitorice las transacciones y los balances de la nueva moneda.
+Finalmente, las funciones que realmente habrá en el contrato y que podrán ser llamadas por usuarios y contratos como son ``mint`` y ``send``. Si se llama a ``mint`` desde una cuenta distinta a la del creador del contrato, no ocurrirá nada. Por otro lado, ``send`` puede ser usado por todos (los que ya tienen algunas de estas monedas) para enviar monedas a cualquier otro. Hay que tener en cuenta que si se usa este contrato para enviar monedas a una dirección, no se verá reflejado cuando se busque la dirección en un explorador de la blockchain por el hecho de enviar monedas, y que los balances sólo serán guardados en el almacenamiento de este contrato de moneda. Con el uso de eventos es relativamente sencillo crear un "explorador de la blockchain" que monitorice las transacciones y los balances de la nueva moneda.
 
 .. _blockchain-basics:
 
@@ -128,9 +129,9 @@ Finalmente, las funciones que actualmente concluirán con el contrato pueden ser
 Fundamentos de Blockchain
 *************************
 
-Las blockchains son un concepto no muy difícil de entender para desarrolladores. La razón es que la mayoría de las complicaciones (minería, `hashing <https://en.wikipedia.org/wiki/Cryptographic_hash_function>`_, `elliptic-curve cryptography <https://en.wikipedia.org/wiki/Elliptic_curve_cryptography>`_, `peer-to-peer networks <https://en.wikipedia.org/wiki/Peer-to-peer>`_, etc.) están justo ahí para proveer un conjunto de funcionalidades y espectativas. Una vez que aceptas estas funcionalidades tal cual vienen dadas, no tienes que preocuparte por la tecnología que lleva inmersa - o, ¿tienes que saber realmente cómo Amazon AWS funciona internamente para poder usarlo?.
+Las blockchains son un concepto no muy difícil de entender para desarrolladores. La razón es que la mayoría de las complicaciones (minería, `hashes <https://en.wikipedia.org/wiki/Cryptographic_hash_function>`_, `criptografa de curva elíptica <https://en.wikipedia.org/wiki/Elliptic_curve_cryptography>`_, `redes P2P <https://en.wikipedia.org/wiki/Peer-to-peer>`_, etc.) están justo ahí para proveer un conjunto de funcionalidades y espectativas. Una vez que aceptas estas funcionalidades tal cual vienen dadas, no tienes que preocuparte por la tecnología que lleva inmersa - o, ¿tienes que saber realmente cómo funciona internamente Amazon AWS para poder usarlo?.
 
-.. index:: transacción
+.. index:: transaction
 
 Transacciones
 =============
@@ -142,7 +143,7 @@ Como un ejemplo, imagine una tabla que lista los balances de todas las cuentas e
 
 Yendo más allá, una transacción es siempre firmada criptográficamente por el remitente (creador). Esto la hace más robusta para garantizar el acceso a modificaciones específicas de la base de datos. En el ejemplo de divisas electrónicas, un simple chequeo asegura que sólo la persona que posee las claves de la cuenta puede transferir dinero desde ella.
 
-.. index:: ! bloque
+.. index:: ! block
 
 Bloques
 =======
@@ -169,7 +170,7 @@ Introducción
 
 La máquina virtual de Ethereum (EVM por sus siglas en inglés) es un entorno de ejecución de contratos inteligentes en Ethereum.Va más allá de una configuración tipo sandbox ya que se encuentra totalmente aislada, lo que significa que el código que se ejecuta en la EVM no tiene acceso a la red, ni al sistema de ficheros, ni a cualquier otro proceso. Incluso los contratos inteligentes tienen acceso limitado a otros contratos inteligentes.
 
-.. index:: ! cuentas, direcciones, almacenamiento, balance
+.. index:: ! account, address, storage, balance
 
 Cuentas
 =======
@@ -184,7 +185,7 @@ Cada cuenta tiene un almacenamiento persistente clave-valor que mapea palabras d
 
 Más allá, cada cuenta tiene un **balance** en Ether (in "Wei" para ser exactos) que puede ser modificado enviando transacciones que incluyen Ether.
 
-.. index:: ! transacción
+.. index:: ! transaction
 
 Transacciones
 =============
@@ -195,7 +196,7 @@ Si la cuenta destino contiene código, este es ejecutado y la carga útil se pro
 
 Si la cuenta destino es la cuenta-cero (la cuenta con dirección ``0``), la transacción crea un **nuevo contrato**. Como se ha mancionado, la dirección del contrato no es la dirección cero, pero sí una dirección derivada del que envía y su número de transacciones enviadas (el "nonce"). Los datos binarios de la transacción que crea el contrato son obtenidos como bytecode por la EVM y ejecutados. La salida de esta ejecución es permanentemente almacenada como el código del contrato. Esto significa que para crear un contrato, no se envía el código actual del contrato, realmente se envía código que nos devuelve ese código final.
 
-.. index:: ! gas, ! precio gas
+.. index:: ! gas, ! gas price
 
 Gas
 ===
@@ -208,7 +209,7 @@ El **precio gas** es un valor establecido por el que crea la transacción, quié
 Si se ha gastado todo el gas en un punto (p.ej.: es negativo),
 se lanza una excepción de out-of-gas, que revierte todas las modificaciones hechas al estado en el frame llamado actualmente.
 
-.. index:: ! almacenamiento, ! memoria, ! pila
+.. index:: ! storage, ! memory, ! stack
 
 Almacenamiento, Memoria y la Pila
 =================================
