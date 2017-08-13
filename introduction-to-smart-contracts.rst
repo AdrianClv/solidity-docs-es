@@ -137,9 +137,9 @@ Transacciones
 =============
 
 Una blockchain es una base de datos transaccional globalmente compartida. Esto quiere decir que todos pueden leer las entradas en la base de datos simplemente participando en la red. Si quieres cambiar algo en la base de datos, tienes que crear una transacción a tal efecto que tiene que ser aceptada por todos los demás.
-La palabra transacción implica que el cambio que quieres hacer (asumiendo que quieres cambiar dos valores al mismo tiempo) no se hace o no se aplica completamente. Es más, mientras tu transacción es aplicada en la base de datos, ninguna otra transacción puede modificarla. 
+La palabra transacción implica que el cambio que quieres hacer (asumiendo que quieres cambiar dos valores al mismo tiempo) o se aplica por completo, o no se realiza. Es más, mientras tu transacción es aplicada en la base de datos, ninguna otra transacción puede modificarla. 
 
-Como un ejemplo, imagine una tabla que lista los balances de todas las cuentas en una divisa electrónica. Si una transferencia de una cuenta a otra es solicitada, la naturaleza transaccional de la base de datos garantiza que la cantidad que es sustraída de una cuenta, es añadida en la otra. Si por la razón que sea, añadir la cantidad a la cuenta de destino no es posible, la cuenta origen tampoco se modifica. 
+Como ejemplo, imagine una tabla que lista los balances de todas las cuentas en una divisa electrónica. Si se solicita una transferencia de una cuenta a otra, la naturaleza transaccional de la base de datos garantiza que la cantidad que es sustraída de una cuenta, es añadida en la otra. Si por la razón que sea, no es posible añadir la cantidad a la cuenta de destino, la cuenta origen tampoco se modifica. 
 
 Yendo más allá, una transacción es siempre firmada criptográficamente por el remitente (creador). Esto la hace más robusta para garantizar el acceso a modificaciones específicas de la base de datos. En el ejemplo de divisas electrónicas, un simple chequeo asegura que sólo la persona que posee las claves de la cuenta puede transferir dinero desde ella.
 
@@ -148,53 +148,53 @@ Yendo más allá, una transacción es siempre firmada criptográficamente por el
 Bloques
 =======
 
-Un obstáculo mayor que sobrepasar es el que, en términos de Bitcoin, es llamado un ataque de "doble gasto": ¿qué ocurre si dos transacciones existentes en la red quieren borrar una cuenta?, ¿un conflicto?.
+Un obstáculo mayor que sobrepasar es el que, en términos de Bitcoin, se llama ataque de "doble gasto": ¿qué ocurre si dos transacciones existentes en la red quieren borrar una cuenta?, ¿un conflicto?.
 
-La respuesta abstracta a esto es que no tienes de qué preocuparte. Un orden para estas transacciones será seleccitonado por tí, las transacciones se aglutinarán en lo que es llamado "bloque" y entonces serán ejecutadas y distribuídas entre todos los nodos participantes. Si dos transacciones se contradicen, la que concluye en segundo lugar será rechazada y no formará parte del bloque.
+La respuesta abstracta a esto es que no tienes de qué preocuparte. El orden de las transacciones se seleccionará por ti, las transacciones se aglutinarán en lo que es llamado "bloque" y entonces serán ejecutadas y distribuídas entre todos los nodos participantes. Si dos transacciones se contradicen, la que concluye en segundo lugar será rechazada y no formará parte del bloque.
 
-Estos bloques forman una secuencia lineal en el tiempo y del que viene la palabra cadema de bloques o "blockchain". Los bloques son añadidos a la cadena en intervalos regulares - para Ethereum esto viene a significar cada 17 segundos.
+Estos bloques forman una secuencia lineal en el tiempo de la que viene la palabra cadena de bloques o "blockchain". Los bloques son añadidos a la cadena en intervalos regulares - para Ethereum esto viene a significar cada 17 segundos.
 
-Como parte del "mecanismo de selcción de orden" (que se conoce como minería), tiene que pasar que los bloques sean revertidos de cuando en cuando, pero sólo en el extremo o "tip" de la cadena. Cuanto más bloques se añaden encima, menos probable es. Entonces, sucedería que tus transacciones sean revertidas e incluso borradas de la blockchain, y cuanto más esperes, menos probable será.
+Como parte del "mecanismo de selcción de orden" (que se conoce como minería), tiene que pasar que los bloques sean revertidos de cuando en cuando, pero sólo en el extremo o "tip" de la cadena. Cuantos más bloques se añaden encima, menos probable es. En ese caso, lo que ocurre es que tus transacciones son revertidas e incluso borradas de la blockchain, pero cuanto más esperes, menos probable será.
 
 
 .. _the-ethereum-virtual-machine:
 
 .. index:: !evm, ! ethereum virtual machine
 
-************************
-Máquina Virtual Ethereum
-************************
+***************************
+Máquina Virtual de Ethereum
+***************************
 
 Introducción
 ============
 
-La máquina virtual de Ethereum (EVM por sus siglas en inglés) es un entorno de ejecución de contratos inteligentes en Ethereum.Va más allá de una configuración tipo sandbox ya que se encuentra totalmente aislada, lo que significa que el código que se ejecuta en la EVM no tiene acceso a la red, ni al sistema de ficheros, ni a cualquier otro proceso. Incluso los contratos inteligentes tienen acceso limitado a otros contratos inteligentes.
+La máquina virtual de Ethereum (EVM por sus siglas en inglés) es un entorno de ejecución de contratos inteligentes en Ethereum. Va más allá de una configuración tipo sandbox ya que se encuentra totalmente aislada, lo que significa que el código que se ejecuta en la EVM no tiene acceso a la red, ni al sistema de ficheros, ni a ningún otro proceso. Incluso los contratos inteligentes tienen acceso limitado a otros contratos inteligentes.
 
 .. index:: ! account, address, storage, balance
 
 Cuentas
 =======
 
-Hay dos tipos de cuentas en Ethereum que comparten el mismo espacio de dirección: **Cuentas externas** que están controladas por un par de claves pública-privadas (p-ej.: humanos) y **Cuentas contrato** que están controladas por el código almacenado conjuntamente con la cuenta.
+Hay dos tipos de cuentas en Ethereum que comparten el mismo espacio de dirección: **Cuentas externas** que están controladas por un par de claves pública-privada (p-ej.: humanos) y **Cuentas contrato** que están controladas por el código almacenado conjuntamente con la cuenta.
 
-La dirección de una cuenta externa viene determinada por la clave pública mientras que la dirección de la cuenta contrato se define en el momento que se crea dicho contrato (se deriva de la dirección del creador y del número de transacciones enviadas desde esa dirección, el llamado "nonce").
+La dirección de una cuenta externa viene determinada por la clave pública mientras que la dirección de la cuenta contrato se define en el momento en que se crea dicho contrato (se deriva de la dirección del creador y del número de transacciones enviadas desde esa dirección, el llamado "nonce").
 
-Independientemente de que la cuenta almacene código, los dos tipos son tratados de forma equitativa por la EVM.
+Independientemente de que la cuenta almacene código, los dos tipos se tratan de forma equitativa por la EVM.
 
-Cada cuenta tiene un almacenamiento persistente clave-valor que mapea palabras de 256-bit a palabras de 256-bit llamado **almacenamiento**.
+Cada cuenta tiene un almacenamiento persistente clave-valor que mapea palabras de 256 bits a palabras de 256 bits llamado **almacenamiento**.
 
-Más allá, cada cuenta tiene un **balance** en Ether (in "Wei" para ser exactos) que puede ser modificado enviando transacciones que incluyen Ether.
+Además, cada cuenta tiene un **balance** en Ether (en "Wei" para ser exactos) que puede ser modificado enviando transacciones que incluyen Ether.
 
 .. index:: ! transaction
 
 Transacciones
 =============
 
-Una transacción es un mensaje que se envía de una cuenta a otra (que debería ser la mismo o la especial cuenta-cero, ver más adelante). Puede incluir datos binarios (payload) y Ether.
+Una transacción es un mensaje que se envía de una cuenta a otra (que debería ser la misma o la especial cuenta-cero, ver más adelante). Puede incluir datos binarios (payload) y Ether.
 
-Si la cuenta destino contiene código, este es ejecutado y la carga útil se provee como dato de entrada.
+Si la cuenta destino contiene código, este es ejecutado y el payload se provee como dato de entrada.
 
-Si la cuenta destino es la cuenta-cero (la cuenta con dirección ``0``), la transacción crea un **nuevo contrato**. Como se ha mancionado, la dirección del contrato no es la dirección cero, pero sí una dirección derivada del que envía y su número de transacciones enviadas (el "nonce"). Los datos binarios de la transacción que crea el contrato son obtenidos como bytecode por la EVM y ejecutados. La salida de esta ejecución es permanentemente almacenada como el código del contrato. Esto significa que para crear un contrato, no se envía el código actual del contrato, realmente se envía código que nos devuelve ese código final.
+Si la cuenta destino es la cuenta-cero (la cuenta con dirección ``0``), la transacción crea un **nuevo contrato**. Como se ha mencionado, la dirección del contrato no es la dirección cero, sino de una dirección derivada del emisor y su número de transacciones enviadas (el "nonce"). Los datos binarios de la transacción que crea el contrato son obtenidos como bytecode por la EVM y ejecutados. La salida de esta ejecución es permanentemente almacenada como el código del contrato. Esto significa que para crear un contrato, no se envía el código actual del contrato, realmente se envía código que nos devuelve ese código final.
 
 .. index:: ! gas, ! gas price
 
@@ -202,12 +202,12 @@ Gas
 ===
 
 En cuanto se crean, cada transacción se carga con una determinada cantidad de **gas**,
-cuyo propósito es limitar la cantidad de trabajo que se necesita para ejecutar la transacción y pagar por esta ejecución. Mientras la EVM ejecuta la transacción, el gas es gradualemnte gastado según unas reglas específicas.
+cuyo propósito es limitar la cantidad de trabajo que se necesita para ejecutar la transacción y pagar por esta ejecución. Mientras la EVM ejecuta la transacción, el gas se gasta gradualmente según unas reglas específicas.
 
-El **precio gas** es un valor establecido por el que crea la transacción, quién tiene que pagar el ``gas_price * gas`` desde la cuenta de envío. Si queda algo de gas después de la ejecución, se le reembolsa.
+El **precio del gas** (gas price) es un valor establecido por el creador de la transacción, quien tiene que pagar el ``gas_price * gas`` desde la cuenta de envío. Si queda algo de gas después de la ejecución, se le reembolsa.
 
 Si se ha gastado todo el gas en un punto (p.ej.: es negativo),
-se lanza una excepción de out-of-gas, que revierte todas las modificaciones hechas al estado en el frame llamado actualmente.
+se lanza una excepción de out-of-gas, que revierte todas las modificaciones hechas al estado en el contexto de la ejecución actual.
 
 .. index:: ! storage, ! memory, ! stack
 
@@ -215,12 +215,12 @@ Almacenamiento, Memoria y la Pila
 =================================
 
 Cada cuenta tiene un área de memoria persistente que se llama **almacenamiento**.
-Almacenamiento es un almacén clave-valor que mapea palabras 256-bit con palabras 256-bit.
-No es posible enumerar el almacenamiento interno a un contrato y es comparativamente costoso leer y, más todavía, modificar el almacenamiento. Un contrato no pueder leer ni escribir en otro almacenamiento que no sea el suyo.
+El almacenamiento es un almacén clave-valor que mapea palabras de 256 bits con palabras de 256 bits.
+No es posible enumerar el almacenamiento interno desde un contrato y es comparativamente costoso leer y, más todavía, modificar el almacenamiento. Un contrato no pueder leer ni escribir en otro almacenamiento que no sea el suyo.
 
-La segunda área de memoria se conoce como **memoria**, de la que un contrato obtiene de forma ágil una instancia clara de cada message call (llamada mensaje). La memoria es lineal y puede ser tratada a nivel byte, pero las lecturas están limitadas a un ancho de 256 bits, mientras que las escrituras puden ser tanto de 8 bits como de 256 bits de ancho. La memoria se expande por palabras (256-bit), cuando se accede (tanto para leer o escribir) a una palabra de memoria sin modificar previamente (p.ej.: cualquier offset de una palabra). En el momento de expansión, se debe pagar el coste en gas. La memoria es más costosa cuanto más crece (escala cuadraticamente).
+La segunda área de memoria se conoce como **memoria**, de la que un contrato obtiene de forma ágil una instancia clara de cada message call (llamada de mensaje). La memoria es lineal y puede ser tratada a nivel de byte, pero las lecturas están limitadas a un ancho de 256 bits, mientras que las escrituras puden ser tanto de 8 bits como de 256 bits de ancho. La memoria se expande por palabras (256 bits), cuando se accede (tanto para leer o escribir) a una palabra de memoria sin modificar previamente (p.ej.: cualquier offset de una palabra). En el momento de expansión, se debe pagar el coste en gas. La memoria es más costosa cuanto más crece (escala cuadráticamente).
 
-La EVM no es una máquina a modo registro, es una máquina a modo pila por lo que todas las operaciones se hacen en un área llamada la **pila**. Tiene un espacio máximo de 1024 elementos y contiene palabras de 256 bits. El acceso a la pila está limitado a su cima de la siguiente manera:
+La EVM no es una máquina de registro, es una máquina de pila por lo que todas las operaciones se hacen en un área llamada la **pila**. Tiene un espacio máximo de 1024 elementos y contiene palabras de 256 bits. El acceso a la pila está limitado a su cima de la siguiente manera:
 Es posible copiar uno de los 16 elementos superiores a la cima de la pila o intercambiar el elemento superior justo después de uno de los 16 elementos superiores.
 El resto de operaciones cogen los dos elementos más superiores (o uno, o más, dependiendo de la operación) de la pila y ponen el resultado en ella. Por supuesto, es posible mover elementos de la pila al almacenamiento o a la memoria, pero no es posible acceder simplemente a elementos arbitrarios más profundos dentro de la pila sin, primeramente, borrar los que ya están encima.
 
@@ -229,24 +229,24 @@ El resto de operaciones cogen los dos elementos más superiores (o uno, o más, 
 Conjunto de instrucciones
 =========================
 
-El conjunto de instrucciones de la EVM se mantiene mínimo con el objetivo de evitar implementaciones incorrectas que podrían causar problemas de consenso. Todas las intruciones operan con el tipo de datos básico, palabras de 256-bit.
-La aritmética habitual, bit, lógica y operaciones de comparación están presentes.
-Saltos condicionales o no condicionales están permitidos. Es más, los contratos pueden acceder a propiedades relevantes del bloque actual como su número y timestamp.
+El conjunto de instrucciones de la EVM se mantiene mínimo con el objetivo de evitar implementaciones incorrectas que podrían causar problemas de consenso. Todas las instrucciones operan con el tipo de datos básico, palabras de 256 bits.
+Las operaciones de aritmética habitual, bit, lógica y de comparación están presentes.
+Se permiten tanto los saltos condicionales como los no condicionales. Es más, los contratos pueden acceder a propiedades relevantes del bloque actual como su número y timestamp.
 
 .. index:: ! message call, function;call
 
 Message Calls
 =============
 
-Los contratos pueden llamar a otros contratos o enviar Ether a cuentas no-contrato usando message calls. Los Message calls son similares a las transacciones, en el sentido de que tienen un origen, un destino, datos, Ether, gas y datos de retorno. De hecho, cada transacción consiste en un message call de alto nivel que de forma consecutiva puede crear message calls posteriores.
+Los contratos pueden llamar a otros contratos o enviar Ether a cuentas que no sean de contratos usando message calls. Los Message calls son similares a las transacciones, en el sentido de que tienen un origen, un destino, datos, Ether, gas y datos de retorno. De hecho, cada transacción consiste en un message call de alto nivel que de forma consecutiva puede crear message calls posteriores.
 
-Un contrato puede decidir cuánto de su **gas** restante podría ser enviado con el message call interno y cuánto quiere retener. Si una excepción de out-of-gas ocurre en la llamada interna (o cualquier otra excepción), esto se firmará por un valor de error introducido dentro de la pila. En este caso, sólo se gasta el gas enviado junto con la llamada.
-En Solidity, el contrato que hace la llamada causa una excepción manual por defecto en estas situaciones, por lo que esas excepciones amplian la pila de llamada. 
+Un contrato puede decidir cuánto de su **gas** restante podría ser enviado con el message call interno y cuánto quiere retener. Si ocurre una excepción de out-of-gas durante la llamada interna (o cualquier otra excepción), se mostrará como un valor de error introducido dentro de la pila. En este caso, sólo se gasta el gas enviado junto con la llamada.
+En Solidity, el contrato que hace la llamada causa una excepción manual por defecto en estas situaciones, por lo que esas excepciones ascienden en la pila de llamada. 
 
-Como se ha mencionado, el contrato llamado (que podría ser el mismo que el que hace la llamada) recivirá una instancia de memoria vacía y tendrá acceso a los datos de la llamada - que serán provistos en un área separada que se llama **calldata**.
+Como se ha mencionado, el contrato llamado (que podría ser el mismo que el que hace la llamada) recibirá una instancia de memoria vacía y tendrá acceso a los datos de la llamada - que serán provistos en un área separada que se llama **calldata**.
 Después de finalizar su ejecución, puede devolver datos que serán almacenados en una localización en la memoria del que hace la llamada que éste ha reservado previamente.
 
-Las llamadas están **limitadas** a la capacidad de 1024, lo que quiere decir que para operaciones más complejas, se debería preferir bucles sobre llamadas recursivas.
+Las llamadas están **limitadas** a la profundidad de 1024, lo que quiere decir que para operaciones más complejas, se debería preferir bucles sobre llamadas recursivas.
 
 .. index:: delegatecall, callcode, library
 
@@ -254,9 +254,9 @@ Delegatecall / Callcode y librerías
 ===================================
 
 Existe una variante especial de message call llamada **delegatecall**
-que es idéntica a un message call con la excepción del hecho de que el código en la dirección destino se ejecuta en el contexto del que hace la llamada y ``msg.sender`` y ``msg.value`` no cambian sus valores.
+que es idéntica a un message call con la excepción de que el código en la dirección destino se ejecuta en el contexto del que hace la llamada y ``msg.sender`` y ``msg.value`` no cambian sus valores.
 
-Esto significa que un contrato puede dinámicamente cargar código desde una dirección diferente en tiempo de ejecución. El almacenamiento, la dirección actual y el balance siguen referenciando al contrato que realiza la llamada, sólo se coge el código desde la dirección llamada.
+Esto significa que un contrato puede cargar código dinámicamente desde una dirección diferente en tiempo de ejecución. El almacenamiento, la dirección actual y el balance siguen referenciando al contrato que realiza la llamada, sólo se coge el código desde la dirección llamada.
 
 Esto hace posible implementar la funcionalidad de "librería" en Solidity:
 Código de librería reusable que se puede aplicar a un almacenamiento de contrato, por ejemplo, con el fin de implementar una estructura de datos compleja.
@@ -267,7 +267,7 @@ Logs
 ====
 
 Es posible almacenar datos en una estructura de datos indexada que mapea todo el recorrido hasta el nivel de bloque. Esta funcionalidad llamada **logs** se usa en Solidity para implementar **eventos**.
-Los contratos no pueden acceder a los datos del log después de crearse, pero pueden de forma eficiente ser accedidos desde fuera de la  blockchain. Como parte de los datos del log se guardan en  `bloom filters <https://en.wikipedia.org/wiki/Bloom_filter>`_, es posible buscar estos datos eficientemente y criptográficamente de manera segura, por lo que los otros miembros de la red que no se han descargado la blockchain entera ("light clients") pueden todavía buscarlos.
+Los contratos no pueden acceder a los datos del log después de crearse, pero pueden ser accedidos desde fuera de la blockchain de forma eficiente. Como parte de los datos del log se guardan en  `bloom filters <https://en.wikipedia.org/wiki/Bloom_filter>`_, es posible buscar estos datos eficientemente y criptográficamente de manera segura, por lo que los otros miembros de la red que no se han descargado la blockchain entera ("light clients") todavía pueden buscarlos.
 
 .. index:: contract creation
 
@@ -286,6 +286,6 @@ La única posibilidad de borrar el código de la blockchain es cuando un contrat
 .. warning:: Aunque un contrato no contenga una llamada a ``selfdestruct``,
   todavía podría hacer esa operación mediante ``delegatecall`` o ``callcode``.
 
-.. note:: La depuración de contratos antiguos pueden o no ser implementados en clientes de Ethereum. Adicionalmente, los nodos de archivo podrían elegir mantener el almacenamiento del contrato y el código de forma indefinida.
+.. note:: La eliminación de contratos antiguos puede, o no, ser implementada en clientes de Ethereum. Adicionalmente, los nodos de archivo podrían elegir mantener el almacenamiento del contrato y el código de forma indefinida.
 
 .. note:: Actualmente las **cuentas externas** no se pueden borrar del estado.
