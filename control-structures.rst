@@ -17,15 +17,14 @@ Los parámetros de entrada se declaran de la misma forma que las variables. Como
 
     contract Simple {
         function taker(uint _a, uint _b) {
-            // do something with _a and _b.
+            // has algo con _a y _b.
         }
     }
 
 Parámetros de salida
 --------------------
 
-Los parámetros de salida se pueden declarar con la misma sintaxis después de la palabra reservada ``returns``. Por ejemplo, supongamos que deseamos devolver dos resultados:
-La suma y el producto de dos valores dados, entonces escribiríamos un código como este::
+Los parámetros de salida se pueden declarar con la misma sintaxis después de la palabra reservada ``returns``. Por ejemplo, supongamos que deseamos devolver dos resultados: la suma y el producto de dos valores dados. Entonces, escribiríamos un código como este::
 
     contract Simple {
         function arithmetics(uint _a, uint _b) returns (uint o_sum, uint o_product) {
@@ -37,7 +36,7 @@ La suma y el producto de dos valores dados, entonces escribiríamos un código c
 Los nombres de los parámetros de salida se pueden omitir.
 Los valores de saluda se pueden especificar también usando sentencias ``return``.
 Las sentencias ``return`` también son capaces de devolver múltiples valores, ver :ref:`multi-return`.
-Los parámetros de retorno se inicializan a cero; si no se especifica esxplícitamente su valor, permanecen con dicho valor cero.
+Los parámetros de retorno se inicializan a cero; si no se especifica esplícitamente su valor, permanecen con dicho valor cero.
 
 Los parámetros de entrada y salida se pueden usar como expresiones en el cuerpo de la función. En este caso, también pueden ir en el lado izquierdo de una asignación.
 
@@ -46,7 +45,7 @@ Los parámetros de entrada y salida se pueden usar como expresiones en el cuerpo
 Estructuras de control
 ======================
 
-La mayoría de las estructuras de controlos disponibles en JavaScript, también lo están en Solidity exceptuando ``switch`` y ``goto``. Esto significa que tenemos: ``if``, ``else``, ``while``, ``do``, ``for``, ``break``, ``continue``, ``return``, ``? :``, con la semántica habitual conocida de C o JavaScript.
+La mayoría de las estructuras de control disponibles en JavaScript, también lo están en Solidity exceptuando ``switch`` y ``goto``. Esto significa que tenemos: ``if``, ``else``, ``while``, ``do``, ``for``, ``break``, ``continue``, ``return``, ``? :``, con la semántica habitual conocida de C o JavaScript.
 
 Los paréntesis no se pueden omitir para condicionales, pero sí las llaves alrededor de los cuerpos de las sentencias sencillas.
 
@@ -70,14 +69,14 @@ Llamadas de función
 Llamadas de función internas
 ----------------------------
 
-Las funciones del conrtrato actual pueden ser llamadas directamente("internamente"), y también recursivamente, como se puede ver en este ejemplo sin sentido::
+Las funciones del conrtrato actual pueden ser llamadas directamente("internamente") y, también recursivamente como se puede ver en este ejemplo sin sentido funcional::
 
     contract C {
         function g(uint a) returns (uint ret) { return f(); }
         function f() returns (uint ret) { return g(7) + f(); }
     }
 
-Estas llamadas de función son traducidas en simples saltos dentro de la máquina virtual de Ethereum (EVM). Esto tiene como consecuencia que la memoria actual no se limpia, p.ej.: pasando referencias de memoria a las funciones internamente llamadas es muy eficiente. Sólo las funciones del mismo contrato pueden ser llamadas internamente.
+Estas llamadas de función son traducidas en simples saltos dentro de la máquina virtual de Ethereum (EVM). Esto tiene como consecuencia que la memoria actual no se limpia, así que pasar referencias de memoria a las funciones llamadas internamente es muy eficiente. Sólo las funciones del mismo contrato pueden ser llamadas internamente.
 
 Llamadas de función externas
 ----------------------------
@@ -104,22 +103,22 @@ Cuando se llama a funciones de otros contratos, la cantidad de Wei enviada con l
 El modificador ``payable`` se tiene que usar para ``info``, porque de otra manera la opción `.value()`
 no estaría disponible.
 
-Destacar que la expresión ``InfoFeed(addr)`` realiza una conversión de tipo explícita afirmando que "sabemos que el tipo de contrato en la dirección dada es ``InfoFeed``" y este no ejecuta un constructor. Las conversiones de tipo explícitas tienen que ser gestionados con extrema precaución. Nunca se debe llamar a una función en un contrato donde no se tiene seguridad de cuál es su tipo.
+Destacar que la expresión ``InfoFeed(addr)`` realiza una conversión de tipo explícita afirmando que "sabemos que el tipo de contrato en la dirección dada es ``InfoFeed``" y este no ejecuta un constructor. Las conversiones de tipo explícitas tienen que ser gestionadas con extrema precaución. Nunca se debe llamar a una función en un contrato donde no se tiene seguridad de cuál es su tipo.
 
 También se podría usar ``function setFeed(InfoFeed _feed) { feed = _feed; }`` directamente.
 Hay que tener cuidado con el hecho de que ``feed.info.value(10).gas(800)``
-sólo (localmente) establece el valor y la cantidfad de gas enviado con la llamada de función y sólo el paréntesis al final realiza la llamada actual.
+sólo (localmente) establece el valor y la cantidfad de gas enviado con la llamada de función y, sólo el paréntesis al final realiza la llamada actual.
 
 Las llamadas de función provocan excepciones si el contrato invocado no existe (en el sentido de que la cuenta no contiene código) o si el contrato invocado por sí mismo dispara una excepción o se queda sin gas.
 
 .. warning::
-    Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente arbitrario y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama via sus funciones. Escribir tus funciones de esa manera, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato, hace que este contrato no sea vulnerable a una código malicioso reejecutable.
+    Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente aleatoria y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama via sus funciones. Escribir tus funciones de esa manera, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato, hace que este contrato no sea vulnerable a un código malicioso reejecutable.
     
 
 Named Calls y parámetros de funciones anónimas
 ----------------------------------------------
 
-Los argumentos de una llamada a una función pueden venir dados por el nombre, en cualquier orden, si están entre ``{ }`` como se puede ver en el siguiente ejemplo. La lista de argumentos tiene que coincidir por el nombre con la lista de parámetros de la declaración d ela función, pero pueden estar en orden aleatorio.
+Los argumentos de una llamada a una función pueden venir dados por el nombre, en cualquier orden, si están entre ``{ }`` como se puede ver en el siguiente ejemplo. La lista de argumentos tiene que coincidir por el nombre con la lista de parámetros de la declaración de la función, pero pueden estar en orden aleatorio.
 
 ::
 
@@ -145,7 +144,7 @@ Esos nombres estarán presentes en la pila, pero serán inaccesibles.
     pragma solidity ^0.4.0;
 
     contract C {
-        // omitted name for parameter
+        //Se omite el nombre para el parámetro
         function func(uint k, uint) returns(uint) {
             return k;
         }
@@ -174,14 +173,14 @@ Un contrato puede crear un nuevo contrato usando la palabra reservada ``new``. E
 
 
     contract C {
-        D d = new D(4); // will be executed as part of C's constructor
+        D d = new D(4); // Se ejecutará como parte del constructor de C
 
         function createD(uint arg) {
             D newD = new D(arg);
         }
 
         function createAndEndowD(uint arg, uint amount) {
-            // Send ether along with the creation
+            // Envía Ether junto con la creación
             D newD = (new D).value(amount)(arg);
         }
     }
@@ -205,7 +204,7 @@ Asignación
 Asignaciones para desestructurar y retornar múltiples valores
 -------------------------------------------------------------
 
-Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , potencialmente, diferentes tipos cuyo tamaño es constante en tiempo de compilación. Esas tuplas pueden ser usadas para retornar múltiples valores al mismo timepo y, también, asignarlos a múltiples variables (o lista de valores en general) al mismo tiempo::
+Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , potencialmente, diferentes tipos cuyo tamaño es constante en tiempo de compilación. Esas tuplas pueden ser usadas para retornar múltiples valores al mismo tiempo y, también, asignarlos a múltiples variables (o lista de valores en general) al mismo tiempo::
 
     contract C {
         uint[] data;
@@ -215,23 +214,23 @@ Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , pote
         }
 
         function g() {
-            // Declares and assigns the variables. Specifying the type explicitly is not possible.
+            //Declara y asigna variables. No es posible especificar el tipo de forma esplícita.
             var (x, b, y) = f();
-            // Assigns to a pre-existing variable.
+            //Asigna a una variable pre-existente.
             (x, y) = (2, 7);
-            // Common trick to swap values -- does not work for non-value storage types.
+            // Truco común para intercambiar valores -- no funcoina con tipos de almacenamiento sin valor.
             (x, y) = (y, x);
-            // Components can be left out (also for variable declarations).
-            // If the tuple ends in an empty component,
-            // the rest of the values are discarded.
-            (data.length,) = f(); // Sets the length to 7
-            // The same can be done on the left side.
+            //Los componentes se pueden dejar fuera (también en declaraciones de variables).
+            //Si la tupla acaba en un componente vacío,
+            //el resto de los valores se descartan.
+            (data.length,) = f(); // Establece la longitud a 7
+            // Lo mismo se puede hacer en el lado izquierdo.
             (,data[3]) = f(); // Sets data[3] to 2
-            // Components can only be left out at the left-hand-side of assignments, with
-            // one exception:
+            //Los componentes sólo se pueden dejar en el lado izquierdo de las asignaciones, con
+            // una excepción:
             (x,) = (1,);
-            // (1,) is the only way to specify a 1-component tuple, because (1) is
-            // equivalent to 1.
+            // (1,) es la única forma de especificar una tupla de un componente, porque (1) 
+            // equivale a 1.
         }
     }
 
@@ -248,15 +247,12 @@ Las asignaciones *a* variables de estado siempre crean una copia independiente. 
 Scoping and declaraciones
 =========================
 
-Una variable que es declarada tendrá una valor inicial por defecto cuyo valor, representado en bytes, será todo ceros.
-Los valorespor defecto de variables son los típicos "estado-cero" cualquiera que sea el tipo. por ejemplo, el valor por defecto para un ``bool`` es ``false``. El valor por defecto para un ``uint`` o ``int`` es ``0``. Para arrays For statically-sized arrays and ``bytes1`` to ``bytes32``, each individual
-element will be initialized to the default value corresponding to its type. Finally, for dynamically-sized arrays, ``bytes``
-and ``string``, the default value is an empty array or string.
+Una variable que es declarada tendrá un valor inicial por defecto cuyo valor, representado en bytes, será todo ceros.
+Los valores por defecto de variables son los típicos "estado-cero" cualquiera que sea el tipo. Por ejemplo, el valor por defecto para un ``bool`` es ``false``. El valor por defecto para un ``uint`` o ``int`` es ``0``. Para arrays de tamaño estático y ``bytes1`` hasta ``bytes32``, cada elemento individual será inicializado a un valor por defecto según sea su tipo. Finalmente, para arrays de tamaño dinámico, ``bytes``y ``string``, el valor por defecto es un array o string vacio.
 
-A variable declared anywhere within a function will be in scope for the *entire function*, regardless of where it is declared.
-This happens because Solidity inherits its scoping rules from JavaScript.
-This is in contrast to many languages where variables are only scoped where they are declared until the end of the semantic block.
-As a result, the following code is illegal and cause the compiler to throw an error, ``Identifier already declared``::
+Una variable declarada en cualquier punto de una función, estará dentro del alcance de *toda la función*, independientemente de donde se haya declarado. Esto ocurre porque Solidity hereda sus reglas de scoping de JavaScript.
+Esto difiere de muchos lenguajes donde las variables sólo están en el alcance de donde se declaran hasta que acaba el bloque semántico.
+Como consecuencia de esto, el código siguiente es ilegal y hace que el compilador devuelva un error porque el identificador se ha declarado previamente, ``Identifier already declared``::
 
     pragma solidity ^0.4.0;
 
@@ -269,7 +265,7 @@ As a result, the following code is illegal and cause the compiler to throw an er
             }
 
             while (i++ < 2) {
-                uint same1 = 0;// Illegal, second declaration of same1
+                uint same1 = 0;// Ilegal, seguna declaración para same1
             }
         }
 
@@ -279,7 +275,7 @@ As a result, the following code is illegal and cause the compiler to throw an er
             }
 
             {
-                uint same2 = 0;// Illegal, second declaration of same2
+                uint same2 = 0;// Ilegal, seguna declaración para same2
             }
         }
 
@@ -287,23 +283,23 @@ As a result, the following code is illegal and cause the compiler to throw an er
             for (uint same3 = 0; same3 < 1; same3++) {
             }
 
-            for (uint same3 = 0; same3 < 1; same3++) {// Illegal, second declaration of same3
+            for (uint same3 = 0; same3 < 1; same3++) {// Ilegal, seguna declaración para same3
             }
         }
     }
 
-In addition to this, if a variable is declared, it will be initialized at the beginning of the function to its default value.
-As a result, the following code is legal, despite being poorly written::
+Como añadido a esto, si la variable se declara, se inicializará al principio de la función con su valor por defecto.
+Esto significa que el siguiente código es legal, aunque se haya escrito de manera un tanto pobre::
 
     function foo() returns (uint) {
-        // baz is implicitly initialized as 0
+        // baz se inicializa implícitamente a 0
         uint bar = 5;
         if (true) {
             bar += baz;
         } else {
-            uint baz = 10;// never executes
+            uint baz = 10;// Nunca se ejecuta
         }
-        return bar;// returns 5
+        return bar;// devuelve 5
     }
 
 .. index:: ! exception, ! throw
