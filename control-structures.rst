@@ -17,7 +17,7 @@ Los parámetros de entrada se declaran de la misma forma que las variables. Como
 
     contract Simple {
         function taker(uint _a, uint _b) {
-            // has algo con _a y _b.
+            // hace algo con _a y _b.
         }
     }
 
@@ -34,7 +34,7 @@ Los parámetros de salida se pueden declarar con la misma sintaxis después de l
     }
 
 Los nombres de los parámetros de salida se pueden omitir.
-Los valores de saluda se pueden especificar también usando sentencias ``return``.
+Los valores de salida se pueden especificar también usando sentencias ``return``.
 Las sentencias ``return`` también son capaces de devolver múltiples valores, ver :ref:`multi-return`.
 Los parámetros de retorno se inicializan a cero; si no se especifica esplícitamente su valor, permanecen con dicho valor cero.
 
