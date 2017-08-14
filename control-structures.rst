@@ -247,7 +247,7 @@ Las asignaciones *a* variables de estado siempre crean una copia independiente. 
 Scoping and declaraciones
 =========================
 
-Una variable que es declarada tendrá un valor inicial por defecto cuyo valor, representado en bytes, será todo ceros.
+Una variable cuando se declara tendrá un valor inicial por defecto que, representado en bytes, será todo ceros.
 Los valores por defecto de variables son los típicos "estado-cero" cualquiera que sea el tipo. Por ejemplo, el valor por defecto para un ``bool`` es ``false``. El valor por defecto para un ``uint`` o ``int`` es ``0``. Para arrays de tamaño estático y ``bytes1`` hasta ``bytes32``, cada elemento individual será inicializado a un valor por defecto según sea su tipo. Finalmente, para arrays de tamaño dinámico, ``bytes``y ``string``, el valor por defecto es un array o string vacio.
 
 Una variable declarada en cualquier punto de una función, estará dentro del alcance de *toda la función*, independientemente de donde se haya declarado. Esto ocurre porque Solidity hereda sus reglas de scoping de JavaScript.
@@ -307,50 +307,44 @@ Esto significa que el siguiente código es legal, aunque se haya escrito de mane
 Exceptions
 ==========
 
-There are some cases where exceptions are thrown automatically (see below). You can use the ``throw`` instruction to throw an exception manually. The effect of an exception is that the currently executing call is stopped and reverted (i.e. all changes to the state and balances are undone) and the exception is also "bubbled up" through Solidity function calls (exceptions are ``send`` and the low-level functions ``call``, ``delegatecall`` and ``callcode``, those return ``false`` in case of an exception).
+Hay algunos casos en los que las excepciones se lanzan automáticamente(ver más adelante). Se puede usar la instrucción ``throw`` para lanzarlas manualmente. La consecuencia de una excepción es que la llamada que se está ejecutando en ese momento se para y se revierte (todos los cambios en los estados y balances se deshacen) y la excepción también se genera mediante llamadas de función de Solidity (las excepciones ``send`` y las funciones de bajo nivel ``call``, ``delegatecall`` y ``callcode``, todas ellas devuelven ``false`` en caso de una excepción).
 
-Catching exceptions is not yet possible.
+Todavía no es posible capturar excepciones.
 
-In the following example, we show how ``throw`` can be used to easily revert an Ether transfer and also how to check the return value of ``send``::
+En el siguiente ejemplo, se enseña como ``throw`` se puede usar para revertir fácilmente una transferencia de Ether y, además, se enseña como comprobar el valor de retorno de ``send``::
 
     pragma solidity ^0.4.0;
 
     contract Sharer {
         function sendHalf(address addr) payable returns (uint balance) {
             if (!addr.send(msg.value / 2))
-                throw; // also reverts the transfer to Sharer
+                throw; // También revierte la transferencia de Sharer
             return this.balance;
         }
     }
 
-Currently, Solidity automatically generates a runtime exception in the following situations:
+Actualmente, Solidity genera automáticamente una excepción en tiempo de ejecución en las siguientes situaciones:
 
-#. If you access an array at a too large or negative index (i.e. ``x[i]`` where ``i >= x.length`` or ``i < 0``).
-#. If you access a fixed-length ``bytesN`` at a too large or negative index.
-#. If you call a function via a message call but it does not finish properly (i.e. it runs out of gas, has no matching function, or throws an exception itself), except when a low level operation ``call``, ``send``, ``delegatecall`` or ``callcode`` is used.  The low level operations never throw exceptions but indicate failures by returning ``false``.
-#. If you create a contract using the ``new`` keyword but the contract creation does not finish properly (see above for the definition of "not finish properly").
-#. If you divide or modulo by zero (e.g. ``5 / 0`` or ``23 % 0``).
-#. If you shift by a negative amount.
-#. If you convert a value too big or negative into an enum type.
-#. If you perform an external function call targeting a contract that contains no code.
-#. If your contract receives Ether via a public function without ``payable`` modifier (including the constructor and the fallback function).
-#. If your contract receives Ether via a public getter function.
-#. If you call a zero-initialized variable of internal function type.
-#. If a ``.transfer()`` fails.
-#. If you call ``assert`` with an argument that evaluates to false.
+#. Si se accede a un array en un índice demasiado largo o negativo (ejemplo: ``x[i]`` donde ``i >= x.length`` o ``i < 0``).
+#. Si se accede a un ``bytesN`` de longitud fija en un índice demasiado largo o negativo.
+#. Si se llama a una función con un message call, pero no finaliza adecuadamente (ejemplo: se queda sin gas, no tiene una función de matching, o dispara una excepción por sí mismo), exceptuando el caso en el que se use una operación de bajo nivel ``call``, ``send``, ``delegatecall`` o ``callcode``.  Las operaciones de bajo nivel disparan excepciones, pero indican fallos devolviendo ``false``.
+#. Si se crea un contrato usando la palabra reservada ``new``, perola creación del contrato no finaliza corectamente (ver más arriba la definición de "no finalizar correctamente").
+#. Si se divide o se hace módulo por cero (ejemplos: ``5 / 0`` o ``23 % 0``).
+#. Si se hace un movimiento por una cantidad negativa.
+#. Si se convierte un valor muy grande o negativo en un tipo enum.
+#. Si se realiza una llamada de función externa apuntando a un contrato que no contiene código.
+#. Si un contrato recibe Ether mediante una función sin el modificador ``payable``(incluyendo el constructor y la función de fallback).
+#. Si un contrato recibe Ether mediante una función getter pública.
+#. Si se llama a una variable inicializada a cero de un tipo de función interna.
+#. Si un ``.transfer()`` falla.
+#. Si se invoca con ``assert`` junto con un argumento que evalúa a falso.
 
-While a user-provided exception is generated in the following situations:
+Mientras se genera una excepción provista por el usuario en las siguientes situaciones:
 
-#. Calling ``throw``.
-#. Calling ``require`` with an argument that evaluates to ``false``.
+#. Llamando a ``throw``.
+#. Llamando a ``require`` junto con un argumento que evalúa a ``false``.
 
-Internally, Solidity performs a revert operation (instruction ``0xfd``) when a user-provided exception is thrown or the condition of
-a ``require`` call is not met. In contrast, it performs an invalid operation
-(instruction ``0xfe``) if a runtime exception is encountered or the condition of an ``assert`` call is not met. In both cases, this causes
-the EVM to revert all changes made to the state. The reason for this is that there is no safe way to continue execution, because an expected effect
-did not occur. Because we want to retain the atomicity of transactions, the safest thing to do is to revert all changes and make the whole transaction
-(or at least call) without effect.
+Internamente, Solidity realiza una operación de revertir (instrucciónn ``0xfd``) cuando una excepción provista por un usuario se lanza o la condición de la llamada ``require`` no se satisface. Por contra, realiza una operación inválida (instrucción ``0xfe``) si una excepción en tiempo de ejecución aparece o la condición de una llamada ``assert`` no se satisface. En ambos casos, esto ocasiona que la EVM revierta todos los cambios de estado acaecidos. El motivo de todo esto es que no existe un modo seguro de continuar con la ejecución debido a que no sucedió el efecto esperado. Como se quiere mantener la atomicidad de las transacciones, lo más seguro es revertir todos los cambios y hacer que la transacción no tenga ningún efecto en su totalidad o, como mínimo, en la llamada.
 
-If contracts are written so that ``assert`` is only used to test internal conditions and ``require``
-is used in case of malformed input, a formal analysis tool that verifies that the invalid
-opcode can never be reached can be used to check for the absence of errors assuming valid inputs.
+En el caso de que los contratos se escriban de tal manera que ``assert`` sólo sea usado para probar condiciones internas y ``require``
+se use en caso de que haya una entrada malformada, una herramienta de análisis formal que verifique que el opcode inválido que nunca pueda ser alcanzado, se podría usar para chequear la ausencia de errorres asumiendo entradas válidas.
