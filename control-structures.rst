@@ -56,7 +56,7 @@ Hay que tener en cuenta que no hay conversión de tipos desde non-boolean a bool
 Devolver múltiples valores
 --------------------------
 
-Cuando una función tiene múltiples valores de salida, ``return (v0, v1, ...,
+Cuando una función tiene múltiples parámetross de salida, ``return (v0, v1, ...,
 vn)`` puede devolver múltiples valores. El número de componentes debe ser el mismo que el de parámetros de salida.
 
 .. index:: ! función;llamada, función;interna, función;externa
@@ -69,7 +69,7 @@ Llamadas de función
 Llamadas de función internas
 ----------------------------
 
-Las funciones del conrtrato actual pueden ser llamadas directamente("internamente") y, también recursivamente como se puede ver en este ejemplo sin sentido funcional::
+Las funciones del conrtrato actual pueden ser llamadas directamente("internamente") y, también, recursivamente como se puede ver en este ejemplo sin sentido funcional::
 
     contract C {
         function g(uint a) returns (uint ret) { return f(); }
@@ -81,7 +81,7 @@ Estas llamadas de función son traducidas en simples saltos dentro de la máquin
 Llamadas de función externas
 ----------------------------
 
-Las expresiones ``this.g(8);`` and ``c.g(2);`` (donde ``c`` es la instancia de un contrato) son también llamadas de función válidas, pero en esta ocasión, la función se llamará "externamente", mediante un message call y no directamente por saltos.
+Las expresiones ``this.g(8);`` and ``c.g(2);`` (donde ``c`` es la instancia de un contrato) son también llamadas de función válidas, pero en esta ocasión, la función se llamará "externamente" mediante un message call y no directamente por saltos.
 Por favor, es importante tener en cuenta que las llamadas de función en ``this`` no pueden ser usadas en el constructor, ya que el contrato en cuestión no se ha creado todavía.
 
 Las funciones de otros contratos se tienen que llamar de forma externa. Para una llamada externa,
@@ -100,14 +100,12 @@ Cuando se llama a funciones de otros contratos, la cantidad de Wei enviada con l
         function callFeed() { feed.info.value(10).gas(800)(); }
     }
 
-El modificador ``payable`` se tiene que usar para ``info``, porque de otra manera la opción `.value()`
-no estaría disponible.
+El modificador ``payable`` se tiene que usar para ``info``, porque de otra manera la opción `.value()` no estaría disponible.
 
 Destacar que la expresión ``InfoFeed(addr)`` realiza una conversión de tipo explícita afirmando que "sabemos que el tipo de contrato en la dirección dada es ``InfoFeed``" y este no ejecuta un constructor. Las conversiones de tipo explícitas tienen que ser gestionadas con extrema precaución. Nunca se debe llamar a una función en un contrato donde no se tiene seguridad de cuál es su tipo.
 
 También se podría usar ``function setFeed(InfoFeed _feed) { feed = _feed; }`` directamente.
-Hay que tener cuidado con el hecho de que ``feed.info.value(10).gas(800)``
-sólo (localmente) establece el valor y la cantidfad de gas enviado con la llamada de función y, sólo el paréntesis al final realiza la llamada actual.
+Hay que tener cuidado con el hecho de que ``feed.info.value(10).gas(800)`` sólo (localmente) establece el valor y la cantidad de gas enviado con la llamada de función y, sólo el paréntesis al final realiza la llamada actual.
 
 Las llamadas de función provocan excepciones si el contrato invocado no existe (en el sentido de que la cuenta no contiene código) o si el contrato invocado por sí mismo dispara una excepción o se queda sin gas.
 
@@ -204,7 +202,7 @@ Asignación
 Asignaciones para desestructurar y retornar múltiples valores
 -------------------------------------------------------------
 
-Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , potencialmente, diferentes tipos cuyo tamaño es constante en tiempo de compilación. Esas tuplas pueden ser usadas para retornar múltiples valores al mismo tiempo y, también, asignarlos a múltiples variables (o lista de valores en general) al mismo tiempo::
+Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , potencialmente, diferentes tipos cuyo tamaño es constante en tiempo de compilación. Esas tuplas pueden ser usadas para retornar múltiples valores al mismo tiempo y, también, asignarlos a múltiples variables (o lista de valores en general) también al mismo tiempo::
 
     contract C {
         uint[] data;
@@ -214,7 +212,7 @@ Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , pote
         }
 
         function g() {
-            //Declara y asigna variables. No es posible especificar el tipo de forma esplícita.
+            //Declara y asigna variables. No es posible especificar el tipo de forma explícita.
             var (x, b, y) = f();
             //Asigna a una variable pre-existente.
             (x, y) = (2, 7);
@@ -237,7 +235,7 @@ Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , pote
 Complicaciones en Arrays y Structs
 ----------------------------------
 
-La sintaxis de asignación es algo más complicada por tipos sin valor como arrays y structs.
+La sintaxis de asignación es algo más complicada para tipos sin valor como arrays y structs.
 Las asignaciones *a* variables de estado siempre crean una copia independiente. Por otro lado, asignar una variable local crea sólo una copia independiente para tipos elementales, como tipos estáticos que casan en 32 bytes. Si los structs o arrays (incluyendo ``bytes`` y ``string``) son asignados desde una variable de estado a una local, la variable local se queda una referencia a la variable de estado original. Una segunda asignación a la variable local no modifica el estado, sólo cambia la referencia. Las asignaciones a miembros (o elementos) de la variable local *hacen* cambiar el estado.
 
 .. index:: ! scoping, declaraciones, valor por defecto
@@ -265,7 +263,7 @@ Como consecuencia de esto, el código siguiente es ilegal y hace que el compilad
             }
 
             while (i++ < 2) {
-                uint same1 = 0;// Ilegal, seguna declaración para same1
+                uint same1 = 0;// Ilegal, segunda declaración para same1
             }
         }
 
@@ -275,7 +273,7 @@ Como consecuencia de esto, el código siguiente es ilegal y hace que el compilad
             }
 
             {
-                uint same2 = 0;// Ilegal, seguna declaración para same2
+                uint same2 = 0;// Ilegal, segunda declaración para same2
             }
         }
 
@@ -283,7 +281,7 @@ Como consecuencia de esto, el código siguiente es ilegal y hace que el compilad
             for (uint same3 = 0; same3 < 1; same3++) {
             }
 
-            for (uint same3 = 0; same3 < 1; same3++) {// Ilegal, seguna declaración para same3
+            for (uint same3 = 0; same3 < 1; same3++) {// Ilegal, segunda declaración para same3
             }
         }
     }
@@ -304,7 +302,7 @@ Esto significa que el siguiente código es legal, aunque se haya escrito de mane
 
 .. index:: ! exception, ! throw
 
-Exceptions
+Excepciones
 ==========
 
 Hay algunos casos en los que las excepciones se lanzan automáticamente(ver más adelante). Se puede usar la instrucción ``throw`` para lanzarlas manualmente. La consecuencia de una excepción es que la llamada que se está ejecutando en ese momento se para y se revierte (todos los cambios en los estados y balances se deshacen) y la excepción también se genera mediante llamadas de función de Solidity (las excepciones ``send`` y las funciones de bajo nivel ``call``, ``delegatecall`` y ``callcode``, todas ellas devuelven ``false`` en caso de una excepción).
@@ -328,7 +326,7 @@ Actualmente, Solidity genera automáticamente una excepción en tiempo de ejecuc
 #. Si se accede a un array en un índice demasiado largo o negativo (ejemplo: ``x[i]`` donde ``i >= x.length`` o ``i < 0``).
 #. Si se accede a un ``bytesN`` de longitud fija en un índice demasiado largo o negativo.
 #. Si se llama a una función con un message call, pero no finaliza adecuadamente (ejemplo: se queda sin gas, no tiene una función de matching, o dispara una excepción por sí mismo), exceptuando el caso en el que se use una operación de bajo nivel ``call``, ``send``, ``delegatecall`` o ``callcode``.  Las operaciones de bajo nivel disparan excepciones, pero indican fallos devolviendo ``false``.
-#. Si se crea un contrato usando la palabra reservada ``new``, perola creación del contrato no finaliza corectamente (ver más arriba la definición de "no finalizar correctamente").
+#. Si se crea un contrato usando la palabra reservada ``new``, pero la creación del contrato no finaliza correctamente (ver más arriba la definición de "no finalizar correctamente").
 #. Si se divide o se hace módulo por cero (ejemplos: ``5 / 0`` o ``23 % 0``).
 #. Si se hace un movimiento por una cantidad negativa.
 #. Si se convierte un valor muy grande o negativo en un tipo enum.
@@ -344,7 +342,7 @@ Mientras se genera una excepción provista por el usuario en las siguientes situ
 #. Llamando a ``throw``.
 #. Llamando a ``require`` junto con un argumento que evalúa a ``false``.
 
-Internamente, Solidity realiza una operación de revertir (instrucciónn ``0xfd``) cuando una excepción provista por un usuario se lanza o la condición de la llamada ``require`` no se satisface. Por contra, realiza una operación inválida (instrucción ``0xfe``) si una excepción en tiempo de ejecución aparece o la condición de una llamada ``assert`` no se satisface. En ambos casos, esto ocasiona que la EVM revierta todos los cambios de estado acaecidos. El motivo de todo esto es que no existe un modo seguro de continuar con la ejecución debido a que no sucedió el efecto esperado. Como se quiere mantener la atomicidad de las transacciones, lo más seguro es revertir todos los cambios y hacer que la transacción no tenga ningún efecto en su totalidad o, como mínimo, en la llamada.
+Internamente, Solidity realiza una operación de revertir (instrucción ``0xfd``) cuando una excepción provista por un usuario se lanza o la condición de la llamada ``require`` no se satisface. Por contra, realiza una operación inválida (instrucción ``0xfe``) si una excepción en tiempo de ejecución aparece o la condición de una llamada ``assert`` no se satisface. En ambos casos, esto ocasiona que la EVM revierta todos los cambios de estado acaecidos. El motivo de todo esto es que no existe un modo seguro de continuar con la ejecución debido a que no sucedió el efecto esperado. Como se quiere mantener la atomicidad de las transacciones, lo más seguro es revertir todos los cambios y hacer que la transacción no tenga ningún efecto en su totalidad o, como mínimo, en la llamada.
 
 En el caso de que los contratos se escriban de tal manera que ``assert`` sólo sea usado para probar condiciones internas y ``require``
-se use en caso de que haya una entrada malformada, una herramienta de análisis formal que verifique que el opcode inválido que nunca pueda ser alcanzado, se podría usar para chequear la ausencia de errorres asumiendo entradas válidas.
+se use en caso de que haya una entrada malformada, una herramienta de análisis formal que verifique que el opcode inválido que nunca pueda ser alcanzado, se podría usar para chequear la ausencia de errores asumiendo entradas válidas.
