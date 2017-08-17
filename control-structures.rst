@@ -241,7 +241,7 @@ Las asignaciones *a* variables de estado siempre crean una copia independiente. 
 
 .. _default-value:
 
-Scoping and declaraciones
+Scoping y declaraciones
 =========================
 
 Una variable cuando se declara tendrá un valor inicial por defecto que, representado en bytes, será todo ceros.
@@ -304,7 +304,7 @@ Esto significa que el siguiente código es legal, aunque se haya escrito de mane
 Excepciones
 ===========
 
-Hay algunos casos en los que las excepciones se lanzan automáticamente(ver más adelante). Se puede usar la instrucción ``throw`` para lanzarlas manualmente. La consecuencia de una excepción es que la llamada que se está ejecutando en ese momento se para y se revierte (todos los cambios en los estados y balances se deshacen) y la excepción también se genera mediante llamadas de función de Solidity (las excepciones ``send`` y las funciones de bajo nivel ``call``, ``delegatecall`` y ``callcode``, todas ellas devuelven ``false`` en caso de una excepción).
+Hay algunos casos en los que las excepciones se lanzan automáticamente (ver más adelante). Se puede usar la instrucción ``throw`` para lanzarlas manualmente. La consecuencia de una excepción es que la llamada que se está ejecutando en ese momento se para y se revierte (todos los cambios en los estados y balances se deshacen) y la excepción también se genera mediante llamadas de función de Solidity (las excepciones ``send`` y las funciones de bajo nivel ``call``, ``delegatecall`` y ``callcode``, todas ellas devuelven ``false`` en caso de una excepción).
 
 Todavía no es posible capturar excepciones.
 
