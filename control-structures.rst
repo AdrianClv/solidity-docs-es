@@ -148,7 +148,7 @@ Esos nombres estarán presentes en la pila, pero serán inaccesibles.
     }
     
 
-.. index:: ! new, contract;creation
+.. index:: ! new, contracts;creation
 
 .. _creating-contracts:
 
@@ -191,12 +191,12 @@ Orden de la evaluación de expresiones
 
 El orden de evaluación de expresiones no se especifica (más formalmente, el orden en el que los hijos de un nodo en el árbol de la expresión son evaluados no es especificado. Eso sí, son evaluados antes que el propio nodo). Sólo se garantiza que las sentencias son ejecutadas en orden y que se hace un cortocircuito para las expresiones booleanas. Ver :ref:`order` para más información.
 
-.. index:: ! assigment
+.. index:: ! assignment
 
 Asignación
 ==========
 
-.. index:: ! assigment;destructuring
+.. index:: ! assignment;destructuring
 
 Asignaciones para desestructurar y retornar múltiples valores
 -------------------------------------------------------------
