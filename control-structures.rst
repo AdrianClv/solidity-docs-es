@@ -86,7 +86,7 @@ Por favor, es importante tener en cuenta que las llamadas de función en ``this`
 Las funciones de otros contratos se tienen que llamar de forma externa. Para una llamada externa,
 todos los argumentos de la función tienen que ser copiados en memoria.
 
-Cuando se llama a funciones de otros contratos, la cantidad de Wei enviada con la llamada y el gas pueden especificarse con opciones especiales ``.value()`` y ``.gas()``, respectivamente::
+Cuando se llama a funciones de otros contratos, la cantidad de Wei enviada con la llamada y el gas pueden especificarse con las opciones especiales ``.value()`` y ``.gas()``, respectivamente::
 
     contract InfoFeed {
         function info() payable returns (uint ret) { return 42; }
