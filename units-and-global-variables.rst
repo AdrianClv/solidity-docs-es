@@ -100,14 +100,14 @@ Podría pasar que le falte gas para llamar a las funciones ``sha256``, ``ripemd1
 En relación a las direcciones
 -----------------------------
 
-``<address>.balance`` (``uint256``): balance en Wei de la dirección (:ref:`address`).
-``<address>.transfer(uint256 amount)``: envía el importe deseado en Wei a la dirección (:ref:`address`) o lanza excepción si falla.
-``<address>.send(uint256 amount) returns (bool)``: envía el importe deseado en Wei a la dirección (:ref:`address`) o devuelve ``false`` si falla.
+``<address>.balance`` (``uint256``): balance en Wei de la :ref:`dirección <address>`.
+``<address>.transfer(uint256 amount)``: envía el importe deseado en Wei a la :ref:`dirección <address>` o lanza excepción si falla.
+``<address>.send(uint256 amount) returns (bool)``: envía el importe deseado en Wei a la :ref:`dirección <address>` o devuelve ``false`` si falla.
 ``<address>.call(...) returns (bool)``: crea una instrucción de tipo ``CALL`` a bajo nivel o devuelve ``false`` si falla.
 ``<address>.callcode(...) returns (bool)``: crea una instrucción de tipo ``CALLCODE`` a bajo nivel o devuelve ``false`` si falla.
 ``<address>.delegatecall(...) returns (bool)``: crea una instrucción de tipo ``DELEGATECALL`` a bajo nivel o devuelve ``false`` si falla.
 
-Para más información, véase la sección :ref:`address`.
+Para más información, véase la sección :ref:`dirección <address>`.
 
 .. warning::
     Existe un peligro a la hora de usar ``send``: la transferencia falla si la profundidad de la pila de llamadas es de 1024 (esto siempre lo puede forzar el que hace la llamada); también falla si el destinatario se queda sin gas. Entonces, para asegurarse de hacer transferencias seguras en Ether, fíjese siempre en el valor devuelto por ``send``, use ``transfer`` en lugar de ``send``, o mejor aún, use un patrón donde es el destinatario quien retira los fondos.
@@ -117,7 +117,7 @@ Para más información, véase la sección :ref:`address`.
 En relación a los contratos
 ---------------------------
 
-``this`` (el tipo del contrato actual): el contrato actual, explicitamente convertible en dirección (:ref:`address`).
-``selfdestruct(address recipient)``: destruye el contrato actual y envía los fondos que tiene a una dirección (:ref:`address`) especificada.
+``this`` (el tipo del contrato actual): el contrato actual, explicitamente convertible en :ref:`address`.
+``selfdestruct(address recipient)``: destruye el contrato actual y envía los fondos que tiene a una :ref:`dirección <address>` especificada.
 
 Además, todas las funciones del contrato actual se pueden llamar directamente, incluida la función actual.
