@@ -2,13 +2,12 @@
 Expresiones y Estructuras de Control
 #####################################
 
-.. index:: ! parámetro, parámetro;entrada, parámetro;salida
+.. index:: ! parameter, parameter;input, parameter;output
 
 Parámetros de entrada y de salida
 =================================
 
-Al igual que en Javascript, las funciones obtienen parámetros como entrada;
-al contrario que en Javascript y C, estas también deberían devolver un número arbitrario de parámetros como salida.
+Al igual que en Javascript, las funciones obtienen parámetros como entrada. Por otro lado, al contrario que en Javascript y C, estas también deberían devolver un número aleatorio de parámetros como salida.
 
 Parámetros de entrada
 ---------------------
@@ -56,10 +55,10 @@ Hay que tener en cuenta que no hay conversión de tipos desde non-boolean a bool
 Devolver múltiples valores
 --------------------------
 
-Cuando una función tiene múltiples parámetross de salida, ``return (v0, v1, ...,
+Cuando una función tiene múltiples parámetros de salida, ``return (v0, v1, ...,
 vn)`` puede devolver múltiples valores. El número de componentes debe ser el mismo que el de parámetros de salida.
 
-.. index:: ! función;llamada, función;interna, función;externa
+.. index:: ! function;call, function;internal, function;external
 
 .. _function-calls:
 
@@ -105,12 +104,12 @@ El modificador ``payable`` se tiene que usar para ``info``, porque de otra maner
 Destacar que la expresión ``InfoFeed(addr)`` realiza una conversión de tipo explícita afirmando que "sabemos que el tipo de contrato en la dirección dada es ``InfoFeed``" y este no ejecuta un constructor. Las conversiones de tipo explícitas tienen que ser gestionadas con extrema precaución. Nunca se debe llamar a una función en un contrato donde no se tiene seguridad de cuál es su tipo.
 
 También se podría usar ``function setFeed(InfoFeed _feed) { feed = _feed; }`` directamente.
-Hay que tener cuidado con el hecho de que ``feed.info.value(10).gas(800)`` sólo (localmente) establece el valor y la cantidad de gas enviado con la llamada de función y, sólo el paréntesis al final realiza la llamada actual.
+Hay que tener cuidado con el hecho de que ``feed.info.value(10).gas(800)`` sólo (localmente) establece el valor y la cantidad de gas enviada con la llamada de función y, sólo el paréntesis al final realiza la llamada actual.
 
 Las llamadas de función provocan excepciones si el contrato invocado no existe (en el sentido de que la cuenta no contiene código) o si el contrato invocado por sí mismo dispara una excepción o se queda sin gas.
 
 .. warning::
-    Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente aleatoria y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama via sus funciones. Escribir tus funciones de esa manera, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato, hace que este contrato no sea vulnerable a un código malicioso reejecutable.
+    Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente aleatoria y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama via sus funciones. Escribir tus funciones de manera que realicen, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato, hace que este contrato no sea vulnerable a un código malicioso reejecutable.
     
 
 Named Calls y parámetros de funciones anónimas
@@ -149,12 +148,12 @@ Esos nombres estarán presentes en la pila, pero serán inaccesibles.
     }
     
 
-.. index:: ! nuevo, contratos;creación
+.. index:: ! new, contract;creation
 
 .. _creating-contracts:
 
-Creando contratos via ``new``
-=============================
+Creando contratos mediante ``new``
+==================================
 
 Un contrato puede crear un nuevo contrato usando la palabra reservada ``new``. El código completo del contrato que se está creando tiene que ser conocido de antemano, por lo que no son posibles las dependencias de creación recursivas.
 
@@ -192,12 +191,12 @@ Orden de la evaluación de expresiones
 
 El orden de evaluación de expresiones no se especifica (más formalmente, el orden en el que los hijos de un nodo en el árbol de la expresión son evaluados no es especificado. Eso sí, son evaluados antes que el propio nodo). Sólo se garantiza que las sentencias son ejecutadas en orden y que se hace un cortocircuito para las expresiones booleanas. Ver :ref:`order` para más información.
 
-.. index:: ! asignación
+.. index:: ! assigment
 
 Asignación
 ==========
 
-.. index:: ! asignación;desestructurar
+.. index:: ! assigment;destructuring
 
 Asignaciones para desestructurar y retornar múltiples valores
 -------------------------------------------------------------
@@ -216,7 +215,7 @@ Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , pote
             var (x, b, y) = f();
             //Asigna a una variable pre-existente.
             (x, y) = (2, 7);
-            // Truco común para intercambiar valores -- no funcoina con tipos de almacenamiento sin valor.
+            // Truco común para intercambiar valores -- no funciona con tipos de almacenamiento sin valor.
             (x, y) = (y, x);
             //Los componentes se pueden dejar fuera (también en declaraciones de variables).
             //Si la tupla acaba en un componente vacío,
@@ -238,7 +237,7 @@ Complicaciones en Arrays y Structs
 La sintaxis de asignación es algo más complicada para tipos sin valor como arrays y structs.
 Las asignaciones *a* variables de estado siempre crean una copia independiente. Por otro lado, asignar una variable local crea sólo una copia independiente para tipos elementales, como tipos estáticos que casan en 32 bytes. Si los structs o arrays (incluyendo ``bytes`` y ``string``) son asignados desde una variable de estado a una local, la variable local se queda una referencia a la variable de estado original. Una segunda asignación a la variable local no modifica el estado, sólo cambia la referencia. Las asignaciones a miembros (o elementos) de la variable local *hacen* cambiar el estado.
 
-.. index:: ! scoping, declaraciones, valor por defecto
+.. index:: ! scoping, declarations, default value
 
 .. _default-value:
 
@@ -303,7 +302,7 @@ Esto significa que el siguiente código es legal, aunque se haya escrito de mane
 .. index:: ! exception, ! throw
 
 Excepciones
-==========
+===========
 
 Hay algunos casos en los que las excepciones se lanzan automáticamente(ver más adelante). Se puede usar la instrucción ``throw`` para lanzarlas manualmente. La consecuencia de una excepción es que la llamada que se está ejecutando en ese momento se para y se revierte (todos los cambios en los estados y balances se deshacen) y la excepción también se genera mediante llamadas de función de Solidity (las excepciones ``send`` y las funciones de bajo nivel ``call``, ``delegatecall`` y ``callcode``, todas ellas devuelven ``false`` en caso de una excepción).
 
@@ -346,3 +345,4 @@ Internamente, Solidity realiza una operación de revertir (instrucción ``0xfd``
 
 En el caso de que los contratos se escriban de tal manera que ``assert`` sólo sea usado para probar condiciones internas y ``require``
 se use en caso de que haya una entrada malformada, una herramienta de análisis formal que verifique que el opcode inválido nunca pueda ser alcanzado, se podría usar para chequear la ausencia de errores asumiendo entradas válidas.
+-
