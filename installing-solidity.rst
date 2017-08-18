@@ -2,17 +2,17 @@
 
 .. _installing-solidity:
 
-####################
+###################
 Instalando Solidity
-####################
+###################
 
-Control de Versión
-==================
+Control de Versiones
+====================
 
-Las versiones de Solidity siguen `versioning semantica <https://semver.org>`_ y además
-de los releases, también hay **nightly developement builds**. Los nightly builds no están
-garantizados a funcionar y puede que contengan cambios no documentados o que no funcionen.
-Recomendamos usar la última release. Los instaladores de paquetes siguientes usarán la release
+Las versiones de Solidity siguen un `versionado semántico <https://semver.org>`_, y además
+de los releases, también hay **nightly developement builds**. El funcionamiento de los nightly builds
+no está garantizado y puede que contengan cambios no documentados o que no funcionen.
+Recomendamos usar la última release. Los siguientes instaladores de paquetes usarán la release
 más actual.
 
 Remix
@@ -27,36 +27,36 @@ y bajar el .ZIP como se explica en esa página.
 npm / Node.js
 =============
 
-Esto es probablemente la manera más portable y conveniente de instalar Solidity localmente.
+Esta es probablemente la manera más portable y conveniente de instalar Solidity localmente.
 
-Una librería Javascript independiente de plataforma está proporcionada compilando la fuente C++
+Se proporciona una librería Javascript independiente de plataforma mediante la compilación del código C++
 a Javascript usando Emscripten. Puede ser usado en proyectos directamente (como Remix).
-Refiérete al repositorio `solc-js <https://github.com/ethereum/solc-js>`_ para ver las instrucciones.
+Visita el repositorio `solc-js <https://github.com/ethereum/solc-js>`_ para ver las instrucciones.
 
-También contiene una herramienta de línea de comando llamada `solcjs` que puede ser instala vía npm:
+También contiene una herramienta de línea de comandos llamada `solcjs` que puede ser instalada vía npm:
 
 .. code:: bash
 
     npm install -g solc
 
-.. nota::
+.. note::
 
-    Las opciones de línea de comando de `solcjs` no son compatibles con `solc` y herramientas
-    (tales como `geth`) esperando que el comportamiento de `solc` no funcione con `solcjs`.
+    Las opciones de línea de comandos de `solcjs` no son compatibles con `solc`, y las herramientas
+    (tales como `geth`) que esperen el comportamiento de `solc` no funcionarán con `solcjs`.
 
 Docker
 ======
 
-Proveemos builds docker al día para el compilador. El repositorio
-``stable`` contiene las versiones released mientras que el ``nightly``
+Proveemos builds de docker actualizadas para el compilador. El repositorio
+``stable`` contiene las versiones publicadas mientras que el ``nightly``
 contiene cambios potencialmente inestables de la rama de desarrollo.
 
 .. code:: bash
 
     docker run ethereum/solc:stable solc --version
 
-Actualmente, la imagen docker contiene el compilador ejecutable,
-así que tendrás que enlazar las carpetas de fuente y de output.
+Actualmente, la imagen de docker contiene el compilador ejecutable,
+así que tendrás que enlazar las carpetas de código y de output.
 
 Paquetes Binarios
 =================
@@ -87,10 +87,10 @@ Arch Linux también tiene paquetes, pero limitados a la versión de desarrollo m
 
     pacman -S solidity-git
 
-Homebrew aún no tiene paquetes preconstruidos (pre-built bottles),
+Homebrew aún no tiene paquetes preconstruidos,
 siguiendo una migración de Jenkins a TavisCI, pero Homebrew
-debería aún funcionar para construir desde la fuente (build-from-source).
-Se agregarán los paquetes preconstruidos pronto.
+todavía debería funcionar para construir desde el código.
+Pronto se agregarán los paquetes preconstruidos.
 
 .. code:: bash
 
@@ -106,7 +106,7 @@ una fórmula Homebrew desde Github.
 Ver
 `solidity.rb commits on Github <https://github.com/ethereum/homebrew-ethereum/commits/master/solidity.rb>`_.
 
-Seguir los enlaces de historia hasta que veas un archivo crudo de un
+Sigue los enlaces de historia hasta que veas un enlace a un fichero de un
 commit específico de ``solidity.rb``.
 
 instalar con ``brew``:
@@ -125,13 +125,13 @@ Gentoo también provee un paquete Solidity que puede instalarse con ``emerge``:
 
 .. _building-from-source:
 
-Construir desde la fuente
+Construir desde el código
 =========================
 
 Clonar el Repositorio
 ---------------------
 
-Para clonar el código fuente, ejecuta el comando siguiente:
+Para clonar el código fuente, ejecuta el siguiente comando:
 
 .. code:: bash
 
@@ -153,14 +153,14 @@ Solidity tiene submódulos de git. Asegúrate que están cargados correctamente:
    git submodule update --init --recursive
 
 Prerrequisitos - macOS
----------------------
+----------------------
 
-Para macOS, asegúrate que tiene la versión más reciente de
-`Xcode installed <https://developer.apple.com/xcode/download/>`_.
+Para macOS, asegúrate de tener la versión más reciente de
+`Xcode instalada <https://developer.apple.com/xcode/download/>`_.
 Esto contiene el `compilador Clang C++ <https://en.wikipedia.org/wiki/Clang>`_, las
 herramientas que se necesitan para construir aplicaciones C++ en OS X.
 Si estás instalando Xcode por primera vez, necesitarás aceptar las condiciones de uso
-antes de poder hacer builds de línea de comando:
+antes de poder hacer builds de línea de comandos:
 
 .. code:: bash
 
@@ -173,19 +173,19 @@ Aquí puedes ver cómo `desinstalar Homebrew
 si alguna vez quieres empezar de nuevo.
 
 Prerrequisitos - Windows
------------------------
+------------------------
 
 Necesitarás instalar las siguientes dependencias para los builds de Solidity en Windows:
 
-+------------------------------+-------------------------------------------------------+
-| Software                     | Notas                                                 |
-+==============================+=======================================================+
-| `Git para Windows`_          | Herramienta de línea de comando para repositorios git.|
-+------------------------------+-------------------------------------------------------+
-| `CMake`_                     | Generador de build multi plataforma.                  |
-+------------------------------+-------------------------------------------------------+
-| `Visual Studio 2015`_        | compilador C++ y entorno desarrollo.                  |
-+------------------------------+-------------------------------------------------------+
++------------------------------+--------------------------------------------------------+
+| Software                     | Notas                                                  |
++==============================+========================================================+
+| `Git para Windows`_          | Herramienta de línea de comandos para repositorios git.|
++------------------------------+--------------------------------------------------------+
+| `CMake`_                     | Generador de build multi plataforma.                   |
++------------------------------+--------------------------------------------------------+
+| `Visual Studio 2015`_        | Compilador C++ y entorno de desarrollo.                |
++------------------------------+--------------------------------------------------------+
 
 .. _Git para Windows: https://git-scm.com/download/win
 .. _CMake: https://cmake.org/download/
@@ -195,9 +195,9 @@ Necesitarás instalar las siguientes dependencias para los builds de Solidity en
 Dependencias Externas
 ---------------------
 
-Ahora tenemos un script simple de uso que instala todos las dependencias externas
+Ahora tenemos un script fácil de usar que instala todas las dependencias externas
 en macOS, Windows y varias distros Linux. Esto solía ser un proceso manual de varias
-etapas, pero ahora es una sólo línea:
+etapas, pero ahora es una sola línea:
 
 .. code:: bash
 
@@ -209,7 +209,7 @@ o, en Windows:
 
     scripts\install_deps.bat
 
-Build en Línea de comandos
+Build en línea de comandos
 --------------------------
 
 Construir Solidity es bastante similar en Linux, macOS y otros sistemas Unix:
@@ -224,7 +224,7 @@ o aún más fácil:
 
 .. code:: bash
 
-    #nota: esto instalará binarios solc y soltest en usr/local/bin
+    #nota: esto instalará los binarios de solc y soltest en usr/local/bin
     ./scripts/build.sh
 
 Incluso para Windows:
@@ -240,7 +240,7 @@ Estas últimas instrucciones deberían resultar en la creación de
 archivo debería abrir Visual Studio. Sugerimos construir
 la configuración **RelWithDebugInfo**, pero todas funcionan.
 
-O si no, puedes construir para Windows en la línea de comandos, así:
+O si no, puedes construir para Windows en la línea de comandos de la siguiente manera:
 
 .. code:: bash
 
@@ -252,14 +252,13 @@ La cadena de versión en detalle
 La cadena de versión de Solidity está compuesta por 4 partes:
 
 - el número de la versión
-- tag pre-release, en general en formato ``develop.YYYY.MM.DD`` o ``nightly.YYYY.MM.DD``
+- etiqueta pre-release, en general en formato ``develop.YYYY.MM.DD`` o ``nightly.YYYY.MM.DD``
 - commit en formato ``commit.GITHASH``
-- plataforma tiene número arbitrario de ítems, contiene detalles de la plataforma y compilador
+- la plataforma tiene número arbitrario de ítems, contiene detalles de la plataforma y el compilador
 
-Si es que hay modificaciones locales, el commit será postfixed con ``.mod``.
+Si hay modificaciones locales, el commit tendrá el sufijo ``.mod``.
 
-Éstas partes son combinadas son requeridas por Semver, donde la tag pre-release de Solidity equivale al pre-release
-de Semver y el commit Solidity y plataforma combinadas hacen el metadata del build de Semver.
+Éstas partes se combinan como es requerido por Semver, donde la etiqueta pre-release de Solidity equivale al pre-release de Semver y el commit Solidity y plataforma combinadas hacen el metadata del build de Semver.
 
 Un ejemplo de release: ``0.4.8+commit.60cc1668.Emscripten.clang``.
 
@@ -268,17 +267,16 @@ Un ejemplo pre-release: ``0.4.9-nightly.2017.1.17+commit.6ecb4aa3.Emscripten.cla
 Información importante sobre versiones
 ======================================
 
-Luego de hacer un release, la versión de nível de patch es levantada, porque asumimos que sólo
-siguen cambios de nivel de patch. Cuando los cambios son integrados, la versión será aumentada
-de acuerdo a la versión Semver y la urgencia de los cambios. Finalmente, un release siempre está
-hecho con la versión de la build nightly actual, pero sin el especificador ``prerelease``.
+Tras hacer un release, se incrementa el nivel de versión patch, porque asumimos que sólo
+siguen cambios de nivel de patch. Cuando se integran los cambios, la versión se aumenta
+de acuerdo a la versión Semver y la urgencia de los cambios. Finalmente, un release siempre se hace con la versión de la build nightly actual, pero sin el especificador ``prerelease``.
 
 Ejemplo:
 
 0. se hace el release 0.4.0
-1. el nightly build tiene versión 0.4.1 desde ahora
-2. cambios sin ruptura se introducen - no hay cambio en versión
-3. cambios con ruptura de introducen - versión se aumenta a 0.5.0
+1. el nightly build tiene versión 0.4.1 a partir de ahora
+2. se introducen cambios compatibles - no hay cambio en versión
+3. se introduce cambios no compatibles - la versión se aumenta a 0.5.0
 4. se hace el release 0.5.0
 
-Este comportamiento funciona bien con el :ref:`version pragma <version_pragma>`.
+Este comportamiento funciona bien con la :ref:`versión pragma <version_pragma>`.
