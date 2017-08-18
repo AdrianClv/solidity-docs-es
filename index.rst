@@ -6,11 +6,11 @@ Solidity
     :alt: Solidity logo
     :align: center
 
-Solidity es un lenguaje de alto nivel orientado a contratos. Su sintaxis es similar a la de JavaScript y está enfocado especificamente a la Máquina Virtual de Etehreum (EVM).
+Solidity es un lenguaje de alto nivel orientado a contratos. Su sintaxis es similar a la de JavaScript y está enfocado específicamente a la Máquina Virtual de Etehreum (EVM).
 
-Solidity está ???tipificado(typed) de manera estática y acepta, entre otras cosas, herencias, librerías y tipos complejos definidos por el usuario.
+Solidity está tipado de manera estática y acepta, entre otras cosas, herencias, librerías y tipos complejos definidos por el usuario.
 
-Como lo verá, es posible crear contratos para votar, para el crowdfunding, para subastas a ciegas, para monederos muti firmas, y mucho más.
+Como verá, es posible crear contratos para votar, para el crowdfunding, para subastas a ciegas, para monederos muti firmas, y mucho más.
 
 .. note::
     La mejor manera de probar Solidity ahora mismo es usando `Remix <https://remix.ethereum.org/>`_ (puede tardar un rato en cargarse, por favor sea paciente).
@@ -30,8 +30,8 @@ Enlaces útiles
 
 * `Chat de Gitter <https://gitter.im/ethereum/solidity/>`_
 
-Integradores disponibles para Solidity
---------------------------------------
+Integraciones de Solidity disponibles
+-------------------------------------
 
 * `Remix <https://remix.ethereum.org/>`_
     Entorno integrado de desarrollo (IDE) basado en un navegador que integra un compilador y un entorno en tiempo de ejecución para Solidity sin los componentes orientados al servidor.
@@ -39,22 +39,22 @@ Integradores disponibles para Solidity
 * `Ethereum Studio <https://live.ether.camp/>`_
     Entorno integrado de desarrollo (IDE) especializado que proporciona acceso a un entorno completo de Ethereum a través de un intérprete de comandos (shell).
 
-* `plugin IntelliJ IDEA <https://plugins.jetbrains.com/plugin/9475-intellij-solidity>`_
-    Plugin de Solidity para IntelliJ IDEA (y otros entorno integrado de desarrollo (IDE) de tipo JetBrains).
+* `Plugin IntelliJ IDEA <https://plugins.jetbrains.com/plugin/9475-intellij-solidity>`_
+    Plugin de Solidity para IntelliJ IDEA (y el resto de IDEs de JetBrains).
 
-* `Extension de Visual Studio <https://visualstudiogallery.msdn.microsoft.com/96221853-33c4-4531-bdd5-d2ea5acc4799/>`_
+* `Extensión de Visual Studio <https://visualstudiogallery.msdn.microsoft.com/96221853-33c4-4531-bdd5-d2ea5acc4799/>`_
     Plugin de Solidity para Microsoft Visual Studio que incluye un compilador de Solidity.
 
 * `Paquete para SublimeText <https://packagecontrol.io/packages/Ethereum/>`_
     Paquete para resaltar la sintáxis de Solidity en el editor SublimeText.
 
 * `Etheratom <https://github.com/0mkara/etheratom>`_
-    Plugin para el editor Atom que ofrece: resaltar la sintáxis, un entorno de compilación y un entorno en tiempo de ejecución (compatible con un un nodo de backend y con una máquina virtual).
+    Plugin para el editor Atom que ofrece: resaltar la sintáxis, un entorno de compilación y un entorno en tiempo de ejecución (compatible con un nodo en segundo plano y con una máquina virtual).
 
-* `Atom Solidity Linter <https://atom.io/packages/linter-solidity>`_
+* `Linter de Solidity para Atom <https://atom.io/packages/linter-solidity>`_
     Plugin para el editor Atom que ofrece linting para Solidity.
 
-* `Atom Solium Linter <https://atom.io/packages/linter-solium>`_
+* `Linter de Solium para Atom <https://atom.io/packages/linter-solium>`_
     Programa de linting de Solidity configurable para Atom que usa Solium como base.
 
 * `Solium <https://github.com/duaraghav8/Solium/>`_
@@ -76,7 +76,7 @@ Integradores disponibles para Solidity
 Descontinuados:
 
 * `Mix IDE <https://github.com/ethereum/mix/>`_
-    Entorno integrado de desarrollo (IDE) basado en Qt para el diseño, el debugging y el testeo de contratos astutos en Solidity.
+    Entorno integrado de desarrollo (IDE) basado en Qt para el diseño, debugging y testeo de contratos inteligentes en Solidity.
 
 
 Herramientas para Solidity
@@ -92,12 +92,12 @@ Herramientas para Solidity
     Visualiza el flujo de control de Solidity y resalta potenciales vulnerabilidades de seguridad.
 
 * `evmdis <https://github.com/Arachnid/evmdis>`_
-    Desasemblador de la Máquina Virtual de Ethereum (EVM) que realiza análisis estáticos sobre el bytecode y así, proporcionar un mayor nivel de abstracción que las operaciones brutas del EVM.
+    Desensamblador de la Máquina Virtual de Ethereum (EVM) que realiza análisis estáticos sobre el bytecode y así proporcionar un mayor nivel de abstracción que las operaciones brutas del EVM.
 
 * `Doxity <https://github.com/DigixGlobal/doxity>`_
     Generador de documentación para Solidity.
 
-Analizadores de Sintáxis y de Gramática alternativos para Solidity
+Analizadores de sintáxis y de gramática alternativos para Solidity
 ------------------------------------------------------------------
 
 * `solidity-parser <https://github.com/ConsenSys/solidity-parser>`_
@@ -106,23 +106,23 @@ Analizadores de Sintáxis y de Gramática alternativos para Solidity
 * `Solidity Grammar para ANTLR 4 <https://github.com/federicobond/solidity-antlr4>`_
     Analizador de gramática de Solidity para el generador de sintáxis ANTLR 4.
 
-Documentación del Lenguaje
+Documentación del lenguaje
 --------------------------
 
-A continuación, primero veremos un :ref:`simple contrato astuto <simple-smart-contract>` escrito en Solidity, seguido de las bases sobre :ref:`blockchains <blockchain-basics>` y sobre la :ref:`Máquina Virtual de Ethereum <the-ethereum-virtual-machine>`.
+A continuación, primero veremos un :ref:`contrato inteligente sencilo <simple-smart-contract>` escrito en Solidity, seguido de una introduccin sobre :ref:`blockchains <blockchain-basics>` y sobre la :ref:`Máquina Virtual de Ethereum <the-ethereum-virtual-machine>`.
 
 En la siguiente sección se explicarán distintas características de Solidity con varios :ref:`ejemplos de contratos <voting>`. Recuerde que siempre puede probar estos contratos `en su navegador <https://remix.ethereum.org>`_!.
 
-La última sección (y también la más extensiva) cubre, en profundidad, todos los aspectos de Solidity.
+La última sección (y también la más amplia) cubre, en profundidad, todos los aspectos de Solidity.
 
-Si todavía tiene dudas o preguntas, puede buscar y preguntar en la web de `Ethereum Stackexchange <https://ethereum.stackexchange.com/>`_, o puede unirse a nuestro `canal de gitter <https://gitter.im/ethereum/solidity/>`_. Ideas para mejorar Solidity o esta documentación siempre son bienvenidas!
+Si todavía tiene dudas o preguntas, puede buscar y preguntar en la web de `Ethereum Stackexchange <https://ethereum.stackexchange.com/>`_, o puede unirse a nuestro `canal de gitter <https://gitter.im/ethereum/solidity/>`_. ¡Ideas para mejorar Solidity o esta documentación siempre son bienvenidas!
 
 También existe la `versión rusa (русский перевод) <https://github.com/ethereum/wiki/wiki/%D0%A0%D1%83%D0%BA%D0%BE%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE-%D0%BF%D0%BE-Solidity>`_.
 
 Contenidos
 ==========
 
-:ref:`Indice de palabras clave <genindex>`, :ref:`Página de búsqueda <search>`
+:ref:`Índice de palabras clave <genindex>`, :ref:`Página de búsqueda <search>`
 
 .. toctree::
    :maxdepth: 2
