@@ -4,17 +4,17 @@ Ensamblador de Solidity
 
 .. index:: ! assembly, ! asm, ! evmasm
 
-Solidity defines an assembly language that can also be used without Solidity.
-This assembly language can also be used as "inline assembly" inside Solidity
-source code. We start with describing how to use inline assembly and how it
-differs from standalone assembly and then specify assembly itself.
+Solidity define un lenguaje ensamblador que también puede ser usado sin Solidity.
+Este lenguaje ensamblador también se puede usar como "ensamblador inline" dentro del
+código fuente de Solidity. Vamos a comenzar explicando cómo usar ensamblador inline y 
+sus diferencias con ensamblador independiente, y luego la especificación de ensamblador.
 
-TODO: Write about how scoping rules of inline assembly are a bit different
-and the complications that arise when for example using internal functions
-of libraries. Furthermore, write about the symbols defined by the compiler.
+TODO: Escribir sobre de qué manera el ámbito del ensamblador inline es un poco diferente
+y las complicaciones que aparecen cuando, por ejemplo, se usan funciones internas
+o librerías. Además, escribir sobre los símbolos definidos por el compilador.
 
-Inline Assembly
-===============
+Ensalblador inline
+==================
 
 For more fine-grained control especially in order to enhance the language by writing libraries,
 it is possible to interleave Solidity statements with inline assembly in a language close
