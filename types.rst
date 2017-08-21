@@ -6,56 +6,54 @@
 Types
 *****
 
-Solidity es un lenguaje de tipado estático, que significa que el tipo de cada
-variable (estado y local) necesita ser especificada (o al menos conocida -
-ver: :ref:`type-deduction` abajo) en tiempo de compilación.
-Solidity provee varios tipos elementales que pueden ser combinado para
-formar tipos complejos.
+Solidity is a statically typed language, which means that the type of each
+variable (state and local) needs to be specified (or at least known -
+see :ref:`type-deduction` below) at
+compile-time. Solidity provides several elementary types which can be combined
+to form complex types.
 
-Además de eso, los tipos pueden interactuar el uno con el otro en expresiones
-conteniendo operadores. Para una lista rápida de referencia de los operadores,
-ver :ref:`order`.
+In addition, types can interact with each other in expressions containing
+operators. For a quick reference of the various operators, see :ref:`order`.
 
 .. index:: ! value type, ! type;value
 
-Tipos de Valores
-================
+Value Types
+===========
 
-Los siguientes tipos son también llamados tipos de valores porque las variables
-de este tipo siempre serán pasadas por valor. ej. son siempre copiadas cuando se usan
-en argumentos de funciones o en asignaciones.
+The following types are also called value types because variables of these
+types will always be passed by value, i.e. they are always copied when they
+are used as function arguments or in assignments.
 
 .. index:: ! bool, ! true, ! false
 
-Booleanos
----------
+Booleans
+--------
 
-``bool``: Los posibles valores son las constantes ``true`` and ``false``.
+``bool``: The possible values are constants ``true`` and ``false``.
 
-Operadores:
+Operators:
 
-*  ``!`` (negación lógica)
-*  ``&&`` (conjunción lógica, "y")
-*  ``||`` (disyunción lógica, "o")
-*  ``==`` (igualdad)
-*  ``!=`` (inigualdad)
+*  ``!`` (logical negation)
+*  ``&&`` (logical conjunction, "and")
+*  ``||`` (logical disjunction, "or")
+*  ``==`` (equality)
+*  ``!=`` (inequality)
 
-Los operadores ``||`` y ``&&`` aplican las reglas comunes de cortocircuito. Esto significa que la expresión ``f(x) || g(y)``, si ``f(x)`` evalúa a ``true``, ``g(y)`` no será evaluada incluso si tuviera efectos segundarios.
+The operators ``||`` and ``&&`` apply the common short-circuiting rules. This means that in the expression ``f(x) || g(y)``, if ``f(x)`` evaluates to ``true``, ``g(y)`` will not be evaluated even if it may have side-effects.
 
 .. index:: ! uint, ! int, ! integer
 
-Enteros
--------
+Integers
+--------
 
-``int`` / ``uint``: Números con o sin signo de varios tamaños. Las palabras claves ``uint8`` a ``uint256`` en pasos de ``8`` (sin signo de 9 hasta 256 bits) y ``int8`` a ``int256``. ``uint`` y ``int`` son alias para ``uint256`` y ``int256``, respectivamente.
+``int`` / ``uint``: Signed and unsigned integers of various sizes. Keywords ``uint8`` to ``uint256`` in steps of ``8`` (unsigned of 8 up to 256 bits) and ``int8`` to ``int256``. ``uint`` and ``int`` are aliases for ``uint256`` and ``int256``, respectively.
 
-Operadores:
+Operators:
 
-* Comparaciones: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evaluar a ``bool``)
-* Operadores de bit: ``&``, ``|``, ``^`` (exclusivo bitwise o), ``~`` (negación bitwise)
-* Operadores aritméticos: ``+``, ``-``, unary ``-``, unary ``+``, ``*``, ``/``, ``%`` (remainder), ``**`` (exponentiation), ``<<`` (left shift), ``>>`` (right shift)
+* Comparisons: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evaluate to ``bool``)
+* Bit operators: ``&``, ``|``, ``^`` (bitwise exclusive or), ``~`` (bitwise negation)
+* Arithmetic operators: ``+``, ``-``, unary ``-``, unary ``+``, ``*``, ``/``, ``%`` (remainder), ``**`` (exponentiation), ``<<`` (left shift), ``>>`` (right shift)
 
-División siempre
 Division always truncates (it just is compiled to the DIV opcode of the EVM), but it does not truncate if both
 operators are :ref:`literals<rational_literals>` (or literal expressions).
 
@@ -406,7 +404,7 @@ Example that shows how to use internal function types::
         }
       }
     }
-
+    
     contract Pyramid {
       using ArrayUtils for *;
       function pyramid(uint l) returns (uint) {
@@ -940,3 +938,4 @@ parameters or return parameters.
     the loop in the following snippet is infinite, as ``i`` will have the type
     ``uint8`` and any value of this type is smaller than ``2000``.
     ``for (var i = 0; i < 2000; i++) { ... }``
+
