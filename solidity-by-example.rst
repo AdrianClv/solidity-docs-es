@@ -19,7 +19,7 @@ todos los problemas, pero por lo menos vamos a ver cómo se puede
 hacer un sistema de votación delegado que permita contar votos
 de forma **automática y completamente transparente** al mismo tiempo.
 
-La idea es crear un contrato por votación,
+La idea es crear un contrato por cada votación,
 junto con un breve nombre para cada opción.
 El creador del contrato, que ejercerá de presidente,
 será el encargado de dar derecho a voto a cada
@@ -72,7 +72,7 @@ devolverá la propuesta más votada.
             // al final del array.
             for (uint i = 0; i < proposalNames.length; i++) {
                 // `Proposal({...})` crea una nuevo objeto de tipo Proposal
-                // de forma temporal y añade al final de `proposals`
+                // de forma temporal y se añade al final de `proposals`
                 // mediante `proposals.push(...)`.
                 proposals.push(Proposal({
                     name: proposalNames[i],
@@ -177,7 +177,7 @@ Posibles mejoras
 ================
 
 Actualmente, hacen falta muchas transacciones para dar derecho
-a voto a todos los participantes. ¿Se te ocurre una forma mejor?
+de voto a todos los participantes. ¿Se te ocurre una forma mejor?
 
 .. index:: auction;blind, auction;open, blind auction, open auction
 
