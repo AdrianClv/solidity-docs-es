@@ -6,24 +6,24 @@ Patrones Comunes
 
 .. _withdrawal_pattern:
 
-**********************
-Retiro desde Contratos
-**********************
+************************
+Retirada desde contratos
+************************
 
-El método recomendado de envío de fondos después de un efecto
-es usando el patrón de retiro (withdrawal pattern). Aunque el método
-más intuitivo de envío de Ether, del resultado de un efecto, es
-un llamado directo de ``send``, esto no es recomendado ya que
+El método recomendado de envío de fondos después de una acción,
+es usando el patrón de retirada (withdrawal pattern). Aunque el método
+más intuitivo para enviar Ether tras una acción es
+llamar directamente a ``send``, esto no es recomendable ya que
 introduce un potencial riesgo de seguridad. Puedes leer más
-de esto en la página :ref:`security_considerations`.
+sobre esto en la página :ref:`security_considerations`.
 
-Este es un ejemplo del patrón de retiro in práctica en un
-contrato donde el objetivo es enviar la mayor cantidad del Ether
+Este es un ejemplo del patrón de retirada en un
+contrato donde el objetivo es enviar la mayor cantidad de Ether
 al contrato a fin de convertirse en el más "adinerado", inspirado por
 `King of the Ether <https://www.kingoftheether.com/>`_.
 
 En el siguiente contrato, si dejas de ser el más adinerado,
-recibes los fondos de la persona quien te destronó.
+recibes los fondos de la persona que te destronó.
 
 ::
 
@@ -53,14 +53,14 @@ recibes los fondos de la persona quien te destronó.
 
         function withdraw() {
             uint amount = pendingWithdrawals[msg.sender];
-            // Remember to zero the pending refund before
-            // sending to prevent re-entrancy attacks
+            // Acuérdate de poner a cero la cantidad a reembolsar antes
+            // de enviarlo para evitar re-entrancy attacks
             pendingWithdrawals[msg.sender] = 0;
             msg.sender.transfer(amount);
         }
     }
 
-Esto en lugar de el patrón más intuitivo de envío:
+Esto en lugar del patrón más intuitivo de envío:
 
 ::
 
@@ -90,10 +90,10 @@ Esto en lugar de el patrón más intuitivo de envío:
 
 Nótese que, en este ejemplo, un atacante puede bloquear
 el contrato en un estado inútil haciendo que ``richest``
-sea la dirección de un contrato que tiene como función una
-respaldo (ej. usando ``revert()`` o solo consumiendo más de
-2300 estipendio de gas). De esa forma, cuando ``transfer``
-es llamado para enviar fondos al contrato "envenenado", fallará
+sea la dirección de un contrato que tiene una función fallback
+que falla (ej. usando ``revert()`` o simplemente consumiendo más de
+2300 de gas). De esa forma, cuando se llama a ``transfer``
+para enviar fondos al contrato "envenenado", fallará
 y también fallará la función ``becomeRichest``, bloqueando el
 contrario para siempre.
 
@@ -104,28 +104,28 @@ el resto del contrato.
 .. index:: access;restricting
 
 ********************
-Restringiendo Acceso
+Restringiendo acceso
 ********************
 
-Restringiendo acceso es un patrón común para contratos.
-Nótese que nunca se puede restringir un humano o ordenador
-de leer el contenido de una transacción o del estado de un
+Restringiendo acceso (Restricting access) es un patrón común para contratos.
+Nótese que nunca se puede evitar que un humano o un ordenador
+lean el contenido de una transacción o el estado de un
 contrato. Lo puedes hacer un poco más difícil de leer usando
 criptografía, pero si tu contrato debe leer los datos, todos
-podrán leerlo también.
+podrán leerlo.
 
-Puedes restringir acceso de lectura al estado de tu contrato
-por **otros contratos**. Esto es, en realidad, por defecto
-al menos que declares tus variables ``public``.
+Puedes restringir el acceso de lectura al estado de tu contrato
+por **otros contratos**. Esto ocurre por defecto
+salvo que declares tus variables como ``public``.
 
 Además, puedes restringir quién puede hacer modificaciones
-al estado de tu contrato o quien puede llamar las funciones
-y de eso se trata esta sección.
+al estado de tu contrato o quién puede llamar a las funciones.
+De eso se trata esta sección.
 
 .. index:: function;modifier
 
-El uso de **modificadores de funciones** (function modifiers)
-hace estas restricciones altamente lisibles.
+El uso de **modificadores de funciones**
+hace estas restricciones altamente visibles.
 
 ::
 
@@ -133,28 +133,28 @@ hace estas restricciones altamente lisibles.
 
     contract AccessRestriction {
         // Estas serán asignadas en la fase de
-        // construcción, donde `msg.sender` es
-        // el account que crea este contrato.
+        // compilación, donde `msg.sender` es
+        // la cuenta que crea este contrato.
         address public owner = msg.sender;
         uint public creationTime = now;
 
-        // Modificadores pueden usarse para
+        // Los modificadores pueden usarse para
         // cambiar el cuerpo de una función.
-        // Si el modificador es usado, agregará
+        // Si se usa este modificador, agregará
         // un chequeo que sólo pasa si la
-        // función es llamada desde una cierta
+        // función se llama desde una cierta
         // dirección.
         modifier onlyBy(address _account)
         {
             require(msg.sender == _account);
-            // No olvides el "_;"!
-            // Esto será reemplazado por el cuerpo
-            // de la función cuando el modificador
-            // será activado.
+            // ¡No olvides el "_;"!
+            // Esto se reemplazará por el cuerpo
+            // de la función cuando se use
+            // el modificador
             _;
         }
 
-        /// Hacer `_newOwner` el nuevo owner de
+        /// Hacer que `_newOwner` sea el nuevo owner de
         /// este contrato.
         function changeOwner(address _newOwner)
             onlyBy(owner)
@@ -167,9 +167,9 @@ hace estas restricciones altamente lisibles.
             _;
         }
 
-        /// Borrar información de ownership.
+        /// Borra la información del dueño.
         /// Sólo puede llamarse 6 semanas
-        /// después que el contrato hay sido
+        /// después de que el contrato haya sido
         /// creado.
         function disown()
             onlyBy(owner)
@@ -178,15 +178,15 @@ hace estas restricciones altamente lisibles.
             delete owner;
         }
 
-        // Este modificador requiere un cierto pago
-        // de fee que sea asociado con una llamada
-        // de función.
+        // Este modificador requiere del pago de
+        // una comisión asociada a la llamada
+        // de una función.
         // Si el llamador envió demasiado, será
         // reembolsado, pero sólo después del cuerpo
         // de la función.
         // Esto era peligroso antes de la versión
-        // 0.4.0 de solidity, donde era posible
-        // de saltar la parte después de `_;`.
+        // 0.4.0 de Solidity, donde era posible
+        // saltarse la parte después de `_;`.
         modifier costs(uint _amount) {
             require(msg.value >= _amount);
             _;
@@ -207,34 +207,34 @@ hace estas restricciones altamente lisibles.
         }
     }
 
-Una manera más especializada de acceder a funciones
-que pueden ser restringidas será visto en el próximo
-ejemplo.
+Una manera más especializada de la forma en la que se puede
+reestringir el acceso a la llamada de funciones se verá en el
+próximo ejemplo.
 
 .. index:: state machine
 
-*****************
-Máquina de Estado
-*****************
+******************
+Máquina de Estados
+******************
 
-Los contratos a menudo actúan como una máquina de estado,
-que significa que tienen ciertas **etapas** en donde se
+Los contratos a menudo actúan como una máquina de estados,
+lo que significa que tienen ciertas **etapas** en donde se
 comportan de manera diferente o en donde distintas funciones
 pueden ser llamadas. Una llamada de función a menudo
 termina una etapa y pasa el contrato a la siguiente
-etapa (especialmente si el contrato modela **interaction**).
-También es común que algunas etapas será automáticamente
-alcanzadas a cierto punto en el **tiempo**.
+etapa (especialmente si el contrato modela la **interacción**).
+También es común que algunas etapas se alcancen
+automáticamente en cierto punto en el **tiempo**.
 
-Como un ejemplo de esto es el contrato ciego de contrato
-que comienza en la etapa "aceptando ofertas ciegas", luego
-pasa a "revelando ofertas" que es finalizado por
-"determinar resultado de subasta".
+Un ejemplo de esto es el contrato de subastas a ciegas
+que comienza en la etapa "aceptando pujas a ciegas", luego
+pasa a "revelando pujas" que es finalizado por
+"determinar resultado de la subasta".
 
 .. index:: function;modifier
 
-Modificadores de funciones pueden ser usado en esta
-situación para modelar los estados y cuidar
+Los modificadores de funciones se pueden usar en esta
+situación para modelar los estados y evitar
 el uso incorrecto del contrato.
 
 Ejemplo
@@ -242,16 +242,16 @@ Ejemplo
 
 En el siguiente ejemplo,
 el modificador ``atStage`` asegura que la función
-pueda sólo ser llamada desde una cierta etapa.
+sólo pueda ser llamada en una cierta etapa.
 
-Transiciones automáticas temporizadas son manejadas
-por el modificador ``timeTransitions``, quien
-debe usarse para toas las funciones.
+El modificador ``timeTransitions`` gestiona las
+transiciones de etapas de forma automática en función
+del tiempo. Debe ser usado en todas las funciones.
 
 .. nota::
-    **EL Ordén del Modificador Importa**.
-    Si atStage es combinado
-    con timesTransitions, asegúrate que puedas
+    **El ordén del modificador importa**.
+    Si atStage se combina
+    con timesTransitions, asegúrate de que puedas
     mencionarlo después de éste, para que la nueva
     etapa sea tomada en cuenta.
 
