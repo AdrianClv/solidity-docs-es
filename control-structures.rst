@@ -33,9 +33,9 @@ Los parámetros de salida se pueden declarar con la misma sintaxis después de l
     }
 
 Los nombres de los parámetros de salida se pueden omitir.
-Los valores de salida se pueden especificar también usando sentencias ``return``.
-Las sentencias ``return`` también son capaces de devolver múltiples valores, ver :ref:`multi-return`.
-Los parámetros de retorno se inicializan a cero; si no se especifica esplícitamente su valor, permanecen con dicho valor cero.
+Los valores de salida se pueden especificar también usando declaraciones ``return``.
+Las declaraciones ``return`` también son capaces de devolver múltiples valores, ver :ref:`multi-return`.
+Los parámetros de retorno se inicializan a cero; si no se especifica explícitamente su valor, permanecen con dicho valor cero.
 
 Los parámetros de entrada y salida se pueden usar como expresiones en el cuerpo de la función. En este caso, también pueden ir en el lado izquierdo de una asignación.
 
@@ -46,9 +46,9 @@ Estructuras de control
 
 La mayoría de las estructuras de control disponibles en JavaScript, también lo están en Solidity exceptuando ``switch`` y ``goto``. Esto significa que tenemos: ``if``, ``else``, ``while``, ``do``, ``for``, ``break``, ``continue``, ``return``, ``? :``, con la semántica habitual conocida de C o JavaScript.
 
-Los paréntesis no se pueden omitir para condicionales, pero sí las llaves alrededor de los cuerpos de las sentencias sencillas.
+Los paréntesis no se pueden omitir para condicionales, pero sí las llaves alrededor de los cuerpos de las declaraciones sencillas.
 
-Hay que tener en cuenta que no hay conversión de tipos desde non-boolean a boolean como hay en C y JavaScript, por loo que ``if (1) { ... }`` *no* es válido en Solidity.
+Hay que tener en cuenta que no hay conversión de tipos desde non-boolean a boolean como hay en C y JavaScript, por lo que ``if (1) { ... }`` *no* es válido en Solidity.
 
 .. _multi-return:
 
@@ -201,7 +201,7 @@ Asignación
 Asignaciones para desestructurar y retornar múltiples valores
 -------------------------------------------------------------
 
-Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , potencialmente, diferentes tipos cuyo tamaño es constante en tiempo de compilación. Esas tuplas pueden ser usadas para retornar múltiples valores al mismo tiempo y, también, asignarlos a múltiples variables (o lista de valores en general) también al mismo tiempo::
+Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de, potencialmente, diferentes tipos cuyo tamaño es constante en tiempo de compilación. Esas tuplas pueden ser usadas para retornar múltiples valores al mismo tiempo y, también, asignarlos a múltiples variables (o lista de valores en general) también al mismo tiempo::
 
     contract C {
         uint[] data;
@@ -211,19 +211,19 @@ Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de , pote
         }
 
         function g() {
-            //Declara y asigna variables. No es posible especificar el tipo de forma explícita.
+            // Declara y asigna variables. No es posible especificar el tipo de forma explícita.
             var (x, b, y) = f();
-            //Asigna a una variable pre-existente.
+            // Asigna a una variable pre-existente.
             (x, y) = (2, 7);
             // Truco común para intercambiar valores -- no funciona con tipos de almacenamiento sin valor.
             (x, y) = (y, x);
-            //Los componentes se pueden dejar fuera (también en declaraciones de variables).
-            //Si la tupla acaba en un componente vacío,
-            //el resto de los valores se descartan.
+            // Los componentes se pueden dejar fuera (también en declaraciones de variables).
+            // Si la tupla acaba en un componente vacío,
+            // el resto de los valores se descartan.
             (data.length,) = f(); // Establece la longitud a 7
             // Lo mismo se puede hacer en el lado izquierdo.
             (,data[3]) = f(); // Sets data[3] to 2
-            //Los componentes sólo se pueden dejar en el lado izquierdo de las asignaciones, con
+            // Los componentes sólo se pueden dejar en el lado izquierdo de las asignaciones, con
             // una excepción:
             (x,) = (1,);
             // (1,) es la única forma de especificar una tupla de un componente, porque (1) 
