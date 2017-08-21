@@ -6,11 +6,11 @@ s.. index:: type
 Tipos
 *****
 
-Solidity es un lenguaje de tipado estátio, que significa que cada tipo de
+Solidity es un lenguaje de tipado estático, que significa que cada tipo de
 variable (estado y local) tiene ser especificada (o al menos conocida -
 ver :ref:`type-deduction` abajo) en tiempo de compilación.
 Solidity proporciona varios tipos elementales que pueden ser combinados para
-crear tipos mas complejos.
+crear tipos más complejos.
 
 Además, tipos puedes interactuar con
 In addition, types can interact with each other in expressions containing
@@ -23,7 +23,7 @@ Tipos de Valor
 
 Los siguientes tipos también son llamados tipos de valor porque las variables
 de este tipo serán siempre pasadas como valores, ej. siempre serán copiados cuando
-son usados como argumentos de funciones o en asignaciones.
+son usados como argumentos de funciónes o en asignaciones.
 
 .. index:: ! bool, ! true, ! false
 
@@ -47,18 +47,18 @@ Los operadores ``||`` y ``&&`` aplican las reglas comunes de corto circuitos. Es
 Enteros
 -------
 
-``int`` / ``uint``: Enteros con y sin signo de varios tamaños. Las palabras clave ``uint8`` a ``uint256`` en pasos de ``8`` (sin signo de 8 hasta 256 bits) y ``int8`` a ``int256``. ``uint`` y ``int`` son aliases para ``uint256`` y ``int256``, respectivamete.
+``int`` / ``uint``: Enteros con y sin signo de varios tamaños. Las palabras clave ``uint8`` a ``uint256`` en pasos de ``8`` (sin signo de 8 hasta 256 bits) y ``int8`` a ``int256``. ``uint`` y ``int`` son aliases para ``uint256`` y ``int256``, respectivamente.
 
 Operadores:
 
 * Comparaciones: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evalúa a ``bool``)
 * Operadores bit: ``&``, ``|``, ``^`` (bitwise exclusivo or), ``~`` (negación bitwise)
-* Operadores aritméticos: ``+``, ``-``, unary ``-``, unary ``+``, ``*``, ``/``, ``%`` (restante), ``**`` (exponenciales), ``<<`` (shift izquiera), ``>>`` (shift derecha)
+* Operadores aritméticos: ``+``, ``-``, unary ``-``, unary ``+``, ``*``, ``/``, ``%`` (restante), ``**`` (exponenciales), ``<<`` (shift izquierda), ``>>`` (shift derecha)
 
 La división siempre trunca (está compilado a la opcode DIV de la EVM), pero no trunca si los dos
 operadores son :ref:`literales<rational_literals>` (o expresiones literales).
 
-División por cero y modulus con cero arrojan una excepcion runtime.
+División por cero y modulus con cero arrojan una excepción runtime.
 
 El resultado de una operación shift es el tipo de operador izquierdo. La
 expresión ``x << y`` es equivalente a ``x * 2**y`` y ``x >> y`` es
@@ -68,8 +68,8 @@ extiende en signo. Haciendo shift por un número negativo arroja una excepción 
 .. warning::
     Los resultados producidos por shift derecho de valores negativos de tipos de enteros con signo es diferente de esos producidos
     por otros lenguajes de programación. En Solidity, shift derecho mapea la división para que los valores negativos de shift
-    serán redondeados hacia cero (truncado). En otros lenguajes de programacion el shift derecho de valores negativos
-    funciona como una división con redondeo hacia abajo (hacia infinito negativo).
+    serán redondeados hacia cero (truncado). En otros lenguajes de programación el shift derecho de valores negativos
+    funcióna como una división con redondeo hacia abajo (hacia infinito negativo).
 
 .. index:: address, balance, send, call, callcode, delegatecall, transfer
 
@@ -110,13 +110,13 @@ Send es la contrapartida de bajo nivel de ``transfer``. Si la ejecución falla, 
 .. warning::
     Hay algunos peligros en utiliza ``send``: La transferencia falla si la profundidad de la llamada es de 1024
     (esto puede ser fozado por el llamador) y también falla si el recipiente se le acaba el gas. Entonces para
-    hacer transferencia de Ether seguras, siempre revisar el valor devuleto por ``send``, usar ``transfer`` o incluso mejor:
+    hacer transferencia de Ether seguras, siempre revisar el valor devuelto por ``send``, usar ``transfer`` o incluso mejor:
     usa el patrón donde el recipiente retira el dinero.
 
 * ``call``, ``callcode`` and ``delegatecall``
 
 Además, para interfazar con contratos que no adhieren al ABI,
-la función ``call`` es provedida que toma un número arbitrario de argumentos de cualquier tipo. Estos argumentos son alcochados a 32 bytes y concatenados. Una excepción es el caso donde el primer argumento es codificado a exactamente 4 bytes. En este caso, no está acolchado para permitir el uso de firmas de función aquí.
+la función ``call`` es prevista que toma un número arbitrario de argumentos de cualquier tipo. Estos argumentos son acolchados a 32 bytes y concatenados. Una excepción es el caso donde el primer argumento es codificado a exactamente 4 bytes. En este caso, no está acolchado para permitir el uso de firmas de función aquí.
 
 ::
 
@@ -128,7 +128,7 @@ la función ``call`` es provedida que toma un número arbitrario de argumentos d
 
 En una forma similar, ``delegatecall`` puede ser usado: La diferencia es que solo el código de la dirección dada es usado, todo otros aspectos (almacenamiento, saldo, ...) salen del contrato actual. El propósito de ``delegatecall`` es usar el código de librería que está almacenado en otro contrato. El usuario tiene que asegurarse que el layout del almacenamiento en ambos contratos es correcto para usar delegatecall. Antes de homestead, sólo una versión limitada llamada ``callcode`` estaba disponible que no daba acceso a los valores ``msg.sender`` y ``msg.value`` originales.
 
-Las tres funciones ``call``, ``delegatecall`` y ``callcode`` son funciones de muy bajo nivel y deben usarse sólo como medida de último recurso ya que rompen la seguridad de tipo de Solidity.
+Las tres funciónes ``call``, ``delegatecall`` y ``callcode`` son funciónes de muy bajo nivel y deben usarse sólo como medida de último recurso ya que rompen la seguridad de tipo de Solidity.
 
 La opción ``.gas()`` está disponible en los 3 métodos, mientras la opción ``.value()`` no se admite para ``delegatecall``.
 
@@ -137,9 +137,9 @@ La opción ``.gas()`` está disponible en los 3 métodos, mientras la opción ``
     usando ``this.balance``.
 
 .. warning::
-    Todas estas funciones son funciones de bajo nivel y debe usarse con cuidado.
+    Todas estas funciónes son funciónes de bajo nivel y debe usarse con cuidado.
     Específicamente, cualquier contrato desconocido puede ser malicioso y si se le llama,
-    se le da el controll a ese contrato que puede, luego llamar de vuelta a tu contrato,
+    se le da el control a ese contrato que puede, luego llamar de vuelta a tu contrato,
     así que prepárense para cambios a tus variables de estado cuando el llamado retorna.
 
 .. index:: byte array, bytes32
@@ -156,7 +156,7 @@ Operadores:
 * Operadores Bit: ``&``, ``|``, ``^`` (exclusivo bitwise or), ``~`` (negación bitwise), ``<<`` (shift izquierdo), ``>>`` (shift derecho)
 * Acceso index: Si ``x`` es de tipo ``bytesI``, entonces ``x[k]`` para ``0 <= k < I`` devuelve el byte ``k`` (lectura sólo).
 
-El operador shift funciona con cualquier entero como operador derecho (pero
+El operador shift funcióna con cualquier entero como operador derecho (pero
 devuelve el tipo del operador izquierdo, que denota el número de bits a desplazarse.
 Desplazarse por un número negativo arroja una excepción runtime.
 
@@ -174,7 +174,7 @@ Array byte de tamaño dinámico
 
 Como regla general, usa ``bytes`` para data raw byte de tamaño arbitrario y ``string``
 para una cadena de caracteres (UTF-8) de tamaño arbitrario. Si puedes limitar el tamaño a un cierto
-número de bytes, siempre usa una de ``bytes1`` a ``bytes32`` porque son muchas mas baratas.
+número de bytes, siempre usa una de ``bytes1`` a ``bytes32`` porque son muchas más baratas.
 
 .. index:: ! ufixed, ! fixed, ! fixed point number
 
@@ -192,8 +192,8 @@ Address LIterales
 
 Literales hexadecimales que pasan el test checksum, por ejemplo
 ``0xdCad3a6d3569DF655070DEd06cb7A1b2Ccd1D3AF`` es de tipo ``address``.
-Literales hexaecimales que estan entre 39 y 41 dígitos de largo y
-no pasan test de checksum producen una advetencia y son tratados como
+Literales hexadecimales que están entre 39 y 41 dígitos de largo y
+no pasan test de checksum producen una advertencia y son tratados como
 números racionales literales regulares.
 
 .. index:: literal, literal;rational
@@ -203,7 +203,7 @@ números racionales literales regulares.
 Literales racionales y enteros
 ------------------------------
 
-Literales enteros son formados por una sequencia de números en el rango 0-9.
+Literales enteros son formados por una secuencia de números en el rango 0-9.
 Son interpretados como decimales. Por ejemplo, ``69`` significa sesenta y nueve.
 Literales octales no existen en Solidity y ceros a la izquierda son inválidos.
 
@@ -236,27 +236,27 @@ operaciones de bit no son permitidas y la exponenciación no es permitida si el 
 (porque eso puede resultar en un número no racional).
 
 .. note::
-    Solidity tiene tipo literal de número prar cada número racional.
-    Literales enteros y números racionales literales pertenecen a los tipos de numeros
-    literales. Por otra parte, todos las expreciones litereales (ej. las epresiones que
-    contienen sólo números literales y operadores) pertenecen a tipos de numeros literales.
+    Solidity tiene tipo literal de número para cada número racional.
+    Literales enteros y números racionales literales pertenecen a los tipos de números
+    literales. Por otra parte, todos las expresiones literales (ej. las expresiones que
+    contienen sólo números literales y operadores) pertenecen a tipos de números literales.
     Entonces las expresiones de números literales  ``1 + 2`` y ``2 + 1`` ambas
-    pertenecen al mismo tipo de numero literal para el número racional tres.
+    pertenecen al mismo tipo de número literal para el número racional tres.
 
 .. note::
     La mayoría de fracciones decimales finitas como ``5.3743`` no son finitamente representable en binario.
     El tipo correcto para ``5.3743`` es ``ufixed8x248`` porque permite la mejor aproximación del número. Si
-    quieres usar el número junto con tipos como ``ufixed`` (ej. ``ufixed128x128``), tienes que explicitamente
-    espcificar la precisión buscada: ``x + ufixed(5.3743)``.
+    quieres usar el número junto con tipos como ``ufixed`` (ej. ``ufixed128x128``), tienes que explícitamente
+    especificar la precisión buscada: ``x + ufixed(5.3743)``.
 
 .. warning::
-    División en enteros literales usados para truncar en versiones anteriores, pero ahora se convertirá en un número racional, ej. ``5 / 2`` no es igual a ``1``, mas bien a ``2.5``.
+    División en enteros literales usados para truncar en versiones anteriores, pero ahora se convertirá en un número racional, ej. ``5 / 2`` no es igual a ``1``, más bien a ``2.5``.
 
 .. note::
     Expresiones de números literales son convertidas en tipos no literales tan pronto como ellas son usadas con expresiones
     no literales. Aunque sabemos que el valor de la expresión
     asignada a ``b`` en el siguiente ejemplo evalúa a un entero, sigue usando
-    tipos de punto fijo (y no numeros literales racionales) entremedio y entonces
+    tipos de punto fijo (y no números literales racionales) entremedio y entonces
     el código no compila.
 
 ::
@@ -269,10 +269,10 @@ operaciones de bit no son permitidas y la exponenciación no es permitida si el 
 Literales cadenas
 -----------------
 
-Las cadenas literales son cerrados con comillas simples o dobles (``"foo"`` or ``'bar'``). No hay ceros implícitos como en C; ``"foo"`` representa tres bytes, no cuatro. Como con lietrales enteros, su tpo puede variar, pero son implícitamente convvertibles a ``bytes1``, ..., ``bytes32``, si caben a ``bytes`` y a ``string``.
+Las cadenas literales son cerrados con comillas simples o dobles (``"foo"`` or ``'bar'``). No hay ceros implícitos como en C; ``"foo"`` representa tres bytes, no cuatro. Como con lietrales enteros, su tpo puede variar, pero son implícitamente convertibles a ``bytes1``, ..., ``bytes32``, si caben a ``bytes`` y a ``string``.
 
 
-Las cadenas literales soportan caracteres de escape, tales como ``\n``, ``\xNN`` y ``\uNNNN``. ``\xNN`` toma un valor e inserta el byte apropiado, mientas que ``\uNNNN`` toma un codepoint Unicode e inserta una secuencia UTF-8.
+Las cadenas literales soportan caracteres de escape, tales como ``\n``, ``\xNN`` y ``\uNNNN``. ``\xNN`` toma un valor e inserta el byte apropiado, mientras que ``\uNNNN`` toma un codepoint Unicode e inserta una secuencia UTF-8.
 
 
 .. index:: literal, bytes
@@ -283,7 +283,7 @@ Literales hexadecimales
 
 Los literales hexadecimales son prefijos con la palabra clave ``hex`` y son cerrados por comillas simples o dobles (``hex"001122FF"``). Su contenido debe ser una cadena hexadecimal y su valor será la representación binaria de esos valores.
 
-Los literales hexadecimales se comportan como los literales de cadena y tienen los mismas restricciones de convetibilidad.
+Los literales hexadecimales se comportan como los literales de cadena y tienen los mismas restricciones de convertibilidad.
 
 
 .. index:: enum
@@ -312,7 +312,7 @@ revisan los valores de rangos en runtime y una falla causa una excepción. Enums
 
         // Ya que los tipos enum no son parte del ABI, la firma de "getChoice"
         // automáticamente será cambiada a "getChoice() returns (unit8)"
-        // para todo lo externo a Solidity. El tipo entero usado es a penas
+        // para todo lo externo a Solidity. El tipo entero usado es apenas
         // suficientemente grande para guardar todos los valores enum, ej. si
         // tienes más valores, `unit16` será utilizado y así.
         function getChoice() returns (ActionChoices) {
@@ -332,21 +332,21 @@ Función
 -------
 
 Los tipos función son tipos de función. Variables de tipo función
-pueden ser asignados desde funciones y parametros de funciones de tipo función
-pueden ser usadas para pasar funciones y retornar funciones de llamados de funciones.
+pueden ser asignados desde funciónes y parámetros de funciónes de tipo función
+pueden ser usadas para pasar funciónes y retornar funciónes de llamados de funciónes.
 Los tipos de función hay de dos tipos - *internas* y *externas*:
 
-Las funciones internas sólo pueden ser usadas dentro del contrato actual (específicamente,
-dentro de la unidad de code actual, que también incluye funciones libreríás internas
-y funciones heredadas) porque no pueden ser ejecutadas fuera del
+Las funciónes internas sólo pueden ser usadas dentro del contrato actual (específicamente,
+dentro de la unidad de code actual, que también incluye funciónes librerías internas
+y funciónes heredadas) porque no pueden ser ejecutadas fuera del
 contexto del contrato actual. Llamando una función interna se realiza
 saltando a su label de entrada, tal como cuando se llama una función interna del
 contrato actual.
 
-Funciones externas están compuestas de una dirección y una firma de función y pueden
+funciónes externas están compuestas de una dirección y una firma de función y pueden
 ser pasadas y devueltas desde una llamada de función externa.
 
-Los tipos de funciones son notadas como sigue::
+Los tipos de funciónes son notadas como sigue::
 
     function (<parameter types>) {internal|external} [constant] [payable] [returns (<return types>)]
 
@@ -354,7 +354,7 @@ En contraste a los tipos de parámetros, los tipos de retorno no pueden estar va
 el tipo función no debe retornar nada, la parte ``returns (<return types>)``
 tiene que ser omitida.
 
-Por defecto, las funciones son de tipo interna, así que la palabra clave ``internal``
+Por defecto, las funciónes son de tipo interna, así que la palabra clave ``internal``
 puede ser omitida.
 
 Hay dos formas de acceder una función en el contrato actual: o bien directamente
@@ -365,21 +365,21 @@ Si una variable de tipo función no es inicializada, llamarla resultará
 resultar en una excepción. Lo mismo ocurre si llamas una función después de usar
 ``delete`` en ella.
 
-Si funciones externas son usadas fuera del contexto de Solidity, son tratadas
+Si funciónes externas son usadas fuera del contexto de Solidity, son tratadas
 como tipo ``function``, que codifica la dirección seguida por el identificador
 de la función junto con un tipo ``bytes24``.
 
-Nótese que las funciones públicas del contrato actual pueden ser usado tanto
+Nótese que las funciónes públicas del contrato actual pueden ser usado tanto
 como una función interna y externa. Para usar ``f`` como función interna, sólo
 se le llama como ``f``, y si se quiere usar como externa, usar ``this.f``.
 
 
-Ejemplo que muestra como usar tipos de funcion internas::
+Ejemplo que muestra como usar tipos de función internas::
 
     pragma solidity ^0.4.5;
 
     library ArrayUtils {
-      // las funciones internas pueden ser usadas en funciones de librerías
+      // las funciónes internas pueden ser usadas en funciónes de librerías
       // internas porque serán parte del mismo contexto de código
       function map(uint[] memory self, function (uint) returns (uint) f)
         internal
@@ -455,7 +455,7 @@ Otro ejemplo que usa tipos de función externa::
       }
     }
 
-Notar que los lambda o funciones inline están planeadas pero no están aún implementados.
+Notar que los lambda o funciónes inline están planeadas pero no están aún implementados.
 
 .. index:: ! type;reference, ! reference type, storage, memory, location, array, struct
 
@@ -467,7 +467,7 @@ cn más cuidado que los tipos de valores que ya hemos visto. Ya que copiarlas pu
 ser muy caro, tenemos que pensar sobre si queremos que se almacenen en **memory**
 (que no es persistente) o en **storage** (donde las variables de estado se guardan).
 
-Ubicacion de datos
+Ubicación de datos
 ------------------
 
 Cada tipo complejo, ej. *arrays* y *structs*, tienen anotaciones
@@ -479,12 +479,12 @@ función (incluyendo parámetros de retorno) es ``memory``, por defecto para
 variables locales es ``storage`` y la ubicación es forzada a ``storage``
 para variables de estado (obviamente).
 
-Hay una tercera ubcación de datos, "calldata", un área que no es modificable
-y no persitente donde argumentos de función son almacenados. Parámetros de función
-(no parámetros de retorno) de funciones externas son forzados a "calldata" y
+Hay una tercera ubicación de datos, "calldata", un área que no es modificable
+y no persistente donde argumentos de función son almacenados. Parámetros de función
+(no parámetros de retorno) de funciónes externas son forzados a "calldata" y
 se comporta casi como memoria.
 
-Ubicaciones de datos son importantes porque cambien como las asignaciones se comportan:
+Las ubicaciones de datos son importantes porque cambian cómo las asignaciones se comportan:
 Las asignaciones entre almacenamiento y memoria y también de variables de estado (incluso desde otras
 variable de estado) siempre crean una copia independiente.
 Asignaciones a almacenamiento variable de almacenamiento local sólo asignan una referencia, y
@@ -502,19 +502,19 @@ no crea una copia.
 
         // la ubicacion de datos de memoryArray es memory
         function f(uint[] memoryArray) {
-            x = memoryArray; // funciona, copia el array entero al almacenamiento
-            var y = x; // funciona, asigna una referencia, ubicación de datos de y es almacenamiento
+            x = memoryArray; // funcióna, copia el array entero al almacenamiento
+            var y = x; // funcióna, asigna una referencia, ubicación de datos de y es almacenamiento
             y[7]; // bien, devuelve el octavo elemento
             y.length = 2; // bien, modifica de x a y
             delete x; // bien, limpia el array, también modifica y
-            // Lo siguiente no funciona; debería crear un nuevo temporal/sin nombre
+            // Lo siguiente no funcióna; debería crear un nuevo temporal/sin nombre
             // array en almacenamiento, pero almacenamiento es asignado "estáticamente":
             // y = memoryArray;
-            // Esto no funciona tampoco, ya que resetearía el apuntador, pero no hay
+            // Esto no funcióna tampoco, ya que resetearía el apuntador, pero no hay
             // ubicación donde podría apuntar
             // borrar y;
             g(x); // llama g, dando referencia a x
-            h(x); // llama h y y crea una copia endependiente y temporal en la memoria
+            h(x); // llama h y y crea una copia independiente y temporal en la memoria
         }
 
         function g(uint[] storage storageArray) internal {}
@@ -526,11 +526,11 @@ Resumen
 ^^^^^^^
 
 Ubicación de datos forzada:
- - parámetros (no de retorno) de funciones externas: calldata
+ - parámetros (no de retorno) de funciónes externas: calldata
  - variables de estado: almacenamiento
 
 Ubicación de datos por defecto:
- - parámetros (también de retorno) de funciones: memoria
+ - parámetros (también de retorno) de funciónes: memoria
  - todas otras variables: almacenamiento
 
 .. index:: ! array
@@ -542,13 +542,13 @@ Arrays
 
 Los array pueden tener tamaño fijo en compilación o pueden ser dinámicos.
 Para arrays de almacenamiento, el tipo elemento puede ser arbitrario (ej. también
-otros arryas, mappeos o structs). Para arrays de memoria, no puede ser un mapping
+otros arrays, mapeos o structs). Para arrays de memoria, no puede ser un mapping
 tiene que ser un tipo ABI si es que es un argumento de una función públicamente
 visible.
 
 Un array de tamaño fijo ``k`` y elemento tipo ``T`` es escrito como ``T[k]``,
 un array de tamaño dinámico como ``T[]``. Como ejemplo, un array de 5 arrays
-dinmámicos de ``uint`` es ``uint[][]`` (nótese que la notación es invertida
+dinámicos de ``uint`` es ``uint[][]`` (nótese que la notación es invertida
 cuando comparada a otros lenguajes). Para acceder la segunda uint en el tercer
 array dinámico, se utiliza ``x[2][1]`` ()
 
@@ -632,12 +632,12 @@ no es posible:
 
     contract C {
         function f() {
-            // La próxima linea crea un tipo error porque uint[3] memory
-            // no puede ser conertido a uint[] memory.
+            // La próxima línea crea un tipo error porque uint[3] memory
+            // no puede ser convertido a uint[] memory.
             uint[] x = [uint(1), 3, 4];
     }
 
-Esta restricción está planeada para ser eliminda en el futuro pero actualmente
+Esta restricción está planeada para ser eliminada en el futuro pero actualmente
 crea complicaciones por cómo los arrays son pasados en el ABI.
 
 .. index:: ! array;length, length, push, !array;push
@@ -647,17 +647,17 @@ Miembros
 
 **length**:
     Arrays tienen un miembro ``length`` para guardar su número de elementos.
-    Arrays dinámicos pueden ser modificados en almacenimiento (no en memoria) cambiando
+    Arrays dinámicos pueden ser modificados en almacenamiento (no en memoria) cambiando
     el miembro ``.length``. Ésto no ocurre automáticamente cuando se intenta acceder los elementos fuera del length actual. El tamaño de arrays de memoria es fijo (pero dinámico, ej. puede depender de parámetros runtime) cuando son creados.
 **push**:
-    Arrays de almacenimiento dinámico y ``bytes`` (no ``string``) tienen una función miembro llamada ``push`` que puede ser usada para agregar un elemento al final del array. La función devuelve el nuevo length.
+    Arrays de almacenamiento dinámico y ``bytes`` (no ``string``) tienen una función miembro llamada ``push`` que puede ser usada para agregar un elemento al final del array. La función devuelve el nuevo length.
 
 .. warning::
-    Aún no es posible usar arrays en funciones externas.
+    Aún no es posible usar arrays en funciónes externas.
 
 .. warning::
-    Dado a las limitaciones de la EVM, no es posibe retornar
-    contenido dinámico de las funciones externas . La función ``f`` en
+    Dado a las limitaciones de la EVM, no es posible retornar
+    contenido dinámico de las funciónes externas . La función ``f`` en
     ``contract C { function f() returns (uint[]) { ... } }`` devolverá
     algo si es llamdo del web3.js, pero no si se llama desde Solidity.
 
@@ -676,7 +676,7 @@ Miembros
         // newPairs es almacenado en memoria - el defecto para argumentos de función
 
         function setAllFlagPairs(bool[2][] newPairs) {
-            // asignación a un array de almacenamiento remplaza el array completo
+            // asignación a un array de almacenamiento reemplaza el array completo
             m_pairsOfFlags = newPairs;
         }
 
@@ -759,7 +759,7 @@ mostrado en el siguiente ejemplo:
         mapping (uint => Campaign) campaigns;
 
         function newCampaign(address beneficiary, uint goal) returns (uint campaignID) {
-            campaignID = numCampaigns++; // campaignID is return variable
+            campaignID = numCampaigns++; // campaignID es variable de retorno
             // Crea un nuevo sruct y guarda en almacenamiento. Dejamos fuera el tipo mapping.
             campaigns[campaignID] = Campaign(beneficiary, goal, 0, 0);
         }
@@ -784,8 +784,8 @@ mostrado en el siguiente ejemplo:
         }
     }
 
-El contrato no provee funcionalidad total de un contrato crowdfunding,
-peor contiene los conceptos básciso necesaios para entender structs.
+El contrato no provee funciónalidad total de un contrato crowdfunding,
+peor contiene los conceptos básicos necesarios para entender structs.
 Tipos structs pueden ser usados dentro de mappings y arrays y pueden ellos
 mismos, contener mappings y arrays.
 
@@ -793,10 +793,10 @@ No es posible para un struct de contener un miembro de su propio tipo,
 aunque el struct puede ser el tipo valor de un miembro mapping.
 Esta restricción es necesaria, ya que el tamaño del struct tiene que ser finito.
 
-Nótese como en todas las funciones, un tipo struct es asignado a la variable local
+Nótese como en todas las funciónes, un tipo struct es asignado a la variable local
 (de la ubicación por defecto del almacenamiento).
 Esto no copia el struct pero guarda una referencia para que las asignaciones
-a miembros de la vaiable local realmente escriban al estado.
+a miembros de la variable local realmente escriban al estado.
 
 Por supuesto, puedes diréctamente acceder los miembros del struct sin
 asignarlos a la variable local, como en
@@ -819,7 +819,7 @@ almacenados en el mapping, sólo su hash ``keccak256`` usado para buscar el valo
 Por esto, mappings no tienen un length o un concepto de "fijar" clave o valor.
 
 Mappings sólo son permitidas para variables de estado (o como tipos de referencia
-en funciones internas).
+en funciónes internas).
 
 Es posible marcar los mappings ``public`` y hacer que Solidity cree un getter.
 El ``_KeyType`` será un parámetro requerido par el getter y devolverá ``_ValueType``.
@@ -855,18 +855,18 @@ para cada ``_KeyType``, recursivamente.
 Operadores con LValues
 ======================
 
-Si ``a`` es un LValue (ej. una variable o algo que puede ser asignado), los siguientes operadoes son abreviaturas posibles:
+Si ``a`` es un LValue (ej. una variable o algo que puede ser asignado), los siguientes operadores son abreviaturas posibles:
 
 ``a += e`` es equivalente a ``a = a + e`` . Los operadores ``-=``, ``*=``, ``/=``, ``%=``, ``a |=``, ``&=`` y ``^=`` son todos definidos de esa manera. ``a++`` y ``a--`` son equivalentes a ``a += 1`` / ``a -= 1`` pero la expresión en sí todavía tiene el valor anterior de ``a``. En contraste, ``--a`` y ``++a`` tienen el mismo efecto en ``a`` pero devuelven el valor después del cambio.
 
 delete
 ------
 
-``delete a`` asigna el valor inicial para el tipo a ``a``. Ej. para enteros, el equivalente es ``a = 0``, pero puede ser usado en arrays, onde el asigna un array dinámico de length cero o un array estático del mismo length con todos los elementos reseteados. Para structs, se asigna a struct con todos los miembros reseteados.
+``delete a`` asigna el valor inicial para el tipo a ``a``. Ej. para enteros, el equivalente es ``a = 0``, pero puede ser usado en arrays, donde él asigna un array dinámico de length cero o un array estático del mismo length con todos los elementos reseteados. Para structs, se asigna a struct con todos los miembros reseteados.
 
-``delete`` no tiene efecto en mappings enteras (ya que las claves de los mappings pueden ser arbitrarias y generalmente desconocidas). Así que si se hace delete a un struct, reseteará todos los miembros que no son mappings y también recurrirá a los miembros al menos que sean mappings. Sin embargo, las claves individuales y lo que pueden mappear puede ser deleted.
+``delete`` no tiene efecto en mappings enteras (ya que las claves de los mappings pueden ser arbitrarias y generalmente desconocidas). Así que si se hace delete a un struct, reseteará todos los miembros que no son mappings y también recurrirá a los miembros al menos que sean mappings. Sin embargo, las claves individuales y lo que pueden mapear puede ser deleted.
 
-Es importante notar que ``delete a`` en realidad se comporta como una asignación a ``a``, ej. almacena un nuevo objecto en ``a``.
+Es importante notar que ``delete a`` en realidad se comporta como una asignación a ``a``, ej. almacena un nuevo objeto en ``a``.
 
 ::
 
@@ -891,8 +891,8 @@ Es importante notar que ``delete a`` en realidad se comporta como una asignació
 
 .. index:: ! type;conversion, ! cast
 
-Converción entre tipos elementarios
-===================================
+Conversión entre tipos elementales
+==================================
 
 Conversiones implícitas
 -----------------------
@@ -900,11 +900,11 @@ Conversiones implícitas
 Si un operador es aplicado a diferentes tipos, el compilador intenta
 implícitamente convertir uno de los operadores al tipo del otro (lo mismo
 es verdad para asignaciones). En general, una conversión implícita entre tipos
-valores es posible si es tiene sentido semaitcamente y no hay información
+valores es posible si es tiene sentido semanticamente y no hay información
 perdida: ``uint8`` es convertible a ``uint16`` y ``int128`` a ``int256``, pero
 ``int8`` no es convertible a ``uint256`` (porque ``uint256`` no puede contener ``-1``).
 Además, enteros sin signo pueden ser convertidos a bytes del mismo tamaño o más grande
-pero no vice-versa. Cualquier tipo que puede ser onvertido a ``uint160`` puede también
+pero no vice-versa. Cualquier tipo que puede ser convertido a ``uint160`` puede también
 ser convertido a ``address``.
 
 
@@ -912,7 +912,7 @@ Conversiones explícitas
 -----------------------
 
 Si el compilador no permite conversión implícita pero sabes lo que estás haciendo,
-una conversión explícita de tipo es aveces posible. Nótese que esto puede darte
+una conversión explícita de tipo es a veces posible. Nótese que esto puede darte
 comportamiento inesperado así que asegúrate de probar que el resultado es lo que quieras!
 Este ejemplo es para convertir de un negativo ``int8`` a ``uint``:
 
@@ -924,7 +924,7 @@ Este ejemplo es para convertir de un negativo ``int8`` a ``uint``:
 Al final de este snippet de código, ``x`` tendrá el valor ``0xfffff..fd`` (64
 caracteres hex), que es -3 en la representación de 256 bits de los complementos de dos.
 
-Si un tipo es explícitamente convertido a un tipo mas pequeño, los bits de ordern mayor son
+Si un tipo es explícitamente convertido a un tipo más pequeño, los bits de orden mayor son
 eliminados::
 
 uint32 a = 0x12345678;
@@ -938,7 +938,7 @@ uint16 b = uint16(a); // b será 0x5678 ahora
 Deducción de tipo
 =================
 
-Para conveniencia, no es siempre necesario de explícitamente espcificar el tipo de
+Para conveniencia, no es siempre necesario de explícitamente especificar el tipo de
 una variable, el compilador infiere automáticamente el tipo del tipo de la primera
 expresión al cual es asignado esa variable::
 
