@@ -12,9 +12,10 @@ ver :ref:`type-deduction` abajo) en tiempo de compilación.
 Solidity proporciona varios tipos elementales que pueden ser combinados para
 crear tipos más complejos.
 
-Además, tipos puedes interactuar con
-In addition, types can interact with each other in expressions containing
-operators. For a quick reference of the various operators, see :ref:`order`.
+
+Además de eso, los tipos pueden interactuar el uno con el otro en expresiones
+conteniendo operadores. Para una lista rápida de referencia de los operadores,
+ver :ref:`order`.
 
 .. index:: ! value type, ! type;value
 
