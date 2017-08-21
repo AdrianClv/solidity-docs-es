@@ -1,5 +1,5 @@
 ################
-Patrones Comunes
+Patrones comunes
 ################
 
 .. index:: withdrawal
@@ -103,11 +103,11 @@ el resto del contrato.
 
 .. index:: access;restricting
 
-********************
-Restringiendo acceso
-********************
+***********************
+Restringiendo el acceso
+***********************
 
-Restringiendo acceso (Restricting access) es un patrón común para contratos.
+Restringiendo el acceso (Restricting access) es un patrón común para contratos.
 Nótese que nunca se puede evitar que un humano o un ordenador
 lean el contenido de una transacción o el estado de un
 contrato. Lo puedes hacer un poco más difícil de leer usando
@@ -214,7 +214,7 @@ próximo ejemplo.
 .. index:: state machine
 
 ******************
-Máquina de Estados
+Máquina de estados
 ******************
 
 Los contratos a menudo actúan como una máquina de estados,
