@@ -892,6 +892,7 @@ Es importante notar que ``delete a`` en realidad se comporta como una asignació
 
 .. index:: ! type;conversion, ! cast
 
+
 Conversión entre tipos elementales
 ==================================
 
