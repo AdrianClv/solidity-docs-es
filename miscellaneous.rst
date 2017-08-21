@@ -1,12 +1,12 @@
-#############
-Miscellaneous
-#############
+#######
+Diverso
+#######
 
 .. index:: storage, state variable, mapping
 
-************************************
-Layout of State Variables in Storage
-************************************
+***************************************************
+Layout de las variables de estado en almacenamiento
+***************************************************
 
 Statically-sized variables (everything except mapping and dynamically-sized array types) are laid out contiguously in storage starting from position ``0``. Multiple items that need less than 32 bytes are packed into a single storage slot if possible, according to the following rules:
 
