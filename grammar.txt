@@ -1,6 +1,6 @@
 SourceUnit = (PragmaDirective | ImportDirective | ContractDefinition)*
 
-// Pragma actually parses anything up to the trailing ';' to be fully forward-compatible.
+// Pragma analiza sintácticamente todo hasta el punto y coma ';' final para ser completamente compatible en adelante.
 PragmaDirective = 'pragma' Identifier ([^;]+) ';'
 
 ImportDirective = 'import' StringLiteral ('as' Identifier)? ';'
@@ -33,8 +33,7 @@ IndexedParameterList = '(' ( TypeName 'indexed'? Identifier? (',' TypeName 'inde
 ParameterList =        '(' ( TypeName            Identifier? (',' TypeName            Identifier?)* )? ')'
 TypeNameList =         '(' ( TypeName (',' TypeName )* )? ')'
 
-// semantic restriction: mappings and structs (recursively) containing mappings
-// are not allowed in argument lists
+// Restricción semántica: mappings y structs que contienen (recursivamente) mappings no se aceptan en listas de argumentos.
 VariableDeclaration = TypeName StorageLocation? Identifier
 
 TypeName = ElementaryTypeName
@@ -71,7 +70,7 @@ Throw = 'throw'
 VariableDefinition = ('var' IdentifierList | VariableDeclaration) ( '=' Expression )?
 IdentifierList = '(' ( Identifier? ',' )* Identifier? ')'
 
-// Precedence by order (see github.com/ethereum/solidity/pull/732)
+// Procedencia por orden (veáse github.com/ethereum/solidity/pull/732)
 Expression =
   ( Expression ('++' | '--') | FunctionCall | IndexAccess | MemberAccess | '(' Expression ')' )
   | ('!' | '~' | 'delete' | '++' | '--' | '+' | '-') Expression
