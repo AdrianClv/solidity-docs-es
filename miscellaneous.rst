@@ -59,7 +59,7 @@ Entonces para el siguiente sinppet de contrato::
       mapping(uint => mapping(uint => s)) data;
     }
 
-The position of ``data[4][9].b`` is at ``keccak256(uint256(9) . keccak256(uint256(4) . uint256(1))) + 1``.
+La posición de ``data[4][9].b`` está en ``keccak256(uint256(9) . keccak256(uint256(4) . uint256(1))) + 1``.
 
 .. index: memory layout
 
