@@ -1,56 +1,49 @@
 .. index:: style, coding style
 
 #############
-Style Guide
+Guía de estilo
 #############
 
 ************
-Introduction
+Introducción
 ************
 
-This guide is intended to provide coding conventions for writing solidity code.
-This guide should be thought of as an evolving document that will change over
-time as useful conventions are found and old conventions are rendered obsolete.
+Esta guía pretende proporcionar convenciones de codificación para escribir código con Solidity.
+Esta guía debe ser entendida como un documento en evolución que cambiará con el tiempo, mientras nuevas convenciones útiles se encuentran y antiguas convenciones se vuelven obsoletas.
 
-Many projects will implement their own style guides.  In the event of
-conflicts, project specific style guides take precedence.
+Muchos proyectos implementarán sus propias guías de estilo. En el caso de conflictos, las guías de estilo específicas del proyecto tendran prioridad.
 
-The structure and many of the recommendations within this style guide were
-taken from python's
-`pep8 style guide <https://www.python.org/dev/peps/pep-0008/>`_.
+La estructura y muchas de las recomendaciones de esta guía de estilo fueron tomadas de Python: `pep8 style guide <https://www.python.org/dev/peps/pep-0008/>`_.
 
-The goal of this guide is *not* to be the right way or the best way to write
-solidity code.  The goal of this guide is *consistency*.  A quote from python's
-`pep8 <https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds>`_
-captures this concept well.
+El objetivo de esta guía * no * es ser la forma correcta o la mejor manera de escribir código con Solidity. El objetivo de esta guía es * consistencia *. Una cita de python `pep8 <https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds>`_ capta bien este concepto.
 
-    A style guide is about consistency. Consistency with this style guide is important. Consistency within a project is more important. Consistency within one module or function is most important.
-    But most importantly: know when to be inconsistent -- sometimes the style guide just doesn't apply. When in doubt, use your best judgment. Look at other examples and decide what looks best. And don't hesitate to ask!
+    Una guía de estilo es sobre consistencia. La consistencia con esta guía de estilo es importante. La consistencia dentro de un proyecto es más importante. La consistencia dentro de un módulo o función es lo más importante.
+    Pero sobre todo: saber cuándo ser inconsistente - a veces la guía de estilo simplemente no se aplica. En caso de duda, use su mejor juicio. Mire otros ejemplos y decida qué parece mejor. ¡Y no dude en preguntar!
 
 
 ***********
-Code Layout
+Diseño del código
 ***********
 
 
-Indentation
+Sangría
 ===========
 
-Use 4 spaces per indentation level.
+Utilice 4 espacios por nivel de sangría.
 
-Tabs or Spaces
+Tabulador o espacios
 ==============
 
-Spaces are the preferred indentation method.
+Los espacios son el método de indentación preferido.
 
-Mixing tabs and spaces should be avoided.
+Se deben evitar la mezcla del tabulador y los espacios.
 
-Blank Lines
+Líneas en blanco
 ===========
 
-Surround top level declarations in solidity source with two blank lines.
+Envuelva las declaraciones de nivel superior en el código de Solidity con dos líneas en blanco.
 
-Yes::
+Sí::
 
     contract A {
         ...
@@ -79,11 +72,11 @@ No::
         ...
     }
 
-Within a contract surround function declarations with a single blank line.
+Dentro de un contrato rodeé las declaraciones de una función con una sola línea en blanco.
 
-Blank lines may be omitted between groups of related one-liners (such as stub functions for an abstract contract)
+Las líneas en blanco se pueden omitir entre grupos de una frase relacionada (tales como las funciones stub en un contrato abstracto)
 
-Yes::
+Sí::
 
     contract A {
         function spam();
@@ -112,17 +105,17 @@ No::
         }
     }
 
-Source File Encoding
+Codificación de archivos de origen
 ====================
 
-UTF-8 or ASCII encoding is preferred.
+Se prefiere la codificación del texto en UTF-8 or ASCII.
 
-Imports
+Importación
 =======
 
-Import statements should always be placed at the top of the file.
+Las declaraciones de importación siempre deben colocarse en la parte superior del archivo.
 
-Yes::
+Sí::
 
     import "owned";
 
@@ -150,23 +143,23 @@ No::
         ...
     }
 
-Order of Functions
+Orden de funciones
 ==================
 
-Ordering helps readers identify which functions they can call and to find the constructor and fallback definitions easier.
+La ordenación ayuda a que los lectores puedan identificar las funciones que pueden invocar y encontrar las definiciones de constructor y de retorno más fácilmente.
 
-Functions should be grouped according to their visibility and ordered:
+Las funciones deben agruparse de acuerdo con su visibilidad y ser ordenadas de acuerdo a:
 
 - constructor
-- fallback function (if exists)
+- fallback function (Si existe)
 - external
 - public
 - internal
 - private
 
-Within a grouping, place the ``constant`` functions last.
+Dentro de un grupo, coloque las funciones `` constant`` de último.
 
-Yes::
+Sí::
 
     contract A {
         function A() {
@@ -218,14 +211,14 @@ No::
         // ...       
     }
 
-Whitespace in Expressions
+Espacios en blanco en expresiones
 =========================
 
-Avoid extraneous whitespace in the following  situations:
+Evite los espacios en blanco irrazonables en las siguientes situaciones:
 
-Immediately inside parenthesis, brackets or braces, with the exception of single-line function declarations.
+Inmediatamente entre paréntesis, llaves o corchetes, con la excepción de declaraciones de una función en una sola línea.
 
-Yes::
+Sí::
 
     spam(ham[1], Coin({name: "ham"}));
 
@@ -233,13 +226,13 @@ No::
 
     spam( ham[ 1 ], Coin( { name: "ham" } ) );
 
-Exception::
+Excepción::
 
     function singleLine() { spam(); }
 
-Immediately before a comma, semicolon:
+Inmediatamente antes de una coma, punto y coma:
 
-Yes::
+Sí::
 
     function spam(uint i, Coin coin);
 
@@ -247,10 +240,10 @@ No::
 
     function spam(uint i , Coin coin) ;
 
-More than one space around an assignment or other operator to align with
-  another:
+Más de un espacio alrededor de una asignación u otro operador para alinearlo con
+  otro:
 
-Yes::
+Sí::
 
     x = 1;
     y = 2;
@@ -262,9 +255,9 @@ No::
     y             = 2;
     long_variable = 3;
 
-Don't include a whitespace in the fallback function:
+No incluya un espacio en blanco en la función de segunda opción:
 
-Yes::
+Sí::
 
     function() {
         ...
@@ -276,18 +269,18 @@ No::
         ...
     }
 
-Control Structures
+Estructuras de control
 ==================
 
-The braces denoting the body of a contract, library, functions and structs
-should:
+Las llaves que denotan el cuerpo de un contrato, biblioteca, funciones y estructuras
+deberán:
 
-* open on the same line as the declaration
-* close on their own line at the same indentation level as the beginning of the
-  declaration.
-* The opening brace should be proceeded by a single space.
+* Abrir en la misma línea que la declaración
+* Cerrar en la misma línea en el mismo nivel de sangría que el
+  declaración.
+* La llaves de apertura deben ser procedidas por un solo espacio.
 
-Yes::
+Sí::
 
     contract Coin {
         struct Bank {
@@ -306,15 +299,12 @@ No::
         }
     }
 
-The same recommendations apply to the control structures ``if``, ``else``, ``while``,
-and ``for``.
+Las mismas recomendaciones se aplican a las estructuras de control ``if``, ``else``, ``while``,
+y ``for``.
 
-Additionally there should be a single space between the control structures
-``if``, ``while``, and ``for`` and the parenthetic block representing the
-conditional, as well as a single space between the conditional parenthetic
-block and the opening brace.
+Además, debería existir un único espacio entre las estructuras de control ``if``, ``while``, y ``for`` Y el bloque entre paréntesis que representa el condicional, así como un único espacio entre el bloque del paréntesis condicional y la llave de apertura.
 
-Yes::
+Sí::
 
     if (...) {
         ...
