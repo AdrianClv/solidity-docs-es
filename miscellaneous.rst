@@ -8,45 +8,50 @@ Diverso
 Layout de las variables de estado en almacenamiento
 ***************************************************
 
-Statically-sized variables (everything except mapping and dynamically-sized array types) are laid out contiguously in storage starting from position ``0``. Multiple items that need less than 32 bytes are packed into a single storage slot if possible, according to the following rules:
+Variables de tamaño estáticas (todo menos mapping y tipos arrays de tamaño variable) se disponen contiguamente en almacenamiento empezando de la posición ``0``. Cuando multiples elementos necesitan menos de 32 bytes, son empaquetados en un slot de almacenamiento cuando posible de acuerdo a las reglas:
 
-- The first item in a storage slot is stored lower-order aligned.
-- Elementary types use only that many bytes that are necessary to store them.
-- If an elementary type does not fit the remaining part of a storage slot, it is moved to the next storage slot.
-- Structs and array data always start a new slot and occupy whole slots (but items inside a struct or array are packed tightly according to these rules).
+- El primer elemento en un slot de almacenamiento es almacenado alineado en lower-order.
+- Tipos elementales usan sólo usan la cantidad de bytes que se necesita para almacenarlas.
+- Si un tipo elemental no cabe en la parte restante de un slot de almacenamiento, es movido al próximo slot de almacenamiento.
+- Structs y datos de array siempre comienzan en un nuevo slot y ocupan slots enteros (pero elementos dentro de un struct o array son empacados estrechamente de acuerdo a estas reglas).
+
 
 .. warning::
-    When using elements that are smaller than 32 bytes, your contract's gas usage may be higher.
-    This is because the EVM operates on 32 bytes at a time. Therefore, if the element is smaller
-    than that, the EVM must use more operations in order to reduce the size of the element from 32
-    bytes to the desired size.
+    Cuando se usan elementos que son más pequeños que 32 bytes, el uso del gas del contrato puede
+    ser más alto. Esto es porque la EVM opera en 32 bytes a la vez. Por lo tanto, si el elemento es
+    más pequeño que eso, la EVM usa más operaciones para reducir el tamaño del elemento de 32 bytes
+    al tamaño deseado.
 
-    It is only beneficial to use reduced-size arguments if you are dealing with storage values
-    because the compiler will pack multiple elements into one storage slot, and thus, combine
-    multiple reads or writes into a single operation. When dealing with function arguments or memory
-    values, there is no inherent benefit because the compiler does not pack these values.
+    Sólo es benéfico de reducir el tamaño de los argumentos si estás tratando con valores de
+    almacenamiento porque el compilador empacará multiples elementos en un slot de almacenamiento,
+    y entonces, combina multiples lecturas y escrituras en una sólo operación. Cuando se trata con
+    argumentos de función o valores de memoria, no hay beneficio inherente porque el compilador no
+    empaca estos valores.
 
-    Finally, in order to allow the EVM to optimize for this, ensure that you try to order your
-    storage variables and ``struct`` members such that they can be packed tightly. For example,
-    declaring your storage variables in the order of ``uint128, uint128, uint256`` instead of
-    ``uint128, uint256, uint128``, as the former will only take up two slots of storage whereas the
-    latter will take up three.
+    Finalmente, para permitir la EVM de optimizar esto, asegúrate de ordenar la variables de
+    almacenamiento y miembros ``struct`` para que puedan ser empacados estrechamente. Por ejemplo,
+    declarando tus variables de almacenamiento en el orden de ``uint128, uint128, uint256`` en vez de
+    ``uint128, uint256, uint128``, ya que el primero utilizará sólo dos slots de almacenamiento y éste
+    último tres.
 
-The elements of structs and arrays are stored after each other, just as if they were given explicitly.
+Los elementos de structs y arrays son almacenados después de ellos mismos, como si fueran dados explícitamente.
 
-Due to their unpredictable size, mapping and dynamically-sized array types use a Keccak-256 hash
-computation to find the starting position of the value or the array data. These starting positions are always full stack slots.
+Dado a su tamaño impredecible, tipos de array dinámicos y de mapping usan computación hash Keccak-256
+para encontrar la posición de inicio del valor o del dato del array. Estas posiciones de inicio
+son siempre slos de full stack.
 
-The mapping or the dynamic array itself
-occupies an (unfilled) slot in storage at some position ``p`` according to the above rule (or by
-recursively applying this rule for mappings to mappings or arrays of arrays). For a dynamic array, this slot stores the number of elements in the array (byte arrays and strings are an exception here, see below). For a mapping, the slot is unused (but it is needed so that two equal mappings after each other will use a different hash distribution).
-Array data is located at ``keccak256(p)`` and the value corresponding to a mapping key
-``k`` is located at ``keccak256(k . p)`` where ``.`` is concatenation. If the value is again a
-non-elementary type, the positions are found by adding an offset of ``keccak256(k . p)``.
+El mapping o el array dinámico en sí ocupa un slot (sin llenar) en alguna posición ``p`` de acuerdo
+a la regla de arriba (o por aplicar esta regla de mappings a mappings o arrays de arrays). Para un
+array dinámico, este slot guarda el número de elmentos en el array (los byte arrays y cadenas son
+excepciones aquí, mirar abajo). Para un mapping, el slot no es utilizado (pero es necesario para que
+dos mappings iguales seguidos usen diferentes distribuciones de hash).
+Datos de array son ubicados en ``kecakk256(p)`` y el valor correspondiente a una llave de mapping
+``k`` es ubicada en ``kecakk256(k . p)`` donde ``.`` es una concatenación. Si el valor de nuevo es
+un tipo no elemental, las posiciones son encontradas agregando un offset de ``keccak256(k . p)``.
 
-``bytes`` and ``string`` store their data in the same slot where also the length is stored if they are short. In particular: If the data is at most ``31`` bytes long, it is stored in the higher-order bytes (left aligned) and the lowest-order byte stores ``length * 2``. If it is longer, the main slot stores ``length * 2 + 1`` and the data is stored as usual in ``keccak256(slot)``.
+``bytes`` y ``string`` almacenan sus datos en el mismo slot donde también el largo es almacenado si son cortos. En particular: si el data es al menos ``31`` bytes de largo, es almacenado en bytes de orden mayor (alineados a la izquierda) y el byte de orden menor almacena ``length * 2``. Si es más largo, el slot principal almacena ``length * 2 + 1`` y los datos son almacenados como siempre en ``keccak256(slot)``.
 
-So for the following contract snippet::
+Entonces para el siguiente sinppet de contrato::
 
     contract C {
       struct s { uint a; uint b; }
