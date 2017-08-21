@@ -909,29 +909,18 @@ Los eventos permiten el uso conveniente de la capacidad de registro del EVM, que
 
 Los eventos son miembros heredables de los contratos. Cuando se les llama, hacen que los argumentos se guarden en el registro de transacciones - una estructura de datos especial en la blockchain. Estos registros están asociados con la dirección del contrato y serán incorporados en la blockchain y allí permanecerán siempre que un bloque esté accesible (eso es: para siempre con Frontier y con Homestead, pero puede cambiar con Serenity). Los datos de registros y de eventos no están disponibles desde dentro de los contratos (ni siquiera desde el contrato que los ha creado).
 
-SPV proofs for logs are possible, so if an external entity supplies
-a contract with such a proof, it can check that the log actually
-exists inside the blockchain.  But be aware that block headers have to be supplied because
-the contract can only see the last 256 block hashes.
+Se pueden hacer pruebas SPV (???SPV proofs) para los registros, de manera que si una entidad externa proporciona un contrato con dicha prueba, se puede comprobar que el registro realmente existe en la blockchain. Dicho esto, tenga en cuenta que las cabeceras de bloque deben proporcionarse porque el contrato  sólo lee los últimos 256 hashes de bloque. 
 
-Up to three parameters can
-receive the attribute ``indexed`` which will cause the respective arguments
-to be searched for: It is possible to filter for specific values of
-indexed arguments in the user interface.
+Hasta tres parámetros pueden recibir el atributo ``indexed``, lo que hará que se busque por los respectivos parámetros. En la interfaz de usuario, es posible filtrar por los valores específicos de argumentos indexados.
 
-If arrays (including ``string`` and ``bytes``) are used as indexed arguments, the
-Keccak-256 hash of it is stored as topic instead.
+Si se utilizan matrices como argumentos indexados (incluyendo ``string`` y ``bytes``), en cambio se guarda su hash Keccak-256 como un tópico (???topic).
 
-The hash of the signature of the event is one of the topics except if you
-declared the event with ``anonymous`` specifier. This means that it is
-not possible to filter for specific anonymous events by name.
+El hash de la firma de un evento es uno de los tópicos, excepto si usted ha declarado el evento con el especificador ``anonymous``. Esto significa que no es posible filtrar por eventos anónimos específicos por su nombre.
 
-All non-indexed arguments will be stored in the data part of the log.
+Todos los argumentos no indexados se guardarán en la parte de datos del registro.
 
 .. note::
-    Indexed arguments will not be stored themselves.  You can only
-    search for the values, but it is impossible to retrieve the
-    values themselves.
+		No se guardan los argumentos indexados propiamente dichos. Uno sólo puede buscar por los valores, pero es imposible recuperar los valores ellos mismos.
 
 ::
 
@@ -945,14 +934,12 @@ All non-indexed arguments will be stored in the data part of the log.
         );
 
         function deposit(bytes32 _id) payable {
-            // Any call to this function (even deeply nested) can
-            // be detected from the JavaScript API by filtering
-            // for `Deposit` to be called.
+            // Cualquier llamada a esta función (por muy anidado que sea) puede ser detectada desde la API de JavaScript con un filtro para que se llame a `Deposit`.
             Deposit(msg.sender, _id, msg.value);
         }
     }
 
-The use in the JavaScript API would be as follows:
+Su uso en la API de JavaScript sería como sigue:
 
 ::
 
@@ -962,25 +949,23 @@ The use in the JavaScript API would be as follows:
 
     var event = clientReceipt.Deposit();
 
-    // watch for changes
+    // mirar si hay cambios
     event.watch(function(error, result){
-        // result will contain various information
-        // including the argumets given to the Deposit
-        // call.
+        // el resultado contendrá varias informaciones incluyendo los argumentos proporcionados en el momento de la llamada a Deposit.
         if (!error)
             console.log(result);
     });
 
-    // Or pass a callback to start watching immediately
+    // O hacer una retro llamada (???callback) para empezar a mirar de inmediato
     var event = clientReceipt.Deposit(function(error, result) {
         if (!error)
             console.log(result);
     });
 
-.. index:: ! log
+.. index:: ! registro
 
-Low-Level Interface to Logs
-===========================
+Interfaz a registros de bajo nivel
+==================================
 
 It is also possible to access the low-level interface to the logging
 mechanism via the functions ``log0``, ``log1``, ``log2``, ``log3`` and ``log4``.
