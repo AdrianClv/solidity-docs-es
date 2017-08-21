@@ -249,28 +249,28 @@ transiciones de etapas de forma automática en función
 del tiempo. Debe ser usado en todas las funciones.
 
 .. nota::
-    **El ordén del modificador importa**.
+    **El orden de los modificadores importa**.
     Si atStage se combina
     con timesTransitions, asegúrate de que puedas
     mencionarlo después de éste, para que la nueva
     etapa sea tomada en cuenta.
 
 Finalmente, el modificador ``transitionNext`` puede
-ser usado automáticamente para ir a la próxima etapa
-cuando la función termina.
+ser usado para ir automáticamente a la próxima etapa
+cuando la función termine.
 
 .. nota::
-    **El Modificador Puede Ser Omitido**.
+    **El modificador puede ser omitido**.
     Esto sólo se aplica a Solidity antes de la versión
     0.4.0:
-    Ya que los modificadores son aplicados simplemente
-    remplazando código y no usando llamados de funciones,
-    el código puede ser omitido si la función en sí usa
-    return. Si es lo que quieres hacer, asegúrate
-    de llamar nextStage manualmente desde esas funciones.
-    Comenzando con la versión 0.4.0 ,modificar código
-    correrá incluso si la función explícitamente
-    retorna.
+    Puesto que los modificadores se aplican simplemente
+    reemplazando código y no realizando una llamada a una función,
+    el código del modificador transitionNext se puede omitir
+    si la propia función usa return. Si es lo que quieres hacer, asegúrate
+    de llamar manualmente a nextStage desde esas funciones.
+    A partir de la versión 0.4.0, el código de los modificadores
+    se ejecutará incluso en el caso de que la función
+    ejecute explícitamente un return.
 
 ::
 
@@ -299,9 +299,9 @@ cuando la función termina.
             stage = Stages(uint(stage) + 1);
         }
 
-        // Hacer transiciones temporizadas. Asegúrate de
-        // mencionar este modificador primero, si no, la
-        // seguridad no tomará en cuenta la nueva etapa.
+        // Hace transiciones temporizadas. Asegúrate de
+        // mencionar este modificador primero, si no,
+        // no se tendrá en cuenta la nueva etapa.
         modifier timedTransitions() {
             if (stage == Stages.AcceptingBlindedBids &&
                         now >= creationTime + 10 days)
@@ -309,7 +309,7 @@ cuando la función termina.
             if (stage == Stages.RevealBids &&
                     now >= creationTime + 12 days)
                 nextStage();
-            // Las otras etapas transición por transición
+            // La transición del resto de etapas se produce por transacciones
             _;
         }
 
