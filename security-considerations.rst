@@ -24,11 +24,11 @@ deberíás tener más cuidado.
 
 Esta sección nombrará algunos errores comunes y recomendaciones de seguridad
 generales pero no puede, por supuesto, ser una lista completa. Además, recordar
-que incluso si tu contrato inteligente está libre de errores (bug-free), el complilador
+que incluso si tu contrato inteligente está libre de errores (bug-free), el compilador
 o la plataforma puede que tenga uno. Una lista de errores de seguridad públicamente
 conocidos del compilador puede encontrarse en: :ref:`lista de errores conocidos<known_bugs>`,
-la lista también es legible por maquina (machine-readable). Nótese que hay una recompensa
-por errores (bug-bounty) que cubre el generador de código del compliador de Solidity.
+la lista también es legible por máquina (machine-readable). Nótese que hay una recompensa
+por errores (bug-bounty) que cubre el generador de código del compilador de Solidity.
 
 Como siempre es el caso con documentación de código abierto, por favor ayúdanos a extender
 esta sección, especialmente con algunos ejemplos!
@@ -128,13 +128,13 @@ Enviando y Recibiendo Ether
   requerimientos de gas de la función de respaldo (por ejemplo en la sección de "details" de Remix).
 
 - Hay una manera de enviar más gas a contrato receptor usando ``addr.call.value(x)()``.
-  Esto es escencialmente lo mismo que ``addr.transfer(x)``, solo que envía todo el gas restante
+  Esto es esencialmente lo mismo que ``addr.transfer(x)``, solo que envía todo el gas restante
   y permite la posibilidad al recipiente de hacer acciones más caras (y solo devuelve un código
   de error y no propaga automáticamente el error). Esto puede incluir volviendo a llamar al contrato
-  enviador o otros cambios de estado que nofueron imaginados. Así que permite más flexibilidad para
+  enviador o otros cambios de estado que no fueron imaginados. Así que permite más flexibilidad para
   usuarios honestos pero también para los usuarios maliciosos.
 
-- Si quieres envíar Ether usando ``address.transfer``, hay ciertos detalles de los que hay que saber:
+- Si quieres enviar Ether usando ``address.transfer``, hay ciertos detalles de los que hay que saber:
 
   1. Si el recipiente es un contrato, causa que la función de respaldo sea ejecutada lo cual puede, a su vez, llamar de vuelta el
   contrato que envía Ether.
@@ -157,7 +157,7 @@ exceden la pila de llamadas de 1024. En tales situaciones, Solidity lanza
 una excepción. Usuarios maliciosos podrían forzar la pila a un valor alto
 antes de interactuar con el contrato.
 
-Notar que ``.send()`` **no** lanza una excepción si la pila esta vacía si no
+Notar que ``.send()`` **no** lanza una excepción si la pila está vacía si no
 que retorna ``false`` en ese caso. Las funciones de bajo nivel de ``.call()``,
 ``.callcode()``  ``.delegatecall()`` se comportan de la misma manera.
 
@@ -203,19 +203,19 @@ Ahora alguien te engaña para que le envíes Ether a esta billetera de ataque:
         }
     }
 
-Si tu billetera hubiera checkeado ``msg.sender`` para autorización, recibiría la cuenta de la billetera de ataque, en vez de la billetera del 'owner'. Pero al chequear ``tx.origin``, recibe la cuenta original que envió la transacción, quien aún es la cuenta owner. La billetera atacante immediatamente vacía todos tus fondos.
+Si tu billetera hubiera checkeado ``msg.sender`` para autorización, recibiría la cuenta de la billetera de ataque, en vez de la billetera del 'owner'. Pero al chequear ``tx.origin``, recibe la cuenta original que envió la transacción, quien aún es la cuenta owner. La billetera atacante inmediatamente vacía todos tus fondos.
 
 
 Detalles Menores
 ================
 
 - En ``for (var i = 0; i < arrayName.length; i++) { ... }``, el tipo de ``i`` será ``uint8``, porque este es el más pequeño tipo que es requerido para guardar el valor ``0``. Si el vector (array) tiene más de 255 elementos, el bucle no se terminará.
-- La palabra reservada ``constant`` para funciones no es actualmente forzada por compliadores.
+- La palabra reservada ``constant`` para funciones no es actualmente forzada por compiladores.
   Además, no está forzada por la EVM, entonces una función de contrato que "pretende" ser constante,
   puede aún hacer cambios al estado.
 - Tipos que no utilizan totalmente los 32 bytes pueden contener "dirty high order bits".
   Esto es especialmente importante si se accede a ``msg.data`` ya que supone un riesgo de maleabilidad:
-  Puedes crear transacciones que llaman una función ``f(uint8 x)`` con un argumeto raw byte
+  Puedes crear transacciones que llaman una función ``f(uint8 x)`` con un argumento raw byte
   de ``0xff000001`` y con ``0x00000001``. Ambos son pasados al contrato y ambos se verán como
   números como ``1``. Pero ``msg.data`` es diferente, así que si se usa ``keccak246(msg.data)`` para
   algo, tendrás resultados diferentes.
@@ -248,7 +248,7 @@ Usa el orden Checks-Effects-Interactions
 
 La mayoría de las funciones primero ejecutan algunos chequeos (¿quién ha llamado
 la función? ¿los argumentos están en el rango? ¿mandaron suficiente Ether?
-¿La cuenta tiene tokens? etc) Estos chequeos deben se hacerse primero.
+¿La cuenta tiene tokens? etc) Estos chequeos deben de hacerse primero.
 
 Como segundo paso, si es que todos los chequeos pasaron, los efectos a las
 variables de estado del contrato actual deben hacerse. Interacción con otros
@@ -282,11 +282,11 @@ o se convierte en un contrato "devuélveme mi dinero".
 Verificación Formal
 *******************
 
-Usando verficación formal, es posible realizar pruebas matemáticas automatizadas
+Usando verificación formal, es posible realizar pruebas matemáticas automatizadas
 que el código haga una cierta especificación formal.
 La especificación aún es formal (como el código fuente), pero usualmente mucho más simple.
 Hay un prototipo en Solidity que realiza verificación formal y será mejor documentada pronto.
 
-Notar que la verficación formal en sí mismo, solo puede ayudarte a entender la diferencia
+Notar que la verificación formal en sí mismo, sólo puede ayudarte a entender la diferencia
 entre lo que hiciste (la especificación) y cómo lo hiciste (la implementación real). Aún necesitas
 chequear si la especificación es lo que querías y que no hayas olvidado efectos inesperados de ello.
