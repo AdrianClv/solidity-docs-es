@@ -1,8 +1,8 @@
 .. index:: style, coding style
 
-#############
+##############
 Guía de estilo
-#############
+##############
 
 ************
 Introducción
