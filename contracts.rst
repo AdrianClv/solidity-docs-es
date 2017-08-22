@@ -967,11 +967,7 @@ Su uso en la API de JavaScript sería como sigue:
 Interfaz a registros de bajo nivel
 ==================================
 
-It is also possible to access the low-level interface to the logging
-mechanism via the functions ``log0``, ``log1``, ``log2``, ``log3`` and ``log4``.
-``logi`` takes ``i + 1`` parameter of type ``bytes32``, where the first
-argument will be used for the data part of the log and the others
-as topics. The event call above can be performed in the same way as
+También es posible acceder al mecanismo de logging a través de la interfaz de bajo nivel mediante las funciones ``log0``, ``log1``, ``log2``, ``log3`` y ``log4``. ``logi`` toma ``i + 1`` parámetros del tipo ``bytes32``, donde el primer argumento se utiliza para la parte de datos del log y los otros como tópicos. La llamada al evento aquí arriba puede realizarse de una manera similar a esta:
 
 ::
 
@@ -982,36 +978,31 @@ as topics. The event call above can be performed in the same way as
         _id
     );
 
-where the long hexadecimal number is equal to
-``keccak256("Deposit(address,hash256,uint256)")``, the signature of the event.
+donde el numero hexadecimal largo es igual a ``keccak256("Deposit(address,hash256,uint256)")``, la firma del evento.
 
-Additional Resources for Understanding Events
-==============================================
+Recursos Adicional para Entender los Eventos
+============================================
 
-- `Javascript documentation <https://github.com/ethereum/wiki/wiki/JavaScript-API#contract-events>`_
-- `Example usage of events <https://github.com/debris/smart-exchange/blob/master/lib/contracts/SmartExchange.sol>`_
-- `How to access them in js <https://github.com/debris/smart-exchange/blob/master/lib/exchange_transactions.js>`_
+- `Documentación de Javascript <https://github.com/ethereum/wiki/wiki/JavaScript-API#contract-events>`_
+- `Ejemplo de uso de los eventos <https://github.com/debris/smart-exchange/blob/master/lib/contracts/SmartExchange.sol>`_
+- `Como acceder a eventos con js <https://github.com/debris/smart-exchange/blob/master/lib/exchange_transactions.js>`_
 
 .. index:: ! inheritance, ! base class, ! contract;base, ! deriving
 
-***********
-Inheritance
-***********
+********
+Herencia
+********
 
-Solidity supports multiple inheritance by copying code including polymorphism.
+Solidity soporta multiples herencias copiando el código, incluyendo el polimorfismo. 
 
-All function calls are virtual, which means that the most derived function
-is called, except when the contract name is explicitly given.
+Todas las llamadas a funciones son virtuales, lo que significa que es la función la más derivada la que se llama, excepto cuando el nombre del contrato es explícitamente mencionado.
 
-When a contract inherits from multiple contracts, only a single
-contract is created on the blockchain, and the code from all the base contracts
-is copied into the created contract.
+Cuando un contrato hereda de múltiples contratos, un solo contrato está creado en la blockchain, y el código de todos los contratos base está copiado dentro del contrato creado.
 
-The general inheritance system is very similar to
-`Python's <https://docs.python.org/3/tutorial/classes.html#inheritance>`_,
-especially concerning multiple inheritance.
+El sistema general de herencia es muy similar al de `Python <https://docs.python.org/3/tutorial/classes.html#inheritance>`_,
+especialmente en lo que se refiere a herencias multiples.
 
-Details are given in the following example.
+En el siguiente ejemplo se dan más detalles.
 
 ::
 
@@ -1023,10 +1014,7 @@ Details are given in the following example.
     }
 
 
-    // Use "is" to derive from another contract. Derived
-    // contracts can access all non-private members including
-    // internal functions and state variables. These cannot be
-    // accessed externally via `this`, though.
+		// Usar "is" para derivar de otro contrato. Los contratos derivados pueden acceder a todos los miembros no privados, incluidas las funciones internas y variables de estado. A éstas sin embargo no se puede acceder externamente mediante `this`.
     contract mortal is owned {
         function kill() {
             if (msg.sender == owner) selfdestruct(owner);
@@ -1034,10 +1022,7 @@ Details are given in the following example.
     }
 
 
-    // These abstract contracts are only provided to make the
-    // interface known to the compiler. Note the function
-    // without body. If a contract does not implement all
-    // functions it can only be used as an interface.
+		// Estos contratos abstractos solo se proporcionan para que el compilador sepa de la interfaz. Nótese que la función no tiene cuerpo. Si un contrato no implementa todas las funciones, solo puede usarse como interfaz.
     contract Config {
         function lookup(uint id) returns (address adr);
     }
@@ -1049,35 +1034,27 @@ Details are given in the following example.
      }
 
 
-    // Multiple inheritance is possible. Note that "owned" is
-    // also a base class of "mortal", yet there is only a single
-    // instance of "owned" (as for virtual inheritance in C++).
+		// Las herencias multiples son posibles. Nótese que "owned" también es una clase base de "mortal", aun así hay una sóla instancia de "owned" (igual que para las herencias virtuales en C++).
     contract named is owned, mortal {
         function named(bytes32 name) {
             Config config = Config(0xd5f9d8d94886e70b06e474c3fb14fd43e2f23970);
             NameReg(config.lookup(1)).register(name);
         }
 
-        // Functions can be overridden by another function with the same name and
-        // the same number/types of inputs.  If the overriding function has different
-        // types of output parameters, that causes an error.
-        // Both local and message-based function calls take these overrides
-        // into account.
+        // Las funciones pueden ser invalidadas por otras funciones con el mismo nombre y el mismo numero/tipo de entradas. Si la función que invalida tiene distintos tipos de parámetros de salida, esto provocará un error. 
+        // Tanto las llamadas a funciones locales como a las que están basadas en mensaje toman en cuenta estas invalidaciones.
         function kill() {
             if (msg.sender == owner) {
                 Config config = Config(0xd5f9d8d94886e70b06e474c3fb14fd43e2f23970);
                 NameReg(config.lookup(1)).unregister();
-                // It is still possible to call a specific
-                // overridden function.
+                // Sigue siendo posible llamar a una función específica que ha sido invalidadas.
                 mortal.kill();
             }
         }
     }
 
 
-    // If a constructor takes an argument, it needs to be
-    // provided in the header (or modifier-invocation-style at
-    // the constructor of the derived contract (see below)).
+    // Si un constructor acepta un argumento, es necesario proporcionarlo en la cabecera (o ???modifier-invocation-style al constructor del contrato derivado (ver más abajo)).
     contract PriceFeed is owned, mortal, named("GoldFeed") {
        function updateInfo(uint newInfo) {
           if (msg.sender == owner) info = newInfo;
@@ -1088,9 +1065,9 @@ Details are given in the following example.
        uint info;
     }
 
-Note that above, we call ``mortal.kill()`` to "forward" the
-destruction request. The way this is done is problematic, as
-seen in the following example::
+Nótese que arriba, llamamos a ``mortal.kill()`` para "reenviar" la orden de destrucción. Hacerlo de esta forma es problemático, como se puede ver en el siguiente ejemplo.
+
+::
 
     pragma solidity ^0.4.0;
 
@@ -1102,22 +1079,21 @@ seen in the following example::
 
 
     contract Base1 is mortal {
-        function kill() { /* do cleanup 1 */ mortal.kill(); }
+        function kill() { /* hacer limpieza 1 */ mortal.kill(); }
     }
 
 
     contract Base2 is mortal {
-        function kill() { /* do cleanup 2 */ mortal.kill(); }
+        function kill() { /* hacer limpieza 2 */ mortal.kill(); }
     }
 
 
     contract Final is Base1, Base2 {
     }
 
-A call to ``Final.kill()`` will call ``Base2.kill`` as the most
-derived override, but this function will bypass
-``Base1.kill``, basically because it does not even know about
-``Base1``.  The way around this is to use ``super``::
+Una llamada a ``Final.kill()`` llamará a ``Base2.kill`` como la invalidación la más derivada, pero esta función obviará ``Base1.kill``, básicamente porque no siquiera sabe de la existencia de ``Base1``. La forma de solucionar esto es usando ``super``.
+
+::
 
     pragma solidity ^0.4.0;
 
@@ -1129,33 +1105,24 @@ derived override, but this function will bypass
 
 
     contract Base1 is mortal {
-        function kill() { /* do cleanup 1 */ super.kill(); }
+        function kill() { /* hacer limpieza 1 */ super.kill(); }
     }
 
 
     contract Base2 is mortal {
-        function kill() { /* do cleanup 2 */ super.kill(); }
+        function kill() { /* hacer limpieza 2 */ super.kill(); }
     }
 
 
     contract Final is Base2, Base1 {
     }
 
-If ``Base1`` calls a function of ``super``, it does not simply
-call this function on one of its base contracts.  Rather, it 
-calls this function on the next base contract in the final
-inheritance graph, so it will call ``Base2.kill()`` (note that
-the final inheritance sequence is -- starting with the most
-derived contract: Final, Base1, Base2, mortal, owned).
-The actual function that is called when using super is
-not known in the context of the class where it is used,
-although its type is known. This is similar for ordinary
-virtual method lookup.
+Si ``Base1`` llama a una función de ``super``, no simplemente llama a esta función en uno de sus contratos base. En cambio, llama a esta función en el siguiente contrato base en el ultimo gráfico de herencias, por lo tanto llama a ``Base2.kill()`` (nótese que la secuencia final de herencia es -- empezando por el contrato el más derivado: Final, Base1, Base2, mortal, owned). La función real a la que se llama cuando se usa super no se sabe en el contexto de la clase donde se usa, aunque su tipo es conocido. Esto es similar para métodos habituales de búsqueda virtual. 
 
 .. index:: ! base;constructor
 
-Arguments for Base Constructors
-===============================
+Argumentos para Constructores Base
+==================================
 
 Derived contracts need to provide all arguments needed for
 the base constructors. This can be done in two ways::
