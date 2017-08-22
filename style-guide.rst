@@ -15,31 +15,31 @@ Muchos proyectos implementarán sus propias guías de estilo. En el caso de conf
 
 La estructura y muchas de las recomendaciones de esta guía de estilo fueron tomadas de Python: `pep8 style guide <https://www.python.org/dev/peps/pep-0008/>`_.
 
-El objetivo de esta guía * no * es ser la forma correcta o la mejor manera de escribir código con Solidity. El objetivo de esta guía es * consistencia *. Una cita de python `pep8 <https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds>`_ capta bien este concepto.
+El objetivo de esta guía *no* es ser la forma correcta o la mejor manera de escribir código con Solidity. El objetivo de esta guía es *consistencia*. Una cita de python `pep8 <https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds>`_ capta bien este concepto.
 
     Una guía de estilo es sobre consistencia. La consistencia con esta guía de estilo es importante. La consistencia dentro de un proyecto es más importante. La consistencia dentro de un módulo o función es lo más importante.
     Pero sobre todo: saber cuándo ser inconsistente - a veces la guía de estilo simplemente no se aplica. En caso de duda, use su mejor juicio. Mire otros ejemplos y decida qué parece mejor. ¡Y no dude en preguntar!
 
 
-***********
+*****************
 Diseño del código
-***********
+*****************
 
 
 Sangría
-===========
+=======
 
 Utilice 4 espacios por nivel de sangría.
 
 Tabulador o espacios
-==============
+====================
 
 Los espacios son el método de indentación preferido.
 
 Se deben evitar la mezcla del tabulador y los espacios.
 
 Líneas en blanco
-===========
+================
 
 Envuelva las declaraciones de nivel superior en el código de Solidity con dos líneas en blanco.
 
@@ -106,12 +106,12 @@ No::
     }
 
 Codificación de archivos de origen
-====================
+==================================
 
 Se prefiere la codificación del texto en UTF-8 or ASCII.
 
 Importación
-=======
+===========
 
 Las declaraciones de importación siempre deben colocarse en la parte superior del archivo.
 
@@ -212,7 +212,7 @@ No::
     }
 
 Espacios en blanco en expresiones
-=========================
+=================================
 
 Evite los espacios en blanco irrazonables en las siguientes situaciones:
 
@@ -270,7 +270,7 @@ No::
     }
 
 Estructuras de control
-==================
+======================
 
 Las llaves que denotan el cuerpo de un contrato, biblioteca, funciones y estructuras
 deberán:
