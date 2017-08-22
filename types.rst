@@ -24,14 +24,14 @@ Tipos de Valor
 
 Los siguientes tipos también son llamados tipos de valor porque las variables
 de este tipo serán siempre pasadas como valores, ej. siempre serán copiados cuando
-son usados como argumentos de funciónes o en asignaciones.
+son usados como argumentos de funciones o en asignaciones.
 
 .. index:: ! bool, ! true, ! false
 
 Booleanos
 ---------
 
-``bool``: Los posibles valores son las constantes ``true`` and ``false``.
+``bool``: Los posibles valores son las constantes ``true`` y ``false``.
 
 Operadores:
 
@@ -41,7 +41,7 @@ Operadores:
 *  ``==`` (igualdad)
 *  ``!=`` (inigualdad)
 
-Los operadores ``||`` y ``&&`` aplican las reglas comunes de corto circuitos. Esto significa que en la expresión c, si ``f(x)`` evalúa a ``true``, ``g(y)`` no será evaluado incluso si tuviera efectos segundarios.
+Los operadores ``||`` y ``&&`` aplican las reglas comunes de corto circuitos. Esto significa que en la expresión ``f(x) || g(y)``, si ``f(x)`` evalúa a ``true``, ``g(y)`` no será evaluado incluso si tuviera efectos segundarios.
 
 .. index:: ! uint, ! int, ! integer
 
@@ -69,7 +69,7 @@ extiende en signo. Haciendo shift por un número negativo arroja una excepción 
 .. warning::
     Los resultados producidos por shift derecho de valores negativos de tipos de enteros con signo es diferente de esos producidos
     por otros lenguajes de programación. En Solidity, shift derecho mapea la división para que los valores negativos de shift
-    serán redondeados hacia cero (truncado). En otros lenguajes de programación el shift derecho de valores negativos
+    sean redondeados hacia cero (truncado). En otros lenguajes de programación el shift derecho de valores negativos
     funcióna como una división con redondeo hacia abajo (hacia infinito negativo).
 
 .. index:: address, balance, send, call, callcode, delegatecall, transfer
@@ -79,16 +79,16 @@ extiende en signo. Haciendo shift por un número negativo arroja una excepción 
 Address
 -------
 
-``address``: Contiene un valor de 20 byte (tamaño de una dirección Ethereum). Tipos de address también miembros y sirven como base para todos los contratos.
+``address``: Contiene un valor de 20 byte (tamaño de una dirección Ethereum). Los tipos de address también tienen miembros y sirven como base para todos los contratos.
 
 Operadores:
 
-* ``<=``, ``<``, ``==``, ``!=``, ``>=`` and ``>``
+* ``<=``, ``<``, ``==``, ``!=``, ``>=`` y ``>``
 
 Miembros de Address
 ^^^^^^^^^^^^^^^^^^^
 
-* ``balance`` and ``transfer``
+* ``balance`` y ``transfer``
 
 Para una referencia rápida, ver :ref:`address_related`.
 
@@ -109,15 +109,15 @@ y de enviar Ether (en unidades de wei) a una dirección usando la función ``tra
 Send es la contrapartida de bajo nivel de ``transfer``. Si la ejecución falla, el contrato actual no se detendrá con una excepción, pero ``send`` devuelve ``false``.
 
 .. warning::
-    Hay algunos peligros en utiliza ``send``: La transferencia falla si la profundidad de la llamada es de 1024
-    (esto puede ser fozado por el llamador) y también falla si el recipiente se le acaba el gas. Entonces para
+    Hay algunos peligros en utilizar ``send``: La transferencia falla si la profundidad de la llamada es de 1024
+    (esto puede ser forzado por el llamador) y también falla si al recipiente se le acaba el gas. Entonces para
     hacer transferencia de Ether seguras, siempre revisar el valor devuelto por ``send``, usar ``transfer`` o incluso mejor:
-    usa el patrón donde el recipiente retira el dinero.
+    usar un patrón donde el recipiente retira el dinero.
 
-* ``call``, ``callcode`` and ``delegatecall``
+* ``call``, ``callcode`` y ``delegatecall``
 
 Además, para interfazar con contratos que no adhieren al ABI,
-la función ``call`` es prevista que toma un número arbitrario de argumentos de cualquier tipo. Estos argumentos son acolchados a 32 bytes y concatenados. Una excepción es el caso donde el primer argumento es codificado a exactamente 4 bytes. En este caso, no está acolchado para permitir el uso de firmas de función aquí.
+la función ``call`` es prevista que tome un número arbitrario de argumentos de cualquier tipo. Estos argumentos son acolchados a 32 bytes y concatenados. Una excepción es el caso donde el primer argumento es codificado a exactamente 4 bytes. En este caso, no está acolchado para permitir el uso de firmas de función aquí.
 
 ::
 
@@ -125,22 +125,22 @@ la función ``call`` es prevista que toma un número arbitrario de argumentos de
     nameReg.call("register", "MyName");
     nameReg.call(bytes4(keccak256("fun(uint256)")), a);
 
-``call`` devuelve un booleano indicando si la función llamada terminó (``true``) o causó una excepción del EVM (``false``). No es posible acceder a los datos reales devueltos (para esto necesitaremos saber el tamaño de codificación en avance).
+``call`` devuelve un booleano indicando si la función llamada terminó (``true``) o causó una excepción del EVM (``false``). No es posible acceder a los datos reales devueltos (para esto necesitaremos saber de antemano el tamaño de codificación).
 
-En una forma similar, ``delegatecall`` puede ser usado: La diferencia es que solo el código de la dirección dada es usado, todo otros aspectos (almacenamiento, saldo, ...) salen del contrato actual. El propósito de ``delegatecall`` es usar el código de librería que está almacenado en otro contrato. El usuario tiene que asegurarse que el layout del almacenamiento en ambos contratos es correcto para usar delegatecall. Antes de homestead, sólo una versión limitada llamada ``callcode`` estaba disponible que no daba acceso a los valores ``msg.sender`` y ``msg.value`` originales.
+En una forma similar, ``delegatecall`` puede ser usado: la diferencia es que solo se usa el código de la dirección dada, todos los demás aspectos (almacenamiento, saldo, ...) salen directamente del contrato actual. El propósito de ``delegatecall`` es usar el código de librería que está almacenado en otro contrato. El usuario tiene que asegurarse de que el layout del almacenamiento en ambos contratos es correcto para usar ``delegatecall``. Antes de homestead, sólo una versión limitada llamada ``callcode`` estaba disponible pero no daba acceso a los valores ``msg.sender`` y ``msg.value`` originales.
 
-Las tres funciónes ``call``, ``delegatecall`` y ``callcode`` son funciónes de muy bajo nivel y deben usarse sólo como medida de último recurso ya que rompen la seguridad de tipo de Solidity.
+Las tres funciones ``call``, ``delegatecall`` y ``callcode`` son funciones de muy bajo nivel y deben usarse sólo como medida de último recurso ya que rompen la seguridad de tipo de Solidity.
 
-La opción ``.gas()`` está disponible en los 3 métodos, mientras la opción ``.value()`` no se admite para ``delegatecall``.
+La opción ``.gas()`` está disponible en los 3 métodos, mientras que la opción ``.value()`` no se admite para ``delegatecall``.
 
 .. note::
     Todos los contratos heredan los miembros de address, así que es posible consultar el saldo del contrato actual
     usando ``this.balance``.
 
 .. warning::
-    Todas estas funciónes son funciónes de bajo nivel y debe usarse con cuidado.
+    Todas estas funciones son funciones de bajo nivel y debe usarse con cuidado.
     Específicamente, cualquier contrato desconocido puede ser malicioso y si se le llama,
-    se le da el control a ese contrato que puede, luego llamar de vuelta a tu contrato,
+    se le da el control a ese contrato, que luego puede llamar de vuelta a tu contrato,
     así que prepárense para cambios a tus variables de estado cuando el llamado retorna.
 
 .. index:: byte array, bytes32
