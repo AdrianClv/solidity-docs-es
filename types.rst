@@ -7,7 +7,7 @@ Tipos
 *****
 
 Solidity es un lenguaje de tipado estático, que significa que cada tipo de
-variable (estado y local) tiene ser especificada (o al menos conocida -
+variable (estado y local) tiene que ser especificada (o al menos conocida -
 ver :ref:`type-deduction` abajo) en tiempo de compilación.
 Solidity proporciona varios tipos elementales que pueden ser combinados para
 crear tipos más complejos.
