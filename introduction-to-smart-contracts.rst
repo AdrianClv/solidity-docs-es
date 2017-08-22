@@ -281,7 +281,7 @@ Los contratos pueden incluso crear otros contratos usando un opcode especial (p.
 Auto-destrucción
 ================
 
-La única posibilidad de borrar el código de la blockchain es cuando un contrato en esa dirección realiza una operación de ``selfdestruct`. Los Ether restantes almacenados en esa dirección son enviados al destinatario designado y, entonces, se borran el almacenamiento y el código del estado.
+La única posibilidad de borrar el código de la blockchain es cuando un contrato en esa dirección realiza una operación de ``selfdestruct``. Los Ether restantes almacenados en esa dirección son enviados al destinatario designado y, entonces, se borran el almacenamiento y el código del estado.
 
 .. warning:: Aunque un contrato no contenga una llamada a ``selfdestruct``,
   todavía podría hacer esa operación mediante ``delegatecall`` o ``callcode``.
