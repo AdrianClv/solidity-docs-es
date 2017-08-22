@@ -248,7 +248,7 @@ El modificador ``timeTransitions`` gestiona las
 transiciones de etapas de forma automática en función
 del tiempo. Debe ser usado en todas las funciones.
 
-.. nota::
+.. note::
     **El orden de los modificadores importa**.
     Si atStage se combina
     con timesTransitions, asegúrate de que puedas
@@ -259,7 +259,7 @@ Finalmente, el modificador ``transitionNext`` puede
 ser usado para ir automáticamente a la próxima etapa
 cuando la función termine.
 
-.. nota::
+.. note::
     **El modificador puede ser omitido**.
     Esto sólo se aplica a Solidity antes de la versión
     0.4.0:
