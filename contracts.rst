@@ -61,14 +61,12 @@ Si un contrato quiere crear otros contrato, el creador del código fuente (y el 
 
     contract OwnedToken {
         // TokenCreator es un contrato que està definido más abajo. 
-        // No hay problema en referenciarlo, siempre y cuando no está 
-        // siendo utilizado para crear un contrato nuevo.
+        // No hay problema en referenciarlo, siempre y cuando no está siendo utilizado para crear un contrato nuevo.
         TokenCreator creator;
         address owner;
         bytes32 name;
 
-        // Esto es el constructor que registra el creador y el nombre 
-        // que se le ha asignado
+        // Esto es el constructor que registra el creador y el nombre que se le ha asignado
         function OwnedToken(bytes32 _name) {
             // Se accede a las variables de estado por su nombre
             // y no por ejemplo por this.owner. Eso también se aplica 
@@ -185,10 +183,10 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
     contract D {
         function readData() {
             C c = new C();
-            uint local = c.f(7); // error: el ???miembro (member) "f" no es visible
+            uint local = c.f(7); // error: el miembro "f" no es visible
             c.setData(3);
             local = c.getData();
-            local = c.compute(3, 5); // error: el ???miembro (member) "compute" no es visible
+            local = c.compute(3, 5); // error: el miembro "compute" no es visible
         }
     }
 
@@ -196,7 +194,7 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
     contract E is C {
         function g() {
             C c = new C();
-            uint val = compute(3, 5);  // acceso a un miembro interno ???(from derivated to parent contract)
+            uint val = compute(3, 5);  // acceso a un miembro con visibilidad interna (desde un contrato derivado a su contrato padre)
         }
     }
 
@@ -205,7 +203,7 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
 Funciones Getter
 ================
 
-El compilador crea automaticamente funciones getter para todas las variables de estado **publicas**. En el contrato que se muestra abajo, el compilador va a generar una función llamada ``data`` que no lee ningún argumento y devuelve un ``unint``, el valor de la variable de estado ``data``. La inicialización de las variables de estado se puede hacer en el momento de la declaración. 
+El compilador crea automaticamente funciones getter para todas las variables de estado **públicas**. En el contrato que se muestra abajo, el compilador va a generar una función llamada ``data`` que no lee ningún argumento y devuelve un ``unint``, el valor de la variable de estado ``data``. La inicialización de las variables de estado se puede hacer en el momento de la declaración. 
 
 ::
 
@@ -283,7 +281,7 @@ Se pueden usar los Modifiers para cambiar el comportamiento de las funciones de 
         
         // Este contrato solo define un Modifier pero lo usa – se va a utilizar en un contrato derivado.
         // El cuerpo de la función se incerta donde aparece el símbolo especial "_;" en la definición del Modifier.
-        // Esto significa que si el propietario llama a esta función, la función se ejecuta, pero en otros casos devolverá un error (???exception).
+        // Esto significa que si el propietario llama a esta función, la función se ejecuta, pero en otros casos devolverá una excepción.
         modifier onlyOwner {
             require(msg.sender == owner);
             _;
@@ -415,7 +413,7 @@ Además, esta función se ejecutará siempre y cuando el contrato sólo recibe E
 En particular, las siguientes operaciones consumirán más gas que  lo que se paga (???stipend) para una función fallback.
 In particular, the following operations will consume more gas than the stipend provided to a fallback function:
 
-- Escribir al ???(storage)
+- Escribir al almacén ???(storage)
 - Crear un contrato
 - Llamar a una función externa que consume una cantidad de gas significativa
 - Mandar Ether
@@ -423,7 +421,7 @@ In particular, the following operations will consume more gas than the stipend p
 Asegúrese por favor de testear su función fallback meticulosamente antes de desplegar el contrato para asegurarse de que su coste de ejecución es menor de 2300 gas.
 
 .. warning::
-Los contratos que reciben Ether directamente (sin una llamada a una función, p.ej usando ``send`` o ``transfer``) pero que no tienen definida una función fallback, van a devolver una excepción (???exception), devolviendo el Ether (nótese que esto era diferente antes de la versión v0.4.0 de Solidity). Por lo tanto, si desea que su contrato reciba Ether, tiene que implementar una función fallback.
+Los contratos que reciben Ether directamente (sin una llamada a una función, p.ej usando ``send`` o ``transfer``) pero que no tienen definida una función fallback, van a devolver una excepción, devolviendo el Ether (nótese que esto era diferente antes de la versión v0.4.0 de Solidity). Por lo tanto, si desea que su contrato reciba Ether, tiene que implementar una función fallback.
 
 ::
 
@@ -630,10 +628,10 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
     contract D {
         function readData() {
             C c = new C();
-            uint local = c.f(7); // error: el ???miembro (member) "f" no es visible
+            uint local = c.f(7); // error: el miembro "f" no es visible
             c.setData(3);
             local = c.getData();
-            local = c.compute(3, 5); // error: el ???miembro (member) "compute" no es visible
+            local = c.compute(3, 5); // error: el miembro "compute" no es visible
         }
     }
 
@@ -641,7 +639,7 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
     contract E is C {
         function g() {
             C c = new C();
-            uint val = compute(3, 5);  // acceso a un miembro interno ???(from derivated to parent contract)
+            uint val = compute(3, 5);  // acceso a un miembro interno (desde un contrato derivado a su contrato padre)
         }
     }
 
@@ -650,7 +648,7 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
 Funciones Getter
 ================
 
-El compilador crea automáticamente funciones getter para todas las variables de estado **publicas**. En el contrato que se muestra abajo, el compilador va a generar una función llamada ``data`` que no lee ningún argumento y devuelve un ``unint``, el valor de la variable de estado ``data``. La inicialización de las variables de estado se puede hacer en el momento de la declaración. 
+El compilador crea automáticamente funciones getter para todas las variables de estado **públicas**. En el contrato que se muestra abajo, el compilador va a generar una función llamada ``data`` que no lee ningún argumento y devuelve un ``unint``, el valor de la variable de estado ``data``. La inicialización de las variables de estado se puede hacer en el momento de la declaración. 
 
 ::
 
@@ -728,7 +726,7 @@ Se pueden usar los Modifiers para cambiar el comportamiento de las funciones de 
         
         // Este contrato solo define un Modifier pero lo usa – se va a utilizar en un contrato derivado.
         // El cuerpo de la función se inserta donde aparece el símbolo especial "_;" en la definición del Modifier.
-        // Esto significa que si el propietario llama a esta función, la función se ejecuta, pero en otros casos devolverá un error (???exception).
+        // Esto significa que si el propietario llama a esta función, la función se ejecuta, pero en otros casos devolverá una excepción.
         modifier onlyOwner {
             require(msg.sender == owner);
             _;
