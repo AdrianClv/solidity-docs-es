@@ -86,7 +86,7 @@ Layout de Call Data
 *******************
 
 Cuando un contrato Solidity es despliegado y cuando es llamado de un
-account, el data de input se asume que está en el formato de la
+account, el data de entrada se asume que está en el formato de la
 `espcificación ABI <https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI>`_.
 La especificación ABI requiere que los argumentos sean acolchados a
 multiples de 32 bytes. Las llamadas de función internas usan otra convención.
@@ -114,7 +114,7 @@ una instrucción ``JUMPI``, no limpiamos los valores booleanos antes que sean ut
 como condición para ``JUMPI``.
 
 Además de este principio de diseño, el compilador Solidity
-limpia los datos de input cuando está cargado en el stack.
+limpia los datos de entrada cuando está cargado en el stack.
 
 Diferentes tipos tienen diferentes reglas para limpiar valores inválidos:
 
@@ -147,7 +147,9 @@ Diferentes tipos tienen diferentes reglas para limpiar valores inválidos:
 Internos - El optimizador
 *************************
 
-The Solidity optimizer operates on assembly, so it can be and also is used by other languages. It splits the sequence of instructions into basic blocks at JUMPs and JUMPDESTs. Inside these blocks, the instructions are analysed and every modification to the stack, to memory or storage is recorded as an expression which consists of an instruction and a list of arguments which are essentially pointers to other expressions. The main idea is now to find expressions that are always equal (on every input) and combine them into an expression class. The optimizer first tries to find each new expression in a list of already known expressions. If this does not work, the expression is simplified according to rules like ``constant + constant = sum_of_constants`` or ``X * 1 = X``. Since this is done recursively, we can also apply the latter rule if the second factor is a more complex expression where we know that it will always evaluate to one. Modifications to storage and memory locations have to erase knowledge about storage and memory locations which are not known to be different: If we first write to location x and then to location y and both are input variables, the second could overwrite the first, so we actually do not know what is stored at x after we wrote to y. On the other hand, if a simplification of the expression x - y evaluates to a non-zero constant, we know that we can keep our knowledge about what is stored at x.
+El optimizador solidity funciona con assembly, así que puede y es usado con otros idiomas. Divide la secuencia de las instrucciones en bloques básicos de JUMPs y JUMPDESTs. Dentro de estos bloques, las instrucciones son analizadas y cada modificación al stack, a la memoria o al almacenamiento son guardadas como una expresión que consiste en una instrucción y una lista de argumentos que son esencialmente apuntadores a otras expresiones. La idea principal es encontrar expreciones que sean siempre iguales (en todo entradas) y combinatlas a una classe de expression. El optimizador primero intenta encontrar una nueva expresión en una lista de expresiones conocidas. Si esto no funciona, la expresión es simplificada de acuerdo a reglas como ``constante + constante = suma_de_constantes`` o ``X * 1 = X``. Ya que esto es hecho recursivamente, también podemos aplicar la última regla si el segundo factor es más una expresión más compleja donde sabemos que siempre evaluará a uno. Modificaciones al almacenamiento y ubicaciones de memoria tienen que borrar el conocimiento de almacenamiento y ubicaciones de memoriaque no son conocidas como diferentes: Si primero escribimos a ubicación `x` y luego a ubicación `y` y ambas son variables de entrada, la segunda puede sobre escribir la primera, entonces no sabemos realmente lo que es almacenadoen `x` después de escribir a `y`. Por otro lado, si una simplificación de la expresión `x -y` evalúa a una constante no cero, sabemos que podemos mantener nuestro conocimiento de lo que es almacenado en x.
+
+En el fin de este proceso, sabemos cuales expresiones tienen que estar en el stack en el fin y tienen una lista de modificaciones a la memoria y almacenamiento. Esta información es almacenada junta con los bloques básicos y es usada para unirlas. Además, información sobre el stack, almacenamiento y configuración de memoria es enviada al (los) próximo(s) bloque(s). Si sabemos los objetivos de cada una de las instrucciones JUMP y JUMPI, podemos construir un gráfico de flujo completo del programa. Si sólo hay un objetivo que no conocemos (esto puede pasar ya que en principio, los objetivos de jumps pueden ser computados de las entradas), tenemos que borrar toda información sobre los estados de entrada
 
 At the end of this process, we know which expressions have to be on the stack in the end and have a list of modifications to memory and storage. This information is stored together with the basic blocks and is used to link them. Furthermore, knowledge about the stack, storage and memory configuration is forwarded to the next block(s). If we know the targets of all JUMP and JUMPI instructions, we can build a complete control flow graph of the program. If there is only one target we do not know (this can happen as in principle, jump targets can be computed from inputs), we have to erase all knowledge about the input state of a block as it can be the target of the unknown JUMP. If a JUMPI is found whose condition evaluates to a constant, it is transformed to an unconditional jump.
 
