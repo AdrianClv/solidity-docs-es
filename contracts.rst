@@ -700,18 +700,11 @@ Una es directamente en la lista de herencias (``is Base(7)``). La otra es en la 
 
 .. index:: ! herencia;multiple, ! linearizacion, ! linearizacion C3
 
-Multiple Inheritance and Linearization
-======================================
+Herencia Múltiple Inheritance y Linearización
+=============================================
 
-Languages that allow multiple inheritance have to deal with
-several problems.  One is the `Diamond Problem <https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem>`_.
-Solidity follows the path of Python and uses "`C3 Linearization <https://en.wikipedia.org/wiki/C3_linearization>`_"
-to force a specific order in the DAG of base classes. This
-results in the desirable property of monotonicity but
-disallows some inheritance graphs. Especially, the order in
-which the base classes are given in the ``is`` directive is
-important. In the following code, Solidity will give the
-error "Linearization of inheritance graph impossible".
+Los lenguajes que permiten herencias múltiples tienen que lidiar con varios problemas. Uno es el `Problema del Diamante <https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem>`_.
+Solidity le sigue la pista a Python y utiliza la "`Linearización C3 <https://en.wikipedia.org/wiki/C3_linearization>`_" para forzar un orden específico en el DAG de las clases base. Esto hace que se consigue la propiedad deseada de ???monotonicidad pero impide algunos gráficos de herencia. El orden en el que las clases base se van dando con la instrucción ``is``  es especialmente importante. En el siguiente código, Solidity dará el error "Linearization of inheritance graph impossible".
 
 ::
 
@@ -721,13 +714,9 @@ error "Linearization of inheritance graph impossible".
     contract A is X {}
     contract C is A, X {}
 
-The reason for this is that ``C`` requests ``X`` to override ``A``
-(by specifying ``A, X`` in this order), but ``A`` itself
-requests to override ``X``, which is a contradiction that
-cannot be resolved.
+La razón de este error es que ``C`` requiere ``X`` para invalidar ``A`` (especificando ``A, X`` en este orden), pero ``A`` mismo requiere ??? para invalidar ``X``, lo que presenta una contradicción que no puede resolverse.
 
-A simple rule to remember is to specify the base classes in
-the order from "most base-like" to "most derived".
+Una regla simple para recordar es de especificar las clases base en el orden desde "la más base" hasta "la más derivada".
 
 Inheriting Different Kinds of Members of the Same Name
 ======================================================
