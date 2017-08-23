@@ -679,8 +679,9 @@ Si ``Base1`` llama a una función de ``super``, no simplemente llama a esta func
 Argumentos para Constructores Base
 ==================================
 
-Derived contracts need to provide all arguments needed for
-the base constructors. This can be done in two ways::
+Se requiere que los contratos derivados proporcionen todos los argumentos necesarios para los constructores base. Esto se puede hacer de dos maneras.
+
+::
 
     pragma solidity ^0.4.0;
 
@@ -695,17 +696,9 @@ the base constructors. This can be done in two ways::
         }
     }
 
-One way is directly in the inheritance list (``is Base(7)``).  The other is in
-the way a modifier would be invoked as part of the header of
-the derived constructor (``Base(_y * _y)``). The first way to
-do it is more convenient if the constructor argument is a
-constant and defines the behaviour of the contract or
-describes it. The second way has to be used if the
-constructor arguments of the base depend on those of the
-derived contract. If, as in this silly example, both places
-are used, the modifier-style argument takes precedence.
+Una es directamente en la lista de herencias (``is Base(7)``). La otra es en la misma linea en que un modificador se invoca como parte de la cabecera de un constructor derivado (``Base(_y * _y)``). La primera manera es más conveniente si el argumento del constructor es una constante y define el comportamiento del contrato o por lo menos lo describe. La segunda manera se tiene que usar si los argumentos del constructor de la base dependen de los argumentos del contrato derivado. Si, como en este ejemplo sencillo, ambos sitios están utilizados, el argumento ??? tiene la prioridad.
 
-.. index:: ! inheritance;multiple, ! linearization, ! C3 linearization
+.. index:: ! herencia;multiple, ! linearizacion, ! linearizacion C3
 
 Multiple Inheritance and Linearization
 ======================================
