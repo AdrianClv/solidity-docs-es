@@ -263,15 +263,15 @@ Nos va a generar una función de la siguiente forma:
 
 Notese que se ha omitido el mapeo en el struct porque no hay una buena manera de dar la clave para hacer el mapeo.
 
-.. index:: ! funcion;modifier
+.. index:: ! funcion;modificador
 
 .. _modifiers:
 
-*******************
-Funciones Modifiers
-*******************
+***********************
+Funciones Modificadores
+***********************
 
-Se pueden usar los Modifiers para cambiar el comportamiento de las funciones de una manera ágil. Por ejemplo, los Modifiers son capaces de comprobar automáticamente una condición antes de ejecutar una función. Los Modifiers son propiedades heredables de los contratos y pueden ser sobrescritos por contratos derivados.
+Se pueden usar los modificadores para cambiar el comportamiento de las funciones de una manera ágil. Por ejemplo, los modificadores son capaces de comprobar automáticamente una condición antes de ejecutar una función. Los modificadores son propiedades heredables de los contratos y pueden ser sobrescritos por contratos derivados.
 
 ::
 
@@ -281,8 +281,8 @@ Se pueden usar los Modifiers para cambiar el comportamiento de las funciones de 
         function owned() { owner = msg.sender; }
         address owner;
         
-        // Este contrato solo define un Modifier pero lo usa – se va a utilizar en un contrato derivado.
-        // El cuerpo de la función se inserta donde aparece el símbolo especial "_;" en la definición del Modifier.
+        // Este contrato solo define un modificador pero lo usa – se va a utilizar en un contrato derivado.
+        // El cuerpo de la función se inserta donde aparece el símbolo especial "_;" en la definición del modificador.
         // Esto significa que si el propietario llama a esta función, la función se ejecuta, pero en otros casos devolverá una excepción.
         modifier onlyOwner {
             require(msg.sender == owner);
@@ -292,7 +292,7 @@ Se pueden usar los Modifiers para cambiar el comportamiento de las funciones de 
 
 
     contract mortal is owned {
-        // Este contrato hereda del Modifier "onlyOwner" desde "owned" y lo aplica a la función "close", lo que tiene como efecto que las llamadas a "close" solamente tienen efecto si las hacen el propietario registrado.
+        // Este contrato hereda del modificador "onlyOwner" desde "owned" y lo aplica a la función "close", lo que tiene como efecto que las llamadas a "close" solamente tienen efecto si las hacen el propietario registrado.
         function close() onlyOwner {
             selfdestruct(owner);
         }
@@ -300,7 +300,7 @@ Se pueden usar los Modifiers para cambiar el comportamiento de las funciones de 
 
 
     contract priced {
-        // Los Modifiers pueden recibir argumentos:
+        // Los modificadores pueden recibir argumentos:
         modifier costs(uint price) {
             if (msg.value >= price) {
                 _;
@@ -335,7 +335,7 @@ Se pueden usar los Modifiers para cambiar el comportamiento de las funciones de 
         }
 
         /// Esta función está protegida por un mutex, lo que significa que llamadas reentrantes desde dentro del msg.sender.call no pueden llamar a f de nuevo.
-        /// La declaración `return 7` asigna 7 al valor devuelto, pero aún así ejecuta la declaración `locked = false` en el Modifier.
+        /// La declaración `return 7` asigna 7 al valor devuelto, pero aún así ejecuta la declaración `locked = false` en el modificador.
         function f() noReentrancy returns (uint) {
             require(msg.sender.call());
             return 7;
@@ -345,11 +345,11 @@ Se pueden usar los Modifiers para cambiar el comportamiento de las funciones de 
 Múltiples Modifiers pueden ser aplicados a una misma función especificándolos en una lista separada por espacios en blanco. Serán evaluados en el orden presentado en la lista.
 
 .. warning::
-    En una versión anterior de Solidity, declaraciones del tipo ``return`` dentro de funciones que contienen Modifiers se comportaban de otra manera. 
+	En una versión anterior de Solidity, declaraciones del tipo ``return`` dentro de funciones que contienen modificadores se comportaban de otra manera. 
 
-Lo que se devuelve explícitamente de un Modifier o del cuerpo de una función solo sale del Modifier actual o del cuerpo de la función actual. Las variables que se devuelven están asignadas y el control de flujo continúa después del "_" en el Modifier que precede.
+	Lo que se devuelve explícitamente de un Modifier o del cuerpo de una función solo sale del modificador actual o del cuerpo de la función actual. Las variables que se devuelven están asignadas y el control de flujo continúa después del "_" en el Modifier que precede.
 
-Se aceptan expresiones arbitrarias para los argumentos del Modifier y en ese contexto, todos los símbolos visibles desde la función son visibles en el Modifier. Símbolos introducidos en el Modifier no son visibles en la función (ya que pueden cambiar por sobreescritura).
+	Se aceptan expresiones arbitrarias para los argumentos del modificador y en ese contexto, todos los símbolos visibles desde la función son visibles en el modificador. Símbolos introducidos en el modificador no son visibles en la función (ya que pueden cambiar por sobreescritura).
 
 .. index:: ! constante
 
@@ -398,7 +398,7 @@ En el caso en que un función se declare como constante, promete no modificar el
   Los métodos getter están marcados como constantes. 
 
 .. warning::
-  El compilador todavía no impone que un método constante no modifica el estado.
+	El compilador todavía no impone que un método constante no modifica el estado.
 
 .. index:: ! funcion fallback, funcion;fallback
 
@@ -423,7 +423,7 @@ In particular, the following operations will consume more gas than the stipend p
 Asegúrese por favor de testear su función fallback meticulosamente antes de desplegar el contrato para asegurarse de que su coste de ejecución es menor de 2300 gas.
 
 .. warning::
-Los contratos que reciben Ether directamente (sin una llamada a una función, p.ej usando ``send`` o ``transfer``) pero que no tienen definida una función fallback, van a devolver una excepción (???exception), devolviendo el Ether (nótese que esto era diferente antes de la versión v0.4.0 de Solidity). Por lo tanto, si desea que su contrato reciba Ether, tiene que implementar una función fallback.
+	Los contratos que reciben Ether directamente (sin una llamada a una función, p.ej usando ``send`` o ``transfer``) pero que no tienen definida una función fallback, van a devolver una excepción (???exception), devolviendo el Ether (nótese que esto era diferente antes de la versión v0.4.0 de Solidity). Por lo tanto, si desea que su contrato reciba Ether, tiene que implementar una función fallback.
 
 ::
 
