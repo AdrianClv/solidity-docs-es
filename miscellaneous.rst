@@ -149,13 +149,11 @@ Internos - El optimizador
 
 El optimizador solidity funciona con assembly, así que puede y es usado con otros idiomas. Divide la secuencia de las instrucciones en bloques básicos de JUMPs y JUMPDESTs. Dentro de estos bloques, las instrucciones son analizadas y cada modificación al stack, a la memoria o al almacenamiento son guardadas como una expresión que consiste en una instrucción y una lista de argumentos que son esencialmente apuntadores a otras expresiones. La idea principal es encontrar expreciones que sean siempre iguales (en todo entradas) y combinatlas a una classe de expression. El optimizador primero intenta encontrar una nueva expresión en una lista de expresiones conocidas. Si esto no funciona, la expresión es simplificada de acuerdo a reglas como ``constante + constante = suma_de_constantes`` o ``X * 1 = X``. Ya que esto es hecho recursivamente, también podemos aplicar la última regla si el segundo factor es más una expresión más compleja donde sabemos que siempre evaluará a uno. Modificaciones al almacenamiento y ubicaciones de memoria tienen que borrar el conocimiento de almacenamiento y ubicaciones de memoriaque no son conocidas como diferentes: Si primero escribimos a ubicación `x` y luego a ubicación `y` y ambas son variables de entrada, la segunda puede sobre escribir la primera, entonces no sabemos realmente lo que es almacenadoen `x` después de escribir a `y`. Por otro lado, si una simplificación de la expresión `x -y` evalúa a una constante no cero, sabemos que podemos mantener nuestro conocimiento de lo que es almacenado en x.
 
-En el fin de este proceso, sabemos cuales expresiones tienen que estar en el stack en el fin y tienen una lista de modificaciones a la memoria y almacenamiento. Esta información es almacenada junta con los bloques básicos y es usada para unirlas. Además, información sobre el stack, almacenamiento y configuración de memoria es enviada al (los) próximo(s) bloque(s). Si sabemos los objetivos de cada una de las instrucciones JUMP y JUMPI, podemos construir un gráfico de flujo completo del programa. Si sólo hay un objetivo que no conocemos (esto puede pasar ya que en principio, los objetivos de jumps pueden ser computados de las entradas), tenemos que borrar toda información sobre los estados de entrada
+En el fin de este proceso, sabemos cuales expresiones tienen que estar en el stack en el fin y tienen una lista de modificaciones a la memoria y almacenamiento. Esta información es almacenada junta con los bloques básicos y es usada para unirlas. Además, información sobre el stack, almacenamiento y configuración de memoria es enviada al (los) próximo(s) bloque(s). Si sabemos los objetivos de cada una de las instrucciones JUMP y JUMPI, podemos construir un gráfico de flujo completo del programa. Si hay un sólo objetivo que no conocemos (esto puede pasar ya que en principio, los objetivos de jumps pueden ser computados de las entradas), tenemos que borrar toda información sobre los estados de entrada de un bloque ya que puede ser el objetivo de del JUMP desconocido. Si un JUMPI es encontrado que la condición evalúa a una constante, es transformada en un jump incondicional.
 
-At the end of this process, we know which expressions have to be on the stack in the end and have a list of modifications to memory and storage. This information is stored together with the basic blocks and is used to link them. Furthermore, knowledge about the stack, storage and memory configuration is forwarded to the next block(s). If we know the targets of all JUMP and JUMPI instructions, we can build a complete control flow graph of the program. If there is only one target we do not know (this can happen as in principle, jump targets can be computed from inputs), we have to erase all knowledge about the input state of a block as it can be the target of the unknown JUMP. If a JUMPI is found whose condition evaluates to a constant, it is transformed to an unconditional jump.
+Como en el último paso, el código en cada bloque es completamente regenerado. Un gráfico de dependencias es creado de la expresión en el stack en el fin del bloque y cada operación que no es parte de este gráfico es esencialmente olvidado. Ahora código es generado que aplica las modificaciones a la memoria y al almacenamiento en el orden que fueron hechas en el código original (olvidandon modificaciones que fueron encontradas innecesarias) y finalmente, genera todos valores que son requeridos para estar en el stack en el lugar correcto.
 
-As the last step, the code in each block is completely re-generated. A dependency graph is created from the expressions on the stack at the end of the block and every operation that is not part of this graph is essentially dropped. Now code is generated that applies the modifications to memory and storage in the order they were made in the original code (dropping modifications which were found not to be needed) and finally, generates all values that are required to be on the stack in the correct place.
-
-These steps are applied to each basic block and the newly generated code is used as replacement if it is smaller. If a basic block is split at a JUMPI and during the analysis, the condition evaluates to a constant, the JUMPI is replaced depending on the value of the constant, and thus code like
+Estos pasos son aplicados a cada bloque básico y el código nuevo es usado remplazando si es que es más pequeño. Si un bloque básico es dividido en un JUMPI y durante el análisis, la condición evalúa a una constante el JUMPI es reemplazado dependiendo de la valor de la constante, y por lo tanto código como
 
 ::
 
@@ -166,14 +164,14 @@ These steps are applied to each basic block and the newly generated code is used
     else
       return 1;
 
-is simplified to code which can also be compiled from
+es simplificado a código que también puede ser compilado de
 
 ::
 
     data[7] = 9;
     return 1;
 
-even though the instructions contained a jump in the beginning.
+aunque las instrucciones contenían un jump en el inicio.
 
 .. index:: source mappings
 
