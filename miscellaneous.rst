@@ -63,58 +63,57 @@ La posición de ``data[4][9].b`` está en ``keccak256(uint256(9) . keccak256(uin
 
 .. index: memory layout
 
-****************
-Layout in Memory
-****************
+*****************
+Layout en Memoria
+*****************
 
-Solidity reserves three 256-bit slots:
+Solidity reserva tres slots de 256-bits:
 
--  0 - 64: scratch space for hashing methods
-- 64 - 96: currently allocated memory size (aka. free memory pointer)
+- 0 - 64: espacio de scratch para métodos de hash
+- 64 - 96: tamaño de memoria actualmente asignada (también conocida como free memory pointer)
 
-Scratch space can be used between statements (ie. within inline assembly).
+El espacio de scratch puede ser usado entre declaraciones (ej. dento de inline assembly).
 
-Solidity always places new objects at the free memory pointer and memory is never freed (this might change in the future).
+Solidity siempre emplaza los nuevos objetos en el puntero de memoria libre y la memoria nunca es liberada (esto puede cambiar en el futuro).
 
 .. warning::
-  There are some operations in Solidity that need a temporary memory area larger than 64 bytes and therefore will not fit into the scratch space. They will be placed where the free memory points to, but given their short lifecycle, the pointer is not updated. The memory may or may not be zeroed out. Because of this, one shouldn't expect the free memory to be zeroed out.
-
+  Hay algunas operaciones en SOlidity que necesitan un área temporal de memoria mas grande que 64 bytes y por lo tanto no caben en el espacio scratch. Ellos serán emplazados donde apunta la memoria libre, pero dado su corta vida, el apuntador no es actualizado. La memoria puede o no ser puesta a cero. Por esto, uno no debiera esperar que la memoria libre sea puesta a cero.
 
 .. index: calldata layout
 
 *******************
-Layout of Call Data
+Layout de Call Data
 *******************
 
-When a Solidity contract is deployed and when it is called from an
-account, the input data is assumed to be in the format in `the ABI
-specification
-<https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI>`_.  The
-ABI specification requires arguments to be padded to multiples of 32
-bytes.  The internal function calls use a different convention.
-
+Cuando un contrato Solidity es despliegado y cuando es llamado de un
+account, el data de input se asume que está en el formato de la
+`espcificación ABI <https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI>`_.
+La especificación ABI requiere que los argumentos sean acolchados a
+multiples de 32 bytes. Las llamadas de función internas usan otra convención.
 
 .. index: variable cleanup
 
-*********************************
-Internals - Cleaning Up Variables
-*********************************
+******************************
+Internas - Limpiando Variables
+******************************
 
-When a value is shorter than 256-bit, in some cases the remaining bits
-must be cleaned.
-The Solidity compiler is designed to clean such remaining bits before any operations
-that might be adversely affected by the potential garbage in the remaining bits.
-For example, before writing a value to the memory, the remaining bits need
-to be cleared because the memory contents can be used for computing
-hashes or sent as the data of a message call.  Similarly, before
-storing a value in the storage, the remaining bits need to be cleaned
-because otherwise the garbled value can be observed.
+Cuando un valor es mas corto que 256-bit, en algunos casos los bits
+restantes tienen que ser limpiados.
+El compilador Solidity es diseñado para limpiar estos bits restantes antes
+de cualquier operación que pueda ser afectada adversamente por la potencial
+basura en los bits restantes.
+Por ejemplo, antes de escribir un valor a la memoria los bits restantes tienen
+que ser limpiados porque los contenidos de la memoria pueden ser usados para
+computar hashes o enviados como data de un llamado de mensaje. De manera similar,
+antes de almacenar un valor en el almacenamiento, los bits restantes tienen
+que ser limpiados porque si no el valor ilegible puede ser observado.
 
-On the other hand, we do not clean the bits if the immediately
-following operation is not affected.  For instance, since any non-zero
-value is considered ``true`` by ``JUMPI`` instruction, we do not clean
-the boolean values before they are used as the condition for
-``JUMPI``.
+Por otro lado, no limpiamos los bits si la operación siguiente no es afectada.
+Por ejemplo, ya que cualquier valor no-cero es considerado ``true`` por
+una instrucción ``JUMPI``, no limpiamos los valores booleanos antes que sean utiliziados
+como condición para ``JUMPI``.
+
+
 
 In addition to the design principle above, the Solidity compiler
 cleans input data when it is loaded onto the stack.
