@@ -113,38 +113,38 @@ Por ejemplo, ya que cualquier valor no-cero es considerado ``true`` por
 una instrucción ``JUMPI``, no limpiamos los valores booleanos antes que sean utiliziados
 como condición para ``JUMPI``.
 
+Además de este principio de diseño, el compilador Solidity
+limpia los datos de input cuando está cargado en el stack.
 
+Diferentes tipos tienen diferentes reglas para limpiar valores inválidos:
 
-In addition to the design principle above, the Solidity compiler
-cleans input data when it is loaded onto the stack.
-
-Different types have different rules for cleaning up invalid values:
-
-+---------------+---------------+-------------------+
-|Type           |Valid Values   |Invalid Values Mean|
-+===============+===============+===================+
-|enum of n      |0 until n - 1  |exception          |
-|members        |               |                   |
-+---------------+---------------+-------------------+
-|bool           |0 or 1         |1                  |
-+---------------+---------------+-------------------+
-|signed integers|sign-extended  |currently silently |
-|               |word           |wraps; in the      |
-|               |               |future exceptions  |
-|               |               |will be thrown     |
++---------------+---------------+--------------------+
+|Tipo           |Valores válidos|Val. inv. significan|
++===============+===============+====================+
+|enum de n      |0 hasta n - 1  |excepción          |
+|miembros       |               |                   |
++---------------+---------------+--------------------+
+|bool           |0 o  1         |1                  |
++---------------+---------------+--------------------+
+|enteros con    |palabra        |por ahora envuelve |
+|signo          |extendida por  |silenciosamente;   |
+|               |signo          |en el futuro esto  |
+|               |               |arrojará           |
+|               |               |excepciones        |
 |               |               |                   |
-|               |               |                   |
-+---------------+---------------+-------------------+
-|unsigned       |higher bits    |currently silently |
-|integers       |zeroed         |wraps; in the      |
-|               |               |future exceptions  |
-|               |               |will be thrown     |
-+---------------+---------------+-------------------+
++---------------+---------------+--------------------+
+|enteros        |altos bits     |por ahora envuelve |
+|sin signos     |zeroed         |silenciosamente;   |
+|               |               |en el futuro esto  |
+|               |               |arrojará           |
+|               |               |excepciones        |
++---------------+---------------+--------------------+
+
 
 .. index:: optimizer, common subexpression elimination, constant propagation
 
 *************************
-Internals - The Optimizer
+Internos - El optimizador
 *************************
 
 The Solidity optimizer operates on assembly, so it can be and also is used by other languages. It splits the sequence of instructions into basic blocks at JUMPs and JUMPDESTs. Inside these blocks, the instructions are analysed and every modification to the stack, to memory or storage is recorded as an expression which consists of an instruction and a list of arguments which are essentially pointers to other expressions. The main idea is now to find expressions that are always equal (on every input) and combine them into an expression class. The optimizer first tries to find each new expression in a list of already known expressions. If this does not work, the expression is simplified according to rules like ``constant + constant = sum_of_constants`` or ``X * 1 = X``. Since this is done recursively, we can also apply the latter rule if the second factor is a more complex expression where we know that it will always evaluate to one. Modifications to storage and memory locations have to erase knowledge about storage and memory locations which are not known to be different: If we first write to location x and then to location y and both are input variables, the second could overwrite the first, so we actually do not know what is stored at x after we wrote to y. On the other hand, if a simplification of the expression x - y evaluates to a non-zero constant, we know that we can keep our knowledge about what is stored at x.
