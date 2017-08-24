@@ -1,60 +1,58 @@
 .. _security_considerations:
 
-#######################
-Consideraciones de Seguridad
-#######################
+############################
+Consideraciones de seguridad
+############################
 
-Aunque en general es bastante fácil de hacer software que funciona como esperamos,
-es mucho más difícil de chequear que nadie lo puede usar de alguna forma que **no**
+Aunque en general es bastante fácil hacer software que funcione como esperamos,
+es mucho más difícil de chequear que nadie lo pueda usar de alguna forma que **no**
 fue anticipada.
 
 En solidity, esto es aún más importante ya que se pueden usar los contratos
 inteligentes para mover tokens, o posiblemente, cosas aún más valiosas. Además,
-cada ejecución de un contrato inteligente ocurre en público y, a ello se suma
+cada ejecución de un contrato inteligente es pública, y a ello se suma
 que el código fuente muchas veces está disponible.
 
-Por supuesto siempre se tiene que considerar lo que está en juego:
+Por supuesto, siempre se tiene que considerar lo que está en juego:
 Puedes comparar un contrato inteligente con un servicio web que está abierto
-al público (y por lo tanto, a malos intencionados también) y quizá
+al público (y por lo tanto, también a gente malintencionada) y quizá
 de código abierto.
-Si solo se guarda la lista de compras en ese servicio web, puede que no tengas
+Si sólo se guarda la lista de compras en ese servicio web, puede que no tengas
 que tener mucho cuidado, pero si accedes a tu cuenta bancaria usando ese servicio,
 deberíás tener más cuidado.
 
-
 Esta sección nombrará algunos errores comunes y recomendaciones de seguridad
 generales pero no puede, por supuesto, ser una lista completa. Además, recordar
-que incluso si tu contrato inteligente está libre de errores (bug-free), el compilador
-o la plataforma puede que tenga uno. Una lista de errores de seguridad públicamente
+que incluso si tu contrato inteligente está libre de errores, el compilador
+o la plataforma puede que los tenga. Una lista de errores de seguridad públicamente
 conocidos del compilador puede encontrarse en: :ref:`lista de errores conocidos<known_bugs>`,
-la lista también es legible por máquina (machine-readable). Nótese que hay una recompensa
-por errores (bug-bounty) que cubre el generador de código del compilador de Solidity.
+la lista también es legible por máquina. Nótese que hay una recompensa
+por encontrar errores (bug-bounty) que cubre el generador de código del compilador de Solidity.
 
-Como siempre es el caso con documentación de código abierto, por favor ayúdanos a extender
-esta sección, especialmente con algunos ejemplos!
+Como siempre ocurre con la documentación de código abierto, por favor, ayúdanos a extender
+esta sección, ¡especialmente con algunos ejemplos!
 
 
 ***************
 Errores Comunes
 ***************
 
-Información Privada y Aleatoriedad
+Información privada y aleatoriedad
 ==================================
 
 Todo lo que usas en un contrato inteligente es públicamente visible, incluso
 variables locales y variables de estado marcadas como ``private``.
 
-Usando números aleatorios en contratos inteligentes es bastante difícil si no
+Es bastante complejo usar números aleatorios en contratos inteligentes si no
 quieres que los mineros puedan hacer trampa.
 
-
-Reingreso (Re-entry)
-====================
+Reentrada
+=========
 
 Cualquier interacción desde un contrato (A) con otro contrato (B) y cualquier
-transferencia de Ether le da el control a ese contrato (B). Esto hace posible
+transferencia de Ether, le da el control a ese contrato (B). Esto hace posible
 que B vuelva a llamar a A antes de terminar la interacción. Para dar un ejemplo,
-el siguiente código contiene un error (esto es solo un snippet y no un contrato
+el siguiente código contiene un error (esto es sólo un snippet y no un contrato
 completo):
 
 ::
@@ -63,22 +61,22 @@ completo):
 
   // ESTE CONTRATO CONTIENE UN ERROR - NO USAR
   contract Fund {
-      /// Mapping de shares de ether del contrato.
+      /// Mapping de distribución de ether del contrato.
       mapping(address => uint) shares;
-      /// Retira tu share.
+      /// Retira tu parte.
       function withdraw() {
           if (msg.sender.send(shares[msg.sender]))
               shares[msg.sender] = 0;
       }
   }
 
-El problema aquí no es tan grave por los límites del gas como parte
-de ``send``, pero aun así, expone una debilidad: transferencia de Ether
-siempre incluye ejecución de código, así que el recipiente puede ser un
-contrato que vuelve a llamar ``withdraw``. Esto lo permitiría obtener
-múltiples devoluciones y por lo tanto vaciar el Ether del contrato.
+El problema aquí no es tan grave por el límite de gas de la función
+``send``, pero aun así, expone una debilidad: una transferencia de Ether
+siempre incluye ejecución de código, así que el receptor puede ser un
+contrato que vuelve a llamar a ``withdraw``. Esto le permitiría obtener
+múltiples devoluciones, y por lo tanto, vaciar el Ether del contrato.
 
-Para evitar reingresos, puedes usar el orden Checks-Effects-Interactions
+Para evitar reentradas, puedes usar el orden Comprobaciones-Consecuencias-Interacciones
 como detallamos aquí:
 
 ::
@@ -86,9 +84,9 @@ como detallamos aquí:
   pragma solidity ^0.4.11;
 
   contract Fund {
-      /// Mapping de shares de ether del contrato.
+      /// Mapping de distribución de ether del contrato.
       mapping(address => uint) shares;
-      /// Retira tu share.
+      /// Retira tu parte.
       function withdraw() {
           var share = shares[msg.sender];
           shares[msg.sender] = 0;
@@ -96,52 +94,50 @@ como detallamos aquí:
       }
   }
 
-Nótese que los reingresos no solo son un riesgo de transferencia de Ether, pero
+Nótese que las reentradas no sólo son un riesgo al transferir Ether, sino
 de cualquier ejecución de una función de otro contrato. Además, también tienes que
 considerar situaciones de multi-contrato. Un contrato ejecutado podría modificar el
 estado de otro contrato del cual dependes.
 
-Límite de Gas y Bucles (Loops)
-==============================
+Límite de gas y bucles
+======================
 
 Los bucles que no tienen un número fijo de iteraciones, por ejemplo, bucles que dependen de valores de almacenamiento, tienen que
 usarse con cuidado:
-Dado al límite de gas del bloque, las transacciones pueden sólamente consumir una cierta cantidad de gas. Ya sea explícitamente,
-o por una operación normal, el número de iteraciones en un loop puede crecer más allá del límite de gas que puede causar el
-contrato completo a detenerse a un cierto punto. Esto no se aplica a funciones ``constant`` que son solo llamadas para
-leer data de la blockchain. Pero aun así, estas funciones pueden ser llamadas por otros contratos como parte de operaciones
-en la cadena (on-chain) y detenerlas a ellas. Por favor ser explícito con estos casos en la documentación de tus contratos.
+Dado el límite de gas del bloque, las transacciones sólo pueden consumir una cierta cantidad de gas. Ya sea explícitamente,
+o por una operación normal, el número de iteraciones en un bucle puede crecer más allá del límite de gas, lo que puede causar que el
+contrato se detenga por completo en un cierto punto. Esto no se aplica a funciones ``constant`` que sólo se llaman para
+leer información de la blockchain. Pero aun así, estas funciones pueden ser llamadas por otros contratos como parte de operaciones
+on-chain y detenerlos a ellos. Por favor, sé explícito con estos casos en la documentación de tus contratos.
 
-Enviando y Recibiendo Ether
-===========================
+Envío y recibo de Ether
+=======================
 
-- Ni contratos ni cuentas externas ("external accoutns"), son actualmente capaces de prevenir que alguien
-  les envíe Ether. Contratos pueden reaccionar y rechazar una transferencia normal, pero hay maneras de mover
-  Ether sin crear un mensaje de llamado (message call). Una manera de simplemente "minando" a la
+- Ni los contratos ni las "cuentas externas", son actualmente capaces de prevenir que alguien
+  les envíe Ether. Los contratos pueden reaccionar y rechazar una transferencia normal, pero hay maneras de mover
+  Ether sin provocar la ejecución de código. Una manera es simplemente "minando" a la
   cuenta del contrato y la otra es usando ``selfdestruct(x)``.
 
-- Si un contrato recibe Ether (sin que una función sea llamada), la función de respaldo es ejecutada.
-  Si no tiene función de respaldo, el Ether será rechazado (lanzando una excepción).
-  Durante la ejecución de la función de respaldo, el contrato solo puede depender del
-  "estipendio de gas" (2300 gas) que tiene disponible en ese momento. Esto estipendio no es suficiente para acceder
-  el almacenamiento de ninguna forma. Para asegurarte que tu contrato puede recibir Ether en ese modo, verifica los
-  requerimientos de gas de la función de respaldo (por ejemplo en la sección de "details" de Remix).
+- Si un contrato recibe Ether (sin que se llame a ninguna función), se ejecuta la función fallback.
+  Si no tiene una funcin fallback, el Ether será rechazado (lanzando una excepción).
+  Durante la ejecución de la función fallback, el contrato sólo puede depender del
+  "estipendio de gas" (2300 gas) que tiene disponible en ese momento. Este estipendio no es suficiente para acceder
+  al almacenamiento de ninguna forma. Para asegurarte de que tu contrato pueda recibir Ether de ese modo, verifica los
+  requerimientos de gas de la función fallback (por ejemplo, en la sección de "details" de Remix).
 
-- Hay una manera de enviar más gas a contrato receptor usando ``addr.call.value(x)()``.
+- Hay una manera de enviar más gas al contrato receptor usando ``addr.call.value(x)()``.
   Esto es esencialmente lo mismo que ``addr.transfer(x)``, solo que envía todo el gas restante
-  y permite la posibilidad al recipiente de hacer acciones más caras (y solo devuelve un código
-  de error y no propaga automáticamente el error). Esto puede incluir volviendo a llamar al contrato
-  enviador o otros cambios de estado que no fueron imaginados. Así que permite más flexibilidad para
+  y permite la posibilidad al receptor de hacer acciones más caras (y sólo devuelve un código
+  de error y no propaga automáticamente el error). Dentro de estas acciones se incluyen llamar de nuevo al contrato
+  emisor u otros cambios de estado que no fueron previstos. Permite más flexibilidad para
   usuarios honestos pero también para los usuarios maliciosos.
 
-- Si quieres enviar Ether usando ``address.transfer``, hay ciertos detalles de los que hay que saber:
+- Si quieres enviar Ether usando ``address.transfer``, hay ciertos detalles que hay que saber:
 
-  1. Si el recipiente es un contrato, causa que la función de respaldo sea ejecutada lo cual puede, a su vez, llamar de vuelta el
+  1. Si el receptor es un contrato, la función fallback será ejecutada, lo cual puede llamar de vuelta al
   contrato que envía Ether.
-  2. Enviar Ether puede fallar debido a la profundidad de la llamada (call depth) subiendo por sobre 1024. Ya que el que llama está
-     en control total de la profundidad de llamada, pueden forzar la transferencia a fallas; tener en consideración está posibilidad
-     o utilizar siempre ``send`` y asegurarse siempre de revisar el valor de retorno. O mejor aún, escribir el contrato con un orden en
-     que el recipiente pueda retirar Ether.
+  2. Enviar Ether puede fallar debido a la profundidad de la llamada subiendo por encima 1024. Ya que el que llama está
+     en control total de la profundidad de la llamada, pueden forzar la transferencia para que falle; tened en consideración esta posibilidad o utilizad siempre ``send`` y asegurarse siempre de revisar el valor de retorno. O mejor aún, escribir el contrato con un orden en que el recipiente pueda retirar Ether.
   3. Enviar Ether también puede fallar, porque la ejecución del contrato de recipiente necesita más gas
      que la cantidad asignada dejándolo sin gas (OOG, por sus siglas en inglés "Out of Gas"). Esto ocurre porque
      explícitamente se usó ``require``, ``assert``, ``revert``, ``throw``, o simplemente porque la operación es demasiado cara.
