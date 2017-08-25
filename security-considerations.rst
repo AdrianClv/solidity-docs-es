@@ -76,7 +76,7 @@ siempre incluye ejecución de código, así que el receptor puede ser un
 contrato que vuelve a llamar a ``withdraw``. Esto le permitiría obtener
 múltiples devoluciones, y por lo tanto, vaciar el Ether del contrato.
 
-Para evitar reentradas, puedes usar el orden Comprobaciones-Consecuencias-Interacciones
+Para evitar reentradas, puedes usar el orden Comprobaciones-Efectos-Interacciones
 como detallamos aquí:
 
 ::
