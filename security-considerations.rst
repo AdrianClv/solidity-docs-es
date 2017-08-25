@@ -119,7 +119,7 @@ Envío y recibo de Ether
   cuenta del contrato y la otra es usando ``selfdestruct(x)``.
 
 - Si un contrato recibe Ether (sin que se llame a ninguna función), se ejecuta la función fallback.
-  Si no tiene una funcin fallback, el Ether será rechazado (lanzando una excepción).
+  Si no tiene una función fallback, el Ether será rechazado (lanzando una excepción).
   Durante la ejecución de la función fallback, el contrato sólo puede depender del
   "estipendio de gas" (2300 gas) que tiene disponible en ese momento. Este estipendio no es suficiente para acceder
   al almacenamiento de ninguna forma. Para asegurarte de que tu contrato pueda recibir Ether de ese modo, verifica los
@@ -127,41 +127,42 @@ Envío y recibo de Ether
 
 - Hay una manera de enviar más gas al contrato receptor usando ``addr.call.value(x)()``.
   Esto es esencialmente lo mismo que ``addr.transfer(x)``, solo que envía todo el gas restante
-  y permite la posibilidad al receptor de hacer acciones más caras (y sólo devuelve un código
+  y permite la posibilidad al receptor de realizar acciones más caras (y sólo devuelve un código
   de error y no propaga automáticamente el error). Dentro de estas acciones se incluyen llamar de nuevo al contrato
   emisor u otros cambios de estado que no fueron previstos. Permite más flexibilidad para
   usuarios honestos pero también para los usuarios maliciosos.
 
 - Si quieres enviar Ether usando ``address.transfer``, hay ciertos detalles que hay que saber:
 
-  1. Si el receptor es un contrato, la función fallback será ejecutada, lo cual puede llamar de vuelta al
+  1. Si el receptor es un contrato, se ejecutará la función fallback, lo cual puede llamar de vuelta al
   contrato que envía Ether.
-  2. Enviar Ether puede fallar debido a la profundidad de la llamada subiendo por encima 1024. Ya que el que llama está
-     en control total de la profundidad de la llamada, pueden forzar la transferencia para que falle; tened en consideración esta posibilidad o utilizad siempre ``send`` y asegurarse siempre de revisar el valor de retorno. O mejor aún, escribir el contrato con un orden en que el recipiente pueda retirar Ether.
-  3. Enviar Ether también puede fallar, porque la ejecución del contrato de recipiente necesita más gas
-     que la cantidad asignada dejándolo sin gas (OOG, por sus siglas en inglés "Out of Gas"). Esto ocurre porque
-     explícitamente se usó ``require``, ``assert``, ``revert``, ``throw``, o simplemente porque la operación es demasiado cara.
-     Si usas ``transfer`` o ``send`` con revisión de la valor de retorno, esto puede proveer una manera para el recipiente
-     de bloquear el progreso en el contrato de envío. Pero volviendo a insistir, aquí lo mejor es usar
-     un orden de retiro :ref:`"withdraw" en vez de "orden de envío" <withdrawal_pattern>`.
+  2. El envío de Ether puede fallar debido a la profundidad de la llamada subiendo por encima 1024. Puesto que el que
+  llama tiene el control total de la profundidad de la llamada, pueden forzar la transferencia para que falle;
+  tened en consideración esta posibilidad o utilizad siempre ``send`` y aseguraos siempre de revisar el valor
+  de retorno. O mejor aún, escribid el contrato siguiendo un patrón de modo que sea el receptor el que tenga que sacar el Ether.
+  3. El envío de Ether también puede fallar porque la ejecución del contrato receptor necesita más gas que
+  la cantidad asignada (OOG, por sus siglas en inglés "Out of Gas"). Esto ocurre porque
+  explícitamente se usó ``require``, ``assert``, ``revert``, ``throw``, o simplemente porque la operación es
+  demasiado cara. Si usas ``transfer`` o ``send`` comprobando el valor de retorno, esto puede hacer que el receptor bloquee
+  el progreso en el contrato emisor.Pero volviendo a insistir, aquí lo mejor es usar un
+  :ref:`patrón de "retirada" en vez de un "orden de envío" <withdrawal_pattern>`.
 
-Profundidad de Pila de Llamadas (Callstack)
-==================================
+Profundidad de la pila de llamadas (Callstack)
+==============================================
 
-Llamadas externas de funciones pueden fallas en cualquier momento porque
-exceden la pila de llamadas de 1024. En tales situaciones, Solidity lanza
-una excepción. Usuarios maliciosos podrían forzar la pila a un valor alto
-antes de interactuar con el contrato.
+Las llamadas externas a funciones pueden fallar en cualquier momento al
+exceder la profundidad máxima de la pila de llamadas de 1024. En tales situaciones,
+Solidity lanza una excepción. Los usuarios maliciosos podrían forzar la profundidad de 
+la pila a un valor alto antes de interactuar con el contrato.
 
-Notar que ``.send()`` **no** lanza una excepción si la pila está vacía si no
-que retorna ``false`` en ese caso. Las funciones de bajo nivel de ``.call()``,
+Ten en cuenta que ``.send()`` **no** lanza una excepción si la pila está vacía, sino
+que retorna ``false`` en ese caso. Las funciones de bajo nivel como ``.call()``,
 ``.callcode()``  ``.delegatecall()`` se comportan de la misma manera.
-
 
 tx.origin
 =========
 
-Nunca usar tx.origin para autorización. Digamos que tienes un contrato de billetera como esta:
+No uses nunca tx.origin para dar autorización. Digamos que tienes un contrato de cartera como este:
 
 ::
 
@@ -181,7 +182,7 @@ Nunca usar tx.origin para autorización. Digamos que tienes un contrato de bille
         }
     }
 
-Ahora alguien te engaña para que le envíes Ether a esta billetera de ataque:
+Ahora alguien te engaña para que le envíes Ether a esta cartera maliciosa:
 
 ::
 
@@ -199,21 +200,20 @@ Ahora alguien te engaña para que le envíes Ether a esta billetera de ataque:
         }
     }
 
-Si tu billetera hubiera checkeado ``msg.sender`` para autorización, recibiría la cuenta de la billetera de ataque, en vez de la billetera del 'owner'. Pero al chequear ``tx.origin``, recibe la cuenta original que envió la transacción, quien aún es la cuenta owner. La billetera atacante inmediatamente vacía todos tus fondos.
-
+Si tu cartera hubiera comprobado ``msg.sender`` para darle autorización, recibiría la cuenta de la cartera atacante, en vez de la cartera del 'owner'. Pero al chequear ``tx.origin``, recibe la cuenta original que envió la transacción, que es la cuenta owner. La cartera atacante inmediatamente vacía todos tus fondos.
 
 Detalles Menores
 ================
 
-- En ``for (var i = 0; i < arrayName.length; i++) { ... }``, el tipo de ``i`` será ``uint8``, porque este es el más pequeño tipo que es requerido para guardar el valor ``0``. Si el vector (array) tiene más de 255 elementos, el bucle no se terminará.
-- La palabra reservada ``constant`` para funciones no es actualmente forzada por compiladores.
-  Además, no está forzada por la EVM, entonces una función de contrato que "pretende" ser constante,
-  puede aún hacer cambios al estado.
-- Tipos que no utilizan totalmente los 32 bytes pueden contener "dirty high order bits".
+- En ``for (var i = 0; i < arrayName.length; i++) { ... }``, el tipo de ``i`` será ``uint8``, porque este es el tipo más pequeño que es requerido para guardar el valor ``0``. Si el vector (array) tiene más de 255 elementos, el bucle no se terminará.
+- La palabra reservada ``constant`` para funciones no es actualmente forzada por el compilador.
+  Tampoco está forzada por la EVM, de modo que una función de un contrato que "pretenda" ser constante,
+  todava podría hacer cambios al estado.
+- Los tipos que no utilizan totalmente los 32 bytes pueden contener basura en los bits más significativos.
   Esto es especialmente importante si se accede a ``msg.data`` ya que supone un riesgo de maleabilidad:
-  Puedes crear transacciones que llaman una función ``f(uint8 x)`` con un argumento raw byte
-  de ``0xff000001`` y con ``0x00000001``. Ambos son pasados al contrato y ambos se verán como
-  números como ``1``. Pero ``msg.data`` es diferente, así que si se usa ``keccak246(msg.data)`` para
+  Puedes crear transacciones que llaman una función ``f(uint8 x)`` con un argumento de tipo byte
+  de ``0xff000001`` y ``0x00000001``. Ambos se pasarán al contrato y ambos se verán como
+  el número ``1``. Pero ``msg.data`` es diferente, así que si se usa ``keccak246(msg.data)`` para
   algo, tendrás resultados diferentes.
 
 ***************
@@ -223,66 +223,64 @@ Recomendaciones
 Restringir la cantidad de Ether
 ===============================
 
-Restringir la cantidad de Ether (o otros tokens) que pueden ser almacenados
+Restringir la cantidad de Ether (u otros tokens) que puedan ser almacenados
 en un contrato inteligente. Si el código fuente, el compilador o la plataforma
-tiene un error, estos fondos pueden ser perdidos. Si quieres limitar la pérdida,
+tiene un error, estos fondos podrían perderse. Si quieres limitar la pérdida,
 limita la cantidad de Ether.
-
 
 Pequeño y modular
 =================
 
-Mantén tus contratos pequeños y fáciles de entender. Separar funcionalidad
-no relacionada en otros contratos o en librerías. Recomendaciones generales de
-calidad de otras fuentes de código pueden aplicarse: Limitar la cantidad de variables
-locales, limitar el largo de la funciones, y más. Documenta tus funciones para que
-otros puedan ver cual era la intención del código y para ver si hace algo diferente de
-lo que pretendía.
+Mantén tus contratos pequeños y fáciles de entender. Separa las funcionalidades
+no relacionadas en otros contratos o en librerías. Se pueden aplicar las recomendaciones
+estándar de calidad de código: Limitar la cantidad de variables locales, limitar la longitud
+de las funciones, etc. Documenta tus funciones para que otros puedan ver cuál era la
+intención del código y para ver si hace algo diferente de lo que pretendía.
 
-Usa el orden Checks-Effects-Interactions
-=========================================
+Usa el orden Comprobaciones-Efectos-Interacciones
+=======================================================
 
-La mayoría de las funciones primero ejecutan algunos chequeos (¿quién ha llamado
-la función? ¿los argumentos están en el rango? ¿mandaron suficiente Ether?
-¿La cuenta tiene tokens? etc) Estos chequeos deben de hacerse primero.
+La mayoría de las funciones primero ejecutan algunos chequeos (¿quién ha llamado a
+la función?, ¿los argumentos están en el rango?, ¿mandaron suficiente Ether?
+¿La cuenta tiene tokens?, etc.). Estos chequeos deben de hacerse primero.
 
-Como segundo paso, si es que todos los chequeos pasaron, los efectos a las
-variables de estado del contrato actual deben hacerse. Interacción con otros
-contratos debe hacerse como el último paso en cualquier función.
+Como segundo paso, si se pasaron todos los chequeos, se deben ejecutar los efectos a las
+variables de estado del contrato actual. La interacción con otros contratos debe
+hacerse como último paso en cualquier función.
 
-Algunos primeros contratos retrasaban algunos efectos y esperaban a una función
-externa que retorne un estado sin errores. Esto es un error serio ya que se puede
+Al principio, algunos contratos retrasaban la ejecución de los efectos y esperaban a que
+una función externa devolviera un estado sin errores. Esto es un error grave ya que se puede
 hacer un reingreso, como explicamos arriba.
 
-Notar que, también, llamadas a contratos conocidos pueden a su vez causar llamadas
-a otros contratos no conocidos, así que siempre es mejor de aplicar este orden.
+También hay que tener en cuenta que las llamadas a contratos conocidos pueden a su vez causar llamadas
+a otros contratos no conocidos, así que siempre es mejor aplicar este orden.
 
-Incluir un modo a Prueba de Fallos (Fail-Safe)
-==============================================
+Incluir un modo a prueba de fallos
+==================================
 
 Aunque hacer que tu sistema sea completamente descentralizado eliminará cualquier intermediario,
-puede que sea una buena idea, especialmente para nuevo código, de incluir un sistema
+puede que sea una buena idea, especialmente para nuevo código, incluir un sistema
 a prueba de fallos:
 
-Puedes agregar una función a tu contrato que se revise a sí mismo como
-"¿Se ha filtrado Ether?", "¿Es igual la suma de los tokens al balance de la cuenta?"
-o cosas similares. Recordar que no se puede usar mucho gas para eso, así que ayuda con
-computaciones off-chain podrán ser necesarias.
+Puedes agregar una función a tu contrato que realize algunas comprobaciones internas como
+"¿se ha filtrado Ether?", "¿es igual la suma de los tokens al balance de la cuenta?"
+o cosas similares. Recordad que no se puede usar mucho gas para eso, así que ayuda mediante
+computaciones off-chain podrían ser necesarias.
 
-Si los chequeos fallan, el contrato automáticamente cambia a modo prueba de fallos, donde,
+Si los chequeos fallan, el contrato automáticamente cambia a modo a prueba de fallos, donde,
 por ejemplo, se desactivan muchas funciones, da el control a una entidad tercera de confianza
 o se convierte en un contrato "devuélveme mi dinero".
 
 
 *******************
-Verificación Formal
+Verificación formal
 *******************
 
-Usando verificación formal, es posible realizar pruebas matemáticas automatizadas
-que el código haga una cierta especificación formal.
-La especificación aún es formal (como el código fuente), pero usualmente mucho más simple.
-Hay un prototipo en Solidity que realiza verificación formal y será mejor documentada pronto.
+Usando verificación formal, es posible realizar pruebas matemáticas automatizadas de que el código
+sigue una cierta especificación formal. La especificación aún es formal (como el código fuente),
+pero normalmente mucho más simple. Hay un prototipo en Solidity que realiza verificación formal y
+pronto se documentará mejor.
 
-Notar que la verificación formal en sí mismo, sólo puede ayudarte a entender la diferencia
+Ten en cuenta que la verificación formal en sí misma sólo puede ayudarte a entender la diferencia
 entre lo que hiciste (la especificación) y cómo lo hiciste (la implementación real). Aún necesitas
 chequear si la especificación es lo que querías y que no hayas olvidado efectos inesperados de ello.
