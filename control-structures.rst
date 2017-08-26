@@ -1,6 +1,6 @@
-#####################################
-Expresiones y Estructuras de Control
-#####################################
+####################################
+Expresiones y estructuras de control
+####################################
 
 .. index:: ! parameter, parameter;input, parameter;output
 
@@ -62,26 +62,26 @@ vn)`` puede devolver múltiples valores. El número de componentes debe ser el m
 
 .. _function-calls:
 
-Llamadas de función
-===================
+Llamadas a funciones
+====================
 
-Llamadas de función internas
-----------------------------
+Llamadas a funciones internas
+-----------------------------
 
-Las funciones del conrtrato actual pueden ser llamadas directamente("internamente") y, también, recursivamente como se puede ver en este ejemplo sin sentido funcional::
+Las funciones del contrato actual pueden ser llamadas directamente ("internamente") y, también, recursivamente como se puede ver en este ejemplo sin sentido funcional::
 
     contract C {
         function g(uint a) returns (uint ret) { return f(); }
         function f() returns (uint ret) { return g(7) + f(); }
     }
 
-Estas llamadas de función son traducidas en simples saltos dentro de la máquina virtual de Ethereum (EVM). Esto tiene como consecuencia que la memoria actual no se limpia, así que pasar referencias de memoria a las funciones llamadas internamente es muy eficiente. Sólo las funciones del mismo contrato pueden ser llamadas internamente.
+Estas llamadas a funciones son traducidas en simples saltos dentro de la máquina virtual de Ethereum (EVM). Esto tiene como consecuencia que la memoria actual no se limpia, así que pasar referencias de memoria a las funciones llamadas internamente es muy eficiente. Sólo las funciones del mismo contrato pueden ser llamadas internamente.
 
-Llamadas de función externas
-----------------------------
+Llamadas a funciones externas
+-----------------------------
 
-Las expresiones ``this.g(8);`` and ``c.g(2);`` (donde ``c`` es la instancia de un contrato) son también llamadas de función válidas, pero en esta ocasión, la función se llamará "externamente" mediante un message call y no directamente por saltos.
-Por favor, es importante tener en cuenta que las llamadas de función en ``this`` no pueden ser usadas en el constructor, ya que el contrato en cuestión no se ha creado todavía.
+Las expresiones ``this.g(8);`` and ``c.g(2);`` (donde ``c`` es la instancia de un contrato) son también llamadas válidas, pero en esta ocasión, la función se llamará "externamente" mediante un message call y no directamente por saltos.
+Por favor, es importante tener en cuenta que las llamadas a funciones en ``this`` no pueden ser usadas en el constructor, ya que el contrato en cuestión no se ha creado todavía.
 
 Las funciones de otros contratos se tienen que llamar de forma externa. Para una llamada externa,
 todos los argumentos de la función tienen que ser copiados en memoria.
@@ -101,15 +101,15 @@ Cuando se llama a funciones de otros contratos, la cantidad de Wei enviada con l
 
 El modificador ``payable`` se tiene que usar para ``info``, porque de otra manera la opción `.value()` no estaría disponible.
 
-Destacar que la expresión ``InfoFeed(addr)`` realiza una conversión de tipo explícita afirmando que "sabemos que el tipo de contrato en la dirección dada es ``InfoFeed``" y este no ejecuta un constructor. Las conversiones de tipo explícitas tienen que ser gestionadas con extrema precaución. Nunca se debe llamar a una función en un contrato donde no se tiene seguridad de cuál es su tipo.
+Destacar que la expresión ``InfoFeed(addr)`` realiza una conversión de tipo explícita afirmando que "sabemos que el tipo de contrato en la dirección dada es ``InfoFeed``", sin ejecutar un constructor. Las conversiones de tipo explícitas tienen que ser gestionadas con extrema precaución. Nunca se debe llamar a una función en un contrato donde no se sabe con seguridad cuál es su tipo.
 
 También se podría usar ``function setFeed(InfoFeed _feed) { feed = _feed; }`` directamente.
-Hay que tener cuidado con el hecho de que ``feed.info.value(10).gas(800)`` sólo (localmente) establece el valor y la cantidad de gas enviada con la llamada de función y, sólo el paréntesis al final realiza la llamada actual.
+Hay que tener cuidado con el hecho de que ``feed.info.value(10).gas(800)`` sólo (localmente) establece el valor y la cantidad de gas enviada con la llamada a la función. Sólo tras el último paréntesis se realiza realmente la llamada.
 
-Las llamadas de función provocan excepciones si el contrato invocado no existe (en el sentido de que la cuenta no contiene código) o si el contrato invocado por sí mismo dispara una excepción o se queda sin gas.
+Las llamadas a funciones provocan excepciones si el contrato invocado no existe (en el sentido de que la cuenta no contiene código) o si el contrato invocado por sí mismo dispara una excepción o se queda sin gas.
 
 .. warning::
-    Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente aleatoria y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama via sus funciones. Escribir tus funciones de manera que realicen, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato, hace que este contrato no sea vulnerable a un código malicioso reejecutable.
+    Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente aleatoria y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama mediante sus funciones. Escribir tus funciones de manera que realicen, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato, hace que este contrato no sea vulnerable a un ataque de reentrada.
     
 
 Named Calls y parámetros de funciones anónimas
