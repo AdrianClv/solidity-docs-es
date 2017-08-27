@@ -759,20 +759,19 @@ Si un contrato hereda de un contrato abstracto y éste no implementa todas las f
 Interfaces
 **********
 
-Interfaces are similar to abstract contracts, but they cannot have any functions implemented. There are further restrictions:
+Las interfaces son similares a los contratos abstractos, pero no pueden tener ninguna función implementada. Y hay más restricciones:
 
-#. Cannot inherit other contracts or interfaces.
-#. Cannot define constructor.
-#. Cannot define variables.
-#. Cannot define structs.
-#. Cannot define enums.
+#. No pueden heredar otros contratos o interfaces.
+#. No pueden definir contructores.
+#. No pueden definir variables.
+#. No pueden definir structs.
+#. No pueden definir enums.
 
-Some of these restrictions might be lifted in the future.
+Es posible que en el futuro, algunas de estas restricciones se levanten.
 
-Interfaces are basically limited to what the Contract ABI can represent, and the conversion between the ABI and
-an Interface should be possible without any information loss.
+Las interfaces son limitadas a lo que básicamente el Contrato ABI puede representar, y la conversion entre el ABI y la interfaz debería hacerse sin perdida de información.
 
-Interfaces are denoted by their own keyword:
+Se indican las interfaces por su propia palabra clave:
 
 ::
 
@@ -780,15 +779,15 @@ Interfaces are denoted by their own keyword:
         function transfer(address recipient, uint amount);
     }
 
-Contracts can inherit interfaces as they would inherit other contracts.
+Los contratos pueden heredar interfaces como lo heredarían otros contratos.
 
-.. index:: ! library, callcode, delegatecall
+.. index:: ! libreria, callcode, delegatecall
 
-.. _libraries:
+.. _librerias:
 
-************
-Libraries
-************
+*********
+Librerias
+*********
 
 Libraries are similar to contracts, but their purpose is that they are deployed
 only once at a specific address and their code is reused using the ``DELEGATECALL``
