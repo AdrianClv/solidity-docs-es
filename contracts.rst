@@ -789,30 +789,15 @@ Los contratos pueden heredar interfaces como lo heredarían otros contratos.
 Librerias
 *********
 
-Libraries are similar to contracts, but their purpose is that they are deployed
-only once at a specific address and their code is reused using the ``DELEGATECALL``
-(``CALLCODE`` until Homestead)
-feature of the EVM. This means that if library functions are called, their code
-is executed in the context of the calling contract, i.e. ``this`` points to the
-calling contract, and especially the storage from the calling contract can be
-accessed. As a library is an isolated piece of source code, it can only access
-state variables of the calling contract if they are explicitly supplied (it
-would have no way to name them, otherwise).
+Las libreras son similares a los contratos, pero su propósito es que se desplieguen una sola vez a una dirección especifica y su código se pueda reutilizar utilizando la característica ``DELEGATECALL`` (``CALLCODE`` hasta Homestead) del EVM. Lo que significa que si las funciones de una librería se llaman, su código es ejecutado en el contexto del contrato llamando, es decir, ``this`` apunta al contrato llamando y en especial, se puede acceder al almacén del contrato llamando. Como una librería es un trozo de código fuente aislado, una librería sólo puede acceder a las variables de estado de un contrato llamando si estas variables están específicamente proporcionadas (de lo contrario, no tendría la posibilidad de nombrarlas).
 
-Libraries can be seen as implicit base contracts of the contracts that use them.
-They will not be explicitly visible in the inheritance hierarchy, but calls
-to library functions look just like calls to functions of explicit base
-contracts (``L.f()`` if ``L`` is the name of the library). Furthermore,
-``internal`` functions of libraries are visible in all contracts, just as
-if the library were a base contract. Of course, calls to internal functions
-use the internal calling convention, which means that all internal types
-can be passed and memory types will be passed by reference and not copied.
-To realize this in the EVM, code of internal library functions
-and all functions called from therein will be pulled into the calling
-contract, and a regular ``JUMP`` call will be used instead of a ``DELEGATECALL``.
+Las librería pueden considerarse como contratos base implícitos del contrato que las usa.
+Las librerías no son explícitamente visibles en la jerarquía de herencia, pero las llamadas a las funciones de una librería se parecen completamente a las llamadas a funciones de contratos base explícitos (``L.f()`` si ``L`` es el nombre de la librería). Además, las funciones ``internas`` de las librerías son visibles en todos los contratos, como si la librería fuera un contrato base. Por supuesto las llamadas a funciones internas utilizan las normas de llamadas internas, lo que significa que todos los tipos internos pueden ser enviados y que los tipos de memoria serán enviados mediante referencia y no copiados.
+Para realizar esta operación en el EVM, se incluirá en el contrato llamando el código de las funciones internas de la librería y todas las funciones llamadas desde dentro usando el comando habitual ``JUMP`` en lugar del ``DELEGATECALL``.
 
 .. index:: using for, set
 
+El siguiente ejemplo ilustra cómo usar las librerías (pero asegúrese de leer :ref:`using for <using-for>` para tener un ejemplo más avanzado de cómo implementar un set):
 The following example illustrates how to use libraries (but
 be sure to check out :ref:`using for <using-for>` for a
 more advanced example to implement a set).
@@ -822,16 +807,11 @@ more advanced example to implement a set).
     pragma solidity ^0.4.11;
 
     library Set {
-      // We define a new struct datatype that will be used to
-      // hold its data in the calling contract.
+      // Definimos una nuevo tipo de datos para un struct que se va a utilizar para conservar sus datos en el contrato que efectúa la llamanda.
       struct Data { mapping(uint => bool) flags; }
 
-      // Note that the first parameter is of type "storage
-      // reference" and thus only its storage address and not
-      // its contents is passed as part of the call.  This is a
-      // special feature of library functions.  It is idiomatic
-      // to call the first parameter 'self', if the function can
-      // be seen as a method of that object.
+      // Nótese que el primer parametro es del tipo ???"referencia de almacenamiento", por lo tanto solamente su dirección de almacenamiento o no su contenido se envía como parte de la llamada. Esto es una característica especial de las funciones de librerías. Es idiomático llamar el primer parámetro 'self', si la función puede verse como un método de este objeto.
+      Note that the first parameter is of type "storage
       function insert(Data storage self, uint value)
           returns (bool)
       {
