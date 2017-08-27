@@ -596,13 +596,13 @@ En el siguiente ejemplo se dan más detalles.
             NameReg(config.lookup(1)).register(name);
         }
 
-        // Las funciones pueden ser invalidadas por otras funciones con el mismo nombre y el mismo numero/tipo de entradas. Si la función que invalida tiene distintos tipos de parámetros de salida, esto provocará un error. 
-        // Tanto las llamadas a funciones locales como a las que están basadas en mensaje toman en cuenta estas invalidaciones.
+        // Las funciones pueden ser sobre escritas por otras funciones con el mismo nombre y el mismo numero/tipo de entradas. Si la función que sobre escribe tiene distintos tipos de parámetros de salida, esto provocará un error. 
+        // Tanto las llamadas a funciones locales como a las que están basadas en mensaje toman en cuenta estas sobre escrituras.
         function kill() {
             if (msg.sender == owner) {
                 Config config = Config(0xd5f9d8d94886e70b06e474c3fb14fd43e2f23970);
                 NameReg(config.lookup(1)).unregister();
-                // Sigue siendo posible llamar a una función específica que ha sido invalidadas.
+                // Sigue siendo posible llamar a una función específica que ha sido sobre escrita.
                 mortal.kill();
             }
         }
@@ -646,7 +646,7 @@ Nótese que arriba, llamamos a ``mortal.kill()`` para "reenviar" la orden de des
     contract Final is Base1, Base2 {
     }
 
-Una llamada a ``Final.kill()`` llamará a ``Base2.kill`` como la invalidación la más derivada, pero esta función obviará ``Base1.kill``, básicamente porque no siquiera sabe de la existencia de ``Base1``. La forma de solucionar esto es usando ``super``.
+Una llamada a ``Final.kill()`` llamará a ``Base2.kill`` como la función sobre escrita la más derivada, pero esta función obviará ``Base1.kill``, básicamente porque no siquiera sabe de la existencia de ``Base1``. La forma de solucionar esto es usando ``super``.
 
 ::
 
@@ -714,7 +714,7 @@ Solidity le sigue la pista a Python y utiliza la "`Linearización C3 <https://en
     contract A is X {}
     contract C is A, X {}
 
-La razón de este error es que ``C`` requiere ``X`` para invalidar ``A`` (especificando ``A, X`` en este orden), pero ``A`` mismo requiere ??? para invalidar ``X``, lo que presenta una contradicción que no puede resolverse.
+La razón de este error es que ``C`` requiere ``X`` para sobre escribir ``A`` (especificando ``A, X`` en este orden), pero ``A`` mismo requiere ??? para sobre escribir ``X``, lo que presenta una contradicción que no puede resolverse.
 
 Una regla simple para recordar es de especificar las clases base en el orden desde "la más base" hasta "la más derivada".
 
