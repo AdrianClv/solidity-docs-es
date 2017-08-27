@@ -718,14 +718,14 @@ El motivo de que se produzca este error es que ``C`` solicita a ``X`` que sobree
 
 Una regla simple para recordar es de especificar las clases base en el orden desde "la más base" hasta "la más derivada".
 
-Inheriting Different Kinds of Members of the Same Name
-======================================================
+Heredar Distintos Tipos de Miembros con el Mismo Nombre
+=======================================================
 
-When the inheritance results in a contract with a function and a modifier of the same name, it is considered as an error.
-This error is produced also by an event and a modifier of the same name, and a function and an event of the same name.
-As an exception, a state variable getter can override a public function.
+Cuando la herencia termina en un contrato con una función y un modificador con el mismo nombre, se considera esta herencia un error.
+Este error también se produciría en el caso en que un evento y un modificador tuvieran el mismo nombre, así como con una función y un evento con el mismo nombre. 
+Como excepción, una variable de estado getter puede sobre escribir una función pública. 
 
-.. index:: ! contract;abstract, ! abstract contract
+.. index:: ! contrato;abstracto, ! abstracto contracto
 
 ******************
 Abstract Contracts
