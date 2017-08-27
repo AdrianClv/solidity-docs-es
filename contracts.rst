@@ -725,13 +725,15 @@ Cuando la herencia termina en un contrato con una función y un modificador con 
 Este error también se produciría en el caso en que un evento y un modificador tuvieran el mismo nombre, así como con una función y un evento con el mismo nombre. 
 Como excepción, una variable de estado getter puede sobre escribir una función pública. 
 
-.. index:: ! contrato;abstracto, ! abstracto contracto
+.. index:: ! contrato;abstracto, ! abstracto contrato
 
-******************
-Abstract Contracts
-******************
+********************
+Contratos Abstractos
+********************
 
-Contract functions can lack an implementation as in the following example (note that the function declaration header is terminated by ``;``)::
+Las funciones de un contrato pueden carecer de una implementación como pasa en el siguiente ejemplo (nótese que la cabecera de declaración de la función se termina con un ``;``).
+
+::
 
     pragma solidity ^0.4.0;
 
@@ -739,7 +741,9 @@ Contract functions can lack an implementation as in the following example (note 
         function utterance() returns (bytes32);
     }
 
-Such contracts cannot be compiled (even if they contain implemented functions alongside non-implemented functions), but they can be used as base contracts::
+Estos contratos no pueden compilarse (aunque contengan funciones implementadas junto con funciones no implementadas), pero pueden usarse como contratos base.
+
+::
 
     pragma solidity ^0.4.0;
 
@@ -747,9 +751,9 @@ Such contracts cannot be compiled (even if they contain implemented functions al
         function utterance() returns (bytes32) { return "miaow"; }
     }
 
-If a contract inherits from an abstract contract and does not implement all non-implemented functions by overriding, it will itself be abstract.
+Si un contrato hereda de un contrato abstracto y éste no implementa todas las funciones no implementadas con sobrescritura, será el mismo un contrato abstracto.
 
-.. index:: ! contract;interface, ! interface contract
+.. index:: ! contrato;interfaz, ! interfaz contrato
 
 **********
 Interfaces
