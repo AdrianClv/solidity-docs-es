@@ -807,7 +807,7 @@ more advanced example to implement a set).
     pragma solidity ^0.4.11;
 
     library Set {
-      // Definimos una nuevo tipo de datos para un struct que se va a utilizar para conservar sus datos en el contrato que efectúa la llamanda.
+      // Definimos un nuevo tipo de datos para un struct que se va a utilizar para conservar sus datos en el contrato que efectúa la llamanda.
       struct Data { mapping(uint => bool) flags; }
 
       // Nótese que el primer parametro es del tipo ???"referencia de almacenamiento", por lo tanto solamente su dirección de almacenamiento o no su contenido se envía como parte de la llamada. Esto es una característica especial de las funciones de librerías. Es idiomático llamar el primer parámetro 'self', si la función puede verse como un método de este objeto.
@@ -816,16 +816,7 @@ more advanced example to implement a set).
           returns (bool)
       {
           if (self.flags[value])
-              return false; // already there
-          self.flags[value] = true;
-          return true;
-      }
-
-      function remove(Data storage self, uint value)
-          returns (bool)
-      {
-          if (!self.flags[value])
-              return false; // not there
+              return false; // ???no está
           self.flags[value] = false;
           return true;
       }
@@ -842,31 +833,18 @@ more advanced example to implement a set).
         Set.Data knownValues;
 
         function register(uint value) {
-            // The library functions can be called without a
-            // specific instance of the library, since the
-            // "instance" will be the current contract.
+            // Las funciones de librería pueden llamarse sin una ???instancia específica de la librería, ya que la "instancia" es el contrato actual.
             require(Set.insert(knownValues, value));
         }
-        // In this contract, we can also directly access knownValues.flags, if we want.
+        // En este contrato, si se quiere, también se puede acceder directamente a knownValues.flags.
     }
 
-Of course, you do not have to follow this way to use
-libraries - they can also be used without defining struct
-data types. Functions also work without any storage
-reference parameters, and they can have multiple storage reference
-parameters and in any position.
+No es por supuesto obligatorio usar las librerías de esta manera -  también pueden usarse sin definir tipos de datos struct. Las funciones también funcionan sin parámetros de referencia de almacenamiento, y pueden tener multiples parámetros de referencia de almacenamiento y en cualquier posición.
 
-The calls to ``Set.contains``, ``Set.insert`` and ``Set.remove``
-are all compiled as calls (``DELEGATECALL``) to an external
-contract/library. If you use libraries, take care that an
-actual external function call is performed.
-``msg.sender``, ``msg.value`` and ``this`` will retain their values
-in this call, though (prior to Homestead, because of the use of `CALLCODE`, ``msg.sender`` and
-``msg.value`` changed, though).
+Las llamadas a ``Set.contains``, ``Set.insert`` y ``Set.remove`` son compiladas como llamadas (``DELEGATECALL``) en un contrato/librería externa. Si se usan librerías, hay que asegurarse de que de verdad se realiza una llamada a una función externa.
+``msg.sender``, ``msg.value`` y ``this`` conservarán sus valores en esta llamada, aunque hasta Homestead, por el uso de `CALLCODE`, ``msg.sender`` y ``msg.value`` cambiaban.
 
-The following example shows how to use memory types and
-internal functions in libraries in order to implement
-custom types without the overhead of external function calls:
+En el siguiente ejemplo se muestra cómo usar tipos de memoria y funciones internas en las librerías para implementar tipos a medida sin la necesidad de usar llamadas a funciones externas:
 
 ::
 
@@ -895,7 +873,7 @@ custom types without the overhead of external function calls:
                     carry = 0;
             }
             if (carry > 0) {
-                // too bad, we have to add a limb
+                // ¡Qué mal! Tenemos que añadir un "limb"
                 uint[] memory newLimbs = new uint[](r.limbs.length + 1);
                 for (i = 0; i < r.limbs.length; ++i)
                     newLimbs[i] = r.limbs[i];
@@ -924,60 +902,39 @@ custom types without the overhead of external function calls:
         }
     }
 
-As the compiler cannot know where the library will be
-deployed at, these addresses have to be filled into the
-final bytecode by a linker
-(see :ref:`commandline-compiler` for how to use the
-commandline compiler for linking). If the addresses are not
-given as arguments to the compiler, the compiled hex code
-will contain placeholders of the form ``__Set______`` (where
-``Set`` is the name of the library). The address can be filled
-manually by replacing all those 40 symbols by the hex
-encoding of the address of the library contract.
+Puesto que el compilador no puede saber a qué dirección la librería será desplegada, estas direcciones deben ser insertadas en el bytecode final por un *linker* (véase :ref:`commandline-compiler` para saber cómo usar el compilador de lineas de comando para establecer vínculos). Si las direcciones no están facilitadas como argumentos al compilador, el código hex compilado contendrá ???marcadores de posición de la forma ``__Set______`` (donde ``Set`` es el nombre de la librería). La dirección puede ser facilitada manualmente remplazando cada uno de estos 40 símbolos por el cifrado ???hexadecimal de la dirección del contrato de la librería.
 
-Restrictions for libraries in comparison to contracts:
+Las restricciones para las librerías con respecto a las restricciones para los contratos son las siguientes:
 
-- No state variables
-- Cannot inherit nor be inherited
-- Cannot receive Ether
+- No hay variables de estado
+- No puede heredar no ser heredadas
+- No pueden recibir Ether
 
-(These might be lifted at a later point.)
+(Puede que estas restricciones se levanten en un futuro.)
 
 .. index:: ! using for, library
 
 .. _using-for:
 
-*********
-Using For
-*********
+**************
+Utilizando For
+**************
 
-The directive ``using A for B;`` can be used to attach library
-functions (from the library ``A``) to any type (``B``).
-These functions will receive the object they are called on
-as their first parameter (like the ``self`` variable in
-Python).
+La directiva ``using A for B;`` se puede usar para adjuntar funciones de librería (desde la librería ``A``) a cualquier tipo (``B``). Estas funciones recibirán el objeto con el que se les llama como su primer parámetro (igual que con el parámetro ``self`` en Python).
 
-The effect of ``using A for *;`` is that the functions from
-the library ``A`` are attached to any type.
+El efecto que tiene esta directiva ``using A for *;`` es que las funciones de la librería ``A`` se adjunten a cualquier tipo.
 
-In both situations, all functions, even those where the
-type of the first parameter does not match the type of
-the object, are attached. The type is checked at the
-point the function is called and function overload
-resolution is performed.
+En ambas situaciones, todas las funciones se adjuntan, incluso las funciones donde el tipo del primer parámetro no coincide con el tipo del objeto. El tipo se comprueba en el punto en que se llama a la función y que se resuelve problemas de sobrecarga de la función.
 
-The ``using A for B;`` directive is active for the current
-scope, which is limited to a contract for now but will
-be lifted to the global scope later, so that by including
-a module, its data types including library functions are
-available without having to add further code.
+Con el ???alcance (scope) actual, que por ahora está limitado a un contrato, la directiva ``using A for B;`` está activa. Más adelante tendrá un ???alcance global, lo que hará que cuando se incluya un modulo, sus tipos de datos, incluyendo las funciones de librería, estarán disponibles sin tener que añadir más código.
 
-Let us rewrite the set example from the
-:ref:`libraries` in this way::
+Volvamos a escribir el ejemplo del Set del apartado :ref:`librerias` de la siguiente manera:
+
+::
 
     pragma solidity ^0.4.11;
 
-    // This is the same code as before, just without comments
+    // Es el mismo código que antes pero sin los comentarios
     library Set {
       struct Data { mapping(uint => bool) flags; }
 
@@ -985,7 +942,7 @@ Let us rewrite the set example from the
           returns (bool)
       {
           if (self.flags[value])
-            return false; // already there
+            return false; // ???está
           self.flags[value] = true;
           return true;
       }
@@ -994,7 +951,7 @@ Let us rewrite the set example from the
           returns (bool)
       {
           if (!self.flags[value])
-              return false; // not there
+              return false; // ???no está
           self.flags[value] = false;
           return true;
       }
@@ -1012,15 +969,15 @@ Let us rewrite the set example from the
         Set.Data knownValues;
 
         function register(uint value) {
-            // Here, all variables of type Set.Data have
-            // corresponding member functions.
-            // The following function call is identical to
-            // Set.insert(knownValues, value)
+            // Aqui, cada una de las variables con el tipo Set.Data tiene una función miembro correspondiente.
+            // La siguiente llamada es idéntica a Set.insert(knownValues, value)
             require(knownValues.insert(value));
         }
     }
 
-It is also possible to extend elementary types in that way::
+Es también posible extender los tipos elementales de la siguiente manera:
+
+::
 
     pragma solidity ^0.4.0;
 
@@ -1042,7 +999,7 @@ It is also possible to extend elementary types in that way::
         }
 
         function replace(uint _old, uint _new) {
-            // This performs the library function call
+            // Esto es lo que realiza la llamada a la función de librería
             uint index = data.indexOf(_old);
             if (index == uint(-1))
                 data.push(_new);
@@ -1051,7 +1008,4 @@ It is also possible to extend elementary types in that way::
         }
     }
 
-Note that all library calls are actual EVM function calls. This means that
-if you pass memory or value types, a copy will be performed, even of the
-``self`` variable. The only situation where no copy will be performed
-is when storage reference variables are used.
+Nótese que cualquier llamada a una librería es en realidad una llamada a una función del EVM. Esto significa que si se envía tipos de memoria o de valor, se va a realizar una copia, incluso de la variable ``self``. La única situación en la que no se va a realizar una copia es cuando se utilizan variables ???que hacen referencia al almacenamiento.
