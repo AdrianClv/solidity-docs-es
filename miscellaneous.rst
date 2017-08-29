@@ -235,38 +235,37 @@ Se puede usar para consultar la versión del compilador, las fuentes usadas,
 el ABI y documentación NatSpec a fin de interactuar con más seguridad con el
 contrato y verificar su código fuente.
 
+El compilador agrega un has Swarm del archivo metadata al final del bytecode
+(para detalles, mirar abajo) de cada contrato, para que se pueda recuperar el
+archivo en una manera autentificada sin tener que usar un proveedor de datos
+centrales.
 
-The compiler appends a Swarm hash of the metadata file to the end of the
-bytecode (for details, see below) of each contract, so that you can retrieve
-the file in an authenticated way without having to resort to a centralized
-data provider.
+Sin embargo, se tiene que publicar el arhivo metadata a Swarm (o otro servicio)
+para que otros puedan verlo. El archivo puede ser producido usando ``solc --metadata``
+y el archivo será llamado ``NombreContrato_meta.json``.
+Contendrá referencias Swarm al código fuente, así que tienes que upload
+todos los archivos código fuente y el archivo metadata.
 
-Of course, you have to publish the metadata file to Swarm (or some other service)
-so that others can access it. The file can be output by using ``solc --metadata``
-and the file will be called ``ContractName_meta.json``.
-It will contain Swarm references to the source code, so you have to upload
-all source files and the metadata file.
-
-The metadata file has the following format. The example below is presented in a
-human-readable way. Properly formatted metadata should use quotes correctly,
-reduce whitespace to a minimum and sort the keys of all objects to arrive at a
-unique formatting.
-Comments are of course also not permitted and used here only for explanatory purposes.
+El archivo metadata tiene el formato siguiente. El ejemplo abajo es presentado de
+manera legible por humanos. Metadata formateada correctamente debe usar comillas
+correctamente, reducir espacio blanco a un mínimo y ordenarse diferentemente.
+Los comantarios obviamente tampoco son permitidos y son usados aquí sólo por
+razones explicativos.
 
 .. code-block:: none
 
     {
-      // Required: The version of the metadata format
+      // Requerido: La versoin del formato de metadata
       version: "1",
-      // Required: Source code language, basically selects a "sub-version"
-      // of the specification
+      // Requerido: lenguaje de código fuente, settea una "sub-versión"
+      // de la espcificación
       language: "Solidity",
-      // Required: Details about the compiler, contents are specific
-      // to the language.
+      // Requerido: Detalles del compilador, los contenidos son específicos
+      // al lenguaje
       compiler: {
-        // Required for Solidity: Version of the compiler
+        // Requerido para Solidity: Version del compilador
         version: "0.4.6+commit.2dabbdf0.Emscripten.clang",
-        // Optional: Hash of the compiler binary which produced this output
+        // Opcional: Hash del compilador binario que produjo este resultado
         keccak256: "0x123..."
       },
       // Required: Compilation source files/source units, keys are file names
