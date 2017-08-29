@@ -175,65 +175,66 @@ aunque las instrucciones contenían un jump en el inicio.
 
 .. index:: source mappings
 
-***************
-Source Mappings
-***************
+******************
+Mappings de Fuente
+******************
 
-As part of the AST output, the compiler provides the range of the source
-code that is represented by the respective node in the AST. This can be
-used for various purposes ranging from static analysis tools that report
-errors based on the AST and debugging tools that highlight local variables
-and their uses.
+Como parte de la output AST, el compilador provee el rango del código fuente
+que es representado por el nodo respectio en el AST. Esto puede ser usado
+para varios propísitos desde herramientas de análisis estático que reportan
+errores basados en el AST y herramientas de debugging que demarcan variables
+locales y sus usos.
 
-Furthermore, the compiler can also generate a mapping from the bytecode
-to the range in the source code that generated the instruction. This is again
-important for static analysis tools that operate on bytecode level and
-for displaying the current position in the source code inside a debugger
-or for breakpoint handling.
+Además, el compilador puede también generar un mapping del bytecode
+al rango en el código fuente que generó la instrucción. Esto es importante
+para herramientas de análisis estático que operan a nivel bytecode y
+para mostrar la posición actual en el código fuente dentro del debugger
+o para manejar los breakpoints.
 
-Both kinds of source mappings use integer indentifiers to refer to source files.
-These are regular array indices into a list of source files usually called
-``"sourceList"``, which is part of the combined-json and the output of
-the json / npm compiler.
+Ambos tipos de mappings de fuente usan identificadores enteros para referirse a
+archivos fuente. Estos son índices de arrays regulares en una lista de archivos
+fuente habitualmente llamados ``"sourcelist"``, que es parte del combined-json y
+el output del compilador json / npm.
 
-The source mappings inside the AST use the following
-notation:
+Los mappings de fuente dentro del AST usan la siguiente notación:
 
 ``s:l:f``
 
-Where ``s`` is the byte-offset to the start of the range in the source file,
-``l`` is the length of the source range in bytes and ``f`` is the source
-index mentioned above.
+Donde ``s`` es el byte-offset de el inicio del rango en el archivo fuente,
+``l`` es el largo del rango de la fuente een bytes y ``f`` es el índice de fuente
+mencionado arriba.
 
-The encoding in the source mapping for the bytecode is more complicated:
-It is a list of ``s:l:f:j`` separated by ``;``. Each of these
-elements corresponds to an instruction, i.e. you cannot use the byte offset
-but have to use the instruction offset (push instructions are longer than a single byte).
-The fields ``s``, ``l`` and ``f`` are as above and ``j`` can be either
-``i``, ``o`` or ``-`` signifying whether a jump instruction goes into a
-function, returns from a function or is a regular jump as part of e.g. a loop.
+El encodaje en el mapping de fuente para el bytecode es más complicado:
+Es una lista de ``s:l:f:j`` separada por ``;``. Cada una de estos elementos
+corresponde a una instrucción, i.e. no puedes usar el byte-offset
+si no que tienes que usar la instrucción offset (instrucciones push son mas largas
+que un sólo byte).
+Los campos ``s``, ``l`` y ``f`` son como detallamos arriba y ``j`` puede ser ``i``,
+``i`` o ``-`` y significa si una instrucción jump va en la función, devuelve una
+función, devuelve desde una función o si es un jump regular como parte de un (ej) loop.
 
-In order to compress these source mappings especially for bytecode, the
-following rules are used:
+A fin de comprimir estos mappings de fuente espcialmente para bytecode, las
+siguientes reglas son usadas:
 
- - If a field is empty, the value of the preceding element is used.
- - If a ``:`` is missing, all following fields are considered empty.
+ - Si un campo está vacío, el valor del elemento precedente es usado.
+ - Si un ``:`` falta, todos los campos siguientes son considerados vacíos.
 
-This means the following source mappings represent the same information:
+Esto significa que los suguientes mappings de fuente representan la misma información:
 
 ``1:2:1;1:9:1;2:1:2;2:1:2;2:1:2``
 
 ``1:2:1;:9;2::2;;``
 
-*****************
-Contract Metadata
-*****************
+*********************
+Metadata del Contrato
+*********************
 
-The Solidity compiler automatically generates a JSON file, the
-contract metadata, that contains information about the current contract.
-It can be used to query the compiler version, the sources used, the ABI
-and NatSpec documentation in order to more safely interact with the contract
-and to verify its source code.
+El compilador Solidity genera automáticamente un archivo JSON, el
+metadata del contrato, que contiene información sobre el contrato actual.
+Se puede usar para consultar la versión del compilador, las fuentes usadas,
+el ABI y documentación NatSpec a fin de interactuar con más seguridad con el
+contrato y verificar su código fuente.
+
 
 The compiler appends a Swarm hash of the metadata file to the end of the
 bytecode (for details, see below) of each contract, so that you can retrieve
