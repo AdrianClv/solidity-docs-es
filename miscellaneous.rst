@@ -268,79 +268,82 @@ razones explicativos.
         // Opcional: Hash del compilador binario que produjo este resultado
         keccak256: "0x123..."
       },
-      // Required: Compilation source files/source units, keys are file names
+      // Requerido: Compilación archivos fuente/unidades fuente, las llaves son
+      // nombres de archivos
       sources:
       {
         "myFile.sol": {
-          // Required: keccak256 hash of the source file
+          // Requerido: keccak256 hash del archivo fuente
           "keccak256": "0x123...",
-          // Required (unless "content" is used, see below): Sorted URL(s)
-          // to the source file, protocol is more or less arbitrary, but a
-          // Swarm URL is recommended
+          // Reuqerido (al menos que "content" sea usado, ver abajo): URL(s) ordenadas
+          // al archivo fuente, protocolo es menos arbitrario, pero un
+          // URL swarm es recomendado
           "urls": [ "bzzr://56ab..." ]
         },
         "mortal": {
-          // Required: keccak256 hash of the source file
+          // Requerido: hash keccak256 del arhivo fuente
           "keccak256": "0x234...",
-          // Required (unless "url" is used): literal contents of the source file
+          // Requerido (al menos que "url" sea usado): contenidos literales del archivo fuente
           "content": "contract mortal is owned { function kill() { if (msg.sender == owner) selfdestruct(owner); } }"
         }
       },
       // Required: Compiler settings
       settings:
       {
-        // Required for Solidity: Sorted list of remappings
+        // Requerido para Solidity: Lista ordenada de remappeos
         remappings: [ ":g/dir" ],
-        // Optional: Optimizer settings (enabled defaults to false)
+        // Opcional: Configuración optimizador (por defecto falso)
         optimizer: {
           enabled: true,
           runs: 500
         },
-        // Required for Solidity: File and name of the contract or library this
-        // metadata is created for.
+        // Requerido para Solidity: Archivo y nombre del contrato o librería para
+        // la librería al cual es creado este archivo metadata.
         compilationTarget: {
           "myFile.sol": "MyContract"
         },
-        // Required for Solidity: Addresses for libraries used
+        // Requerido para Solidity: Direcciones para librerías usadas
         libraries: {
           "MyLib": "0x123123..."
         }
       },
-      // Required: Generated information about the contract.
+      // Requerido Información generada sobre el contrato.
       output:
       {
-        // Required: ABI definition of the contract
+        // Requerido: definición ABI del contrato
         abi: [ ... ],
-        // Required: NatSpec user documentation of the contract
+        // Requerido: documentación usuario del contrato de NatSpec
         userdoc: [ ... ],
-        // Required: NatSpec developer documentation of the contract
+        // Requerido: documentación desarrollador del contrato de NatSpec
         devdoc: [ ... ],
       }
     }
 
 .. note::
-    Note the ABI definition above has no fixed order. It can change with compiler versions.
+    Nótese que la definición ABI arriba no tiene orden fijo. Puede cambiar con versiones de compilador.
 
 .. note::
-    Since the bytecode of the resulting contract contains the metadata hash, any change to
-    the metadata will result in a change of the bytecode. Furthermore, since the metadata
-    includes a hash of all the sources used, a single whitespace change in any of the source
-    codes will result in a different metadata, and subsequently a different bytecode.
+    Ya que el bytecode del contrato resultante contiene el hash del metadata, cualquier cambio
+    a la metadata resultará en un cambio en el bytecode. Además, ya que la metadata incluye
+    un hash de todos las fuentes usadas, un simple espacio blanco cambiada en cualquiera de los
+    archivos de fuente resultará en metadata diferente, y posteriormente en bytecode diferente.
 
-Encoding of the Metadata Hash in the Bytecode
-=============================================
 
-Because we might support other ways to retrieve the metadata file in the future,
-the mapping ``{"bzzr0": <Swarm hash>}`` is stored
-[CBOR](https://tools.ietf.org/html/rfc7049)-encoded. Since the beginning of that
-encoding is not easy to find, its length is added in a two-byte big-endian
-encoding. The current version of the Solidity compiler thus adds the following
-to the end of the deployed bytecode::
+Encodaje del hash de metadata en el bytecode
+============================================
+
+Porque podremos soportar otras maneras de consultar el archivo metadta en el futuro,
+el mapping ``{"bzzr0": <Swarm hash>}`` es guardado
+encodado en [CBOR](https://tools.ietf.org/html/rfc7049). Ya que el principio de ese
+encodaje no es fácil de encontrar, su largo es sumado y un encodaje two-byte big-endian.
+La versión actual del compilador de Solidity entonces agrega lo siguiente al final
+de bytecode desplegado::
 
     0xa1 0x65 'b' 'z' 'z' 'r' '0' 0x58 0x20 <32 bytes swarm hash> 0x00 0x29
 
-So in order to retrieve the data, the end of the deployed bytecode can be checked
-to match that pattern and use the Swarm hash to retrieve the file.
+Entonces para recuperar estos datos, el final del bytecode desplegado puede ser
+revisado para coincidir ese patrón y usar el Swarm hash para recuperar el archivo.
+
 
 Usage for Automatic Interface Generation and NatSpec
 ====================================================
