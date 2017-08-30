@@ -1,4 +1,4 @@
-#######
+utilizados#######
 Diverso
 #######
 
@@ -8,7 +8,7 @@ Diverso
 Layout de las variables de estado en almacenamiento
 ***************************************************
 
-Variables de tamaño estáticas (todo menos mapping y tipos arrays de tamaño variable) se disponen contiguamente en almacenamiento empezando de la posición ``0``. Cuando multiples elementos necesitan menos de 32 bytes, son empaquetados en un slot de almacenamiento cuando posible de acuerdo a las reglas:
+Variables de tamaño estáticas (todo menos mapping y tipos arrays de tamaño variable) se disponen contiguamente en almacenamiento empezando de la posición ``0``. Cuando múltiples elementos necesitan menos de 32 bytes, son empaquetados en un slot de almacenamiento cuando posible de acuerdo a las reglas:
 
 - El primer elemento en un slot de almacenamiento es almacenado alineado en lower-order.
 - Tipos elementales usan sólo usan la cantidad de bytes que se necesita para almacenarlas.
@@ -23,8 +23,8 @@ Variables de tamaño estáticas (todo menos mapping y tipos arrays de tamaño va
     al tamaño deseado.
 
     Sólo es benéfico de reducir el tamaño de los argumentos si estás tratando con valores de
-    almacenamiento porque el compilador empacará multiples elementos en un slot de almacenamiento,
-    y entonces, combina multiples lecturas y escrituras en una sólo operación. Cuando se trata con
+    almacenamiento porque el compilador empacará múltiples elementos en un slot de almacenamiento,
+    y entonces, combina múltiples lecturas y escrituras en una sóla operación. Cuando se trata con
     argumentos de función o valores de memoria, no hay beneficio inherente porque el compilador no
     empaca estos valores.
 
@@ -38,11 +38,11 @@ Los elementos de structs y arrays son almacenados después de ellos mismos, como
 
 Dado a su tamaño impredecible, tipos de array dinámicos y de mapping usan computación hash Keccak-256
 para encontrar la posición de inicio del valor o del dato del array. Estas posiciones de inicio
-son siempre slos de full stack.
+son siempre los de full stack.
 
 El mapping o el array dinámico en sí ocupa un slot (sin llenar) en alguna posición ``p`` de acuerdo
 a la regla de arriba (o por aplicar esta regla de mappings a mappings o arrays de arrays). Para un
-array dinámico, este slot guarda el número de elmentos en el array (los byte arrays y cadenas son
+array dinámico, este slot guarda el número de elementos en el array (los byte arrays y cadenas son
 excepciones aquí, mirar abajo). Para un mapping, el slot no es utilizado (pero es necesario para que
 dos mappings iguales seguidos usen diferentes distribuciones de hash).
 Datos de array son ubicados en ``kecakk256(p)`` y el valor correspondiente a una llave de mapping
@@ -85,11 +85,11 @@ Solidity siempre emplaza los nuevos objetos en el puntero de memoria libre y la 
 Layout de Call Data
 *******************
 
-Cuando un contrato Solidity es despliegado y cuando es llamado de un
+Cuando un contrato Solidity es desplegado y cuando es llamado de un
 account, el data de entrada se asume que está en el formato de la
 `espcificación ABI <https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI>`_.
 La especificación ABI requiere que los argumentos sean acolchados a
-multiples de 32 bytes. Las llamadas de función internas usan otra convención.
+múltiples de 32 bytes. Las llamadas de función internas usan otra convención.
 
 .. index: variable cleanup
 
@@ -97,7 +97,7 @@ multiples de 32 bytes. Las llamadas de función internas usan otra convención.
 Internas - Limpiando Variables
 ******************************
 
-Cuando un valor es mas corto que 256-bit, en algunos casos los bits
+Cuando un valor es más corto que 256-bit, en algunos casos los bits
 restantes tienen que ser limpiados.
 El compilador Solidity es diseñado para limpiar estos bits restantes antes
 de cualquier operación que pueda ser afectada adversamente por la potencial
@@ -110,7 +110,7 @@ que ser limpiados porque si no el valor ilegible puede ser observado.
 
 Por otro lado, no limpiamos los bits si la operación siguiente no es afectada.
 Por ejemplo, ya que cualquier valor no-cero es considerado ``true`` por
-una instrucción ``JUMPI``, no limpiamos los valores booleanos antes que sean utiliziados
+una instrucción ``JUMPI``, no limpiamos los valores booleanos antes que sean utilizados
 como condición para ``JUMPI``.
 
 Además de este principio de diseño, el compilador Solidity
@@ -147,13 +147,13 @@ Diferentes tipos tienen diferentes reglas para limpiar valores inválidos:
 Internos - El optimizador
 *************************
 
-El optimizador solidity funciona con assembly, así que puede y es usado con otros idiomas. Divide la secuencia de las instrucciones en bloques básicos de JUMPs y JUMPDESTs. Dentro de estos bloques, las instrucciones son analizadas y cada modificación al stack, a la memoria o al almacenamiento son guardadas como una expresión que consiste en una instrucción y una lista de argumentos que son esencialmente apuntadores a otras expresiones. La idea principal es encontrar expreciones que sean siempre iguales (en todo entradas) y combinatlas a una classe de expression. El optimizador primero intenta encontrar una nueva expresión en una lista de expresiones conocidas. Si esto no funciona, la expresión es simplificada de acuerdo a reglas como ``constante + constante = suma_de_constantes`` o ``X * 1 = X``. Ya que esto es hecho recursivamente, también podemos aplicar la última regla si el segundo factor es más una expresión más compleja donde sabemos que siempre evaluará a uno. Modificaciones al almacenamiento y ubicaciones de memoria tienen que borrar el conocimiento de almacenamiento y ubicaciones de memoriaque no son conocidas como diferentes: Si primero escribimos a ubicación `x` y luego a ubicación `y` y ambas son variables de entrada, la segunda puede sobre escribir la primera, entonces no sabemos realmente lo que es almacenadoen `x` después de escribir a `y`. Por otro lado, si una simplificación de la expresión `x -y` evalúa a una constante no cero, sabemos que podemos mantener nuestro conocimiento de lo que es almacenado en x.
+El optimizador solidity funciona con assembly, así que puede y es usado con otros idiomas. Divide la secuencia de las instrucciones en bloques básicos de JUMPs y JUMPDESTs. Dentro de estos bloques, las instrucciones son analizadas y cada modificación al stack, a la memoria o al almacenamiento son guardadas como una expresión que consiste en una instrucción y una lista de argumentos que son esencialmente apuntadores a otras expresiones. La idea principal es encontrar expreciones que sean siempre iguales (en todo entradas) y combinarlas a una clase de expresión. El optimizador primero intenta encontrar una nueva expresión en una lista de expresiones conocidas. Si esto no funciona, la expresión es simplificada de acuerdo a reglas como ``constante + constante = suma_de_constantes`` o ``X * 1 = X``. Ya que esto es hecho recursivamente, también podemos aplicar la última regla si el segundo factor es más una expresión más compleja donde sabemos que siempre evaluará a uno. Modificaciones al almacenamiento y ubicaciones de memoria tienen que borrar el conocimiento de almacenamiento y ubicaciones de memoria que no son conocidas como diferentes: Si primero escribimos a ubicación `x` y luego a ubicación `y` y ambas son variables de entrada, la segunda puede sobre escribir la primera, entonces no sabemos realmente lo que es almacenado en `x` después de escribir a `y`. Por otro lado, si una simplificación de la expresión `x -y` evalúa a una constante no cero, sabemos que podemos mantener nuestro conocimiento de lo que es almacenado en x.
 
-En el fin de este proceso, sabemos cuales expresiones tienen que estar en el stack en el fin y tienen una lista de modificaciones a la memoria y almacenamiento. Esta información es almacenada junta con los bloques básicos y es usada para unirlas. Además, información sobre el stack, almacenamiento y configuración de memoria es enviada al (los) próximo(s) bloque(s). Si sabemos los objetivos de cada una de las instrucciones JUMP y JUMPI, podemos construir un gráfico de flujo completo del programa. Si hay un sólo objetivo que no conocemos (esto puede pasar ya que en principio, los objetivos de jumps pueden ser computados de las entradas), tenemos que borrar toda información sobre los estados de entrada de un bloque ya que puede ser el objetivo de del JUMP desconocido. Si un JUMPI es encontrado que la condición evalúa a una constante, es transformada en un jump incondicional.
+En el fin de este proceso, sabemos cuáles expresiones tienen que estar en el stack en el fin y tienen una lista de modificaciones a la memoria y almacenamiento. Esta información es almacenada junta con los bloques básicos y es usada para unirlas. Además, información sobre el stack, almacenamiento y configuración de memoria es enviada al (los) próximo(s) bloque(s). Si sabemos los objetivos de cada una de las instrucciones JUMP y JUMPI, podemos construir un gráfico de flujo completo del programa. Si hay un sólo objetivo que no conocemos (esto puede pasar ya que en principio, los objetivos de jumps pueden ser computados de las entradas), tenemos que borrar toda información sobre los estados de entrada de un bloque ya que puede ser el objetivo de del JUMP desconocido. Si un JUMPI es encontrado que la condición evalúa a una constante, es transformada en un jump incondicional.
 
-Como en el último paso, el código en cada bloque es completamente regenerado. Un gráfico de dependencias es creado de la expresión en el stack en el fin del bloque y cada operación que no es parte de este gráfico es esencialmente olvidado. Ahora código es generado que aplica las modificaciones a la memoria y al almacenamiento en el orden que fueron hechas en el código original (olvidandon modificaciones que fueron encontradas innecesarias) y finalmente, genera todos valores que son requeridos para estar en el stack en el lugar correcto.
+Como en el último paso, el código en cada bloque es completamente regenerado. Un gráfico de dependencias es creado de la expresión en el stack en el fin del bloque y cada operación que no es parte de este gráfico es esencialmente olvidado. Ahora código es generado que aplica las modificaciones a la memoria y al almacenamiento en el orden que fueron hechas en el código original (olvidando modificaciones que fueron encontradas innecesarias) y finalmente, genera todos valores que son requeridos para estar en el stack en el lugar correcto.
 
-Estos pasos son aplicados a cada bloque básico y el código nuevo es usado remplazando si es que es más pequeño. Si un bloque básico es dividido en un JUMPI y durante el análisis, la condición evalúa a una constante el JUMPI es reemplazado dependiendo de la valor de la constante, y por lo tanto código como
+Estos pasos son aplicados a cada bloque básico y el código nuevo es usado reemplazando si es que es más pequeño. Si un bloque básico es dividido en un JUMPI y durante el análisis, la condición evalúa a una constante el JUMPI es reemplazado dependiendo de la valor de la constante, y por lo tanto código como
 
 ::
 
@@ -180,8 +180,8 @@ Mappings de Fuente
 ******************
 
 Como parte de la output AST, el compilador provee el rango del código fuente
-que es representado por el nodo respectio en el AST. Esto puede ser usado
-para varios propísitos desde herramientas de análisis estático que reportan
+que es representado por el nodo respecto al AST. Esto puede ser usado
+para varios propósitos desde herramientas de análisis estático que reportan
 errores basados en el AST y herramientas de debugging que demarcan variables
 locales y sus usos.
 
@@ -201,7 +201,7 @@ Los mappings de fuente dentro del AST usan la siguiente notación:
 ``s:l:f``
 
 Donde ``s`` es el byte-offset de el inicio del rango en el archivo fuente,
-``l`` es el largo del rango de la fuente een bytes y ``f`` es el índice de fuente
+``l`` es el largo del rango de la fuente en bytes y ``f`` es el índice de fuente
 mencionado arriba.
 
 El encodaje en el mapping de fuente para el bytecode es más complicado:
@@ -213,13 +213,13 @@ Los campos ``s``, ``l`` y ``f`` son como detallamos arriba y ``j`` puede ser ``i
 ``i`` o ``-`` y significa si una instrucción jump va en la función, devuelve una
 función, devuelve desde una función o si es un jump regular como parte de un (ej) loop.
 
-A fin de comprimir estos mappings de fuente espcialmente para bytecode, las
+A fin de comprimir estos mappings de fuente especialmente para bytecode, las
 siguientes reglas son usadas:
 
  - Si un campo está vacío, el valor del elemento precedente es usado.
  - Si un ``:`` falta, todos los campos siguientes son considerados vacíos.
 
-Esto significa que los suguientes mappings de fuente representan la misma información:
+Esto significa que los siguientes mappings de fuente representan la misma información:
 
 ``1:2:1;1:9:1;2:1:2;2:1:2;2:1:2``
 
@@ -235,12 +235,12 @@ Se puede usar para consultar la versión del compilador, las fuentes usadas,
 el ABI y documentación NatSpec a fin de interactuar con más seguridad con el
 contrato y verificar su código fuente.
 
-El compilador agrega un has Swarm del archivo metadata al final del bytecode
+El compilador agrega un hash Swarm del archivo metadata al final del bytecode
 (para detalles, mirar abajo) de cada contrato, para que se pueda recuperar el
 archivo en una manera autentificada sin tener que usar un proveedor de datos
 centrales.
 
-Sin embargo, se tiene que publicar el arhivo metadata a Swarm (o otro servicio)
+Sin embargo, se tiene que publicar el archivo metadata a Swarm (o otro servicio)
 para que otros puedan verlo. El archivo puede ser producido usando ``solc --metadata``
 y el archivo será llamado ``NombreContrato_meta.json``.
 Contendrá referencias Swarm al código fuente, así que tienes que upload
@@ -249,13 +249,13 @@ todos los archivos código fuente y el archivo metadata.
 El archivo metadata tiene el formato siguiente. El ejemplo abajo es presentado de
 manera legible por humanos. Metadata formateada correctamente debe usar comillas
 correctamente, reducir espacio blanco a un mínimo y ordenarse diferentemente.
-Los comantarios obviamente tampoco son permitidos y son usados aquí sólo por
+Los comentarios obviamente tampoco son permitidos y son usados aquí sólo por
 razones explicativos.
 
 .. code-block:: none
 
     {
-      // Requerido: La versoin del formato de metadata
+      // Requerido: La versión del formato de metadata
       version: "1",
       // Requerido: lenguaje de código fuente, settea una "sub-versión"
       // de la espcificación
@@ -275,13 +275,13 @@ razones explicativos.
         "myFile.sol": {
           // Requerido: keccak256 hash del archivo fuente
           "keccak256": "0x123...",
-          // Reuqerido (al menos que "content" sea usado, ver abajo): URL(s) ordenadas
+          // Requerido (al menos que "content" sea usado, ver abajo): URL(s) ordenadas
           // al archivo fuente, protocolo es menos arbitrario, pero un
           // URL swarm es recomendado
           "urls": [ "bzzr://56ab..." ]
         },
         "mortal": {
-          // Requerido: hash keccak256 del arhivo fuente
+          // Requerido: hash keccak256 del archivo fuente
           "keccak256": "0x234...",
           // Requerido (al menos que "url" sea usado): contenidos literales del archivo fuente
           "content": "contract mortal is owned { function kill() { if (msg.sender == owner) selfdestruct(owner); } }"
@@ -332,7 +332,7 @@ razones explicativos.
 Encodaje del hash de metadata en el bytecode
 ============================================
 
-Porque podremos soportar otras maneras de consultar el archivo metadta en el futuro,
+Porque podremos soportar otras maneras de consultar el archivo metadata en el futuro,
 el mapping ``{"bzzr0": <Swarm hash>}`` es guardado
 encodado en [CBOR](https://tools.ietf.org/html/rfc7049). Ya que el principio de ese
 encodaje no es fácil de encontrar, su largo es sumado y un encodaje two-byte big-endian.
@@ -348,12 +348,12 @@ revisado para coincidir ese patrón y usar el Swarm hash para recuperar el archi
 Uso para Generación de Interfaz Automática y NatSpec
 ====================================================
 
-El metadata es usado de la siguiente forma: Un componenete que quiere interactuar
+El metadata es usado de la siguiente forma: Un componente que quiere interactuar
 con un contrato (ej. Mist) obtiene el código del contrato, a partir de eso el
 hash Swarm de un archivo que luego es recuperado.
 Ese archivo es un JSON con la estructura como la de arriba.
 
-El componenete puede luego usar el ABI para generar automáticamente una rudimentaria
+El componente puede luego usar el ABI para generar automáticamente una rudimentaria
 interfaz de usuario para el contrato.
 
 Además, Mist puede usar el userdoc para mostrar un mensaje de confirmación al usuario
@@ -363,7 +363,7 @@ cuando sea que interactúe con el contrato.
 Uso de Verificación de Código Fuente
 ====================================
 
-A fin de verificar la complilación, las fuentes pueden ser recuperadas de Swarm
+A fin de verificar la compilación, las fuentes pueden ser recuperadas de Swarm
 desde el enlace en el archivo metadata.
 El compilador de la versión correcta (que es luego revisado para ser parte de los compiladores
 "oficiales") es invocado en esa entrada con la configuración específica. El resultado
@@ -378,7 +378,7 @@ Trucos y Consejos
 *****************
 
 * Usar ``delete`` en arrays para borrar sus elementos.
-* Usat tipos mas cortos para elementos struct y ordenarlos para que los elementos mas cortos estén agrupados. Esto puede disminuir los costes de gas ya que multiples operaciones SSTORE puden ser combinadas en una sóla (SSTORE cuesta 5000 o 20000 gas, así que esto es lo que se optimiza). Usar el estimador de precio de gas (con optimizador activado) para probar!
+* Usat tipos mas cortos para elementos struct y ordenarlos para que los elementos mas cortos estén agrupados. Esto puede disminuir los costes de gas ya que múltiples operaciones SSTORE puden ser combinadas en una sóla (SSTORE cuesta 5000 o 20000 gas, así que esto es lo que se optimiza). Usar el estimador de precio de gas (con optimizador activado) para probar!
 * Hacer las variables de estado púlicas - el compilador creará :ref:`getters <visibility-and-getters>` automáticamente.
 * Si revisa las condiciones de entrada o de estado muchas veces en el inicio de las funciones, intenta usar :ref:`modifiers`.
 * Si tu contrato tiene una función llamada ``send`` pero quieres usar la función interna de envío, usa ``address(contractVariable).send(amount)``.
@@ -406,9 +406,9 @@ El siguiente es el orden de precedencia para operadores, listado en orden de eva
 +            +-------------------------------------+--------------------------------------------+
 |            | subscripting de Array               | ``<array>[<index>]``                       |
 +            +-------------------------------------+--------------------------------------------+
-|            | Acceso de mienbro                   | ``<object>.<member>``                      |
+|            | Acceso de miembro                   | ``<object>.<member>``                      |
 +            +-------------------------------------+--------------------------------------------+
-|            | Parentesis                          | ``(<statement>)``                          |
+|            | Paréntesis                          | ``(<statement>)``                          |
 +------------+-------------------------------------+--------------------------------------------+
 | *2*        | Prefijo incremento y decremento     | ``++``, ``--``                             |
 +            +-------------------------------------+--------------------------------------------+
@@ -424,7 +424,7 @@ El siguiente es el orden de precedencia para operadores, listado en orden de eva
 +------------+-------------------------------------+--------------------------------------------+
 | *4*        | Multiplicación, división and módulo | ``*``, ``/``, ``%``                        |
 +------------+-------------------------------------+--------------------------------------------+
-| *5*        | Addición and subtracción            | ``+``, ``-``                               |
+| *5*        | Adición and sustracción             | ``+``, ``-``                               |
 +------------+-------------------------------------+--------------------------------------------+
 | *6*        | Operadores Bitwise shift            | ``<<``, ``>>``                             |
 +------------+-------------------------------------+--------------------------------------------+
@@ -448,7 +448,7 @@ El siguiente es el orden de precedencia para operadores, listado en orden de eva
 |            |                                     | ``>>=``, ``+=``, ``-=``, ``*=``, ``/=``,   |
 |            |                                     | ``%=``                                     |
 +------------+-------------------------------------+--------------------------------------------+
-| *16*       | Operator de coma                    | ``,``                                      |
+| *16*       | Operador de coma                    | ``,``                                      |
 +------------+-------------------------------------+--------------------------------------------+
 
 .. index:: assert, block, coinbase, difficulty, number, block;number, timestamp, block;timestamp, msg, data, gas, sender, value, now, gas price, origin, revert, require, keccak256, ripemd160, sha256, ecrecover, addmod, mulmod, cryptography, this, super, selfdestruct, balance, send
@@ -464,7 +464,7 @@ Variables Globales
 - ``block.timestamp`` (``uint``): timestamp del bloque actual
 - ``msg.data`` (``bytes``): calldata completa
 - ``msg.gas`` (``uint``): gas restante
-- ``msg.sender`` (``address``): sender del mensaje (llamda actual)
+- ``msg.sender`` (``address``): sender del mensaje (llamada actual)
 - ``msg.value`` (``uint``): números de wei enviados con el mensaje
 - ``now`` (``uint``): timestamp del bloque actual (alias para ``block.timestamp``)
 - ``tx.gasprice`` (``uint``): precio de gas de la transacción
@@ -476,7 +476,7 @@ Variables Globales
 - ``sha3(...) devuelve (bytes32)``: un alias a `keccak256()`
 - ``sha256(...) devuelve (bytes32)``: computar el hash SHA-256 de los argumentos (empacados)
 - ``ripemd160(...) devuelve (bytes20)``: computa el hash RIPEMD-160 de los argumentos (empacados)
-- ``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``: recupear address asociada con la llave pública desde la firma de la curva elíptica, devuelve cero en error
+- ``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``: recuperar address asociada con la llave pública desde la firma de la curva elíptica, devuelve cero en error
 - ``addmod(uint x, uint y, uint k) devuelve (uint)``: computa ``(x + y) % k`` donde la suma es hecha con precisión arbitraria y no envuelve ``2**256``
 - ``mulmod(uint x, uint y, uint k) devuelve (uint)``: computa ``(x * y) % k`` donde la multiplicación es hecha con precisión arbitraria y no envuelve ``2**256``
 - ``this`` (tipo del contrato actual): el contrato actual, explícitamente convertible a ``address``
@@ -484,7 +484,7 @@ Variables Globales
 - ``selfdestruct(address recipient)``: destruir el contrato actual, enviando sus fondos a la address dada
 - ``<address>.balance`` (``uint256``): saldo de :ref:`address` en Wei
 - ``<address>.send(uint256 amount) devuelve (bool)``: enviar monto dado de Wei a :ref:`address`, devuelve ``false`` en error
-- ``<address>.transfer(uint256 amount)``: envíar monto dado de Wei a :ref:`address`, arroja si falla
+- ``<address>.transfer(uint256 amount)``: enviar monto dado de Wei a :ref:`address`, arroja si falla
 
 
 .. index:: visibility, public, private, external, internal
@@ -498,15 +498,15 @@ Especificadores de Visibilidad de Función
         return true;
     }
 
-- ``public``: visible externa y internamente (crea función getter para almacenamiento/varibales de estado)
+- ``public``: visible externa y internamente (crea función getter para almacenamiento/variables de estado)
 - ``private``: sólo visible en el contrato actual
 - ``external``: sólo visible del exterior (sólo para funciones) - e.j. sólo puede ser mensaje-llamado (via ``this.func``)
-- ``internal``: sólo visible internamante
+- ``internal``: sólo visible internamente
 
 
 .. index:: modifiers, constant, anonymous, indexed
 
-Modificacores
+Modificadores
 =============
 
 - ``constant`` para variables de estado: no permite asignaciones (excepto inicialización), no ocupa un slot de almacenamiento.
