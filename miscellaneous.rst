@@ -345,43 +345,44 @@ Entonces para recuperar estos datos, el final del bytecode desplegado puede ser
 revisado para coincidir ese patrón y usar el Swarm hash para recuperar el archivo.
 
 
-Usage for Automatic Interface Generation and NatSpec
+Uso para Generación de Interfaz Automática y NatSpec
 ====================================================
 
-The metadata is used in the following way: A component that wants to interact
-with a contract (e.g. Mist) retrieves the code of the contract, from that
-the Swarm hash of a file which is then retrieved.
-That file is JSON-decoded into a structure like above.
+El metadata es usado de la siguiente forma: Un componenete que quiere interactuar
+con un contrato (ej. Mist) obtiene el código del contrato, a partir de eso el
+hash Swarm de un archivo que luego es recuperado.
+Ese archivo es un JSON con la estructura como la de arriba.
 
-The component can then use the ABI to automatically generate a rudimentary
-user interface for the contract.
+El componenete puede luego usar el ABI para generar automáticamente una rudimentaria
+interfaz de usuario para el contrato.
 
-Furthermore, Mist can use the userdoc to display a confirmation message to the user
-whenever they interact with the contract.
-
-Usage for Source Code Verification
-==================================
-
-In order to verify the compilation, sources can be retrieved from Swarm
-via the link in the metadata file.
-The compiler of the correct version (which is checked to be part of the "official" compilers)
-is invoked on that input with the specified settings. The resulting
-bytecode is compared to the data of the creation transaction or CREATE opcode data.
-This automatically verifies the metadata since its hash is part of the bytecode.
-Excess data corresponds to the constructor input data, which should be decoded
-according to the interface and presented to the user.
+Además, Mist puede usar el userdoc para mostrar un mensaje de confirmación al usuario
+cuando sea que interactúe con el contrato.
 
 
-***************
-Tips and Tricks
-***************
+Uso de Verificación de Código Fuente
+====================================
 
-* Use ``delete`` on arrays to delete all its elements.
-* Use shorter types for struct elements and sort them such that short types are grouped together. This can lower the gas costs as multiple SSTORE operations might be combined into a single (SSTORE costs 5000 or 20000 gas, so this is what you want to optimise). Use the gas price estimator (with optimiser enabled) to check!
-* Make your state variables public - the compiler will create :ref:`getters <visibility-and-getters>` for you automatically.
-* If you end up checking conditions on input or state a lot at the beginning of your functions, try using :ref:`modifiers`.
-* If your contract has a function called ``send`` but you want to use the built-in send-function, use ``address(contractVariable).send(amount)``.
-* Initialise storage structs with a single assignment: ``x = MyStruct({a: 1, b: 2});``
+A fin de verificar la complilación, las fuentes pueden ser recuperadas de Swarm
+desde el enlace en el archivo metadata.
+El compilador de la versión correcta (que es luego revisado para ser parte de los compiladores
+"oficiales") es invocado en esa entrada con la configuración específica. El resultado
+bytecode es comparado a los datos de la transacción de creación o a datos del opcode CREATE.
+Esto verifica automáticamente la metadata ya que su hash es parte del bytecode.
+Datos en exceso corresponden a los datos de entrada del constructor, que debiera ser decodificado
+de acuerdo a la interfaz y presentada al usuario.
+
+
+*****************
+Trucos y Consejos
+*****************
+
+* Usar ``delete`` en arrays para borrar sus elementos.
+* Usat tipos mas cortos para elementos struct y ordenarlos para que los elementos mas cortos estén agrupados. Esto puede disminuir los costes de gas ya que multiples operaciones SSTORE puden ser combinadas en una sóla (SSTORE cuesta 5000 o 20000 gas, así que esto es lo que se optimiza). Usar el estimador de precio de gas (con optimizador activado) para probar!
+* Hacer las variables de estado púlicas - el compilador creará :ref:`getters <visibility-and-getters>` automáticamente.
+* Si revisa las condiciones de entrada o de estado muchas veces en el inicio de las funciones, intenta usar :ref:`modifiers`.
+* Si tu contrato tiene una función llamada ``send`` pero quieres usar la función interna de envío, usa ``address(contractVariable).send(amount)``.
+* Inicia structs de almacenamiento con una sóla asignación: ``x = MyStruct({a: 1, b: 2});``
 
 **********
 Cheatsheet
@@ -391,41 +392,41 @@ Cheatsheet
 
 .. _order:
 
-Order of Precedence of Operators
-================================
+Orden de preferencia de Operadores
+==================================
 
-The following is the order of precedence for operators, listed in order of evaluation.
+El siguiente es el orden de precedencia para operadores, listado en orden de evaluación.
 
 +------------+-------------------------------------+--------------------------------------------+
-| Precedence | Description                         | Operator                                   |
+| Precedencia| Descripción                         | Operador                                   |
 +============+=====================================+============================================+
-| *1*        | Postfix increment and decrement     | ``++``, ``--``                             |
+| *1*        | Postfix incremento y decremento     | ``++``, ``--``                             |
 +            +-------------------------------------+--------------------------------------------+
-|            | Function-like call                  | ``<func>(<args...>)``                      |
+|            | llamado tipo Function               | ``<func>(<args...>)``                      |
 +            +-------------------------------------+--------------------------------------------+
-|            | Array subscripting                  | ``<array>[<index>]``                       |
+|            | subscripting de Array               | ``<array>[<index>]``                       |
 +            +-------------------------------------+--------------------------------------------+
-|            | Member access                       | ``<object>.<member>``                      |
+|            | Acceso de mienbro                   | ``<object>.<member>``                      |
 +            +-------------------------------------+--------------------------------------------+
-|            | Parentheses                         | ``(<statement>)``                          |
+|            | Parentesis                          | ``(<statement>)``                          |
 +------------+-------------------------------------+--------------------------------------------+
-| *2*        | Prefix increment and decrement      | ``++``, ``--``                             |
+| *2*        | Prefijo incremento y decremento     | ``++``, ``--``                             |
 +            +-------------------------------------+--------------------------------------------+
-|            | Unary plus and minus                | ``+``, ``-``                               |
+|            | Unary más y menos                   | ``+``, ``-``                               |
 +            +-------------------------------------+--------------------------------------------+
-|            | Unary operations                    | ``delete``                                 |
+|            | Operaciones Unary                   | ``delete``                                 |
 +            +-------------------------------------+--------------------------------------------+
 |            | Logical NOT                         | ``!``                                      |
 +            +-------------------------------------+--------------------------------------------+
 |            | Bitwise NOT                         | ``~``                                      |
 +------------+-------------------------------------+--------------------------------------------+
-| *3*        | Exponentiation                      | ``**``                                     |
+| *3*        | Exponenciación                      | ``**``                                     |
 +------------+-------------------------------------+--------------------------------------------+
-| *4*        | Multiplication, division and modulo | ``*``, ``/``, ``%``                        |
+| *4*        | Multiplicación, división and módulo | ``*``, ``/``, ``%``                        |
 +------------+-------------------------------------+--------------------------------------------+
-| *5*        | Addition and subtraction            | ``+``, ``-``                               |
+| *5*        | Addición and subtracción            | ``+``, ``-``                               |
 +------------+-------------------------------------+--------------------------------------------+
-| *6*        | Bitwise shift operators             | ``<<``, ``>>``                             |
+| *6*        | Operadores Bitwise shift            | ``<<``, ``>>``                             |
 +------------+-------------------------------------+--------------------------------------------+
 | *7*        | Bitwise AND                         | ``&``                                      |
 +------------+-------------------------------------+--------------------------------------------+
@@ -433,62 +434,63 @@ The following is the order of precedence for operators, listed in order of evalu
 +------------+-------------------------------------+--------------------------------------------+
 | *9*        | Bitwise OR                          | ``|``                                      |
 +------------+-------------------------------------+--------------------------------------------+
-| *10*       | Inequality operators                | ``<``, ``>``, ``<=``, ``>=``               |
+| *10*       | Operadores de Inigualdad            | ``<``, ``>``, ``<=``, ``>=``               |
 +------------+-------------------------------------+--------------------------------------------+
-| *11*       | Equality operators                  | ``==``, ``!=``                             |
+| *11*       | Operadores de igualdad              | ``==``, ``!=``                             |
 +------------+-------------------------------------+--------------------------------------------+
 | *12*       | Logical AND                         | ``&&``                                     |
 +------------+-------------------------------------+--------------------------------------------+
 | *13*       | Logical OR                          | ``||``                                     |
 +------------+-------------------------------------+--------------------------------------------+
-| *14*       | Ternary operator                    | ``<conditional> ? <if-true> : <if-false>`` |
+| *14*       | Operador ternario                   | ``<conditional> ? <if-true> : <if-false>`` |
 +------------+-------------------------------------+--------------------------------------------+
-| *15*       | Assignment operators                | ``=``, ``|=``, ``^=``, ``&=``, ``<<=``,    |
+| *15*       | Operador de asignación              | ``=``, ``|=``, ``^=``, ``&=``, ``<<=``,    |
 |            |                                     | ``>>=``, ``+=``, ``-=``, ``*=``, ``/=``,   |
 |            |                                     | ``%=``                                     |
 +------------+-------------------------------------+--------------------------------------------+
-| *16*       | Comma operator                      | ``,``                                      |
+| *16*       | Operator de coma                    | ``,``                                      |
 +------------+-------------------------------------+--------------------------------------------+
 
 .. index:: assert, block, coinbase, difficulty, number, block;number, timestamp, block;timestamp, msg, data, gas, sender, value, now, gas price, origin, revert, require, keccak256, ripemd160, sha256, ecrecover, addmod, mulmod, cryptography, this, super, selfdestruct, balance, send
 
-Global Variables
-================
+Variables Globales
+==================
 
-- ``block.blockhash(uint blockNumber) returns (bytes32)``: hash of the given block - only works for 256 most recent blocks
-- ``block.coinbase`` (``address``): current block miner's address
-- ``block.difficulty`` (``uint``): current block difficulty
-- ``block.gaslimit`` (``uint``): current block gaslimit
-- ``block.number`` (``uint``): current block number
-- ``block.timestamp`` (``uint``): current block timestamp
-- ``msg.data`` (``bytes``): complete calldata
-- ``msg.gas`` (``uint``): remaining gas
-- ``msg.sender`` (``address``): sender of the message (current call)
-- ``msg.value`` (``uint``): number of wei sent with the message
-- ``now`` (``uint``): current block timestamp (alias for ``block.timestamp``)
-- ``tx.gasprice`` (``uint``): gas price of the transaction
-- ``tx.origin`` (``address``): sender of the transaction (full call chain)
-- ``assert(bool condition)``: abort execution and revert state changes if condition is ``false`` (use for internal error)
-- ``require(bool condition)``: abort execution and revert state changes if condition is ``false`` (use for malformed input)
-- ``revert()``: abort execution and revert state changes
-- ``keccak256(...) returns (bytes32)``: compute the Ethereum-SHA-3 (Keccak-256) hash of the (tightly packed) arguments
-- ``sha3(...) returns (bytes32)``: an alias to `keccak256()`
-- ``sha256(...) returns (bytes32)``: compute the SHA-256 hash of the (tightly packed) arguments
-- ``ripemd160(...) returns (bytes20)``: compute the RIPEMD-160 hash of the (tightly packed) arguments
-- ``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``: recover address associated with the public key from elliptic curve signature, return zero on error
-- ``addmod(uint x, uint y, uint k) returns (uint)``: compute ``(x + y) % k`` where the addition is performed with arbitrary precision and does not wrap around at ``2**256``
-- ``mulmod(uint x, uint y, uint k) returns (uint)``: compute ``(x * y) % k`` where the multiplication is performed with arbitrary precision and does not wrap around at ``2**256``
-- ``this`` (current contract's type): the current contract, explicitly convertible to ``address``
-- ``super``: the contract one level higher in the inheritance hierarchy
-- ``selfdestruct(address recipient)``: destroy the current contract, sending its funds to the given address
-- ``<address>.balance`` (``uint256``): balance of the :ref:`address` in Wei
-- ``<address>.send(uint256 amount) returns (bool)``: send given amount of Wei to :ref:`address`, returns ``false`` on failure
-- ``<address>.transfer(uint256 amount)``: send given amount of Wei to :ref:`address`, throws on failure
+- ``block.blockhash(uint blockNumber) devuelve (bytes32)``: hash del bloque dado - sólo funciona para los últimos 256 bloques
+- ``block.coinbase`` (``address``): address del actual minero de bloque
+- ``block.difficulty`` (``uint``): dificultad del bloque actual
+- ``block.gaslimit`` (``uint``): gaslimit del bloque actual
+- ``block.number`` (``uint``): número del bloque actual
+- ``block.timestamp`` (``uint``): timestamp del bloque actual
+- ``msg.data`` (``bytes``): calldata completa
+- ``msg.gas`` (``uint``): gas restante
+- ``msg.sender`` (``address``): sender del mensaje (llamda actual)
+- ``msg.value`` (``uint``): números de wei enviados con el mensaje
+- ``now`` (``uint``): timestamp del bloque actual (alias para ``block.timestamp``)
+- ``tx.gasprice`` (``uint``): precio de gas de la transacción
+- ``tx.origin`` (``address``): sender de la transacción (cadena de llamado completo)
+- ``assert(bool condition)``: abortar ejecución y dehacer cambios de estado si la condición es ``false`` (uso para error interno)
+- ``require(bool condition)``: abortar ejecución y dehacer cambios de estado si la condición es ``false`` (uso para entradas erroneas)
+- ``revert()``: abortar ejecución y deshacer cambios de estado
+- ``keccak256(...) devuelve (bytes32)``: computar el hash Ethereum-SHA-3 (Keccak-256) de los argumentos (empacados)
+- ``sha3(...) devuelve (bytes32)``: un alias a `keccak256()`
+- ``sha256(...) devuelve (bytes32)``: computar el hash SHA-256 de los argumentos (empacados)
+- ``ripemd160(...) devuelve (bytes20)``: computa el hash RIPEMD-160 de los argumentos (empacados)
+- ``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``: recupear address asociada con la llave pública desde la firma de la curva elíptica, devuelve cero en error
+- ``addmod(uint x, uint y, uint k) devuelve (uint)``: computa ``(x + y) % k`` donde la suma es hecha con precisión arbitraria y no envuelve ``2**256``
+- ``mulmod(uint x, uint y, uint k) devuelve (uint)``: computa ``(x * y) % k`` donde la multiplicación es hecha con precisión arbitraria y no envuelve ``2**256``
+- ``this`` (tipo del contrato actual): el contrato actual, explícitamente convertible a ``address``
+- ``super``: el contrato un nivel más alto en la jerarquía de herencia
+- ``selfdestruct(address recipient)``: destruir el contrato actual, enviando sus fondos a la address dada
+- ``<address>.balance`` (``uint256``): saldo de :ref:`address` en Wei
+- ``<address>.send(uint256 amount) devuelve (bool)``: enviar monto dado de Wei a :ref:`address`, devuelve ``false`` en error
+- ``<address>.transfer(uint256 amount)``: envíar monto dado de Wei a :ref:`address`, arroja si falla
+
 
 .. index:: visibility, public, private, external, internal
 
-Function Visibility Specifiers
-==============================
+Especificadores de Visibilidad de Función
+=========================================
 
 ::
 
@@ -496,27 +498,29 @@ Function Visibility Specifiers
         return true;
     }
 
-- ``public``: visible externally and internally (creates getter function for storage/state variables)
-- ``private``: only visible in the current contract
-- ``external``: only visible externally (only for functions) - i.e. can only be message-called (via ``this.func``)
-- ``internal``: only visible internally
+- ``public``: visible externa y internamente (crea función getter para almacenamiento/varibales de estado)
+- ``private``: sólo visible en el contrato actual
+- ``external``: sólo visible del exterior (sólo para funciones) - e.j. sólo puede ser mensaje-llamado (via ``this.func``)
+- ``internal``: sólo visible internamante
 
 
 .. index:: modifiers, constant, anonymous, indexed
 
-Modifiers
-=========
+Modificacores
+=============
 
-- ``constant`` for state variables: Disallows assignment (except initialisation), does not occupy storage slot.
-- ``constant`` for functions: Disallows modification of state - this is not enforced yet.
-- ``anonymous`` for events: Does not store event signature as topic.
-- ``indexed`` for event parameters: Stores the parameter as topic.
-- ``payable`` for functions: Allows them to receive Ether together with a call.
+- ``constant`` para variables de estado: no permite asignaciones (excepto inicialización), no ocupa un slot de almacenamiento.
+- ``constant`` para funciones: no permite modificación de estado - esto no está enforzado aún.
+- ``anonymous`` para eventos: no guarda la firma del evento como topic.
+- ``indexed`` para parámetros de eventos: guarda el parámetro como topic.
+- ``payable`` para funciones: les permite recibir ether junto a una llamada.
 
-Reserved Keywords
-=================
 
-These keywords are reserved in Solidity. They might become part of the syntax in the future:
+Keywords Reservadas
+===================
+
+
+Estas palabras son reservadas en Solidity. Pueden incorporarse a la sintaxis en el futuro:
 
 ``abstract``, ``after``, ``case``, ``catch``, ``default``, ``final``, ``in``, ``inline``, ``interface``, ``let``, ``match``, ``null``,
 ``of``, ``pure``, ``relocatable``, ``static``, ``switch``, ``try``, ``type``, ``typeof``, ``view``.
