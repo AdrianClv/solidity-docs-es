@@ -3,6 +3,11 @@ Para editar un fichero, primero entra en la pestaña "Pull requests" para compro
 
 Para mejor organización, sólo debe traducirse un fichero por Pull request.
 
+### Qué traducir
+Este documento pretende ser una versión en español de la documentación original, de modo que lo que se escriba aquí debe ser un reflejo de lo que haya en la versión en inglés. Esto quiere decir que si crees que falta algo por documentar o puedes mejorar la documentación (que no traducción), el proceso que debes seguir es proponerlo primero en la versión en inglés y, una vez aceptado allí, reflejar aquí la versión en español.
+
+Los documentos que se deben traducir son los **documentos .rst**. Dentro de estos, se debe traducir **el texto y los comentarios del código**. Los nombres de los contratos, variables y demás no deben ser traducidos.
+
 ### Estilo
 Algunas cosas a tener en cuenta cuando se traduzca un documento:
 * El código, nombres de funciones y variables no se traducen (los comentarios sí).
