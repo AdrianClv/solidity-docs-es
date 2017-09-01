@@ -112,8 +112,8 @@ Las llamadas a funciones provocan excepciones si el contrato invocado no existe 
     Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente aleatoria y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama mediante sus funciones. Escribir tus funciones de manera que realicen, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato, hace que este contrato no sea vulnerable a un ataque de reentrada.
     
 
-Named Calls y parámetros de funciones anónimas
-----------------------------------------------
+Llamadas con nombre y parámetros de funciones anónimas
+------------------------------------------------------
 
 Los argumentos de una llamada a una función pueden venir dados por el nombre, en cualquier orden, si están entre ``{ }`` como se puede ver en el siguiente ejemplo. La lista de argumentos tiene que coincidir por el nombre con la lista de parámetros de la declaración de la función, pero pueden estar en orden aleatorio.
 
@@ -125,7 +125,7 @@ Los argumentos de una llamada a una función pueden venir dados por el nombre, e
         function f(uint key, uint value) { ... }
 
         function g() {
-            // named arguments
+            // argumentos con nombre
             f({value: 2, key: 3});
         }
     }
@@ -141,7 +141,7 @@ Esos nombres estarán presentes en la pila, pero serán inaccesibles.
     pragma solidity ^0.4.0;
 
     contract C {
-        //Se omite el nombre para el parámetro
+        // Se omite el nombre para el parámetro
         function func(uint k, uint) returns(uint) {
             return k;
         }
@@ -189,7 +189,7 @@ pero no es posible limitar la cantidad de gas. Si la creación falla
 Orden de la evaluación de expresiones
 =====================================
 
-El orden de evaluación de expresiones no se especifica (más formalmente, el orden en el que los hijos de un nodo en el árbol de la expresión son evaluados no es especificado. Eso sí, son evaluados antes que el propio nodo). Sólo se garantiza que las sentencias son ejecutadas en orden y que se hace un cortocircuito para las expresiones booleanas. Ver :ref:`order` para más información.
+El orden de evaluación de expresiones no se especifica (más formalmente, el orden en el que los hijos de un nodo en el árbol de la expresión son evaluados no es especificado. Eso sí, son evaluados antes que el propio nodo). Sólo se garantiza que las sentencias se ejecutan en orden y que se hace un cortocircuito para las expresiones booleanas. Ver :ref:`order` para más información.
 
 .. index:: ! assignment
 
@@ -235,7 +235,7 @@ Complicaciones en Arrays y Structs
 ----------------------------------
 
 La sintaxis de asignación es algo más complicada para tipos sin valor como arrays y structs.
-Las asignaciones *a* variables de estado siempre crean una copia independiente. Por otro lado, asignar una variable local crea sólo una copia independiente para tipos elementales, como tipos estáticos que casan en 32 bytes. Si los structs o arrays (incluyendo ``bytes`` y ``string``) son asignados desde una variable de estado a una local, la variable local se queda una referencia a la variable de estado original. Una segunda asignación a la variable local no modifica el estado, sólo cambia la referencia. Las asignaciones a miembros (o elementos) de la variable local *hacen* cambiar el estado.
+Las asignaciones *a* variables de estado siempre crean una copia independiente. Por otro lado, asignar una variable local crea una copia independiente sólo para tipos elementales, como tipos estáticos que encajan en 32 bytes. Si los structs o arrays (incluyendo ``bytes`` y ``string``) son asignados desde una variable de estado a una local, la variable local se queda una referencia a la variable de estado original. Una segunda asignación a la variable local no modifica el estado, sólo cambia la referencia. Las asignaciones a miembros (o elementos) de la variable local *hacen* cambiar el estado.
 
 .. index:: ! scoping, declarations, default value
 
@@ -245,9 +245,9 @@ Scoping y declaraciones
 =========================
 
 Una variable cuando se declara tendrá un valor inicial por defecto que, representado en bytes, será todo ceros.
-Los valores por defecto de variables son los típicos "estado-cero" cualquiera que sea el tipo. Por ejemplo, el valor por defecto para un ``bool`` es ``false``. El valor por defecto para un ``uint`` o ``int`` es ``0``. Para arrays de tamaño estático y ``bytes1`` hasta ``bytes32``, cada elemento individual será inicializado a un valor por defecto según sea su tipo. Finalmente, para arrays de tamaño dinámico, ``bytes``y ``string``, el valor por defecto es un array o string vacio.
+Los valores por defecto de las variables son los típicos "estado-cero" cualquiera que sea el tipo. Por ejemplo, el valor por defecto para un ``bool`` es ``false``. El valor por defecto para un ``uint`` o ``int`` es ``0``. Para arrays de tamaño estático y ``bytes1`` hasta ``bytes32``, cada elemento individual será inicializado a un valor por defecto según sea su tipo. Finalmente, para arrays de tamaño dinámico, ``bytes``y ``string``, el valor por defecto es un array o string vacío.
 
-Una variable declarada en cualquier punto de una función, estará dentro del alcance de *toda la función*, independientemente de donde se haya declarado. Esto ocurre porque Solidity hereda sus reglas de scoping de JavaScript.
+Una variable declarada en cualquier punto de una función estará dentro del alcance de *toda la función*, independientemente de donde se haya declarado. Esto ocurre porque Solidity hereda sus reglas de scoping de JavaScript.
 Esto difiere de muchos lenguajes donde las variables sólo están en el alcance de donde se declaran hasta que acaba el bloque semántico.
 Como consecuencia de esto, el código siguiente es ilegal y hace que el compilador devuelva un error porque el identificador se ha declarado previamente, ``Identifier already declared``::
 
@@ -262,7 +262,7 @@ Como consecuencia de esto, el código siguiente es ilegal y hace que el compilad
             }
 
             while (i++ < 2) {
-                uint same1 = 0;// Ilegal, segunda declaración para same1
+                uint same1 = 0; // Ilegal, segunda declaración para same1
             }
         }
 
@@ -272,7 +272,7 @@ Como consecuencia de esto, el código siguiente es ilegal y hace que el compilad
             }
 
             {
-                uint same2 = 0;// Ilegal, segunda declaración para same2
+                uint same2 = 0; // Ilegal, segunda declaración para same2
             }
         }
 
@@ -280,7 +280,7 @@ Como consecuencia de esto, el código siguiente es ilegal y hace que el compilad
             for (uint same3 = 0; same3 < 1; same3++) {
             }
 
-            for (uint same3 = 0; same3 < 1; same3++) {// Ilegal, segunda declaración para same3
+            for (uint same3 = 0; same3 < 1; same3++) { // Ilegal, segunda declaración para same3
             }
         }
     }
@@ -324,25 +324,23 @@ Actualmente, Solidity genera automáticamente una excepción en tiempo de ejecuc
 
 #. Si se accede a un array en un índice demasiado largo o negativo (ejemplo: ``x[i]`` donde ``i >= x.length`` o ``i < 0``).
 #. Si se accede a un ``bytesN`` de longitud fija en un índice demasiado largo o negativo.
-#. Si se llama a una función con un message call, pero no finaliza adecuadamente (ejemplo: se queda sin gas, no tiene una función de matching, o dispara una excepción por sí mismo), exceptuando el caso en el que se use una operación de bajo nivel ``call``, ``send``, ``delegatecall`` o ``callcode``.  Las operaciones de bajo nivel disparan excepciones, pero indican fallos devolviendo ``false``.
+#. Si se llama a una función con un message call, pero no finaliza adecuadamente (ejemplo: se queda sin gas, no tiene una función de matching, o dispara una excepción por sí mismo), exceptuando el caso en el que se use una operación de bajo nivel ``call``, ``send``, ``delegatecall`` o ``callcode``. Las operaciones de bajo nivel nunca disparan excepciones, pero indican fallos devolviendo ``false``.
 #. Si se crea un contrato usando la palabra reservada ``new``, pero la creación del contrato no finaliza correctamente (ver más arriba la definición de "no finalizar correctamente").
 #. Si se divide o se hace módulo por cero (ejemplos: ``5 / 0`` o ``23 % 0``).
 #. Si se hace un movimiento por una cantidad negativa.
 #. Si se convierte un valor muy grande o negativo en un tipo enum.
 #. Si se realiza una llamada de función externa apuntando a un contrato que no contiene código.
-#. Si un contrato recibe Ether mediante una función sin el modificador ``payable``(incluyendo el constructor y la función de fallback).
+#. Si un contrato recibe Ether mediante una función sin el modificador ``payable`` (incluyendo el constructor y la función de fallback).
 #. Si un contrato recibe Ether mediante una función getter pública.
 #. Si se llama a una variable inicializada a cero de un tipo de función interna.
 #. Si un ``.transfer()`` falla.
 #. Si se invoca con ``assert`` junto con un argumento que evalúa a falso.
 
-Mientras se genera una excepción provista por el usuario en las siguientes situaciones:
+Un usuario genera una exepcin en las siguientes situaciones:
 
 #. Llamando a ``throw``.
 #. Llamando a ``require`` junto con un argumento que evalúa a ``false``.
 
-Internamente, Solidity realiza una operación de revertir (instrucción ``0xfd``) cuando una excepción provista por un usuario se lanza o la condición de la llamada ``require`` no se satisface. Por contra, realiza una operación inválida (instrucción ``0xfe``) si una excepción en tiempo de ejecución aparece o la condición de una llamada ``assert`` no se satisface. En ambos casos, esto ocasiona que la EVM revierta todos los cambios de estado acaecidos. El motivo de todo esto es que no existe un modo seguro de continuar con la ejecución debido a que no sucedió el efecto esperado. Como se quiere mantener la atomicidad de las transacciones, lo más seguro es revertir todos los cambios y hacer que la transacción no tenga ningún efecto en su totalidad o, como mínimo, en la llamada.
+Internamente, Solidity realiza una operación de revertir (revert, instrucción ``0xfd``) cuando una excepción provista por un usuario se lanza o la condición de la llamada ``require`` no se satisface. Por contra, realiza una operación inválida (instrucción ``0xfe``) si una excepción en tiempo de ejecución aparece o la condición de una llamada ``assert`` no se satisface. En ambos casos, esto ocasiona que la EVM revierta todos los cambios de estado acaecidos. El motivo de todo esto es que no existe un modo seguro de continuar con la ejecución debido a que no sucedió el efecto esperado. Como se quiere mantener la atomicidad de las transacciones, lo más seguro es revertir todos los cambios y hacer que la transacción no tenga ningún efecto en su totalidad o, como mínimo, en la llamada.
 
-En el caso de que los contratos se escriban de tal manera que ``assert`` sólo sea usado para probar condiciones internas y ``require``
-se use en caso de que haya una entrada malformada, una herramienta de análisis formal que verifique que el opcode inválido nunca pueda ser alcanzado, se podría usar para chequear la ausencia de errores asumiendo entradas válidas.
--
+En el caso de que los contratos se escriban de tal manera que ``assert`` sólo sea usado para probar condiciones internas y ``require`` se use en caso de que haya una entrada malformada, una herramienta de análisis formal que verifique que el opcode inválido nunca pueda ser alcanzado, se podría usar para chequear la ausencia de errores asumiendo entradas válidas.
