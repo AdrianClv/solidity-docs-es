@@ -336,7 +336,7 @@ Actualmente, Solidity genera automáticamente una excepción en tiempo de ejecuc
 #. Si un ``.transfer()`` falla.
 #. Si se invoca con ``assert`` junto con un argumento que evalúa a falso.
 
-Un usuario genera una exepcin en las siguientes situaciones:
+Un usuario genera una excepción en las siguientes situaciones:
 
 #. Llamando a ``throw``.
 #. Llamando a ``require`` junto con un argumento que evalúa a ``false``.
