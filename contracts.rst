@@ -354,10 +354,10 @@ Se pueden aplicar varios modificadores a una misma función especificándolos en
 .. index:: ! constant
 
 ******************************
-Variables de Estado Constantes
+Variables de estado constantes
 ******************************
 
-Las variables de estado pueden declarase como ``constantes``. En este caso, se tienen que asignar desde una expresión que es una constante en momento de compilación. Las expresiones que acceden al almacenamiento, datos sobre la blockchain (p.ej ``now``, ``this.balance`` o ``block.number``), datos sobre la ejecución (``msg.gas``) o que hacen llamadas a contratos externos, están prohibidas. Las expresiones que puedan tener efectos colaterales en el reparto de memoria están permitidas, pero las que puedan tener efectos colaterales en otros objetos de memoria no lo son. Las funciones por defecto ``keccak256``, ``sha256``, ``ripemd160``, ``ecrecover``, ``addmod`` y ``mulmod`` están permitidas (aunque hacen llamadas a contratos externos).
+Las variables de estado pueden declarase como ``constant``. En este caso, se tienen que asignar desde una expresión que es una constante en tiempo de compilación. Las expresiones que acceden al almacenamiento, datos sobre la blockchain (p.ej ``now``, ``this.balance`` o ``block.number``), datos sobre la ejecución (``msg.gas``) o que hacen llamadas a contratos externos, están prohibidas. Las expresiones que puedan tener efectos colaterales en el reparto de memoria están permitidas, pero las que puedan tener efectos colaterales en otros objetos de memoria no lo están. Las funciones por defecto ``keccak256``, ``sha256``, ``ripemd160``, ``ecrecover``, ``addmod`` y ``mulmod`` están permitidas (aunque hacen llamadas a contratos externos).
 
 Se permiten efectos colaterales en el repartidor de memoria porque debe ser posible construir objetos complejos como p.ej lookup-tables. Esta funcionalidad todavía no se puede usar tal cual. 
 
@@ -382,7 +382,7 @@ En este momento, no todos los tipos para las constantes están implementados. Lo
 Funciones constantes
 ********************
 
-En el caso en que un función se declare como constante, promete no modificar el estado.
+En el caso en que una función se declare como constante, promete no modificar el estado.
 
 ::
 
@@ -398,24 +398,23 @@ En el caso en que un función se declare como constante, promete no modificar el
   Los métodos getter están marcados como constantes. 
 
 .. warning::
-	El compilador todavía no impone que un método constante no modifica el estado.
+  El compilador todavía no impone que un método constante no modifique el estado.
 
 .. index:: ! fallback function, function;fallback
 
 .. _fallback-function:
 
 ****************
-Función Fallback
+Función fallback
 ****************
 
 Un contrato puede tener exactamente una sola función sin nombre. Esta función no puede tener argumentos ni puede devolver nada. Se ejecuta si, al llamar al contrato, ninguna de las otras funciones del contrato se corresponde al identificador de función proporcionado (o si no se hubiera proporcionado ningún dato).
 
-Además, esta función se ejecutará siempre y cuando el contrato sólo recibe Ether (sin dato). En este caso en general hay muy poco gas disponible para una llamada a una función (para ser preciso, 2300 gas), por eso es importante hacer las funciones fallback las más baratas posible.
+Además, esta función se ejecutará siempre y cuando el contrato sólo reciba Ether (sin datos). En este caso en general hay muy poco gas disponible para una llamada a una función (para ser preciso, 2300 gas), por eso es importante hacer las funciones fallback lo más baratas posible.
 
-En particular, las siguientes operaciones consumirán más gas que  lo que se paga (???stipend) para una función fallback.
-In particular, the following operations will consume more gas than the stipend provided to a fallback function:
+En particular, las siguientes operaciones consumirán más gas de lo que se da como estipendio para una función fallback.
 
-- Escribir al ???(storage)
+- Escribir en storage
 - Crear un contrato
 - Llamar a una función externa que consume una cantidad de gas significativa
 - Mandar Ether
@@ -423,14 +422,14 @@ In particular, the following operations will consume more gas than the stipend p
 Asegúrese por favor de testear su función fallback meticulosamente antes de desplegar el contrato para asegurarse de que su coste de ejecución es menor de 2300 gas.
 
 .. warning::
-	Los contratos que reciben Ether directamente (sin una llamada a una función, p.ej usando ``send`` o ``transfer``) pero que no tienen definida una función fallback, van a devolver una excepción (???exception), devolviendo el Ether (nótese que esto era diferente antes de la versión v0.4.0 de Solidity). Por lo tanto, si desea que su contrato reciba Ether, tiene que implementar una función fallback.
+    Los contratos que reciben Ether directamente (sin una llamada a una función, p.ej usando ``send`` o ``transfer``) pero que no tienen definida una función fallback, van a lanzar una excepción, devolviendo el Ether (nótese que esto era diferente antes de la versión v0.4.0 de Solidity). Por lo tanto, si desea que su contrato reciba Ether, tiene que implementar una función fallback.
 
 ::
 
     pragma solidity ^0.4.0;
 
     contract Test {
-		    // Se llama a esta función para todos los mensajes enviados a este contrato (no hay otra función). Enviar Ether a este contrato va a devolver una excepción, porque la función fallback no tiene el modificador "payable".
+        // Se llama a esta función para todos los mensajes enviados a este contrato (no hay otra función). Enviar Ether a este contrato lanza una excepción, porque la función fallback no tiene el modificador "payable".
         function() { x = 1; }
         uint x;
     }
@@ -464,18 +463,18 @@ Los eventos permiten el uso conveniente de la capacidad de registro del EVM, que
 
 Los eventos son miembros heredables de los contratos. Cuando se les llama, hacen que los argumentos se guarden en el registro de transacciones - una estructura de datos especial en la blockchain. Estos registros están asociados con la dirección del contrato y serán incorporados en la blockchain y allí permanecerán siempre que un bloque esté accesible (eso es: para siempre con Frontier y con Homestead, pero puede cambiar con Serenity). Los datos de registros y de eventos no están disponibles desde dentro de los contratos (ni siquiera desde el contrato que los ha creado).
 
-Se pueden hacer pruebas SPV (???SPV proofs) para los registros, de manera que si una entidad externa proporciona un contrato con dicha prueba, se puede comprobar que el registro realmente existe en la blockchain. Dicho esto, tenga en cuenta que las cabeceras de bloque deben proporcionarse porque el contrato  sólo lee los últimos 256 hashes de bloque. 
+Se pueden hacer pruebas SPV para los registros, de manera que si una entidad externa proporciona un contrato con dicha prueba, se puede comprobar que el registro realmente existe en la blockchain. Dicho esto, tenga en cuenta que las cabeceras de bloque deben proporcionarse porque el contrato sólo lee los últimos 256 hashes de bloque. 
 
 Hasta tres parámetros pueden recibir el atributo ``indexed``, lo que hará que se busque por los respectivos parámetros. En la interfaz de usuario, es posible filtrar por los valores específicos de argumentos indexados.
 
-Si se utilizan matrices como argumentos indexados (incluyendo ``string`` y ``bytes``), en cambio se guarda su hash Keccak-256 como un tópico (???topic).
+Si se utilizan arrays como argumentos indexados (incluyendo ``string`` y ``bytes``), en su lugar se guarda su hash Keccak-256 como asunto.
 
-El hash de la firma de un evento es uno de los tópicos, excepto si usted ha declarado el evento con el especificador ``anonymous``. Esto significa que no es posible filtrar por eventos anónimos específicos por su nombre.
+El hash de la firma de un evento es uno de los asuntos, excepto si declaras el evento con el especificador ``anonymous``. Esto significa que no es posible filtrar por eventos anónimos específicos por su nombre.
 
 Todos los argumentos no indexados se guardarán en la parte de datos del registro.
 
 .. note::
-		No se guardan los argumentos indexados propiamente dichos. Uno sólo puede buscar por los valores, pero es imposible recuperar los valores ellos mismos.
+    No se guardan los argumentos indexados propiamente dichos. Uno sólo puede buscar por los valores, pero es imposible recuperar los valores en sí.
 
 ::
 
@@ -489,7 +488,7 @@ Todos los argumentos no indexados se guardarán en la parte de datos del registr
         );
 
         function deposit(bytes32 _id) payable {
-            // Cualquier llamada a esta función (por muy anidado que sea) puede ser detectada desde la API de JavaScript con un filtro para que se llame a `Deposit`.
+            // Cualquier llamada a esta función (por muy anidada que sea) puede ser detectada desde la API de JavaScript con un filtro para que se llame a `Deposit`.
             Deposit(msg.sender, _id, msg.value);
         }
     }
@@ -498,7 +497,7 @@ Su uso en la API de JavaScript sería como sigue:
 
 ::
 
-    var abi = /* abi tal que ha sido generado por el compilador */;
+    var abi = /* abi generado por el compilador */;
     var ClientReceipt = web3.eth.contract(abi);
     var clientReceipt = ClientReceipt.at(0x123 /* dirección */);
 
@@ -511,7 +510,7 @@ Su uso en la API de JavaScript sería como sigue:
             console.log(result);
     });
 
-    // O hacer una retro llamada (???callback) para empezar a mirar de inmediato
+    // O ejecutar una funcin callback para empezar a escuchar de inmediato
     var event = clientReceipt.Deposit(function(error, result) {
         if (!error)
             console.log(result);
