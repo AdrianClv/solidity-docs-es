@@ -281,7 +281,7 @@ Se pueden usar los modificadores para cambiar el comportamiento de las funciones
         function owned() { owner = msg.sender; }
         address owner;
         
-        // Este contrato solo define un modificador pero lo usa – se va a utilizar en un contrato derivado.
+        // Este contrato sólo define un modificador pero no lo usa, se va a utilizar en un contrato derivado.
         // El cuerpo de la función se inserta donde aparece el símbolo especial "_;" en la definición del modificador.
         // Esto significa que si el propietario llama a esta función, la función se ejecuta, pero en otros casos devolverá una excepción.
         modifier onlyOwner {
@@ -292,7 +292,7 @@ Se pueden usar los modificadores para cambiar el comportamiento de las funciones
 
 
     contract mortal is owned {
-        // Este contrato hereda del modificador "onlyOwner" desde "owned" y lo aplica a la función "close", lo que tiene como efecto que las llamadas a "close" solamente tienen efecto si las hacen el propietario registrado.
+        // Este contrato hereda del modificador "onlyOwner" desde "owned" y lo aplica a la función "close", lo que tiene como efecto que las llamadas a "close" solamente tienen efecto si las hace el propietario registrado.
         function close() onlyOwner {
             selfdestruct(owner);
         }
@@ -315,7 +315,7 @@ Se pueden usar los modificadores para cambiar el comportamiento de las funciones
 
         function Register(uint initialPrice) { price = initialPrice; }
 
-        // Aquí es importante facilitar también la palabra clave "payable", de lo contrario la función rechazaría automáticamente todos los Ether que le mandemos. 
+        // Aquí es importante facilitar también la palabra clave "payable", de lo contrario la función rechazaría automáticamente todos los ethers que le mandemos. 
         function register() payable costs(price) {
             registeredAddresses[msg.sender] = true;
         }
@@ -342,12 +342,12 @@ Se pueden usar los modificadores para cambiar el comportamiento de las funciones
         }
     }
 
-Múltiples Modifiers pueden ser aplicados a una misma función especificándolos en una lista separada por espacios en blanco. Serán evaluados en el orden presentado en la lista.
+Se pueden aplicar varios modificadores a una misma función especificándolos en una lista separada por espacios en blanco. Serán evaluados en el orden presentado en la lista.
 
 .. warning::
 	En una versión anterior de Solidity, declaraciones del tipo ``return`` dentro de funciones que contienen modificadores se comportaban de otra manera. 
 
-	Lo que se devuelve explícitamente de un Modifier o del cuerpo de una función solo sale del modificador actual o del cuerpo de la función actual. Las variables que se devuelven están asignadas y el control de flujo continúa después del "_" en el Modifier que precede.
+	Lo que se devuelve explícitamente de un modificador o del cuerpo de una función solo sale del modificador actual o del cuerpo de la función actual. Las variables que se devuelven están asignadas y el control de flujo continúa después del "_" en el modificador que precede.
 
 	Se aceptan expresiones arbitrarias para los argumentos del modificador y en ese contexto, todos los símbolos visibles desde la función son visibles en el modificador. Símbolos introducidos en el modificador no son visibles en la función (ya que pueden cambiar por sobreescritura).
 
