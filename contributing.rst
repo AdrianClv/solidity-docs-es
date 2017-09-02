@@ -1,76 +1,74 @@
-############
-Contributing
-############
+##########
+Contribuir
+##########
 
-Help is always appreciated!
+¡La ayuda siempre es bienvenida!
 
-To get started, you can try :ref:`building-from-source` in order to familiarize
-yourself with the components of Solidity and the build process. Also, it may be
-useful to become well-versed at writing smart-contracts in Solidity.
+Para comenzar, puedes intentar :ref:`construir a partir del código <building-from-source>` para familiarizarte
+con los componentes de Solidity y el proceso de build. También, puede ser útil
+especializarse en escribir smart contrats en Solidity.
 
-In particular, we need help in the following areas:
+En particular, necesitamos ayuda en las siguientes áreas:
 
-* Improving the documentation
-* Responding to questions from other users on `StackExchange
-  <https://ethereum.stackexchange.com>`_ and the `Solidity Gitter
+* Mejorando la documentación
+* Respondiendo a las preguntas de otros usarios en `StackExchange
+  <https://ethereum.stackexchange.com>`_ y el `Gitter de Solidity
   <https://gitter.im/ethereum/solidity>`_
-* Fixing and responding to `Solidity's GitHub issues
-  <https://github.com/ethereum/solidity/issues>`_, especially those tagged as
-  `up-for-grabs <https://github.com/ethereum/solidity/issues?q=is%3Aopen+is%3Aissue+label%3Aup-for-grabs>`_ which are
-  meant as introductory issues for external contributors.
+* Corrigiendo y respondiendo a los `issues del GitHub de Solidity
+  <https://github.com/ethereum/solidity/issues>`_, especialmente esos
+  taggeados como `up-for-grabs <https://github.com/ethereum/solidity/issues?q=is%3Aopen+is%3Aissue+label%3Aup-for-grabs>`_
+  que están destinados a contribuidores externos como temas introductorios.
 
-How to Report Issues
-====================
+Cómo reportar un Issue
+======================
 
-To report an issue, please use the
-`GitHub issues tracker <https://github.com/ethereum/solidity/issues>`_. When
-reporting issues, please mention the following details:
+Para reportar un issue, por favor, usa el
+`Issue tracker de GitHub <https://github.com/ethereum/solidity/issues>`_. Cuando
+reportes un issue, por favor, menciona los siguientes detalles:
 
-* Which version of Solidity you are using
-* What was the source code (if applicable)
-* Which platform are you running on
-* How to reproduce the issue
-* What was the result of the issue
-* What the expected behaviour is
+* Qué versión de Solidity estás usando
+* Cuál es el código fuente (si es aplicable)
+* En qué plataforma lo estás ejecutando
+* Cómo reproducir el resultado
+* Cuál fue el resultado del issue
+* Cuál es el resultado esperado
 
-Reducing the source code that caused the issue to a bare minimum is always
-very helpful and sometimes even clarifies a misunderstanding.
+Reducir el código fuente que causó el issue a lo mínimo es siempre muy
+útil y a veces incluso aclara un malentendido.
 
-Workflow for Pull Requests
-==========================
+Flujo de trabajo para Pull Requests
+===================================
 
-In order to contribute, please fork off of the ``develop`` branch and make your
-changes there. Your commit messages should detail *why* you made your change
-in addition to *what* you did (unless it is a tiny change).
+A fin de contribuir, haz un fork de la rama ``develop`` y haz tus cambios ahí.
+Tus mensajes de commit deben detallar *por qué* hiciste el cambio además de *lo que*
+hiciste (al menos que sea un pequeño cambio).
 
-If you need to pull in any changes from ``develop`` after making your fork (for
-example, to resolve potential merge conflicts), please avoid using ``git merge``
-and instead, ``git rebase`` your branch.
+Si necesitas hacer un pull de ``develop`` después de haber hecho tu fork (por ejemplo,
+para resolver potenciales conflictos de merge), evita utilizar ``git merge``. Usa en su lugar ``git rebase`` para tu rama.
 
-Additionally, if you are writing a new feature, please ensure you write appropriate
-Boost test cases and place them under ``test/``.
+Adicionalmente, si estás escribiendo una nueva funcionalidad, por favor, asegúrate de
+hacer tests unitarios Boost y ponerlos en ``test/``.
 
-However, if you are making a larger change, please consult with the Gitter
-channel, first.
+Sin embargo, si estás haciendo cambios más grandes, consulta primero con el canal Gitter.
 
-Finally, please make sure you respect the `coding standards
+Finalmente, siempre asegúrate de respetar los `estándares de código 
 <https://raw.githubusercontent.com/ethereum/cpp-ethereum/develop/CodingStandards.txt>`_
-for this project. Also, even though we do CI testing, please test your code and
-ensure that it builds locally before submitting a pull request.
+de este proyecto. También, aunque hacemos testing CI, testea tu código y asegúrate que
+puedas hacer un build localmente antes de enviar un pull request.
 
-Thank you for your help!
+¡Gracias por tu ayuda!
 
-Running the compiler tests
-==========================
+Ejecutando los tests de compilador
+==================================
 
-Solidity includes different types of tests. They are included in the application
-called ``soltest``. Some of them require the ``cpp-ethereum`` client in testing mode.
+Solidity incluye diferentes tipos de tests. Están incluídos en la aplicación llamada
+``soltest``. Algunos de ellos requieren el cliente ``cpp-ethereum`` en modo test.
 
-To run ``cpp-ethereum`` in testing mode: ``eth --test -d /tmp/testeth``.
+Para ejecutar ``cpp-ethereum`` en modo test: ``eth --test -d /tmp/testeth``.
 
-To run the tests: ``soltest -- --ipcpath /tmp/testeth/geth.ipc``.
+Para lanzar los tests: ``soltest -- --ipcpath /tmp/testeth/geth.ipc``.
 
-To run a subset of tests, filters can be used:
-``soltest -t TestSuite/TestName -- --ipcpath /tmp/testeth/geth.ipc``, where ``TestName`` can be a wildcard ``*``.
+Para ejecutar un subconjunto de los tests, se pueden usar filtros:
+``soltest -t TestSuite/TestName -- --ipcpath /tmp/testeth/geth.ipc``, donde ``TestName`` puede ser un comodín ``*``.
 
-Alternatively, there is a testing script at ``scripts/test.sh`` which executes all tests.
+Alternativamente, hay un script de testing en ``scripts/test.sh`` que ejecuta todos los tests.
