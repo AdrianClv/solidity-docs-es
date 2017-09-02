@@ -521,7 +521,7 @@ Su uso en la API de JavaScript sería como sigue:
 Interfaz a registros de bajo nivel
 ==================================
 
-También es posible acceder al mecanismo de logging a través de la interfaz de bajo nivel mediante las funciones ``log0``, ``log1``, ``log2``, ``log3`` y ``log4``. ``logi`` toma ``i + 1`` parámetros del tipo ``bytes32``, donde el primer argumento se utiliza para la parte de datos del log y los otros como tópicos. La llamada al evento aquí arriba puede realizarse de una manera similar a esta:
+También es posible acceder al mecanismo de logging a través de la interfaz de bajo nivel mediante las funciones ``log0``, ``log1``, ``log2``, ``log3`` y ``log4``. ``logi`` toma ``i + 1`` parámetros del tipo ``bytes32``, donde el primer argumento se utiliza para la parte de datos del log y los otros como asuntos. La llamada al evento de arriba puede realizarse de una manera similar a esta:
 
 ::
 
@@ -534,12 +534,12 @@ También es posible acceder al mecanismo de logging a través de la interfaz de 
 
 donde el numero hexadecimal largo es igual a ``keccak256("Deposit(address,hash256,uint256)")``, la firma del evento.
 
-Recursos Adicional para Entender los Eventos
-============================================
+Recursos adicionales para entender los eventos
+==============================================
 
 - `Documentación de Javascript <https://github.com/ethereum/wiki/wiki/JavaScript-API#contract-events>`_
 - `Ejemplo de uso de los eventos <https://github.com/debris/smart-exchange/blob/master/lib/contracts/SmartExchange.sol>`_
-- `Como acceder a eventos con js <https://github.com/debris/smart-exchange/blob/master/lib/exchange_transactions.js>`_
+- `Cómo acceder a eventos con js <https://github.com/debris/smart-exchange/blob/master/lib/exchange_transactions.js>`_
 
 .. index:: ! inheritance, ! base class, ! contract;base, ! deriving
 
@@ -549,11 +549,12 @@ Herencia
 
 Solidity soporta multiples herencias copiando el código, incluyendo el polimorfismo. 
 
-Todas las llamadas a funciones son virtuales, lo que significa que es la función la más derivada la que se llama, excepto cuando el nombre del contrato es explícitamente mencionado.
+Todas las llamadas a funciones son virtuales, lo que significa que es la función más derivada la que se llama, excepto cuando el nombre del contrato se menciona explícitamente.
 
 Cuando un contrato hereda de múltiples contratos, un solo contrato está creado en la blockchain, y el código de todos los contratos base está copiado dentro del contrato creado.
 
-El sistema general de herencia es muy similar al de `Python <https://docs.python.org/3/tutorial/classes.html#inheritance>`_,
+El sistema general de herencia es muy similar al de
+`Python <https://docs.python.org/3/tutorial/classes.html#inheritance>`_,
 especialmente en lo que se refiere a herencias multiples.
 
 En el siguiente ejemplo se dan más detalles.
@@ -568,7 +569,10 @@ En el siguiente ejemplo se dan más detalles.
     }
 
 
-		// Usar "is" para derivar de otro contrato. Los contratos derivados pueden acceder a todos los miembros no privados, incluidas las funciones internas y variables de estado. A éstas sin embargo no se puede acceder externamente mediante `this`.
+    // Usar "is" para derivar de otro contrato. Los contratos derivados
+    // pueden acceder a todos los miembros no privados, incluidas las
+    // funciones internas y variables de estado. A éstas sin embargo
+    // no se puede acceder externamente mediante `this`.
     contract mortal is owned {
         function kill() {
             if (msg.sender == owner) selfdestruct(owner);
@@ -576,7 +580,9 @@ En el siguiente ejemplo se dan más detalles.
     }
 
 
-		// Estos contratos abstractos solo se proporcionan para que el compilador sepa de la interfaz. Nótese que la función no tiene cuerpo. Si un contrato no implementa todas las funciones, solo puede usarse como interfaz.
+    // Estos contratos abstractos sólo se proporcionan para que el compilador
+    // sepa de la interfaz. Nótese que la función no tiene cuerpo. Si un contrato
+    // no implementa todas las funciones, sólo puede usarse como interfaz.
     contract Config {
         function lookup(uint id) returns (address adr);
     }
@@ -588,15 +594,19 @@ En el siguiente ejemplo se dan más detalles.
      }
 
 
-		// Las herencias multiples son posibles. Nótese que "owned" también es una clase base de "mortal", aun así hay una sóla instancia de "owned" (igual que para las herencias virtuales en C++).
+    // Las herencias multiples son posibles. Nótese que "owned" también es una clase base
+    // de "mortal", aun así hay una sóla instancia de "owned" (igual que para las herencias virtuales en C++).
     contract named is owned, mortal {
         function named(bytes32 name) {
             Config config = Config(0xd5f9d8d94886e70b06e474c3fb14fd43e2f23970);
             NameReg(config.lookup(1)).register(name);
         }
 
-        // Las funciones pueden ser sobreescritas por otras funciones con el mismo nombre y el mismo numero/tipo de entradas. Si la función que sobreescribe tiene distintos tipos de parámetros de salida, esto provocará un error. 
-        // Tanto las llamadas a funciones locales como a las que están basadas en mensaje toman en cuenta estas sobreescrituras.
+        // Las funciones pueden ser sobreescritas por otras funciones con el mismo nombre
+	// y el mismo numero/tipo de entradas. Si la función que sobreescribe tiene distintos
+	// tipos de parámetros de salida, esto provocará un error. 
+        // Tanto las llamadas a funciones locales como las que están basadas en mensajes
+	// tienen en cuenta estas sobreescrituras.
         function kill() {
             if (msg.sender == owner) {
                 Config config = Config(0xd5f9d8d94886e70b06e474c3fb14fd43e2f23970);
@@ -608,7 +618,9 @@ En el siguiente ejemplo se dan más detalles.
     }
 
 
-    // Si un constructor acepta un argumento, es necesario proporcionarlo en la cabecera (o ???modifier-invocation-style al constructor del contrato derivado (ver más abajo)).
+    // Si un constructor acepta un argumento, es necesario proporcionarlo en la cabecera
+    // (o de forma similar a como se hace con los modificadores, en el constructor
+    // del contrato derivado (ver más abajo)).
     contract PriceFeed is owned, mortal, named("GoldFeed") {
        function updateInfo(uint newInfo) {
           if (msg.sender == owner) info = newInfo;
@@ -619,7 +631,7 @@ En el siguiente ejemplo se dan más detalles.
        uint info;
     }
 
-Nótese que arriba, llamamos a ``mortal.kill()`` para "reenviar" la orden de destrucción. Hacerlo de esta forma es problemático, como se puede ver en el siguiente ejemplo.
+Nótese que arriba llamamos a ``mortal.kill()`` para "reenviar" la orden de destrucción. Hacerlo de esta forma es problemático, como se puede ver en el siguiente ejemplo.
 
 ::
 
@@ -645,7 +657,7 @@ Nótese que arriba, llamamos a ``mortal.kill()`` para "reenviar" la orden de des
     contract Final is Base1, Base2 {
     }
 
-Una llamada a ``Final.kill()`` llamará a ``Base2.kill`` como la función sobreescrita la más derivada, pero esta función obviará ``Base1.kill``, básicamente porque no siquiera sabe de la existencia de ``Base1``. La forma de solucionar esto es usando ``super``.
+Una llamada a ``Final.kill()`` llamará a ``Base2.kill`` al ser la última sobreescritura, pero esta función obviará ``Base1.kill``, básicamente porque ni siquiera sabe de la existencia de ``Base1``. La forma de solucionar esto es usando ``super``.
 
 ::
 
@@ -671,11 +683,24 @@ Una llamada a ``Final.kill()`` llamará a ``Base2.kill`` como la función sobree
     contract Final is Base2, Base1 {
     }
 
-Si ``Base1`` llama a una función de ``super``, no simplemente llama a esta función en uno de sus contratos base. En cambio, llama a esta función en el siguiente contrato base en el ultimo gráfico de herencias, por lo tanto llama a ``Base2.kill()`` (nótese que la secuencia final de herencia es -- empezando por el contrato el más derivado: Final, Base1, Base2, mortal, owned). La función real a la que se llama cuando se usa super no se sabe en el contexto de la clase donde se usa, aunque su tipo es conocido. Esto es similar para métodos habituales de búsqueda virtual. 
+If ``Base1`` calls a function of ``super``, it does not simply
+call this function on one of its base contracts.  Rather, it 
+calls this function on the next base contract in the final
+inheritance graph, so it will call ``Base2.kill()`` (note that
+the final inheritance sequence is -- starting with the most
+derived contract: Final, Base1, Base2, mortal, owned).
+The actual function that is called when using super is
+not known in the context of the class where it is used,
+although its type is known. This is similar for ordinary
+virtual method lookup.
+
+Es similar a la búsqueda de métodos virtual
+
+Si ``Base1`` llama a una función de ``super``, no simplemente llama a esta función en uno de sus contratos base. En su lugar, llama a esta función en el siguiente contrato base en el último grafo de herencias, por lo tanto llama a ``Base2.kill()`` (nótese que la secuencia final de herencia es -- empezando por el contrato más derivado: Final, Base1, Base2, mortal, owned). La función a la que se llama cuando se usa super no se sabe en el contexto de la clase donde se usa, aunque su tipo es conocido. Es similar a la búsqueda de métodos virtuales. 
 
 .. index:: ! base;constructor
 
-Argumentos para Constructores Base
+Argumentos para constructores base
 ==================================
 
 Se requiere que los contratos derivados proporcionen todos los argumentos necesarios para los constructores base. Esto se puede hacer de dos maneras.
@@ -695,15 +720,15 @@ Se requiere que los contratos derivados proporcionen todos los argumentos necesa
         }
     }
 
-Una es directamente en la lista de herencias (``is Base(7)``). La otra es en la misma linea en que un modificador se invoca como parte de la cabecera de un constructor derivado (``Base(_y * _y)``). La primera manera es más conveniente si el argumento del constructor es una constante y define el comportamiento del contrato o por lo menos lo describe. La segunda manera se tiene que usar si los argumentos del constructor de la base dependen de los argumentos del contrato derivado. Si, como en este ejemplo sencillo, ambos sitios están utilizados, el argumento ??? tiene la prioridad.
+Una es directamente en la lista de herencias (``is Base(7)``). La otra es en la misma línea en que un modificador se invoca como parte de la cabecera de un constructor derivado (``Base(_y * _y)``). La primera manera es más conveniente si el argumento del constructor es una constante y define el comportamiento del contrato o por lo menos lo describe. La segunda manera se tiene que usar si los argumentos del constructor de la base dependen de los argumentos del contrato derivado. Si, como en este ejemplo sencillo, ambos sitios están utilizados, el argumento estilo modificador tiene la prioridad.
 
 .. index:: ! inheritance;multiple, ! linearization, ! C3 linearization
 
 Herencia múltiple y linearización
-=============================================
+=================================
 
-Los lenguajes que permiten herencias múltiples tienen que lidiar con varios problemas. Uno es el `Problema del Diamante <https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem>`_.
-Solidity le sigue la pista a Python y utiliza la "`Linearización C3 <https://en.wikipedia.org/wiki/C3_linearization>`_" para forzar un orden específico en el DAG de las clases base. Esto hace que se consigue la propiedad deseada de ???monotonicidad pero impide algunos gráficos de herencia. El orden en el que las clases base se van dando con la instrucción ``is``  es especialmente importante. En el siguiente código, Solidity dará el error "Linearization of inheritance graph impossible".
+Los lenguajes que permiten herencias múltiples tienen que lidiar con varios problemas. Uno es el `Problema del diamante <https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem>`_.
+Solidity le sigue la pista a Python y utiliza la "`Linearización C3 <https://en.wikipedia.org/wiki/C3_linearization>`_" para forzar un orden específico en el DAG de las clases base. Esto hace que se consigua la propiedad deseada de monotonicidad pero impide algunos grafos de herencia. El orden en el que las clases base se van dando con la instrucción ``is`` es especialmente importante. En el siguiente código, Solidity dará el error "Linearization of inheritance graph impossible".
 
 ::
 
@@ -715,9 +740,9 @@ Solidity le sigue la pista a Python y utiliza la "`Linearización C3 <https://en
 
 El motivo de que se produzca este error es que ``C`` solicita a ``X`` que sobreescriba ``A`` (especificando ``A``, ``X`` en este orden), pero el propio ``A`` solicita sobreescribir ``X``, lo que presenta una contradicción que no puede resolverse.
 
-Una regla simple para recordar es de especificar las clases base en el orden desde "la más base" hasta "la más derivada".
+Una regla simple para recordar es especificar las clases base en el orden desde "la más base" hasta "la más derivada".
 
-Heredar Distintos Tipos de Miembros con el Mismo Nombre
+Heredar distintos tipos de miembros con el mismo nombre
 =======================================================
 
 Cuando la herencia termina en un contrato con una función y un modificador con el mismo nombre, se considera esta herencia un error.
@@ -727,7 +752,7 @@ Como excepción, una variable de estado getter puede sobre escribir una función
 .. index:: ! contract;abstract, ! abstract contract
 
 ********************
-Contratos Abstractos
+Contratos abstractos
 ********************
 
 Las funciones de un contrato pueden carecer de una implementación como pasa en el siguiente ejemplo (nótese que la cabecera de declaración de la función se termina con un ``;``).
@@ -750,7 +775,7 @@ Estos contratos no pueden compilarse (aunque contengan funciones implementadas j
         function utterance() returns (bytes32) { return "miaow"; }
     }
 
-Si un contrato hereda de un contrato abstracto y éste no implementa todas las funciones no implementadas con sobrescritura, será el mismo un contrato abstracto.
+Si un contrato hereda de un contrato abstracto y éste no implementa todas las funciones no implementadas con sobrescritura, él mismo será un contrato abstracto.
 
 .. index:: ! contract;interface, ! interface contract
 
@@ -768,9 +793,9 @@ Las interfaces son similares a los contratos abstractos, pero no pueden tener ni
 
 Es posible que en el futuro, algunas de estas restricciones se levanten.
 
-Las interfaces son limitadas a lo que básicamente el Contrato ABI puede representar, y la conversion entre el ABI y la interfaz debería hacerse sin perdida de información.
+Las interfaces son limitadas a lo que básicamente el contrato ABI puede representar, y la conversion entre el ABI y la interfaz debería hacerse sin perdida de información.
 
-Se indican las interfaces por su propia palabra clave:
+Las interfaces se indican por su propia palabra clave:
 
 ::
 
@@ -785,21 +810,18 @@ Los contratos pueden heredar interfaces como lo heredarían otros contratos.
 .. _libraries:
 
 *********
-Librerias
+Librerías
 *********
 
-Las libreras son similares a los contratos, pero su propósito es que se desplieguen una sola vez a una dirección especifica y su código se pueda reutilizar utilizando la característica ``DELEGATECALL`` (``CALLCODE`` hasta Homestead) del EVM. Lo que significa que si las funciones de una librería se llaman, su código es ejecutado en el contexto del contrato llamando, es decir, ``this`` apunta al contrato llamando y en especial, se puede acceder al almacén del contrato llamando. Como una librería es un trozo de código fuente aislado, una librería sólo puede acceder a las variables de estado de un contrato llamando si estas variables están específicamente proporcionadas (de lo contrario, no tendría la posibilidad de nombrarlas).
+Las librerías son similares a los contratos, pero su propósito es que se desplieguen una sola vez a una dirección especifica y su código se pueda reutilizar utilizando la característica ``DELEGATECALL`` (``CALLCODE`` hasta Homestead) de la EVM. Lo que significa que si se llama a las funciones de una librería, su código es ejecutado en el contexto del contrato que llama, es decir, ``this`` apunta al contrato que llama y en especial, se puede acceder al almacenamiento del contrato que llama. Como una librería es un trozo de código fuente aislado, una librería sólo puede acceder a las variables de estado de un contrato emisor si estas variables están específicamente proporcionadas (de lo contrario, no tendría la posibilidad de nombrarlas).
 
 Las librería pueden considerarse como contratos base implícitos del contrato que las usa.
-Las librerías no son explícitamente visibles en la jerarquía de herencia, pero las llamadas a las funciones de una librería se parecen completamente a las llamadas a funciones de contratos base explícitos (``L.f()`` si ``L`` es el nombre de la librería). Además, las funciones ``internas`` de las librerías son visibles en todos los contratos, como si la librería fuera un contrato base. Por supuesto las llamadas a funciones internas utilizan las normas de llamadas internas, lo que significa que todos los tipos internos pueden ser enviados y que los tipos de memoria serán enviados mediante referencia y no copiados.
-Para realizar esta operación en el EVM, se incluirá en el contrato llamando el código de las funciones internas de la librería y todas las funciones llamadas desde dentro usando el comando habitual ``JUMP`` en lugar del ``DELEGATECALL``.
+Las librerías no son explícitamente visibles en la jerarquía de herencia, pero las llamadas a las funciones de una librería se parecen completamente a las llamadas a funciones de contratos base explícitos (``L.f()`` si ``L`` es el nombre de la librería). Además, las funciones ``internal`` de las librerías son visibles en todos los contratos, como si la librería fuera un contrato base. Por supuesto las llamadas a funciones internas utilizan las normas de llamadas internas, lo que significa que todos los tipos internos pueden ser enviados y que los tipos de memoria serán enviados mediante referencia y no copiados.
+Para realizar esta operación en la EVM, se incluirá en el contrato emisor el código de las funciones internas de la librería y todas las funciones llamadas desde dentro usando el comando habitual ``JUMP`` en lugar del ``DELEGATECALL``.
 
 .. index:: using for, set
 
 El siguiente ejemplo ilustra cómo usar las librerías (pero asegúrese de leer :ref:`using for <using-for>` para tener un ejemplo más avanzado de cómo implementar un set):
-The following example illustrates how to use libraries (but
-be sure to check out :ref:`using for <using-for>` for a
-more advanced example to implement a set).
 
 ::
 
