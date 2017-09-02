@@ -1,4 +1,4 @@
-.. index:: ! contratos
+.. index:: ! contract
 
 #########
 Contratos
@@ -6,7 +6,7 @@ Contratos
 
 Los contratos en Solidity son similares a las clases en los lenguajes orientados a objeto. Los contratos contienen datos persistentes almacenados en variables de estados y funciones que pueden modificar estas variables. Llamar a una función de un contrato diferente (instancia) realizará una llamada a una función del EVM (Máquina Virtual de Ethereum) para que cambie el contexto de manera que las variables de estado no estén accesibles.
 
-.. index:: ! contrato;creacion
+.. index:: ! contract;creation
 
 ***************
 Crear Contratos
@@ -49,7 +49,7 @@ Desde ``web3.js``, es decir la API de JavaScript, esto se hace de la siguiente m
         {from: myAccount, gas: 1000000}
     );
 
-.. index:: constructor;argumentos
+.. index:: constructor;arguments
 
 Internamente, los argumentos del constructor son transmitidos después del propio código del contrato, pero no se tiene que preocupar de eso si utiliza ``web3.js``.
 
@@ -132,9 +132,9 @@ Si un contrato quiere crear otros contrato, el creador del código fuente (y el 
         }
     }
 
-.. index:: ! visibilidad, externa, pública, privada, interna
+.. index:: ! visibility, external, public, private, internal
 
-.. _visibilidad-y-getters:
+.. _visibility-and-getters:
 
 *********************
 Visibilidad y Getters
@@ -200,9 +200,9 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
         }
     }
 
-.. index:: ! getter;funcion, ! funcion;getter
+.. index:: ! getter;function, ! function;getter
 
-Funciones Getter
+Funciones getter
 ================
 
 El compilador crea automáticamente funciones getter para todas las variables de estado **públicas**. En el contrato que se muestra abajo, el compilador va a generar una función llamada ``data`` que no lee ningún argumento y devuelve un ``unint``, el valor de la variable de estado ``data``. La inicialización de las variables de estado se puede hacer en el momento de la declaración. 
@@ -263,13 +263,13 @@ Nos va a generar una función de la siguiente forma:
 
 Notese que se ha omitido el mapeo en el struct porque no hay una buena manera de dar la clave para hacer el mapeo.
 
-.. index:: ! funcion;modificador
+.. index:: ! function;modifier
 
 .. _modifiers:
 
-***********************
-Funciones Modificadores
-***********************
+**************************
+Modificadores de funciones
+**************************
 
 Se pueden usar los modificadores para cambiar el comportamiento de las funciones de una manera ágil. Por ejemplo, los modificadores son capaces de comprobar automáticamente una condición antes de ejecutar una función. Los modificadores son propiedades heredables de los contratos y pueden ser sobrescritos por contratos derivados.
 
@@ -351,7 +351,7 @@ Múltiples Modifiers pueden ser aplicados a una misma función especificándolos
 
 	Se aceptan expresiones arbitrarias para los argumentos del modificador y en ese contexto, todos los símbolos visibles desde la función son visibles en el modificador. Símbolos introducidos en el modificador no son visibles en la función (ya que pueden cambiar por sobreescritura).
 
-.. index:: ! constante
+.. index:: ! constant
 
 ******************************
 Variables de Estado Constantes
@@ -376,10 +376,10 @@ En este momento, no todos los tipos para las constantes están implementados. Lo
     }
 
 
-.. _funciones-constantes:
+.. _constant-functions:
 
 ********************
-Funciones Constantes
+Funciones constantes
 ********************
 
 En el caso en que un función se declare como constante, promete no modificar el estado.
@@ -400,7 +400,7 @@ En el caso en que un función se declare como constante, promete no modificar el
 .. warning::
 	El compilador todavía no impone que un método constante no modifica el estado.
 
-.. index:: ! funcion fallback, funcion;fallback
+.. index:: ! fallback function, function;fallback
 
 .. _fallback-function:
 
@@ -452,9 +452,9 @@ Asegúrese por favor de testear su función fallback meticulosamente antes de de
         }
     }
 
-.. index:: ! evento
+.. index:: ! event
 
-.. _eventos:
+.. _events:
 
 *******
 Eventos
@@ -517,7 +517,7 @@ Su uso en la API de JavaScript sería como sigue:
             console.log(result);
     });
 
-.. index:: ! registro
+.. index:: ! log
 
 Interfaz a registros de bajo nivel
 ==================================
@@ -698,9 +698,9 @@ Se requiere que los contratos derivados proporcionen todos los argumentos necesa
 
 Una es directamente en la lista de herencias (``is Base(7)``). La otra es en la misma linea en que un modificador se invoca como parte de la cabecera de un constructor derivado (``Base(_y * _y)``). La primera manera es más conveniente si el argumento del constructor es una constante y define el comportamiento del contrato o por lo menos lo describe. La segunda manera se tiene que usar si los argumentos del constructor de la base dependen de los argumentos del contrato derivado. Si, como en este ejemplo sencillo, ambos sitios están utilizados, el argumento ??? tiene la prioridad.
 
-.. index:: ! herencia;multiple, ! linearizacion, ! linearizacion C3
+.. index:: ! inheritance;multiple, ! linearization, ! C3 linearization
 
-Herencia Múltiple Inheritance y Linearización
+Herencia múltiple y linearización
 =============================================
 
 Los lenguajes que permiten herencias múltiples tienen que lidiar con varios problemas. Uno es el `Problema del Diamante <https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem>`_.
@@ -725,7 +725,7 @@ Cuando la herencia termina en un contrato con una función y un modificador con 
 Este error también se produciría en el caso en que un evento y un modificador tuvieran el mismo nombre, así como con una función y un evento con el mismo nombre. 
 Como excepción, una variable de estado getter puede sobre escribir una función pública. 
 
-.. index:: ! contrato;abstracto, ! abstracto contrato
+.. index:: ! contract;abstract, ! abstract contract
 
 ********************
 Contratos Abstractos
@@ -753,7 +753,7 @@ Estos contratos no pueden compilarse (aunque contengan funciones implementadas j
 
 Si un contrato hereda de un contrato abstracto y éste no implementa todas las funciones no implementadas con sobrescritura, será el mismo un contrato abstracto.
 
-.. index:: ! contrato;interfaz, ! interfaz contrato
+.. index:: ! contract;interface, ! interface contract
 
 **********
 Interfaces
@@ -781,9 +781,9 @@ Se indican las interfaces por su propia palabra clave:
 
 Los contratos pueden heredar interfaces como lo heredarían otros contratos.
 
-.. index:: ! libreria, callcode, delegatecall
+.. index:: ! library, callcode, delegatecall
 
-.. _librerias:
+.. _libraries:
 
 *********
 Librerias
