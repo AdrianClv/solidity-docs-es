@@ -1,21 +1,21 @@
-.. index:: contrato, variable de estado, funcion, evento, struct, enum, funcion;modificador
+.. index:: contract, state variable, function, event, struct, enum, function;modifier
 
-.. _estructura-contrato:
+.. _contract_structure:
 
 *************************
-Estructura de un Contrato
+Estructura de un contrato
 *************************
 
-Los Contratos en Solidity son similares a las clases de los lenguajes orientados a objeto.
-Cualquier contrato puede contener declaraciones del tipo :ref:`variables de estado <structure-state-variables>`, :ref:`funciones <structure-functions>`, :ref:`modificadores de funcion <structure-function-modifiers>`, :ref:`eventos <structure-events>`, :ref:`structs <structure-structs-types>` and :ref:`enum <structure-enum-types>`.
+Los Contratos en Solidity son similares a las clases de los lenguajes orientados a objetos.
+Cualquier contrato puede contener declaraciones del tipo :ref:`variables de estado <structure-state-variables>`, :ref:`funciones <structure-functions>`, :ref:`modificadores de función <structure-function-modifiers>`, :ref:`eventos <structure-events>`, :ref:`structs <structure-structs-types>` y :ref:`enums <structure-enum-types>`.
 Además, los contratos pueden heredar de otros contratos.
 
-.. _estructura-variables-de-estado:
+.. _structure-state-variables:
 
-Variables de Estado
+Variables de estado
 ===================
 
-Las Variables de Estado son valores que están permanentemente almacenados en una parte del contrato conocida como almacen del contrato.
+Las variables de estado son valores que están permanentemente almacenados en una parte del contrato conocida como storage del contrato.
 
 ::
 
@@ -26,14 +26,14 @@ Las Variables de Estado son valores que están permanentemente almacenados en un
       // ...
   }
 
-Véase la sección :ref:`tipos <types>` para conocer los diferentes tipos válidos de variables de estado y :ref:`visibilidad y ??? <visibility-and-getters>` para conocer las distintas posibilidades de visibilidad que pueden tener las variables de estado.
+Véase la sección :ref:`tipos <types>` para conocer los diferentes tipos válidos de variables de estado y :ref:`visibilidad-y-getters <visibility-and-getters>` para conocer las distintas posibilidades de visibilidad que pueden tener las variables de estado.
 
-.. _estructura-funciones:
+.. _structure-functions:
 
 Funciones
 =========
 
-Las Funciones son las unidades ejecutables del código dentro de un contrato.
+Las funciones son las unidades ejecutables del código dentro de un contrato.
 
 ::
 
@@ -47,12 +47,12 @@ Las Funciones son las unidades ejecutables del código dentro de un contrato.
 
 Las :ref:`llamadas a una función <function-calls>` pueden ocurrir dentro o fuera de la misma. Una función puede tener varios niveles de :ref:`visibilidad <visibility-and-getters>` con respecto a otros contratos.
 
-.. _estructura-modificadores-funcion:
+.. _structure-function-modifiers:
 
-Modificadores de Función
+Modificadores de función
 ========================
 
-Los Modificadores de función se usan para enmendar de un modo declarativo la semántica de las funciones (véase s:ref:`modificadores <modifiers>` en la sección sobre contratos).
+Los modificadores de función se usan para enmendar de un modo declarativo la semántica de las funciones (véase :ref:`modificadores <modifiers>` en la sección sobre contratos).
 
 ::
 
@@ -71,12 +71,12 @@ Los Modificadores de función se usan para enmendar de un modo declarativo la se
       }
   }
 
-.. _estructura-eventos:
+.. _structure-events:
 
 Eventos
 =======
 
-Los Eventos son interfaces de conveniencia con los servicios de registro del EVM (Máquina Virtual de Ethereum).
+Los eventos son interfaces de conveniencia con los servicios de registro de la EVM (Máquina Virtual de Ethereum).
 
 ::
 
@@ -87,18 +87,18 @@ Los Eventos son interfaces de conveniencia con los servicios de registro del EVM
 
       function bid() payable {
           // ...
-          HighestBidIncreased(msg.sender, msg.value); // Evento disparador
+          HighestBidIncreased(msg.sender, msg.value); // Lanzamiento del evento
       }
   }
 
 Véase :ref:`eventos <events>` en la sección sobre contratos para tener más información sobre cómo se declaran los eventos y cómo se pueden usar dentro de una dapp.
 
-.. _estructura-tipos-structs:
+.. _structure-structs-types:
 
-Tipos de Structs
+Tipos de structs
 ================
 
-Los Structs son tipos definidos por el propio usuario y pueden agrupar mútiples variables (véase :ref:`structs <structs>` en la sección sobre tipos).
+Las estructuras de datos (Structs) son tipos definidos por el propio usuario y pueden agrupar mútiples variables (véase :ref:`structs <structs>` en la sección sobre tipos).
 
 ::
 
@@ -113,12 +113,12 @@ Los Structs son tipos definidos por el propio usuario y pueden agrupar mútiples
       }
   }
 
-.. _estructura-tipos-enum:
+.. _structure-enum-types:
 
-Tipos de Enum
+Tipos de enum
 =============
 
-Los Enums se usan para crear tipos con un conjunto de valores finitos y están definidos por el propio usuario (véase :ref:`enums <enums>` en la sección sobre tipos).
+Los enumerados (Enums) se usan para crear tipos con un conjunto de valores finitos y están definidos por el propio usuario (véase :ref:`enums <enums>` en la sección sobre tipos).
 
 ::
 
