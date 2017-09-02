@@ -1,22 +1,20 @@
-**************************************
-Units and Globally Available Variables
-**************************************
+********************************************
+Unidades y variables disponibles globalmente
+********************************************
 
 .. index:: wei, finney, szabo, ether
 
-Ether Units
-===========
+Unidades de Ether
+=================
 
-A literal number can take a suffix of ``wei``, ``finney``, ``szabo`` or ``ether`` to convert between the subdenominations of Ether, where Ether currency numbers without a postfix are assumed to be Wei, e.g. ``2 ether == 2000 finney`` evaluates to ``true``.
+Un numero literal puede tomar un sufijo como el ``wei``, el ``finney``, el ``szabo`` o el ``ether`` para convertirlo entre las subdenominaciones del Ether. Se asume que un numero sin sufijo para representar la moneda Ether está expresado en Wei, por ejemplo, ``2 ether == 2000 finney`` devuelve ``true``.
 
 .. index:: time, seconds, minutes, hours, days, weeks, years
 
-Time Units
-==========
+Unidades de tiempo
+==================
 
-Suffixes like ``seconds``, ``minutes``, ``hours``, ``days``, ``weeks`` and
-``years`` after literal numbers can be used to convert between units of time where seconds are the base
-unit and units are considered naively in the following way:
+Sufijos como ``seconds``, ``minutes``, ``hours``, ``days``, ``weeks`` y ``years`` utilizados después de numeros literales pueden usarse para convertir unidades de tiempo donde los segundos son la unidad de base. Las equivalencias son las siguientes:
 
  * ``1 == 1 seconds``
  * ``1 minutes == 60 seconds``
@@ -25,87 +23,64 @@ unit and units are considered naively in the following way:
  * ``1 weeks == 7 days``
  * ``1 years == 365 days``
 
-Take care if you perform calendar calculations using these units, because
-not every year equals 365 days and not even every day has 24 hours
-because of `leap seconds <https://en.wikipedia.org/wiki/Leap_second>`_.
-Due to the fact that leap seconds cannot be predicted, an exact calendar
-library has to be updated by an external oracle.
+Ojo si utilizan estas unidades para realizar cálculos de calendario, porque no todos los años tienen 365 días y no todos los días tienen 24 horas, por culpa de los `_segundos intercalares <https://es.wikipedia.org/wiki/Segundo_intercalar>`_. Debido a que los segundos intercalares no son predecibles, la librería del calendario extacto tiene que estar actualizada por un oráculo externo.
 
-These suffixes cannot be applied to variables. If you want to
-interpret some input variable in e.g. days, you can do it in the following way::
+Estos sufijos no pueden aplicarse a variables. Si desea interpretar algunas variables de entrada, como por ejemplo días, puede hacerlo de siguiente forma::
 
     function f(uint start, uint daysAfter) {
         if (now >= start + daysAfter * 1 days) { ... }
     }
 
-Special Variables and Functions
-===============================
+Variables y funciones especiales
+================================
 
-There are special variables and functions which always exist in the global
-namespace and are mainly used to provide information about the blockchain.
+Existen variables y funciones especiales de ámbito global que siempre están disponibles y que se usan principalmente para proporcionar información sobre la blockchain.
 
 .. index:: block, coinbase, difficulty, number, block;number, timestamp, block;timestamp, msg, data, gas, sender, value, now, gas price, origin
 
+Bloque y propiedades de las transacciones
+-----------------------------------------
 
-Block and Transaction Properties
---------------------------------
-
-- ``block.blockhash(uint blockNumber) returns (bytes32)``: hash of the given block - only works for 256 most recent blocks excluding current
-- ``block.coinbase`` (``address``): current block miner's address
-- ``block.difficulty`` (``uint``): current block difficulty
-- ``block.gaslimit`` (``uint``): current block gaslimit
-- ``block.number`` (``uint``): current block number
-- ``block.timestamp`` (``uint``): current block timestamp as seconds since unix epoch
-- ``msg.data`` (``bytes``): complete calldata
-- ``msg.gas`` (``uint``): remaining gas
-- ``msg.sender`` (``address``): sender of the message (current call)
-- ``msg.sig`` (``bytes4``): first four bytes of the calldata (i.e. function identifier)
-- ``msg.value`` (``uint``): number of wei sent with the message
-- ``now`` (``uint``): current block timestamp (alias for ``block.timestamp``)
-- ``tx.gasprice`` (``uint``): gas price of the transaction
-- ``tx.origin`` (``address``): sender of the transaction (full call chain)
-
-.. note::
-    The values of all members of ``msg``, including ``msg.sender`` and
-    ``msg.value`` can change for every **external** function call.
-    This includes calls to library functions.
-
-    If you want to implement access restrictions in library functions using
-    ``msg.sender``, you have to manually supply the value of
-    ``msg.sender`` as an argument.
+- ``block.blockhash(uint blockNumber) returns (bytes32)``: el hash de un bloque dado - sólo funciona para los 256 bloques más recientes, excluyendo el actual
+- ``block.coinbase`` (``address``): devuelve la dirección del minero que está procesando el bloque actual
+- ``block.difficulty`` (``uint``): devuelve la dificultad del bloque actual
+- ``block.gaslimit`` (``uint``): devuelve el límite de gas del bloque actual
+- ``block.number`` (``uint``): devuelve el número del bloque actual
+- ``block.timestamp`` (``uint``): devuelve el timestamp del bloque actual en forma de segundos siguiendo el tiempo universal de Unix (Unix epoch)
+- ``msg.data`` (``bytes``): datos enviados en la transacción (calldata)
+- ``msg.gas`` (``uint``): devuelve el gas que queda
+- ``msg.sender`` (``address``): devuelve remitente de la llamada actual
+- ``msg.sig`` (``bytes4``): devuelve los primeros cuatro bytes de los datos enviados en la transacción (i.e. el identificador de la función)
+- ``msg.value`` (``uint``): devuelve el numero de Wei enviado con la llamada
+- ``now`` (``uint``): devuelve el timestamp del bloque actual (es un alias de ``block.timestamp``)
+- ``tx.gasprice`` (``uint``): devuelve el precio del gas de la transacción
+- ``tx.origin`` (``address``): devuelve el emisor original de la transacción
 
 .. note::
-    The block hashes are not available for all blocks for scalability reasons.
-    You can only access the hashes of the most recent 256 blocks, all other
-    values will be zero.
+    Los valores de todos los elementos de ``msg``, incluido ``msg.sender`` y ``msg.value`` pueden cambiar para cada llamada a una función **externa**. Incluyendo las llamadas a funciones de una librería.
+    
+    Si desea implementar restricciones de acceso para funciones de una librería utilizando ``msg.sender``, tiene que proporcionar manualmente el valor de ``msg.sender`` como argumento.
+    
+.. note::
+    Los hashes de los bloques no están disponibles para todos los bloques por motivos de escalabilidad. Sólo se puede acceder a los hashes de los 256 bloques más recientes. El valor del hash para bloques más antiguos será cero.
 
 .. index:: assert, revert, keccak256, ripemd160, sha256, ecrecover, addmod, mulmod, cryptography, this, super, selfdestruct, balance, send
 
-Mathematical and Cryptographic Functions
-----------------------------------------
+Funciones matemáticas y criptográficas
+--------------------------------------
 
-``assert(bool condition)``:
-    throws if the condition is not met.
-``addmod(uint x, uint y, uint k) returns (uint)``:
-    compute ``(x + y) % k`` where the addition is performed with arbitrary precision and does not wrap around at ``2**256``.
-``mulmod(uint x, uint y, uint k) returns (uint)``:
-    compute ``(x * y) % k`` where the multiplication is performed with arbitrary precision and does not wrap around at ``2**256``.
-``keccak256(...) returns (bytes32)``:
-    compute the Ethereum-SHA-3 (Keccak-256) hash of the (tightly packed) arguments
-``sha3(...) returns (bytes32)``:
-    alias to ``keccak256()``
-``sha256(...) returns (bytes32)``:
-    compute the SHA-256 hash of the (tightly packed) arguments
-``ripemd160(...) returns (bytes20)``:
-    compute RIPEMD-160 hash of the (tightly packed) arguments
-``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``:
-    recover the address associated with the public key from elliptic curve signature or return zero on error
-    (`example usage <https://ethereum.stackexchange.com/q/1777/222>`_)
-``revert()``:
-    abort execution and revert state changes
+``assert(bool condition)``: lanza excepción si la condición no está satisfecha.
+``addmod(uint x, uint y, uint k) returns (uint)``: computa ``(x + y) % k`` donde la suma se realiza con una precisión arbitraria y no se desborda en ``2**256``.
+``mulmod(uint x, uint y, uint k) returns (uint)``: computa ``(x * y) % k`` donde la multiplicación se realiza con una precisión arbitraria y no se desborda en ``2**256``.
+``keccak256(...) returns (bytes32)``: computa el hash de Ethereum-SHA-3 (Keccak-256) de la unión (compactada) de los argumentos.
+``sha3(...) returns (bytes32)``: equivalente a ``keccak256()``.
+``sha256(...) returns (bytes32)``: computa el hash de SHA-256 de la unión (compactada) de los argumentos.
+``ripemd160(...) returns (bytes20)``: computa el hash de RIPEMD-160 de la unión (compactada) de los argumentos.
+``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``: recupera la dirección asociada a la clave pública de la firma de tipo curva elíptica o devuelve cero si hay un error (`ejempo de uso <https://ethereum.stackexchange.com/q/1777/222>`_).
+``revert()``: aborta la ejecución y revierte los cambios de estado a como estaban.
 
-In the above, "tightly packed" means that the arguments are concatenated without padding.
-This means that the following are all identical::
+Más arriba, "compactado" significa que los argumentos están concatenados sin relleno (padding).
+Esto significa que las siguientes llamadas son todas identicas::
 
     keccak256("ab", "c")
     keccak256("abc")
@@ -113,51 +88,36 @@ This means that the following are all identical::
     keccak256(6382179)
     keccak256(97, 98, 99)
 
-If padding is needed, explicit type conversions can be used: ``keccak256("\x00\x12")`` is the
-same as ``keccak256(uint16(0x12))``.
+Si hiciera falta relleno (padding), se pueden usar las conversiones explícitas de tipo: ``keccak256("\x00\x12")`` es lo mismo que ``keccak256(uint16(0x12))``.
 
-Note that constants will be packed using the minimum number of bytes required to store them.
-This means that, for example, ``keccak256(0) == keccak256(uint8(0))`` and
-``keccak256(0x12345678) == keccak256(uint32(0x12345678))``.
+Ten en cuenta que las constantes se compactarán usando el mínimo numero de bytes requeridos para almacenarlas.
+Eso significa por ejemplo que ``keccak256(0) == keccak256(uint8(0))`` y ``keccak256(0x12345678) == keccak256(uint32(0x12345678))``.
 
-It might be that you run into Out-of-Gas for ``sha256``, ``ripemd160`` or ``ecrecover`` on a *private blockchain*. The reason for this is that those are implemented as so-called precompiled contracts and these contracts only really exist after they received the first message (although their contract code is hardcoded). Messages to non-existing contracts are more expensive and thus the execution runs into an Out-of-Gas error. A workaround for this problem is to first send e.g. 1 Wei to each of the contracts before you use them in your actual contracts. This is not an issue on the official or test net.
+Podría pasar que le falte gas para llamar a las funciones ``sha256``, ``ripemd160`` or ``ecrecover`` en *blockchain privadas*. La razón de ser así se debe a que esas funciones están implementadas como contratos precompilados y estos contratos sólo existen depués de recibir el primer mensaje (a pesar de que el contrato está hardcodeado). Los mensajes que se envían a contratos que todavía no existen son más caros y por lo tanto su ejecución puede llevar a un error por una falta de gas (Out-of-Gas error). Una solución a este problema consiste por ejemplo en mandar 1 Wei a todos los contratos antes de empezar a usarlos. Note que esto no llevará a un error en la red oficial o en la red de testeo.
 
 .. _address_related:
 
-Address Related
----------------
+En relación a las direcciones
+-----------------------------
 
-``<address>.balance`` (``uint256``):
-    balance of the :ref:`address` in Wei
-``<address>.transfer(uint256 amount)``:
-    send given amount of Wei to :ref:`address`, throws on failure
-``<address>.send(uint256 amount) returns (bool)``:
-    send given amount of Wei to :ref:`address`, returns ``false`` on failure
-``<address>.call(...) returns (bool)``:
-    issue low-level ``CALL``, returns ``false`` on failure
-``<address>.callcode(...) returns (bool)``:
-    issue low-level ``CALLCODE``, returns ``false`` on failure
-``<address>.delegatecall(...) returns (bool)``:
-    issue low-level ``DELEGATECALL``, returns ``false`` on failure
+``<address>.balance`` (``uint256``): balance en Wei de la :ref:`dirección <address>`.
+``<address>.transfer(uint256 amount)``: envía el importe deseado en Wei a la :ref:`dirección <address>` o lanza excepción si falla.
+``<address>.send(uint256 amount) returns (bool)``: envía el importe deseado en Wei a la :ref:`dirección <address>` o devuelve ``false`` si falla.
+``<address>.call(...) returns (bool)``: crea una instrucción de tipo ``CALL`` a bajo nivel o devuelve ``false`` si falla.
+``<address>.callcode(...) returns (bool)``: crea una instrucción de tipo ``CALLCODE`` a bajo nivel o devuelve ``false`` si falla.
+``<address>.delegatecall(...) returns (bool)``: crea una instrucción de tipo ``DELEGATECALL`` a bajo nivel o devuelve ``false`` si falla.
 
-For more information, see the section on :ref:`address`.
+Para más información, véase la sección :ref:`dirección <address>`.
 
 .. warning::
-    There are some dangers in using ``send``: The transfer fails if the call stack depth is at 1024
-    (this can always be forced by the caller) and it also fails if the recipient runs out of gas. So in order
-    to make safe Ether transfers, always check the return value of ``send``, use ``transfer`` or even better:
-    Use a pattern where the recipient withdraws the money.
+    Existe un peligro a la hora de usar ``send``: la transferencia falla si la profundidad de la pila de llamadas es de 1024 (esto siempre lo puede forzar el que hace la llamada); también falla si el destinatario se queda sin gas. Entonces, para asegurarse de hacer transferencias seguras en Ether, fíjese siempre en el valor devuelto por ``send``, use ``transfer`` en lugar de ``send``, o mejor aún, use un patrón donde es el destinatario quien retira los fondos.
 
 .. index:: this, selfdestruct
 
-Contract Related
-----------------
+En relación a los contratos
+---------------------------
 
-``this`` (current contract's type):
-    the current contract, explicitly convertible to :ref:`address`
+``this`` (el tipo del contrato actual): el contrato actual, explicitamente convertible en :ref:`address`.
+``selfdestruct(address recipient)``: destruye el contrato actual y envía los fondos que tiene a una :ref:`dirección <address>` especificada.
 
-``selfdestruct(address recipient)``:
-    destroy the current contract, sending its funds to the given :ref:`address`
-
-Furthermore, all functions of the current contract are callable directly including the current function.
-
+Además, todas las funciones del contrato actual se pueden llamar directamente, incluida la función actual.
