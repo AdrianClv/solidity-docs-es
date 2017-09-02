@@ -4,24 +4,24 @@
 Contratos
 #########
 
-Los contratos en Solidity son similares a las clases en los lenguajes orientados a objeto. Los contratos contienen datos persistentes almacenados en variables de estados y funciones que pueden modificar estas variables. Llamar a una función de un contrato diferente (instancia) realizará una llamada a una función del EVM (Máquina Virtual de Ethereum) para que cambie el contexto de manera que las variables de estado no estén accesibles.
+Los contratos en Solidity son similares a las clases en los lenguajes orientados a objeto. Los contratos contienen datos persistentes almacenados en variables de estados y funciones que pueden modificar estas variables. Llamar a una función de un contrato diferente (instancia) realizará una llamada a una función de la EVM (Máquina Virtual de Ethereum) para que cambie el contexto de manera que las variables de estado no estén accesibles.
 
 .. index:: ! contract;creation
 
 ***************
-Crear Contratos
+Crear contratos
 ***************
 
-Contratos pueden crearse "desde fuera" o desde contratos en Solidity. Cuando se crea un contrato, su constructor (una función con el mismo nombre que el contrato) se ejecuta una sola vez.
+Los contratos pueden crearse "desde fuera" o desde contratos en Solidity. Cuando se crea un contrato, su constructor (una función con el mismo nombre que el contrato) se ejecuta una sola vez.
 
-El constructor es opcional. Se admite un solo constructor, lo que significa que sobrecargar no está soportado.
+El constructor es opcional. Se admite un solo constructor, lo que significa que la sobrecarga no está soportada.
 
 Desde ``web3.js``, es decir la API de JavaScript, esto se hace de la siguiente manera::
 
     // Es necesario especificar alguna fuente, incluido el nombre del contrato para los parametros de abajo
     var source = "contract CONTRACT_NAME { function CONTRACT_NAME(uint a, uint b) {} }";
 
-    // La matriz abi en json generada por el compilador
+    // El array json del ABI generado por el compilador
     var abiArray = [
         {
             "inputs":[
@@ -53,7 +53,7 @@ Desde ``web3.js``, es decir la API de JavaScript, esto se hace de la siguiente m
 
 Internamente, los argumentos del constructor son transmitidos después del propio código del contrato, pero no se tiene que preocupar de eso si utiliza ``web3.js``.
 
-Si un contrato quiere crear otros contrato, el creador del código fuente (y el binario) del contrato nuevamente creado tiene que estar informado. Eso significa que la creación de dependencias cíclicas es imposible.
+Si un contrato quiere crear otros contratos, el creador tiene que conocer el código fuente (y el binario) del contrato a crear. Eso significa que la creación de dependencias cíclicas es imposible.
 
 ::
 
@@ -61,7 +61,7 @@ Si un contrato quiere crear otros contrato, el creador del código fuente (y el 
 
     contract OwnedToken {
         // TokenCreator es un contrato que está definido más abajo. 
-        // No hay problema en referenciarlo, siempre y cuando no está 
+        // No hay problema en referenciarlo, siempre y cuando no esté 
         // siendo utilizado para crear un contrato nuevo.
         TokenCreator creator;
         address owner;
@@ -71,7 +71,7 @@ Si un contrato quiere crear otros contrato, el creador del código fuente (y el 
         // que se le ha asignado
         function OwnedToken(bytes32 _name) {
             // Se accede a las variables de estado por su nombre
-            // y no por ejemplo por this.owner. Eso también se aplica 
+            // y no, por ejemplo, por this.owner. Eso también se aplica 
             // a las funciones y, especialmente en los constructores, 
             // solo está permitido llamarlas de esa manera ("internal"), 
             // porque el propio contrato no existe todavía.
@@ -87,19 +87,19 @@ Si un contrato quiere crear otros contrato, el creador del código fuente (y el 
         function changeName(bytes32 newName) {
             // Solo el creador puede modificar el nombre --
             // la comparación es posible ya que los contratos 
-            // se pueden implícitamente convertir a direcciones.
+            // se pueden convertir a direcciones de forma implícita.
             if (msg.sender == address(creator))
                 name = newName;
         }
 
         function transfer(address newOwner) {
-            // Solo el creador actual puede transferir el token.
+            // Solo el creador puede transferir el token.
             if (msg.sender != owner) return;
             // También vamos a querer preguntar al creador 
             // si la transferencia ha salido bien. Note que esto
             // tiene como efecto llamar a una función del contrato 
-            // que está definido más abajo. Si la llamada no funciona
-            // (p.ej si no queda gas), la ejecución para aquí inmediatamente.
+            // que está definida más abajo. Si la llamada no funciona
+            // (p.ej si no queda gas), la ejecución se para aquí inmediatamente.
             if (creator.isTokenTransferOK(owner, newOwner))
                 owner = newOwner;
         }
@@ -112,7 +112,7 @@ Si un contrato quiere crear otros contrato, el creador del código fuente (y el 
             // Crea un contrato para crear un nuevo Token.
             // Del lado de JavaScript, el tipo que se nos devuelve
             // simplemente es la dirección ("address"), ya que ese
-            // es el tipo más cerca disponible en el ABI.
+            // es el tipo más cercano disponible en el ABI.
             return new OwnedToken(name);
         }
 
@@ -126,7 +126,7 @@ Si un contrato quiere crear otros contrato, el creador del código fuente (y el 
             address currentOwner,
             address newOwner
         ) returns (bool ok) {
-            // Verifica un condición arbitraria
+            // Verifica una condición arbitraria
             address tokenAddress = msg.sender;
             return (keccak256(newOwner) & 0xff) == (bytes20(tokenAddress) & 0xff);
         }
@@ -137,24 +137,24 @@ Si un contrato quiere crear otros contrato, el creador del código fuente (y el 
 .. _visibility-and-getters:
 
 *********************
-Visibilidad y Getters
+Visibilidad y getters
 *********************
 
-Ya que Solidity sólo conoce dos tipos de llamadas a una función (las internas que no generan una llamada al EVM (también llamadas "llamadas mensaje") y las externas que si generan una llamada al EVM), hay cuatro tipos de visibilidad para las funciones y las variables de estado.
+Ya que Solidity sólo conoce dos tipos de llamadas a una función (las internas que no generan una llamada a la EVM (también llamadas "message calls") y las externas que sí generan una llamada a la EVM), hay cuatro tipos de visibilidad para las funciones y las variables de estado.
 
-Una función puede especificarse como ``externa``, ``pública``, ``interna`` o ``privada``. Por defecto una función es ``pública``. Para las variables de estado, el tipo ``externa`` no es posible y el tipo por defecto es ``interna``.
+Una función puede especificarse como ``external``, ``public``, ``internal`` o ``private``. Por defecto una función es ``public``. Para las variables de estado, el tipo ``external`` no es posible y el tipo por defecto es ``internal``.
 
-``externa``: Funciones externas son parte de la interfaz del contrato, lo que significa que pueden llamarse desde otros contratos y vía transacciones. Una función externa ``f`` no puede llamarse internamente (por ejemplo ``f()`` no funciona, pero ``this.f()`` funciona). Las funciones externas son a veces más eficientes cuando reciben grandes matrices de datos.
+``external``: Las funciones externas son parte de la interfaz del contrato, lo que significa que pueden llamarse desde otros contratos y vía transacciones. Una función externa ``f`` no puede llamarse internamente (por ejemplo ``f()`` no funciona, pero ``this.f()`` funciona). Las funciones externas son a veces más eficientes cuando reciben grandes arrays de datos.
     
-``pública``: Funciones públicas son parte de la interfaz del contrato y pueden llamarse internamente o vía mensajes. Para las variables de estado públicas, se genera una función getter automática (ver más abajo).
+``public``: Las funciones públicas son parte de la interfaz del contrato y pueden llamarse internamente o vía mensajes. Para las variables de estado públicas, se genera una función getter automática (ver más abajo).
 
-``interna``: Estas funciones y variables de estado sólo pueden llamarse internamente (es decir desde dentro del contrato actual o desde contratos de derivan del mismo), sin poder usarse ``this``.
+``internal``: Estas funciones y variables de estado sólo pueden llamarse internamente (es decir, desde dentro del contrato actual o desde contratos de derivan del mismo), sin poder usarse ``this``.
 
 ``private``: Las funciones y variables de estado privadas sólo están visibles para el contrato en el que se han definido y no para contratos de derivan del mismo.
 
-.. note:: Todo lo que está definido dentro de un contrato es visible para todos los observadores externos. Definir algo como ``privado`` sólo impide que otros contratos puedan acceder y modificar la información, pero esta información siempre será visible para todo el mundo, incluso fuera de la blockchain.
+.. note:: Todo lo que está definido dentro de un contrato es visible para todos los observadores externos. Definir algo como ``private`` sólo impide que otros contratos puedan acceder y modificar la información, pero esta información siempre será visible para todo el mundo, incluso fuera de la blockchain.
 
-Es especificador de visibilidad se pone después del tipo para las variables de estado y entre la lista de parámetros y la lista de parámetros que devuelven información para las funciones.
+El especificador de visibilidad se pone después del tipo para las variables de estado y entre la lista de parámetros y la lista de parámetros de retorno para las funciones.
 
 ::
 
@@ -166,7 +166,7 @@ Es especificador de visibilidad se pone después del tipo para las variables de 
         uint public data;
     }
 
-En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el valor de ``data`` en el almacén de estado, pero no puede llamar a ``f``. El contrato ``E`` deriva de ``C`` y, por lo tanto, puede llamar a ``compute``.
+En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el valor de ``data`` en el almacén de estados, pero no puede llamar a ``f``. El contrato ``E`` deriva de ``C`` y, por lo tanto, puede llamar a ``compute``.
 
 ::
 
@@ -205,7 +205,7 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
 Funciones getter
 ================
 
-El compilador crea automáticamente funciones getter para todas las variables de estado **públicas**. En el contrato que se muestra abajo, el compilador va a generar una función llamada ``data`` que no lee ningún argumento y devuelve un ``unint``, el valor de la variable de estado ``data``. La inicialización de las variables de estado se puede hacer en el momento de la declaración. 
+El compilador crea automáticamente funciones getter para todas las variables de estado **públicas**. En el contrato que se muestra abajo, el compilador va a generar una función llamada ``data`` que no lee ningún argumento y devuelve un ``uint``, el valor de la variable de estado ``data``. La inicialización de las variables de estado se puede hacer en el momento de la declaración. 
 
 ::
 
@@ -223,7 +223,7 @@ El compilador crea automáticamente funciones getter para todas las variables de
         }
     }
 
-Las funciones getter tienen visibilidad externa. Si se accede al símbolo internamente (es decir sin ``this.``), entonces se evalúa como un variables de estado. Si se accede al símbolo externamente, (es decir con ``this.``), entonces se evalúa como una función.
+Las funciones getter tienen visibilidad externa. Si se accede al símbolo internamente (es decir sin ``this.``), entonces se evalúa como una variable de estado. Si se accede al símbolo externamente, (es decir con ``this.``), entonces se evalúa como una función.
 
 ::
 
