@@ -414,7 +414,7 @@ Además, esta función se ejecutará siempre y cuando el contrato sólo reciba E
 
 En particular, las siguientes operaciones consumirán más gas de lo que se da como estipendio para una función fallback.
 
-- Escribir en storage
+- Escribir en almacenamiento
 - Crear un contrato
 - Llamar a una función externa que consume una cantidad de gas significativa
 - Mandar Ether
