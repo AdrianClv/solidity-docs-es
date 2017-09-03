@@ -1,0 +1,13 @@
+language: cpp
+
+os: linux
+dist: trusty
+sudo: required
+before_install:
+ - sudo apt-get -y install python-sphinx 
+
+git:
+    depth: 2
+
+script:
+ - sphinx-build -nW -b html -d _build/doctrees . _build/html
