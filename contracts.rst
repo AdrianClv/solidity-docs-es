@@ -828,16 +828,20 @@ El siguiente ejemplo ilustra cómo usar las librerías (pero asegúrese de leer 
     pragma solidity ^0.4.11;
 
     library Set {
-      // Definimos un nuevo tipo de datos para un struct que se va a utilizar para conservar sus datos en el contrato que efectúa la llamanda.
+      // Definimos un nuevo tipo de datos para un struct que se va a utilizar para
+      // conservar sus datos en el contrato que efectúa la llamanda.
       struct Data { mapping(uint => bool) flags; }
 
-      // Nótese que el primer parametro es del tipo ???"referencia de almacenamiento", por lo tanto solamente su dirección de almacenamiento o no su contenido se envía como parte de la llamada. Esto es una característica especial de las funciones de librerías. Es idiomático llamar el primer parámetro 'self', si la función puede verse como un método de este objeto.
-      Note that the first parameter is of type "storage
+      // Nótese que el primer parametro es del tipo "referencia de almacenamiento",
+      // por lo tanto solamente su dirección de almacenamiento y no su contenido se
+      // envía como parte de la llamada. Esto es una característica especial de las
+      // funciones de librerías. Es idiomático llamar al primer parámetro 'self', si
+      // la función puede verse como un método de este objeto.
       function insert(Data storage self, uint value)
           returns (bool)
       {
           if (self.flags[value])
-              return false; // ???no está
+              return false; // ya está
           self.flags[value] = false;
           return true;
       }
@@ -854,7 +858,8 @@ El siguiente ejemplo ilustra cómo usar las librerías (pero asegúrese de leer 
         Set.Data knownValues;
 
         function register(uint value) {
-            // Las funciones de librería pueden llamarse sin una ???instancia específica de la librería, ya que la "instancia" es el contrato actual.
+            // Las funciones de librerías pueden llamarse sin una instancia
+	    // específica de la librería, ya que la "instancia" es el contrato actual.
             require(Set.insert(knownValues, value));
         }
         // En este contrato, si se quiere, también se puede acceder directamente a knownValues.flags.
@@ -923,12 +928,12 @@ En el siguiente ejemplo se muestra cómo usar tipos de memoria y funciones inter
         }
     }
 
-Puesto que el compilador no puede saber a qué dirección la librería será desplegada, estas direcciones deben ser insertadas en el bytecode final por un *linker* (véase :ref:`commandline-compiler` para saber cómo usar el compilador de lineas de comando para establecer vínculos). Si las direcciones no están facilitadas como argumentos al compilador, el código hex compilado contendrá ???marcadores de posición de la forma ``__Set______`` (donde ``Set`` es el nombre de la librería). La dirección puede ser facilitada manualmente remplazando cada uno de estos 40 símbolos por el cifrado ???hexadecimal de la dirección del contrato de la librería.
+Puesto que el compilador no puede saber en qué dirección será desplegada la librería, estas direcciones deben ser insertadas en el bytecode final por un *linker* (véase :ref:`commandline-compiler` para saber cómo usar el compilador de lineas de comando para establecer vínculos). Si las direcciones no están facilitadas como argumentos al compilador, el código hex compilado contendrá marcadores de posición de la forma ``__Set______`` (donde ``Set`` es el nombre de la librería). La dirección puede ser facilitada manualmente remplazando cada uno de estos 40 símbolos por la codificación hexadecimal de la dirección del contrato de la librería.
 
 Las restricciones para las librerías con respecto a las restricciones para los contratos son las siguientes:
 
 - No hay variables de estado
-- No puede heredar no ser heredadas
+- No puede heredar ni ser heredadas
 - No pueden recibir Ether
 
 (Puede que estas restricciones se levanten en un futuro.)
@@ -937,19 +942,19 @@ Las restricciones para las librerías con respecto a las restricciones para los 
 
 .. _using-for:
 
-**************
-Utilizando For
-**************
+*********
+Using For
+*********
 
 La directiva ``using A for B;`` se puede usar para adjuntar funciones de librería (desde la librería ``A``) a cualquier tipo (``B``). Estas funciones recibirán el objeto con el que se les llama como su primer parámetro (igual que con el parámetro ``self`` en Python).
 
 El efecto que tiene esta directiva ``using A for *;`` es que las funciones de la librería ``A`` se adjunten a cualquier tipo.
 
-En ambas situaciones, todas las funciones se adjuntan, incluso las funciones donde el tipo del primer parámetro no coincide con el tipo del objeto. El tipo se comprueba en el punto en que se llama a la función y que se resuelve problemas de sobrecarga de la función.
+En ambas situaciones, todas las funciones se adjuntan, incluso las funciones donde el tipo del primer parámetro no coincide con el tipo del objeto. El tipo se comprueba en el punto en que se llama a la función y se resuelven problemas de sobrecarga de la función.
 
-Con el ???alcance (scope) actual, que por ahora está limitado a un contrato, la directiva ``using A for B;`` está activa. Más adelante tendrá un ???alcance global, lo que hará que cuando se incluya un modulo, sus tipos de datos, incluyendo las funciones de librería, estarán disponibles sin tener que añadir más código.
+Con el alcance actual, que por ahora está limitado a un contrato, la directiva ``using A for B;`` está activa. Más adelante tendrá un alcance global, lo que hará que cuando se incluya un módulo, sus tipos de datos, incluyendo las funciones de librería, estarán disponibles sin tener que añadir más código.
 
-Volvamos a escribir el ejemplo del Set del apartado :ref:`librerias` de la siguiente manera:
+Volvamos a escribir el ejemplo de Set del apartado :ref:`librerías <libraries>` de la siguiente manera:
 
 ::
 
@@ -963,7 +968,7 @@ Volvamos a escribir el ejemplo del Set del apartado :ref:`librerias` de la sigui
           returns (bool)
       {
           if (self.flags[value])
-            return false; // ???está
+            return false; // está
           self.flags[value] = true;
           return true;
       }
@@ -972,7 +977,7 @@ Volvamos a escribir el ejemplo del Set del apartado :ref:`librerias` de la sigui
           returns (bool)
       {
           if (!self.flags[value])
-              return false; // ???no está
+              return false; // no está
           self.flags[value] = false;
           return true;
       }
@@ -986,17 +991,17 @@ Volvamos a escribir el ejemplo del Set del apartado :ref:`librerias` de la sigui
 
 
     contract C {
-        using Set for Set.Data; // this is the crucial change
+        using Set for Set.Data; // este es el cambio importante
         Set.Data knownValues;
 
         function register(uint value) {
-            // Aqui, cada una de las variables con el tipo Set.Data tiene una función miembro correspondiente.
+            // Aquí, cada una de las variables con el tipo Set.Data tiene una función miembro correspondiente.
             // La siguiente llamada es idéntica a Set.insert(knownValues, value)
             require(knownValues.insert(value));
         }
     }
 
-Es también posible extender los tipos elementales de la siguiente manera:
+También es posible extender los tipos elementales de la siguiente manera:
 
 ::
 
@@ -1020,7 +1025,7 @@ Es también posible extender los tipos elementales de la siguiente manera:
         }
 
         function replace(uint _old, uint _new) {
-            // Esto es lo que realiza la llamada a la función de librería
+            // Esto es lo que realiza la llamada a la función de la librería
             uint index = data.indexOf(_old);
             if (index == uint(-1))
                 data.push(_new);
@@ -1029,4 +1034,4 @@ Es también posible extender los tipos elementales de la siguiente manera:
         }
     }
 
-Nótese que cualquier llamada a una librería es en realidad una llamada a una función del EVM. Esto significa que si se envía tipos de memoria o de valor, se va a realizar una copia, incluso de la variable ``self``. La única situación en la que no se va a realizar una copia es cuando se utilizan variables ???que hacen referencia al almacenamiento.
+Nótese que cualquier llamada a una librería es en realidad una llamada a una función de la EVM. Esto significa que si se envían tipos de memoria o de valor, se va a realizar una copia, incluso de la variable ``self``. La única situación en la que no se va a realizar una copia es cuando se utilizan variables que hacen referencia al almacenamiento.
