@@ -12,8 +12,9 @@ Preguntas Básicas
 Ejemplos de contratos
 =====================
 
-There are some `contract examples <https://github.com/fivedogit/solidity-baby-steps/tree/master/contracts/>`_ by fivedogit and
-there should be a `test contract <https://github.com/ethereum/solidity/blob/develop/test/libsolidity/SolidityEndToEndTest.cpp>`_ for every single feature of Solidity.
+Hay algunos `ejemplos de contratos <https://github.com/fivedogit/solidity-baby-steps/tree/master/contracts/>`_ por fivedogit
+y debe haber un `test contract <https://github.com/ethereum/solidity/blob/develop/test/libsolidity/SolidityEndToEndTest.cpp>`_ para cada funcionalidad de Solidity.
+
 
 Crear y publicar el contrato mas simple posible
 ===============================================
@@ -25,44 +26,45 @@ Un contrato bastante simple es el `greeter <https://github.com/fivedogit/solidit
 
 Las transacciones no están garantizadas a ejecutarse en el próximo bloque o en cualquier
 bloque futuro, ya que depende de los mineros de incluir transacciones y no del
+remitente de la transacción. Esto se aplica a llamadas de funciones/transacciones y trasacciones
+de creación de contratos.
 
-Transactions are not guaranteed to happen on the next block or any future
-specific block, since it is up to the miners to include transactions and not up
-to the submitter of the transaction. This applies to function calls/transactions and contract
-creation transactions.
+Si quieres programar llamadas de contrato a futuro, puedes usar el
+`despertador (alarm clock) <http://www.ethereum-alarm-clock.com/>`_.
 
-If you want to schedule future calls of your contract, you can use the
-`alarm clock <http://www.ethereum-alarm-clock.com/>`_.
 
-What is the transaction "payload"?
-==================================
+¿Qué es la "payload" de la transacción?
+=======================================
 
-This is just the bytecode "data" sent along with the request.
+Esto es sólamente el data bytecode enviado junto con la solicitud.
 
-Is there a decompiler available?
+¿Hay un decompilador disponible?
 ================================
 
-There is no decompiler to Solidity. This is in principle possible
-to some degree, but for example variable names will be lost and
-great effort will be necessary to make it look similar to
-the original source code.
+No hay un decompilador en Solidity. Esto es en principio posible
+hasta un punto, pero por ejemplo los nombres de variables serán
+perdidas y un gran esfuerzo será necesario para replicar el código
+de fuente original.
 
-Bytecode can be decompiled to opcodes, a service that is provided by
-several blockchain explorers.
+Bytecode puede ser decompilado a opcoses, un servicio que es provisto
+por varios exploradores de blockchain.
 
-Contracts on the blockchain should have their original source
-code published if they are to be used by third parties.
+Los contratos en la blockchain deben tener su código fuente
+original publicado si serán utilizados por terceros.
 
-Create a contract that can be killed and return funds
-=====================================================
+Crear un contrato que puede ser detenido y devolver los fondos
+==============================================================
 
-First, a word of warning: Killing contracts sounds like a good idea, because "cleaning up"
-is always good, but as seen above, it does not really clean up. Furthermore,
-if Ether is sent to removed contracts, the Ether will be forever lost.
+Primero, una advertencia: Detener contratos suena como una buena idea, porque "limpiar"
+siempre es bueno, pero como se ve arriba, no se limpia realmente. Además,
+si algo de Ether es enviado a contratos eliminados, el Ether será perdido para
+siempre.
 
-If you want to deactivate your contracts, it is preferable to **disable** them by changing some
-internal state which causes all functions to throw. This will make it impossible
-to use the contract and ether sent to the contract will be returned automatically.
+Si quieres desactivar tus contratos, es mejor "inhabilitarlos" cambiando algunos estados
+internos que hace que todas las funciones arrojen excepciones. Esto hará que sea imposible
+de usar el contrato y todo ether enviado será devuelto automáticamente.
+
+Ahora para responder la pregunta:
 
 Now to answering the question: Inside a constructor, ``msg.sender`` is the
 creator. Save it. Then ``selfdestruct(creator);`` to kill and return funds.
