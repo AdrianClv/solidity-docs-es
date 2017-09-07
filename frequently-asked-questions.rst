@@ -64,126 +64,129 @@ Si quieres desactivar tus contratos, es mejor "inhabilitarlos" cambiando algunos
 internos que hace que todas las funciones arrojen excepciones. Esto hará que sea imposible
 de usar el contrato y todo ether enviado será devuelto automáticamente.
 
-Ahora para responder la pregunta:
+Ahora para responder la pregunta: Dento de un constructor, ``msg.sender`` es el
+creador. Guárdalo. Luego ``selfdestruct(creator);`` para matar y devolver los fondos.
 
-Now to answering the question: Inside a constructor, ``msg.sender`` is the
-creator. Save it. Then ``selfdestruct(creator);`` to kill and return funds.
+`ejemplo <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/05_greeter.sol>`_
 
-`example <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/05_greeter.sol>`_
+Nótese que si importas ``import "mortal"`` arriba del contrato y declaras
+``contract AlgunContrato is mortal { ...`` y compilas con un compilador que ya lo
+tiene (que incluye `Remix <https://remix.ethereum.org/>`), luego
+``kill()`` es ejecutado por ti. Una vez que un contrato es "mortal", se puede
+``nombrecontrato.kill.sendTransaction({from:eth.coinbase})``, igual que en los
+ejemplos.
 
-Note that if you ``import "mortal"`` at the top of your contracts and declare
-``contract SomeContract is mortal { ...`` and compile with a compiler that already
-has it (which includes `Remix <https://remix.ethereum.org/>`_), then
-``kill()`` is taken care of for you. Once a contract is "mortal", then you can
-``contractname.kill.sendTransaction({from:eth.coinbase})``, just the same as my
-examples.
 
-Store Ether in a contract
-=========================
+Guardar Ether en un contrato
+============================
 
-The trick is to create the contract with ``{from:someaddress, value: web3.toWei(3,"ether")...}``
+El truco es de crear un contrato con ``{from:someaddress, value: web3.toWei(3,"ether")...}``
 
-See `endowment_retriever.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/30_endowment_retriever.sol>`_.
+Ver `endowment_retriever.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/30_endowment_retriever.sol>`_.
 
-Use a non-constant function (req ``sendTransaction``) to increment a variable in a contract
-===========================================================================================
+Usar una función no-constante (req ``sendTransation``) para incrementar una variable en un contrato
+===================================================================================================
 
-See `value_incrementer.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/20_value_incrementer.sol>`_.
+Ver `value_incrementer.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/20_value_incrementer.sol>`_.
 
-Get a contract to return its funds to you (not using ``selfdestruct(...)``).
-============================================================================
+Obtener que un contrato te devuelva los fondos (sin usar ``selfdestruct(...)``).
+================================================================================
 
-This example demonstrates how to send funds from a contract to an address.
+Este ejemplo demuestra como envíar fondos de un contrato a una address.
 
-See `endowment_retriever <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/30_endowment_retriever.sol>`_.
+Ver `endowment_retriever <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/30_endowment_retriever.sol>`_.
 
-Can you return an array or a ``string`` from a solidity function call?
-======================================================================
+¿Puedes devolver un array o un ``string`` desde una llamada de función solidity?
+================================================================================
 
-Yes. See `array_receiver_and_returner.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/60_array_receiver_and_returner.sol>`_.
+Si. Ver `array_receiver_and_returner.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/60_array_receiver_and_returner.sol>`_.
 
-What is problematic, though, is returning any variably-sized data (e.g. a
-variably-sized array like ``uint[]``) from a fuction **called from within Solidity**.
-This is a limitation of the EVM and will be solved with the next protocol update.
+Lo que sí es problemático es devolver cualquier data de tamaño variable (ej. un
+array de tamaño variable como ``uint[]``) desde una función **llamada desde Solidity**.
+Esto es una limitación de la EVM y será resuelto en la próxima versión del protocolo.
 
-Returning variably-sized data as part of an external transaction or call is fine.
+Devolver data de tamaño variable está bien cuando es parte de una transaction o llamada externa.
 
-How do you represent ``double``/``float`` in Solidity?
-======================================================
+¿Cómo representas ``double``/``float``` en Solidity?
+====================================================
 
-This is not yet possible.
+Esto no es aún posible.
 
-Is it possible to in-line initialize an array like so: ``string[] myarray = ["a", "b"];``
-=========================================================================================
+Es posible de iniciar un array in-line (ej. ``string[] myarray = ["a", "b"];``)
+===============================================================================
 
-Yes. However it should be noted that this currently only works with statically sized memory arrays. You can even create an inline memory
-array in the return statement. Pretty cool, huh?
+Si. Sin embargo debiera notarse que esto sólo funciona con arrays de tamaño estático. Puedes incluso crear un array en memoria en línea
+en la declaración de ddevolución. Cool, ¿no?
 
 Example::
 
     contract C {
         function f() returns (uint8[5]) {
-            string[4] memory adaArr = ["This", "is", "an", "array"];
+            string[4] memory adaArr = ["Esto", "es", "un", "array"];
             return ([1, 2, 3, 4, 5]);
         }
     }
 
-Are timestamps (``now,`` ``block.timestamp``) reliable?
-=======================================================
+Son de confianza los timestamps (``now``, ``block.timestamp``)
+==============================================================
 
-This depends on what you mean by "reliable".
-In general, they are supplied by miners and are therefore vulnerable.
+Esto depende por lo que te refieres con "de confianza".
+En general, son entregados por los mineros y por lo tanto son vulnerables.
 
-Unless someone really messes up the blockchain or the clock on
-your computer, you can make the following assumptions:
+Al menos que haya un problema grave en la blockchain o en tu ordenador,
+puedes hacer las siguientes supuestos:
 
-You publish a transaction at a time X, this transaction contains same
-code that calls ``now`` and is included in a block whose timestamp is Y
-and this block is included into the canonical chain (published) at a time Z.
+Si publicas una transacción en un tiempo X, ésta transacción contitene el
+mismo código que llama ``now`` y es incluída en un bloque de quien la timestamp
+es Y y este bloque es incluído en la cadena canónica (publicado) en un tiempo Z.
 
-The value of ``now`` will be identical to Y and X <= Y <= Z.
+El valor de ``now`` será idéntico a Y y X <= Y <= Z.
 
-Never use ``now`` or ``block.hash`` as a source of randomness, unless you know
-what you are doing!
+Nunca usa ``now`` o ``block.hash`` como una fuente aleatoria, al menos que
+sepas lo que estás haciendo.
 
-Can a contract function return a ``struct``?
-============================================
 
-Yes, but only in ``internal`` function calls.
+¿Puede una función de contrato devolver un ``struct``?
+======================================================
 
-If I return an ``enum``, I only get integer values in web3.js. How to get the named values?
-===========================================================================================
+Si, pero sólo en llamadas de funciones ``internal``.
 
-Enums are not supported by the ABI, they are just supported by Solidity.
-You have to do the mapping yourself for now, we might provide some help
-later.
+Si devuelvo un ``enum``, Sólo me dan valores enteros en web3.js. ¿Cómo obtengo los valores nombrados?
+=====================================================================================================
 
-What is the deal with ``function () { ... }`` inside Solidity contracts? How can a function not have a name?
-============================================================================================================
+Enums no son soportados por la ABI, sólo son soportados por Solidity.
+Tienes que hacer el mapping tu mismo por ahora, aunque puede que proporcionemos
+ayuda mas adelante.
 
-This function is called "fallback function" and it
-is called when someone just sent Ether to the contract without
-providing any data or if someone messed up the types so that they tried to
-call a function that does not exist.
 
-The default behaviour (if no fallback function is explicitly given) in
-these situations is to throw an exception.
+¿Cuál es el significado de ``function() { ... }`` dentro de los contratos Solidity? ¿Cómo es posible que una función no tenga nombre?
+======================================================================================================================================
 
-If the contract is meant to receive Ether with simple transfers, you
-should implement the fallback function as
+Esta función es llamada "callback function" y es
+llamada cuando alguien sólo envía Ether al contrato sin proveer data
+o si alguien se equivocó e intentó llamar una función que no existe.
+
+El funcionamiento por defecto (si no hay función fallback explícita) en
+estas situaciones es arrojar una excepción.
+
+Si el contrato debiera recibir Ether con transferencias simples, debes
+implementar una función callback como
 
 ``function() payable { }``
 
-Another use of the fallback function is to e.g. register that your
-contract received ether by using an event.
+Otro uso de la función callbak es por ejemplo registrar que tu contrato
+recibió ether usando un evento.
 
-*Attention*: If you implement the fallback function take care that it uses as
-little gas as possible, because ``send()`` will only supply a limited amount.
+*Attention*: Si implementas la función fallback, cuida que use lo menos gas
+posible, porque ``send()`` sólo suministrará una cantidad limitada.
 
-Is it possible to pass arguments to the fallback function?
-==========================================================
 
-The fallback function cannot take parameters.
+¿Es posible pasar argumentos a la función fallback?
+===================================================
+
+La función fallback no puede tomar parámetros.
+
+Bajo ciertas circunstancias, puedes enviar data. 
 
 Under special circumstances, you can send data. If you take care
 that none of the other functions is invoked, you can access the data
