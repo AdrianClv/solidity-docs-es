@@ -186,19 +186,17 @@ posible, porque ``send()`` sólo suministrará una cantidad limitada.
 
 La función fallback no puede tomar parámetros.
 
-Bajo ciertas circunstancias, puedes enviar data. 
+Bajo ciertas circunstancias, puedes enviar data. Si cuidad que ninguna
+de las otras funciones es llamada, puedes acceder a la data usando
+``msg.data``.
 
-Under special circumstances, you can send data. If you take care
-that none of the other functions is invoked, you can access the data
-by ``msg.data``.
+¿Pueden las variables de estado ser iniciadas in-line?
+======================================================
 
-Can state variables be initialized in-line?
-===========================================
+Si, esto es posible para todos los tipos (incluso para structs). Sin embargo,
+para arrays debe notarse que se le deben declarar como arrays de memoria estática.
 
-Yes, this is possible for all types (even for structs). However, for arrays it
-should be noted that you must declare them as static memory arrays.
-
-Examples::
+Ejemplos::
 
     contract C {
         struct S {
@@ -208,7 +206,7 @@ Examples::
 
         S public x = S(1, 2);
         string name = "Ada";
-        string[4] memory adaArr = ["This", "is", "an", "array"];
+        string[4] memory adaArr = ["Esto", "es", "un", "array"];
     }
 
 
@@ -216,34 +214,34 @@ Examples::
         C c = new C();
     }
 
-How do structs work?
-====================
+¿Cómo funcionan los structs?
+============================
 
-See `struct_and_for_loop_tester.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/65_struct_and_for_loop_tester.sol>`_.
+Ver `struct_and_for_loop_tester.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/65_struct_and_for_loop_tester.sol>`_.
 
-How do for loops work?
-======================
+¿Cómo funcionan los for loop?
+=============================
 
-Very similar to JavaScript. There is one point to watch out for, though:
+Muy similarmente a Javascript. Aunque esto es un punto al cual debe hacerse atención:
 
-If you use ``for (var i = 0; i < a.length; i ++) { a[i] = i; }``, then
-the type of ``i`` will be inferred only from ``0``, whose type is ``uint8``.
-This means that if ``a`` has more than ``255`` elements, your loop will
-not terminate because ``i`` can only hold values up to ``255``.
+Si usas ``for (var i = 0; i < a.length; i ++) { a[i] = i; }``, entonces
+el tipo de ``i`` será inferido sólo de ``0``, o sea, un tipo ``uint8``.
+Esto significa que si ``a`` tiene más de ``255`` elementos, tu loop no terminará
+ya que ``i`` sólo contendrá valores hasta ``255``.
 
-Better use ``for (uint i = 0; i < a.length...``
+Mejor usar ``for (uint i = 0; i < a.length...``
 
-See `struct_and_for_loop_tester.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/65_struct_and_for_loop_tester.sol>`_.
+Ver `struct_and_for_loop_tester.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/65_struct_and_for_loop_tester.sol>`_.
 
-What character set does Solidity use?
-=====================================
+¿Qué set de caracteres usa Solidity?
+====================================
 
-Solidity is character set agnostic concerning strings in the source code, although
-UTF-8 is recommended. Identifiers (variables, functions, ...) can only use
-ASCII.
+Solidity es agnostico de set de caracteres con respecto a strings en el código fuente,
+aunque UTF-8 es recomendado. Los identificadores (variables, funciones, ...) Solo pueden
+usar ASCII.
 
-What are some examples of basic string manipulation (``substring``, ``indexOf``, ``charAt``, etc)?
-==================================================================================================
+¿Cuáles son algunos ejemplos de manipulación de strings básicos (``substring``, ``indexOf``,, ``charAt``, etc)?
+===============================================================================================================
 
 There are some string utility functions at `stringUtils.sol <https://github.com/ethereum/dapp-bin/blob/master/library/stringUtils.sol>`_
 which will be extended in the future. In addition, Arachnid has written `solidity-stringutils <https://github.com/Arachnid/solidity-stringutils>`_.
