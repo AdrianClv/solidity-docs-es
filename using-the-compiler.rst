@@ -35,23 +35,20 @@ Agregue ``--libraries "Math:0x12345678901234567890 Heap:0xabcdef0123456"`` a su 
 
 Si ``solc`` se llama con la opción ``--link``, todos los archivos de entrada se interpretan como binarios desvinculados (codificados en hexadecimal) en el ``__LibraryName____``-format dado anteriormente y están enlazados in situ (si la entrada se lee desde stdin, se escribe en stdout). Todas las opciones excepto ``--libraries`` son ignorados (incluyendo ``-o``) en este caso.
 
-If ``solc`` is called with the option ``--link``, all input files are interpreted to be unlinked binaries (hex-encoded) in the ``__LibraryName____``-format given above and are linked in-place (if the input is read from stdin, it is written to stdout). All options except ``--libraries`` are ignored (including ``-o``) in this case.
-
-If ``solc`` is called with the option ``--standard-json``, it will expect a JSON input (as explained below) on the standard input, and return a JSON output on the standard output.
+Si ``solc`` se llama con la opción ``--standard-json``, esperará una entrada JSON (como se explica a continuación) en la entrada estándar, y devolverá una salida JSON a la salida estándar.
 
 .. _compiler-api:
 
-Compiler Input and Output JSON Description
+Compilador de entrada y salida JSON Descripción
 ******************************************
 
-These JSON formats are used by the compiler API as well as are available through ``solc``. These are subject to change,
-some fields are optional (as noted), but it is aimed at to only make backwards compatible changes.
+Estos formatos JSON son utilizados por la API del compilador y están disponibles a través de ``solc``. Estos están sujetos a cambios, algunos campos son opcionales (como se ha señalado), pero está dirigido a hacer sólo cambios compatibles hacia atrás.
 
-The compiler API expects a JSON formatted input and outputs the compilation result in a JSON formatted output.
+La API del compilador espera una entrada con formato JSON y genera el resultado de la compilación en una salida con formato JSON.
 
-Comments are of course not permitted and used here only for explanatory purposes.
+Por supuesto, los comentarios no se permiten y se utilizan aquí sólo con fines explicativos.
 
-Input Description
+Descripción de entrada
 -----------------
 
 .. code-block:: none
