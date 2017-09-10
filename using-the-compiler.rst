@@ -27,15 +27,13 @@ solo funcionan si le añades ``import "/etc/passwd";``, así que sólo funcionan
 
 Si hay coincidencias múltiples debido a reasignaciones, se selecciona el prefijo común más largo.
 
+Por razones de seguridad, el compilador tiene restricciones a qué directorios puede acceder. Las rutas de acceso (y sus subdirectorios) de los archivos de origen especificados en la línea de comandos y las rutas definidas por las reasignaciones se permiten para las instrucciones de importación, pero todo lo demás se rechaza. Se pueden permitir rutas adicionales (y sus subdirectorios) a través del cambio ``--allow-paths /sample/path,/another/sample/path``.
 
-Por razones de seguridad, el compilador tiene restricciones a qué directorios puede acceder. Las rutas de acceso (y sus subdirectorios) de los archivos de origen especificados en la línea de comandos y las rutas definidas por las reasignaciones se permiten para las instrucciones de importación, pero todo lo demás se rechaza
+Si tus contratos usan :ref:`libraries <libraries>`, notaras que el bytecode contiene subcadenas del formulario ``__LibraryName______``. Puedes utilizar ``solc`` como un enlazador, lo que significa que insertará las direcciones de la biblioteca en esos puntos:
 
+Agregue ``--libraries "Math:0x12345678901234567890 Heap:0xabcdef0123456"`` a su comando para proporcionar una dirección para cada biblioteca o almacenar la cadena en un archivo (una biblioteca por línea) y ejecutar `` solc`` usando `` --libraries fileName``.
 
-For security reasons the compiler has restrictions what directories it can access. Paths (and their subdirectories) of source files specified on the commandline and paths defined by remappings are allowed for import statements, but everything else is rejected. Additional paths (and their subdirectories) can be allowed via the ``--allow-paths /sample/path,/another/sample/path`` switch.
-
-If your contracts use :ref:`libraries <libraries>`, you will notice that the bytecode contains substrings of the form ``__LibraryName______``. You can use ``solc`` as a linker meaning that it will insert the library addresses for you at those points:
-
-Either add ``--libraries "Math:0x12345678901234567890 Heap:0xabcdef0123456"`` to your command to provide an address for each library or store the string in a file (one library per line) and run ``solc`` using ``--libraries fileName``.
+Si ``solc`` se llama con la opción ``--link``, todos los archivos de entrada se interpretan como binarios desvinculados (codificados en hexadecimal) en el ``__LibraryName____``-format dado anteriormente y están enlazados in situ (si la entrada se lee desde stdin, se escribe en stdout). Todas las opciones excepto ``--libraries`` son ignorados (incluyendo ``-o``) en este caso.
 
 If ``solc`` is called with the option ``--link``, all input files are interpreted to be unlinked binaries (hex-encoded) in the ``__LibraryName____``-format given above and are linked in-place (if the input is read from stdin, it is written to stdout). All options except ``--libraries`` are ignored (including ``-o``) in this case.
 
