@@ -390,22 +390,15 @@ Example::
 La función ``append`` puede funcionar en ambos ``data1`` y ``data2`` y sus
 modificaciones serán guardadas permenentemente. Si quitas la palabra clave
 ``storage``, por defecto se usa ``memory`` para argumentos de función. Esto tiene
-como efecto que el 
+como efecto que en el punto donde ``append(data1)`` o ``append(data2)`` son llamadas,
+una copia independiente de la variable de estado es creada en memoria y ``append``
+opera en esta copia (que no soporta ``.push`` - pero eso es otro tema). Las
+modificaciones a esta copia independiente no se llevan a ``data1`` o ``data2``.
 
+Un error típico es declarar una variable local y presumir que será creada en
+memoria, aunque será creada en storage::
 
-The function ``append`` can work both on ``data1`` and ``data2`` and its modifications will be
-stored permanently. If you remove the ``storage`` keyword, the default
-is to use ``memory`` for function arguments. This has the effect that
-at the point where ``append(data1)`` or ``append(data2)`` is called, an
-independent copy of the state variable is created in memory and
-``append`` operates on this copy (which does not support ``.push`` - but that
-is another issue). The modifications to this independent copy do not
-carry back to ``data1`` or ``data2``.
-
-A common mistake is to declare a local variable and assume that it will
-be created in memory, although it will be created in storage::
-
-    /// THIS CONTRACT CONTAINS AN ERROR
+    /// ESTE CONTRATO CONTIENE UN ERROR
     contract C {
         uint someVariable;
         uint[] data;
@@ -417,18 +410,18 @@ be created in memory, although it will be created in storage::
         }
     }
 
-The type of the local variable ``x`` is ``uint[] storage``, but since
-storage is not dynamically allocated, it has to be assigned from
-a state variable before it can be used. So no space in storage will be
-allocated for ``x``, but instead it functions only as an alias for
-a pre-existing variable in storage.
+El tipo de la variable local ``x`` es ``unint[] storage``, pero ya que
+storage no es asignada dinámicamente, tiene que ser asignada desde
+una variable de estado antes de que pueda ser usada. Entonces nada de
+espacio en storage será asignado para ``x``, pero en cambio funciona
+sólo como un alias para variables pre existentes en storage.
 
-What will happen is that the compiler interprets ``x`` as a storage
-pointer and will make it point to the storage slot ``0`` by default.
-This has the effect that ``someVariable`` (which resides at storage
-slot ``0``) is modified by ``x.push(2)``.
+Lo que pasará es que el compilador interpreta ``x`` como un pointer
+storage y lo apuntará al slot de storage ``0`` por defecto.
+Esto significa que ``unaVariable`` (que reside en slot ``0``
+de storage) es modificada por ``x.push(2)``.
 
-The correct way to do this is the following::
+La manera correcta de hacerlo es la siguiente::
 
     contract C {
         uint someVariable;
@@ -440,55 +433,56 @@ The correct way to do this is the following::
         }
     }
 
-What is the difference between ``bytes`` and ``byte[]``?
-========================================================
+¿Cuál es la diferencia entre ``bytes`` y ``byte[]``?
+====================================================
 
-``bytes`` is usually more efficient: When used as arguments to functions (i.e. in
-CALLDATA) or in memory, every single element of a ``byte[]`` is padded to 32
-bytes which wastes 31 bytes per element.
+``bytes`` es en general mas eficiente: Cuando se usa como argumentos a funciones (ej
+en CALLDATA) o en memoria, cada elemento de un ``byte[]`` es acolchado a 32 bytes
+que derrocha 31 bytes por elemento.
 
-Is it possible to send a value while calling an overloaded function?
-====================================================================
+¿Es posible envíar un valor mientras se llama una función que está overloaded?
+==============================================================================
 
-It's a known missing feature. https://www.pivotaltracker.com/story/show/92020468
-as part of https://www.pivotaltracker.com/n/projects/1189488
+Es una funcionalidad que falta conocida. https://www.pivotaltracker.com/story/show/92020468
+como parte de https://www.pivotaltracker.com/n/projects/1189488
 
-Best solution currently see is to introduce a special case for gas and value and
-just re-check whether they are present at the point of overload resolution.
+La mejor solución actualmente es introducir un caso de uso especial para gas y valor
+y simplemente re-checkear si están presentes en el punto de resolución de overload.
+
+*******************
+Preguntas Avanzadas
+*******************
+
+¿Cómo se obtiene un número al azar en un contrato? (Emplementar un contrato de apuestas autónomo)
+=================================================================================================
+
+Obtener números al azar es a menudo una parte crucial de un proyecto crypto
+y la mayoría de los errores vienen de malos generadores de números random.
+
+Si no quieres que sea seguro, puedes contruir algo similar a la `moneda flipper <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/35_coin_flipper.sol>`_
+si no, mejor usar otro contrato que entrega azar, como el `RANDAO <https://github.com/randao/randao>`_`
+
+Obtener un valor devuelto de una función no constante desde otro contrato
+=========================================================================
+
+El punto clave es que el contrato que llama necesita saber sobre la función que intenta llamar.
+
+Ver `ping.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_ping.sol>`_
+y `pong.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_pong.sol>`_.
 
 
-******************
-Advanced Questions
-******************
+Hacer que un contrato haga algo apenas es minado por primera vez
+================================================================
 
-How do you get a random number in a contract? (Implement a self-returning gambling contract.)
-=============================================================================================
+Usar el contructor. Cualquier cosa dentro de él será ejecutado cuando el contrato sea minado.
 
-Getting randomness right is often the crucial part in a crypto project and
-most failures result from bad random number generators.
+Ver `replicator.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/50_replicator.sol>`_.
 
-If you do not want it to be safe, you build something similar to the `coin flipper <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/35_coin_flipper.sol>`_
-but otherwise, rather use a contract that supplies randomness, like the `RANDAO <https://github.com/randao/randao>`_.
+¿Cómo se crea un array de dos dimenciones?
+==========================================
 
-Get return value from non-constant function from another contract
-=================================================================
+Ver `2D_array.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/55_2D_array.sol>`_.
 
-The key point is that the calling contract needs to know about the function it intends to call.
-
-See `ping.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_ping.sol>`_
-and `pong.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_pong.sol>`_.
-
-Get contract to do something when it is first mined
-===================================================
-
-Use the constructor. Anything inside it will be executed when the contract is first mined.
-
-See `replicator.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/50_replicator.sol>`_.
-
-How do you create 2-dimensional arrays?
-=======================================
-
-See `2D_array.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/55_2D_array.sol>`_.
 
 Note that filling a 10x10 square of ``uint8`` + contract creation took more than ``800,000``
 gas at the time of this writing. 17x17 took ``2,000,000`` gas. With the limit at
