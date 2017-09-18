@@ -243,11 +243,12 @@ usar ASCII.
 ¿Cuáles son algunos ejemplos de manipulación de strings básicos (``substring``, ``indexOf``,, ``charAt``, etc)?
 ===============================================================================================================
 
-There are some string utility functions at `stringUtils.sol <https://github.com/ethereum/dapp-bin/blob/master/library/stringUtils.sol>`_
-which will be extended in the future. In addition, Arachnid has written `solidity-stringutils <https://github.com/Arachnid/solidity-stringutils>`_.
+Hay algunas funciones de utilidad de string en `stringUtils.sol <https://github.com/ethereum/dapp-bin/blob/master/library/stringUtils.sol>`_
+que serán extendidas en el futuro. Además, Arachnid ha escrito `solidity-stringutils <https://github.com/Arachnid/solidity-stringutils>`_.
 
-For now, if you want to modify a string (even when you only want to know its length),
-you should always convert it to a ``bytes`` first::
+Por ahora si quieres modificar un string, (incluso cuando sólo quieres saber su largo),
+debes siempre convertirlo en un ``bytes`` primero::
+
 
     contract C {
         string s;
@@ -262,37 +263,37 @@ you should always convert it to a ``bytes`` first::
     }
 
 
-Can I concatenate two strings?
+¿Puedo concatenar dos strings?
 ==============================
 
-You have to do it manually for now.
+Tienes que hacerlo manualmente por ahora.
 
-Why is the low-level function ``.call()`` less favorable than instantiating a contract with a variable (``ContractB b;``) and executing its functions (``b.doSomething();``)?
-=============================================================================================================================================================================
+Por qué la función de bajo nivel ``.call()`` es menos favorable que instanciando un contrato con ua vaiable (``ContractBb;``) y ejecutando sus funcioens (``b.doSomething();``)?
+==========================================================================================================================================================================================
 
-If you use actual functions, the compiler will tell you if the types
-or your arguments do not match, if the function does not exist
-or is not visible and it will do the packing of the
-arguments for you.
+Si usar reales funciones, el compilador le dirá si los tipos de
+los argumentos no concuerdan, si la función no existe
+o no es visible y hará el empaquetamiento de los argumentos
+por tí.
 
-See `ping.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_ping.sol>`_ and
+
+Ver `ping.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_ping.sol>`_ y
 `pong.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_pong.sol>`_.
 
-Is unused gas automatically refunded?
-=====================================
+¿El gas inutilizado es automaticamente devuelto?
+================================================
 
-Yes and it is immediate, i.e. done as part of the transaction.
+Si y es immediato, ej. hecho como parte de la transacción.
 
-When returning a value of say ``uint`` type, is it possible to return an ``undefined`` or "null"-like value?
-============================================================================================================
+Cuando se devuelve un valor de tipo ``unint``, ¿es posible devolver un `undefined`` o un valor ``null``?
+========================================================================================================
 
-This is not possible, because all types use up the full value range.
+Esto no es posible, porque todos los tipos usan el rango de valores totales.
 
-You have the option to ``throw`` on error, which will also revert the whole
-transaction, which might be a good idea if you ran into an unexpected
-situation.
+Tienes la opción de ``arrojar`` un error, que también revirtirá la transacción
+completa, que puede que sea una buena idea si obtuviste una situación inesperada.
 
-If you do not want to throw, you can return a pair::
+Si no quieres deolver un error, puedes devolver un par::
 
     contract C {
         uint[] counters;
@@ -315,57 +316,57 @@ If you do not want to throw, you can return a pair::
         }
     }
 
+¿Los comentarios son incluídos en los contratos publcados y incrementan el gas?
+===============================================================================
 
-Are comments included with deployed contracts and do they increase deployment gas?
-==================================================================================
+No. Todo lo que no sea utilizado para la ejecución es eliminado durante la compilación.
+Esto incluye, entre otras cosas, comentarios, nombres de variable y nombres de tipos.
 
-No, everything that is not needed for execution is removed during compilation.
-This includes, among others, comments, variable names and type names.
+¿Qué pasa si envías ether junto con una llamada de función a un contrato?
+=========================================================================
 
-What happens if you send ether along with a function call to a contract?
-========================================================================
+Se agrega al balance total del contrato, igual que cuando mandas ether creando un contrato.
+Sólo puedes envíar ether junto con una función que tiene modificador ``payable``,
+si no, una excepción es levantada.
 
-It gets added to the total balance of the contract, just like when you send ether when creating a contract.
-You can only send ether along to a function that has the ``payable`` modifier,
-otherwise an exception is thrown.
-
-Is it possible to get a tx receipt for a transaction executed contract-to-contract?
+¿Es posible obtener una respuesta tx para una transacción ejecutada contrato-a-contrato?
 ===================================================================================
 
-No, a function call from one contract to another does not create its own transaction,
-you have to look in the overall transaction. This is also the reason why several
-block explorer do not show Ether sent between contracts correctly.
+No, una llamada de función de un contrato a otro no crea su propia transacción,
+tienes que mirar en la transacción general. Eso también es la razón por la que
+varios exploradores de bloques no muestran Ether envíado entre contratos correctamente.
 
-What is the ``memory`` keyword? What does it do?
+
+¿Cuál es la palabra clave ``memory`` y qué hace?
 ================================================
 
-The Ethereum Virtual Machine has three areas where it can store items.
+La Máquina Virtual Ethereum tiene tres áreas donde puede guardar cosas.
 
-The first is "storage", where all the contract state variables reside.
-Every contract has its own storage and it is persistent between function calls
-and quite expensive to use.
+La primera es "storage", donde todas las variables de estado del contrato existen.
+Cada contrato tiene su propio storage y es persistente entre llamdas de función
+y bastate caro usarlo.
 
-The second is "memory", this is used to hold temporary values. It
-is erased between (external) function calls and is cheaper to use.
+La segunda es "memory", esto es usado para guardar valores temporales. Es
+borrado entre llamdas de función (externas) y es más barato usar.
 
-The third one is the stack, which is used to hold small local variables.
-It is almost free to use, but can only hold a limited amount of values.
+La tercera es en el stack, que es usado para gurdar pequeñas variables locales.
+Es casi gratis para usar, pero sólo puede guardar una cantidad limitada de valores.
 
-For almost all types, you cannot specify where they should be stored, because
-they are copied everytime they are used.
+Para casi todos los tipos, no puedes especificar donde deben ser gurdadas, porque
+son copiadas cad vez que se usan.
 
-The types where the so-called storage location is important are structs
-and arrays. If you e.g. pass such variables in function calls, their
-data is not copied if it can stay in memory or stay in storage.
-This means that you can modify their content in the called function
-and these modifications will still be visible in the caller.
+Los tipos donde la storage-location es importante son structs
+y arrays. Si, por ejemplo, pasaras estas variables en llamadas de función, su
+data no es copiada si puede quedar en memoria o quedar en storage.
+Esto significa que puedes modificar su contenido en la función llamada
+y estas modificaciones aún serán visibles al llamador.
 
-There are defaults for the storage location depending on which type
-of variable it concerns:
+Hay valores por defecto para el storage location dependiendo de que tipo
+de variable le concierne:
 
-* state variables are always in storage
-* function arguments are always in memory
-* local variables always reference storage
+* variables de estado siempre están en storage
+* argumentos de función siempre están en memoria
+* variable locales siempre referencian storage
 
 Example::
 
@@ -385,6 +386,12 @@ Example::
             d.push(1);
         }
     }
+
+La función ``append`` puede funcionar en ambos ``data1`` y ``data2`` y sus
+modificaciones serán guardadas permenentemente. Si quitas la palabra clave
+``storage``, por defecto se usa ``memory`` para argumentos de función. Esto tiene
+como efecto que el 
+
 
 The function ``append`` can work both on ``data1`` and ``data2`` and its modifications will be
 stored permanently. If you remove the ``storage`` keyword, the default
