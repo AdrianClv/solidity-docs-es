@@ -53,110 +53,111 @@ Descripción de entrada
 
 .. code-block:: none
 
+{
+  // Requerido: Lenguaje del código fuente, tal como "Solidity", "serpent", "lll", "assembly", etc.
+  language: "Solidity",
+  // Requerido
+  sources:
+  {
+    // Las teclas aquí son los nombres "globales" de los ficheros fuente,
+    // las importaciones pueden utilizar otros ficheros mediante remappings (vér más abajo).
+    "myFile.sol":
     {
-      // Required: Source code language, such as "Solidity", "serpent", "lll", "assembly", etc.
-      language: "Solidity",
-      // Required
-      sources:
-      {
-        // The keys here are the "global" names of the source files,
-        // imports can use other files via remappings (see below).
-        "myFile.sol":
-        {
-          // Optional: keccak256 hash of the source file
-          // It is used to verify the retrieved content if imported via URLs.
-          "keccak256": "0x123...",
-          // Required (unless "content" is used, see below): URL(s) to the source file.
-          // URL(s) should be imported in this order and the result checked against the
-          // keccak256 hash (if available). If the hash doesn't match or none of the
-          // URL(s) result in success, an error should be raised.
-          "urls":
-          [
-            "bzzr://56ab...",
-            "ipfs://Qma...",
-            "file:///tmp/path/to/file.sol"
-          ]
-        },
-        "mortal":
-        {
-          // Optional: keccak256 hash of the source file
-          "keccak256": "0x234...",
-          // Required (unless "urls" is used): literal contents of the source file
-          "content": "contract mortal is owned { function kill() { if (msg.sender == owner) selfdestruct(owner); } }"
-        }
-      },
-      // Optional
-      settings:
-      {
-        // Optional: Sorted list of remappings
-        remappings: [ ":g/dir" ],
-        // Optional: Optimizer settings (enabled defaults to false)
-        optimizer: {
-          enabled: true,
-          runs: 500
-        },
-        // Metadata settings (optional)
-        metadata: {
-          // Use only literal content and not URLs (false by default)
-          useLiteralContent: true
-        },
-        // Addresses of the libraries. If not all libraries are given here, it can result in unlinked objects whose output data is different.
-        libraries: {
-          // The top level key is the the name of the source file where the library is used.
-          // If remappings are used, this source file should match the global path after remappings were applied.
-          // If this key is an empty string, that refers to a global level.
-          "myFile.sol": {
-            "MyLib": "0x123123..."
-          }
-        }
-        // The following can be used to select desired outputs.
-        // If this field is omitted, then the compiler loads and does type checking, but will not generate any outputs apart from errors.
-        // The first level key is the file name and the second is the contract name, where empty contract name refers to the file itself,
-        // while the star refers to all of the contracts.
-        //
-        // The available output types are as follows:
-        //   abi - ABI
-        //   ast - AST of all source files
-        //   legacyAST - legacy AST of all source files
-        //   devdoc - Developer documentation (natspec)
-        //   userdoc - User documentation (natspec)
-        //   metadata - Metadata
-        //   ir - New assembly format before desugaring
-        //   evm.assembly - New assembly format after desugaring
-        //   evm.legacyAssembly - Old-style assembly format in JSON
-        //   evm.bytecode.object - Bytecode object
-        //   evm.bytecode.opcodes - Opcodes list
-        //   evm.bytecode.sourceMap - Source mapping (useful for debugging)
-        //   evm.bytecode.linkReferences - Link references (if unlinked object)
-        //   evm.deployedBytecode* - Deployed bytecode (has the same options as evm.bytecode)
-        //   evm.methodIdentifiers - The list of function hashes
-        //   evm.gasEstimates - Function gas estimates
-        //   ewasm.wast - eWASM S-expressions format (not supported atm)
-        //   ewasm.wasm - eWASM binary format (not supported atm)
-        //
-        // Note that using a using `evm`, `evm.bytecode`, `ewasm`, etc. will select every
-        // target part of that output.
-        //
-        outputSelection: {
-          // Enable the metadata and bytecode outputs of every single contract.
-          "*": {
-            "*": [ "metadata", "evm.bytecode" ]
-          },
-          // Enable the abi and opcodes output of MyContract defined in file def.
-          "def": {
-            "MyContract": [ "abi", "evm.opcodes" ]
-          },
-          // Enable the source map output of every single contract.
-          "*": {
-            "*": [ "evm.sourceMap" ]
-          },
-          // Enable the legacy AST output of every single file.
-          "*": {
-            "": [ "legacyAST" ]
-          }
-        }
+      // Opcional: keccak256 hash del fichero fuente
+      // Se utiliza para verificar el contenido recuperado si se importa a través de URLs.
+      "keccak256": "0x123...",
+      // Requerido (a menos que se use "contenido", ver abajo): URL (s) al fichero fuente.
+      // URL(s) deben ser importadas en este orden y el resultado debe ser verificado contra el fichero
+      // keccak256 hash (si está disponible). Si el hash no coincide o no coincide con ninguno de los
+      // URL(s) resultado en el éxito, un error debe ser elevado.
+      "urls":
+      [
+        "bzzr://56ab...",
+        "ipfs://Qma...",
+        "file:///tmp/path/to/file.sol"
+      ]
+    },
+    "mortal":
+    {
+      // Opcional: keccak256 hash del fichero fuente
+      "keccak256": "0x234...",
+      // Requerido (a menos que se use "urls"): contenido literal del fichero fuente
+      "content": "contract mortal is owned { function kill() { if (msg.sender == owner) selfdestruct(owner); } }"
+    }
+  },
+  // Opcional
+  settings:
+  {
+    // Opcional: Lista ordenada de remappings
+    remappings: [ ":g/dir" ],
+    // Opcional: Ajustes de optimización (activación de valores predeterminados a false)
+    optimizador: {
+      enabled: true,
+      runs: 500
+    },
+    // Configuración de metadatos (opcional)
+    metadata: {
+      // Usar sólo contenido literal y no URLs (falso por defecto)
+      useLiteralContent: true
+    },
+    // Direcciones de las bibliotecas. Si no todas las bibliotecas se dan aquí, puede resultar con objetos no vinculados cuyos datos de salida son diferentes.
+    libraries: {
+      // La clave superior es el nombre del fichero fuente donde se utiliza la biblioteca.
+      // Si se utiliza remappings, este fichero fuente debe coincidir con la ruta global después de que se hayan aplicado los remappings.
+      // Si esta clave es una cadena vacía, se refiere a un nivel global.
+
+      "myFile.sol": {
+        "MyLib": "0x123123..."
       }
     }
+    // Para seleccionar las salidas deseadas se puede utilizar lo siguiente.
+    // Si este campo se omite, el compilador se carga y comprueba el tipo, pero no genera ninguna salida aparte de errores.
+    // La clave de primer nivel es el nombre del fichero y la segunda es el nombre del contrato, donde el nombre vacío del contrato se refiere al fichero mismo,
+    // mientras que la estrella se refiere a todos los contratos.
+    //
+    // Las clases de mensajes disponibles son las siguientes:
+    //   abi - ABI
+    //   ast - AST de todos los ficheros fuente
+    //   legacyAST - legado AST de todos los ficheros fuente
+    //   devdoc - Documentación para desarrolladores (natspec)
+    //   userdoc - Documentación de usuario (natspec)
+    //   metadata - Metadatos
+    //   ir - Nuevo formato de montaje antes del desazucarado
+    //   evm.assembly - Nuevo formato de montaje después del desazucarado
+    //   evm.legacyAssembly - Formato de montaje antiguo en JSON
+    //   evm.bytecode.object - Objeto bytecode
+    //   evm.bytecode.opcodes - Lista de Opcodes
+    //   evm.bytecode.sourceMap - Asignación de fuentes (útil para depuración)
+    //   evm.bytecode.linkReferences - Referencias de enlace (si es objeto no enlazado)
+    //   evm.deployedBytecode* - Desplegado bytecode (tiene las mismas opciones que evm.bytecode)
+    //   evm.methodIdentifiers - La lista de funciones de hashes 
+    //   evm.gasEstimates - Funcion de estimación de gas
+    //   ewasm.wast - eWASM S-formato de expresiones (no compatible con atm)
+    //   ewasm.wasm - eWASM formato binario (no compatible con atm)
+    //
+    // Ten en cuenta que el uso de `evm`, `evm.bytecode`, `ewasm`, etc. seleccionara cada
+    // parte objetiva de esa salida.
+    //
+    outputSelection: {
+      // Habilita los metadatos y las salidas de bytecode de cada contrato.
+      "*": {
+        "*": [ "metadata", "evm.bytecode" ]
+      },
+      // Habilitar la salida abi y opcodes de MyContract definida en el fichero def.
+      "def": {
+        "MyContract": [ "abi", "evm.opcodes" ]
+      },
+      // Habilita la salida del mapa de fuentes de cada contrato individual.
+      "*": {
+        "*": [ "evm.sourceMap" ]
+      },
+      // Habilita la salida AST heredada de cada archivo.
+      "*": {
+        "": [ "legacyAST" ]
+      }
+    }
+  }
+}
 
 
 Output Description
