@@ -68,7 +68,7 @@ Descripción de entrada
           "keccak256": "0x123...",
           // Requerido (a menos que se use "contenido", ver abajo): URL (s) al fichero fuente.
           // URL(s) deben ser importadas en este orden y el resultado debe ser verificado contra el fichero
-          // keccak256 hash (si está disponible). Si el hash no coincide o no coincide con ninguno de los
+          // keccak256 hash (si está disponible). Si el hash no coincide con ninguno de los
           // URL(s) resultado en el éxito, un error debe ser elevado.
           "urls":
           [
@@ -165,72 +165,72 @@ Output Description
 .. code-block:: none
 
     {
-      // Optional: not present if no errors/warnings were encountered
-      errors: [
+        // Opcional: no está presente si no se han encontrado errores/avisos
+        errors: [
         {
-          // Optional: Location within the source file.
+          // Opcional: Ubicación dentro del fichero fuente.
           sourceLocation: {
             file: "sourceFile.sol",
             start: 0,
             end: 100
           ],
-          // Mandatory: Error type, such as "TypeError", "InternalCompilerError", "Exception", etc
+          // Obligatorio: Tipo de error, como "TypeError", "InternalCompilerError", "Exception", etc
           type: "TypeError",
-          // Mandatory: Component where the error originated, such as "general", "ewasm", etc.
+          // Obligatorio: Componente donde se originó el error, como "general", "ewasm", etc.
           component: "general",
-          // Mandatory ("error" or "warning")
+          // Obligatorio ("error" o "warning")
           severity: "error",
-          // Mandatory
+          // Obligatorio
           message: "Invalid keyword"
-          // Optional: the message formatted with source location
+          // Opcional: el mensaje formateado con la ubicación de origen
           formattedMessage: "sourceFile.sol:100: Invalid keyword"
         }
-      ],
-      // This contains the file-level outputs. In can be limited/filtered by the outputSelection settings.
-      sources: {
+        ],
+        // Contiene las salidas a nivel de fichero. Puede ser limitado/filtrado por los ajustes de outputSelection.
+        sources: {
         "sourceFile.sol": {
-          // Identifier (used in source maps)
+          // Identificador (utilizado en los mapas fuente)
           id: 1,
-          // The AST object
+          // El objeto AST
           ast: {},
-          // The legacy AST object
+          // El objeto legado AST 
           legacyAST: {}
         }
-      },
-      // This contains the contract-level outputs. It can be limited/filtered by the outputSelection settings.
-      contracts: {
+        },
+        // Contiene las salidas contract-level. Puede ser limitado/filtrado por los ajustes de outputSelection.
+        contracts: {
         "sourceFile.sol": {
-          // If the language used has no contract names, this field should equal to an empty string.
+          // Si el idioma utilizado no tiene nombres de contrato, este campo debe ser igual a una cadena vacía.
           "ContractName": {
-            // The Ethereum Contract ABI. If empty, it is represented as an empty array.
-            // See https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI
+            // El Contrado de Ethereum ABI. Si está vacío, se representa como una matriz vacía.
+            // Ver https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI
             abi: [],
-            // See the Metadata Output documentation (serialised JSON string)
+            // Ver la documentación de salida de metadatos (cadena JSON seriada)
             metadata: "{...}",
-            // User documentation (natspec)
+            // Documentación de usuario (natspec)
             userdoc: {},
-            // Developer documentation (natspec)
+            // Documentación para desarrolladores (natspec)
             devdoc: {},
-            // Intermediate representation (string)
+            // Representación intermedia (cadena)
             ir: "",
-            // EVM-related outputs
+            // EVM-salidas relacionadas 
             evm: {
-              // Assembly (string)
+              // Montaje (cadena)
               assembly: "",
-              // Old-style assembly (object)
+              // Antiguo estilo montaje (objeto)
               legacyAssembly: {},
-              // Bytecode and related details.
+              // Bytecode y detalles relacionados.
               bytecode: {
-                // The bytecode as a hex string.
+                // El bytecode como una cadena hexadecimal.
                 object: "00fe",
-                // Opcodes list (string)
+                // Lista de Opcodes (cadena)
                 opcodes: "",
-                // The source mapping as a string. See the source mapping definition.
+                // El mapeo de fuentes como una cadena. Ve la definición del mapeo de fuentes.
                 sourceMap: "",
-                // If given, this is an unlinked object.
+                // Si se da, este es un objeto no ligado.
                 linkReferences: {
                   "libraryFile.sol": {
-                    // Byte offsets into the bytecode. Linking replaces the 20 bytes located there.
+                    // Traslados de bytes en el bytecode. El enlace sustituye a los 20 bytes que se encuentran allí.
                     "Library1": [
                       { start: 0, length: 20 },
                       { start: 200, length: 20 }
@@ -238,13 +238,13 @@ Output Description
                   }
                 }
               },
-              // The same layout as above.
+              // La misma disposición que la anterior.
               deployedBytecode: { },
-              // The list of function hashes
+              // La lista de hashes de función
               methodIdentifiers: {
                 "delegate(address)": "5c19a95c"
               },
-              // Function gas estimates
+              // Funcion de estimados de gas
               gasEstimates: {
                 creation: {
                   codeDepositCost: "420000",
@@ -259,11 +259,11 @@ Output Description
                 }
               }
             },
-            // eWASM related outputs
+            // eWASM resultados relacionados
             ewasm: {
-              // S-expressions format
+              // S-formato de expressiones
               wast: "",
-              // Binary format (hex string)
+              // Formato Binario (cadena hexagonal)
               wasm: ""
             }
           }
