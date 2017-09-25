@@ -122,9 +122,9 @@ Descripción de entrada
         //   devdoc - Documentación para desarrolladores (natspec)
         //   userdoc - Documentación de usuario (natspec)
         //   metadata - Metadatos
-        //   ir - Nuevo formato de montaje antes del desazucarado
-        //   evm.assembly - Nuevo formato de montaje después del desazucarado
-        //   evm.legacyAssembly - Formato de montaje antiguo en JSON
+        //   ir - Nuevo formato de ensamblaje antes del desazucarado
+        //   evm.assembly - Nuevo formato de ensamblaje después del desazucarado
+        //   evm.legacyAssembly - Formato de ensamblaje antiguo en JSON
         //   evm.bytecode.object - Objeto bytecode
         //   evm.bytecode.opcodes - Lista de Opcodes
         //   evm.bytecode.sourceMap - Asignación de fuentes (útil para depuración)
@@ -217,7 +217,7 @@ Output Description
             evm: {
               // Montaje (cadena)
               assembly: "",
-              // Antiguo estilo montaje (objeto)
+              // Antiguo estilo ensamblaje (objeto)
               legacyAssembly: {},
               // Bytecode y detalles relacionados.
               bytecode: {
