@@ -215,7 +215,7 @@ Output Description
             ir: "",
             // EVM-salidas relacionadas 
             evm: {
-              // Montaje (cadena)
+              // Ensamblaje (cadena)
               assembly: "",
               // Antiguo estilo ensamblaje (objeto)
               legacyAssembly: {},
