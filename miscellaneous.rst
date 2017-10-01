@@ -1,4 +1,4 @@
-utilizados#######
+#######
 Diverso
 #######
 
@@ -8,10 +8,10 @@ Diverso
 Layout de las variables de estado en almacenamiento
 ***************************************************
 
-Variables de tamaño estáticas (todo menos mapping y tipos arrays de tamaño variable) se disponen contiguamente en almacenamiento empezando de la posición ``0``. Cuando múltiples elementos necesitan menos de 32 bytes, son empaquetados en un slot de almacenamiento cuando posible de acuerdo a las reglas:
+Variables de tamaño estáticas (todo menos mapping y tipos arrays de tamaño variable) se disponen contiguamente en almacenamiento empezando de la posición ``0``. Cuando múltiples elementos necesitan menos de 32 bytes, son empaquetados en un slot de almacenamiento cuando es posible de acuerdo a las reglas:
 
 - El primer elemento en un slot de almacenamiento es almacenado alineado en lower-order.
-- Tipos elementales usan sólo usan la cantidad de bytes que se necesita para almacenarlas.
+- Tipos elementales sólo usan la cantidad de bytes que se necesita para almacenarlos.
 - Si un tipo elemental no cabe en la parte restante de un slot de almacenamiento, es movido al próximo slot de almacenamiento.
 - Structs y datos de array siempre comienzan en un nuevo slot y ocupan slots enteros (pero elementos dentro de un struct o array son empacados estrechamente de acuerdo a estas reglas).
 
@@ -22,13 +22,13 @@ Variables de tamaño estáticas (todo menos mapping y tipos arrays de tamaño va
     más pequeño que eso, la EVM usa más operaciones para reducir el tamaño del elemento de 32 bytes
     al tamaño deseado.
 
-    Sólo es benéfico de reducir el tamaño de los argumentos si estás tratando con valores de
+    Sólo es beneficioso reducir el tamaño de los argumentos si estás tratando con valores de
     almacenamiento porque el compilador empacará múltiples elementos en un slot de almacenamiento,
     y entonces, combina múltiples lecturas y escrituras en una sóla operación. Cuando se trata con
     argumentos de función o valores de memoria, no hay beneficio inherente porque el compilador no
     empaca estos valores.
 
-    Finalmente, para permitir la EVM de optimizar esto, asegúrate de ordenar la variables de
+    Finalmente, para permitir a la EVM optimizar esto, asegúrate de ordenar las variables de
     almacenamiento y miembros ``struct`` para que puedan ser empacados estrechamente. Por ejemplo,
     declarando tus variables de almacenamiento en el orden de ``uint128, uint128, uint256`` en vez de
     ``uint128, uint256, uint128``, ya que el primero utilizará sólo dos slots de almacenamiento y éste
@@ -36,20 +36,20 @@ Variables de tamaño estáticas (todo menos mapping y tipos arrays de tamaño va
 
 Los elementos de structs y arrays son almacenados después de ellos mismos, como si fueran dados explícitamente.
 
-Dado a su tamaño impredecible, tipos de array dinámicos y de mapping usan computación hash Keccak-256
+Dado a su tamaño impredecible, los tipos de array dinámicos y de mapping usan computación hash Keccak-256
 para encontrar la posición de inicio del valor o del dato del array. Estas posiciones de inicio
-son siempre los de full stack.
+son siempre slots completos.
 
 El mapping o el array dinámico en sí ocupa un slot (sin llenar) en alguna posición ``p`` de acuerdo
 a la regla de arriba (o por aplicar esta regla de mappings a mappings o arrays de arrays). Para un
 array dinámico, este slot guarda el número de elementos en el array (los byte arrays y cadenas son
 excepciones aquí, mirar abajo). Para un mapping, el slot no es utilizado (pero es necesario para que
 dos mappings iguales seguidos usen diferentes distribuciones de hash).
-Datos de array son ubicados en ``kecakk256(p)`` y el valor correspondiente a una llave de mapping
+Datos de array son ubicados en ``kecakk256(p)`` y el valor correspondiente a una clave de mapping
 ``k`` es ubicada en ``kecakk256(k . p)`` donde ``.`` es una concatenación. Si el valor de nuevo es
 un tipo no elemental, las posiciones son encontradas agregando un offset de ``keccak256(k . p)``.
 
-``bytes`` y ``string`` almacenan sus datos en el mismo slot donde también el largo es almacenado si son cortos. En particular: si el data es al menos ``31`` bytes de largo, es almacenado en bytes de orden mayor (alineados a la izquierda) y el byte de orden menor almacena ``length * 2``. Si es más largo, el slot principal almacena ``length * 2 + 1`` y los datos son almacenados como siempre en ``keccak256(slot)``.
+``bytes`` y ``string`` almacenan sus datos en el mismo slot junto con su longitud si es corta. En particular: si los datos son al menos ``31`` bytes de largo, es almacenado en bytes de orden mayor (alineados a la izquierda) y el byte de orden menor almacena ``length * 2``. Si es más largo, el slot principal almacena ``length * 2 + 1`` y los datos son almacenados como siempre en ``keccak256(slot)``.
 
 Entonces para el siguiente sinppet de contrato::
 
@@ -64,7 +64,7 @@ La posición de ``data[4][9].b`` está en ``keccak256(uint256(9) . keccak256(uin
 .. index: memory layout
 
 *****************
-Layout en Memoria
+Layout en memoria
 *****************
 
 Solidity reserva tres slots de 256-bits:
@@ -77,7 +77,7 @@ El espacio de scratch puede ser usado entre declaraciones (ej. dento de inline a
 Solidity siempre emplaza los nuevos objetos en el puntero de memoria libre y la memoria nunca es liberada (esto puede cambiar en el futuro).
 
 .. warning::
-  Hay algunas operaciones en SOlidity que necesitan un área temporal de memoria mas grande que 64 bytes y por lo tanto no caben en el espacio scratch. Ellos serán emplazados donde apunta la memoria libre, pero dado su corta vida, el apuntador no es actualizado. La memoria puede o no ser puesta a cero. Por esto, uno no debiera esperar que la memoria libre sea puesta a cero.
+  Hay algunas operaciones en Solidity que necesitan un área temporal de memoria mas grande que 64 bytes y por lo tanto no caben en el espacio scratch. Estas operaciones serán emplazadas donde apunta la memoria libre, pero dado su corta vida, el puntero no es actualizado. La memoria puede o no ser puesta a cero. Por esto, uno no debiera esperar que la memoria libre sea puesta a cero.
 
 .. index: calldata layout
 
@@ -85,32 +85,32 @@ Solidity siempre emplaza los nuevos objetos en el puntero de memoria libre y la 
 Layout de Call Data
 *******************
 
-Cuando un contrato Solidity es desplegado y cuando es llamado de un
-account, el data de entrada se asume que está en el formato de la
+Cuando un contrato Solidity es desplegado y cuando es llamado desde una
+cuenta, los datos de entrada se asume que están en el formato de la
 `espcificación ABI <https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI>`_.
-La especificación ABI requiere que los argumentos sean acolchados a
-múltiples de 32 bytes. Las llamadas de función internas usan otra convención.
+La especificación ABI requiere que los argumentos sean ajustados a
+múltiplos de 32 bytes. Las llamadas de función internas usan otra convención.
 
 .. index: variable cleanup
 
 ******************************
-Internas - Limpiando Variables
+Internas - Limpiando variables
 ******************************
 
 Cuando un valor es más corto que 256-bit, en algunos casos los bits
 restantes tienen que ser limpiados.
-El compilador Solidity es diseñado para limpiar estos bits restantes antes
+El compilador de Solidity está diseñado para limpiar estos bits restantes antes
 de cualquier operación que pueda ser afectada adversamente por la potencial
 basura en los bits restantes.
-Por ejemplo, antes de escribir un valor a la memoria los bits restantes tienen
+Por ejemplo, antes de escribir un valor a la memoria, los bits restantes tienen
 que ser limpiados porque los contenidos de la memoria pueden ser usados para
-computar hashes o enviados como data de un llamado de mensaje. De manera similar,
+computar hashes o ser enviados como datos en una llamada. De manera similar,
 antes de almacenar un valor en el almacenamiento, los bits restantes tienen
-que ser limpiados porque si no el valor ilegible puede ser observado.
+que ser limpiados porque si no, el valor ilegible puede ser observado.
 
 Por otro lado, no limpiamos los bits si la operación siguiente no es afectada.
 Por ejemplo, ya que cualquier valor no-cero es considerado ``true`` por
-una instrucción ``JUMPI``, no limpiamos los valores booleanos antes que sean utilizados
+una instrucción ``JUMPI``, no limpiamos los valores booleanos antes de que sean utilizados
 como condición para ``JUMPI``.
 
 Además de este principio de diseño, el compilador Solidity
@@ -121,23 +121,23 @@ Diferentes tipos tienen diferentes reglas para limpiar valores inválidos:
 +---------------+---------------+--------------------+
 |Tipo           |Valores válidos|Val. inv. significan|
 +===============+===============+====================+
-|enum de n      |0 hasta n - 1  |excepción          |
-|miembros       |               |                   |
+|enum de n      |0 hasta n - 1  |excepción           |
+|miembros       |               |                    |
 +---------------+---------------+--------------------+
-|bool           |0 o  1         |1                  |
+|bool           |0 o  1         |1                   |
 +---------------+---------------+--------------------+
-|enteros con    |palabra        |por ahora envuelve |
-|signo          |extendida por  |silenciosamente;   |
-|               |signo          |en el futuro esto  |
-|               |               |arrojará           |
-|               |               |excepciones        |
-|               |               |                   |
+|enteros con    |palabra        |por ahora envuelve  |
+|signo          |extendida por  |silenciosamente;    |
+|               |signo          |en el futuro esto   |
+|               |               |arrojará            |
+|               |               |excepciones         |
+|               |               |                    |
 +---------------+---------------+--------------------+
-|enteros        |altos bits     |por ahora envuelve |
-|sin signos     |zeroed         |silenciosamente;   |
-|               |               |en el futuro esto  |
-|               |               |arrojará           |
-|               |               |excepciones        |
+|enteros        |altos bits     |por ahora envuelve  |
+|sin signos     |a cero         |silenciosamente;    |
+|               |               |en el futuro esto   |
+|               |               |arrojará            |
+|               |               |excepciones         |
 +---------------+---------------+--------------------+
 
 
@@ -147,7 +147,7 @@ Diferentes tipos tienen diferentes reglas para limpiar valores inválidos:
 Internos - El optimizador
 *************************
 
-El optimizador solidity funciona con assembly, así que puede y es usado con otros idiomas. Divide la secuencia de las instrucciones en bloques básicos de JUMPs y JUMPDESTs. Dentro de estos bloques, las instrucciones son analizadas y cada modificación al stack, a la memoria o al almacenamiento son guardadas como una expresión que consiste en una instrucción y una lista de argumentos que son esencialmente apuntadores a otras expresiones. La idea principal es encontrar expreciones que sean siempre iguales (en todo entradas) y combinarlas a una clase de expresión. El optimizador primero intenta encontrar una nueva expresión en una lista de expresiones conocidas. Si esto no funciona, la expresión es simplificada de acuerdo a reglas como ``constante + constante = suma_de_constantes`` o ``X * 1 = X``. Ya que esto es hecho recursivamente, también podemos aplicar la última regla si el segundo factor es más una expresión más compleja donde sabemos que siempre evaluará a uno. Modificaciones al almacenamiento y ubicaciones de memoria tienen que borrar el conocimiento de almacenamiento y ubicaciones de memoria que no son conocidas como diferentes: Si primero escribimos a ubicación `x` y luego a ubicación `y` y ambas son variables de entrada, la segunda puede sobre escribir la primera, entonces no sabemos realmente lo que es almacenado en `x` después de escribir a `y`. Por otro lado, si una simplificación de la expresión `x -y` evalúa a una constante no cero, sabemos que podemos mantener nuestro conocimiento de lo que es almacenado en x.
+El optimizador de solidity funciona con assembly, así que puede y es usado con otros idiomas. Divide la secuencia de las instrucciones en bloques básicos de JUMPs y JUMPDESTs. Dentro de estos bloques, las instrucciones son analizadas y cada modificación al stack, a la memoria o al almacenamiento son guardadas como una expresión que consiste en una instrucción y una lista de argumentos que son esencialmente apuntadores a otras expresiones. La idea principal es encontrar expreciones que sean siempre iguales (en todo entradas) y combinarlas a una clase de expresión. El optimizador primero intenta encontrar una nueva expresión en una lista de expresiones conocidas. Si esto no funciona, la expresión es simplificada de acuerdo a reglas como ``constante + constante = suma_de_constantes`` o ``X * 1 = X``. Ya que esto es hecho recursivamente, también podemos aplicar la última regla si el segundo factor es más una expresión más compleja donde sabemos que siempre evaluará a uno. Modificaciones al almacenamiento y ubicaciones de memoria tienen que borrar el conocimiento de almacenamiento y ubicaciones de memoria que no son conocidas como diferentes: Si primero escribimos a ubicación `x` y luego a ubicación `y` y ambas son variables de entrada, la segunda puede sobre escribir la primera, entonces no sabemos realmente lo que es almacenado en `x` después de escribir a `y`. Por otro lado, si una simplificación de la expresión `x -y` evalúa a una constante no cero, sabemos que podemos mantener nuestro conocimiento de lo que es almacenado en x.
 
 En el fin de este proceso, sabemos cuáles expresiones tienen que estar en el stack en el fin y tienen una lista de modificaciones a la memoria y almacenamiento. Esta información es almacenada junta con los bloques básicos y es usada para unirlas. Además, información sobre el stack, almacenamiento y configuración de memoria es enviada al (los) próximo(s) bloque(s). Si sabemos los objetivos de cada una de las instrucciones JUMP y JUMPI, podemos construir un gráfico de flujo completo del programa. Si hay un sólo objetivo que no conocemos (esto puede pasar ya que en principio, los objetivos de jumps pueden ser computados de las entradas), tenemos que borrar toda información sobre los estados de entrada de un bloque ya que puede ser el objetivo de del JUMP desconocido. Si un JUMPI es encontrado que la condición evalúa a una constante, es transformada en un jump incondicional.
 
