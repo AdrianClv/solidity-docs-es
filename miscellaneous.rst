@@ -85,9 +85,9 @@ Solidity siempre emplaza los nuevos objetos en el puntero de memoria libre y la 
 Layout de Call Data
 *******************
 
-Cuando un contrato Solidity es desplegado y cuando es llamado desde una
+Cuando un contrato de Solidity es desplegado y cuando es llamado desde una
 cuenta, los datos de entrada se asume que están en el formato de la
-`espcificación ABI <https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI>`_.
+`especificación ABI <https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI>`_.
 La especificación ABI requiere que los argumentos sean ajustados a
 múltiplos de 32 bytes. Las llamadas de función internas usan otra convención.
 
@@ -102,7 +102,7 @@ restantes tienen que ser limpiados.
 El compilador de Solidity está diseñado para limpiar estos bits restantes antes
 de cualquier operación que pueda ser afectada adversamente por la potencial
 basura en los bits restantes.
-Por ejemplo, antes de escribir un valor a la memoria, los bits restantes tienen
+Por ejemplo, antes de escribir un valor en la memoria, los bits restantes tienen
 que ser limpiados porque los contenidos de la memoria pueden ser usados para
 computar hashes o ser enviados como datos en una llamada. De manera similar,
 antes de almacenar un valor en el almacenamiento, los bits restantes tienen
@@ -113,7 +113,7 @@ Por ejemplo, ya que cualquier valor no-cero es considerado ``true`` por
 una instrucción ``JUMPI``, no limpiamos los valores booleanos antes de que sean utilizados
 como condición para ``JUMPI``.
 
-Además de este principio de diseño, el compilador Solidity
+Además de este principio de diseño, el compilador de Solidity
 limpia los datos de entrada cuando está cargado en el stack.
 
 Diferentes tipos tienen diferentes reglas para limpiar valores inválidos:
@@ -147,13 +147,13 @@ Diferentes tipos tienen diferentes reglas para limpiar valores inválidos:
 Internos - El optimizador
 *************************
 
-El optimizador de solidity funciona con assembly, así que puede y es usado con otros idiomas. Divide la secuencia de las instrucciones en bloques básicos de JUMPs y JUMPDESTs. Dentro de estos bloques, las instrucciones son analizadas y cada modificación al stack, a la memoria o al almacenamiento son guardadas como una expresión que consiste en una instrucción y una lista de argumentos que son esencialmente apuntadores a otras expresiones. La idea principal es encontrar expreciones que sean siempre iguales (en todo entradas) y combinarlas a una clase de expresión. El optimizador primero intenta encontrar una nueva expresión en una lista de expresiones conocidas. Si esto no funciona, la expresión es simplificada de acuerdo a reglas como ``constante + constante = suma_de_constantes`` o ``X * 1 = X``. Ya que esto es hecho recursivamente, también podemos aplicar la última regla si el segundo factor es más una expresión más compleja donde sabemos que siempre evaluará a uno. Modificaciones al almacenamiento y ubicaciones de memoria tienen que borrar el conocimiento de almacenamiento y ubicaciones de memoria que no son conocidas como diferentes: Si primero escribimos a ubicación `x` y luego a ubicación `y` y ambas son variables de entrada, la segunda puede sobre escribir la primera, entonces no sabemos realmente lo que es almacenado en `x` después de escribir a `y`. Por otro lado, si una simplificación de la expresión `x -y` evalúa a una constante no cero, sabemos que podemos mantener nuestro conocimiento de lo que es almacenado en x.
+El optimizador de solidity funciona con ensamblador, así que puede y es usado con otros lenguajes. Divide la secuencia de las instrucciones en bloques básicos de JUMPs y JUMPDESTs. Dentro de estos bloques, las instrucciones son analizadas y cada modificación al stack, a la memoria o al almacenamiento son guardadas como una expresión que consiste en una instrucción y una lista de argumentos que son esencialmente punteros a otras expresiones. La idea principal es encontrar expresiones que sean siempre iguales (en cada entrada) y combinarlas a una clase de expresión. El optimizador primero intenta encontrar una nueva expresión en una lista de expresiones conocidas. Si esto no funciona, la expresión es simplificada de acuerdo a reglas como ``constante + constante = suma_de_constantes`` o ``X * 1 = X``. Ya que esto es hecho recursivamente, también podemos aplicar la última regla si el segundo factor es una expresión más compleja donde sabemos que siempre evaluará a uno. Modificaciones al almacenamiento y ubicaciones de memoria tienen que borrar el conocimiento de almacenamiento y ubicaciones de memoria que no son conocidas como diferentes: Si primero escribimos a ubicación `x` y luego a ubicación `y` y ambas son variables de entrada, la segunda puede sobrescribir la primera, entonces no sabemos realmente lo que es almacenado en `x` después de escribir a `y`. Por otro lado, si una simplificación de la expresión `x - y` evalúa a una constante distinta de cero, sabemos que podemos mantener nuestro conocimiento de lo que es almacenado en x.
 
-En el fin de este proceso, sabemos cuáles expresiones tienen que estar en el stack en el fin y tienen una lista de modificaciones a la memoria y almacenamiento. Esta información es almacenada junta con los bloques básicos y es usada para unirlas. Además, información sobre el stack, almacenamiento y configuración de memoria es enviada al (los) próximo(s) bloque(s). Si sabemos los objetivos de cada una de las instrucciones JUMP y JUMPI, podemos construir un gráfico de flujo completo del programa. Si hay un sólo objetivo que no conocemos (esto puede pasar ya que en principio, los objetivos de jumps pueden ser computados de las entradas), tenemos que borrar toda información sobre los estados de entrada de un bloque ya que puede ser el objetivo de del JUMP desconocido. Si un JUMPI es encontrado que la condición evalúa a una constante, es transformada en un jump incondicional.
+Al final de este proceso, sabemos qué expresiones tienen que estar al final del stack y tienen una lista de modificaciones a la memoria y almacenamiento. Esta información es almacenada junto con los bloques básicos y es usada para unirlas. Además, información sobre el stack, almacenamiento y configuración de memoria es enviada al (los) próximo(s) bloque(s). Si sabemos los objetivos de cada una de las instrucciones JUMP y JUMPI, podemos construir un gráfico de flujo completo del programa. Si hay un sólo objetivo que no conocemos (esto puede pasar ya que en principio, los objetivos de jumps pueden ser computados de las entradas), tenemos que borrar toda información sobre los estados de entrada de un bloque ya que puede ser el objetivo del JUMP desconocido. Si se encuentra un JUMPI cuya condición evalúa a una constante, es transformado en un jump incondicional.
 
-Como en el último paso, el código en cada bloque es completamente regenerado. Un gráfico de dependencias es creado de la expresión en el stack en el fin del bloque y cada operación que no es parte de este gráfico es esencialmente olvidado. Ahora código es generado que aplica las modificaciones a la memoria y al almacenamiento en el orden que fueron hechas en el código original (olvidando modificaciones que fueron encontradas innecesarias) y finalmente, genera todos valores que son requeridos para estar en el stack en el lugar correcto.
+Como en el último paso, el código en cada bloque es completamente regenerado. Un gráfico de dependencias es creado de la expresión en el stack al final del bloque y cada operación que no es parte de este gráfico es esencialmente olvidada. Ahora se genera código que aplica las modificaciones a la memoria y al almacenamiento en el orden en que fueron hechas en el código original (olvidando modificaciones que fueron encontradas innecesarias) y finalmente, genera todos los valores que son requeridos para estar en el stack en el lugar correcto.
 
-Estos pasos son aplicados a cada bloque básico y el código nuevo es usado reemplazando si es que es más pequeño. Si un bloque básico es dividido en un JUMPI y durante el análisis, la condición evalúa a una constante el JUMPI es reemplazado dependiendo de la valor de la constante, y por lo tanto código como
+Estos pasos son aplicados a cada bloque básico y el nuevo código generado se usa como reemplazo si es más pequeño. Si un bloque básico es dividido en un JUMPI y durante el análisis la condición evalúa a una constante, el JUMPI es reemplazado dependiendo del valor de la constante, y por lo tanto código como
 
 ::
 
@@ -176,16 +176,16 @@ aunque las instrucciones contenían un jump en el inicio.
 .. index:: source mappings
 
 ******************
-Mappings de Fuente
+Mappings de fuente
 ******************
 
-Como parte de la output AST, el compilador provee el rango del código fuente
+Como parte del AST (Abstract syntax tree) de salida, el compilador provee el rango del código fuente
 que es representado por el nodo respecto al AST. Esto puede ser usado
 para varios propósitos desde herramientas de análisis estático que reportan
 errores basados en el AST y herramientas de debugging que demarcan variables
 locales y sus usos.
 
-Además, el compilador puede también generar un mapping del bytecode
+Además, el compilador también puede generar un mapping del bytecode
 al rango en el código fuente que generó la instrucción. Esto es importante
 para herramientas de análisis estático que operan a nivel bytecode y
 para mostrar la posición actual en el código fuente dentro del debugger
@@ -204,20 +204,20 @@ Donde ``s`` es el byte-offset de el inicio del rango en el archivo fuente,
 ``l`` es el largo del rango de la fuente en bytes y ``f`` es el índice de fuente
 mencionado arriba.
 
-El encodaje en el mapping de fuente para el bytecode es más complicado:
+La codificación en el mapping de fuente para el bytecode es más complicada:
 Es una lista de ``s:l:f:j`` separada por ``;``. Cada una de estos elementos
 corresponde a una instrucción, i.e. no puedes usar el byte-offset
-si no que tienes que usar la instrucción offset (instrucciones push son mas largas
+si no que tienes que usar la instrucción offset (las instrucciones push son mas largas
 que un sólo byte).
 Los campos ``s``, ``l`` y ``f`` son como detallamos arriba y ``j`` puede ser ``i``,
-``i`` o ``-`` y significa si una instrucción jump va en la función, devuelve una
-función, devuelve desde una función o si es un jump regular como parte de un (ej) loop.
+``o`` o ``-`` y significa si una instrucción jump va en la función, devuelve desde
+una función o si es un jump regular como parte de un (ej) bucle.
 
 A fin de comprimir estos mappings de fuente especialmente para bytecode, las
 siguientes reglas son usadas:
 
  - Si un campo está vacío, el valor del elemento precedente es usado.
- - Si un ``:`` falta, todos los campos siguientes son considerados vacíos.
+ - Si falta un ``:``, todos los campos siguientes son considerados vacíos.
 
 Esto significa que los siguientes mappings de fuente representan la misma información:
 
@@ -226,10 +226,10 @@ Esto significa que los siguientes mappings de fuente representan la misma inform
 ``1:2:1;:9;2::2;;``
 
 *********************
-Metadata del Contrato
+Metadata del contrato
 *********************
 
-El compilador Solidity genera automáticamente un archivo JSON, el
+El compilador de Solidity genera automáticamente un archivo JSON, el
 metadata del contrato, que contiene información sobre el contrato actual.
 Se puede usar para consultar la versión del compilador, las fuentes usadas,
 el ABI y documentación NatSpec a fin de interactuar con más seguridad con el
@@ -243,12 +243,12 @@ centrales.
 Sin embargo, se tiene que publicar el archivo metadata a Swarm (o otro servicio)
 para que otros puedan verlo. El archivo puede ser producido usando ``solc --metadata``
 y el archivo será llamado ``NombreContrato_meta.json``.
-Contendrá referencias Swarm al código fuente, así que tienes que upload
-todos los archivos código fuente y el archivo metadata.
+Contendrá referencias Swarm al código fuente, así que tienes que subir
+todos los archivos de código fuente y el archivo metadata.
 
-El archivo metadata tiene el formato siguiente. El ejemplo abajo es presentado de
-manera legible por humanos. Metadata formateada correctamente debe usar comillas
-correctamente, reducir espacio blanco a un mínimo y ordenarse diferentemente.
+El archivo metadata tiene el formato siguiente. El ejemplo de abajo es presentado de
+manera legible por humanos. Los metadatos formateados correctamente deben usar comillas
+correctamente, reducir el espacio en blanco a un mínimo y ordenarse de manera diferente.
 Los comentarios obviamente tampoco son permitidos y son usados aquí sólo por
 razones explicativos.
 
@@ -258,7 +258,7 @@ razones explicativos.
       // Requerido: La versión del formato de metadata
       version: "1",
       // Requerido: lenguaje de código fuente, settea una "sub-versión"
-      // de la espcificación
+      // de la especificación
       language: "Solidity",
       // Requerido: Detalles del compilador, los contenidos son específicos
       // al lenguaje
@@ -268,7 +268,7 @@ razones explicativos.
         // Opcional: Hash del compilador binario que produjo este resultado
         keccak256: "0x123..."
       },
-      // Requerido: Compilación archivos fuente/unidades fuente, las llaves son
+      // Requerido: Compilación de archivos fuente/unidades fuente, las claves son
       // nombres de archivos
       sources:
       {
@@ -276,8 +276,8 @@ razones explicativos.
           // Requerido: keccak256 hash del archivo fuente
           "keccak256": "0x123...",
           // Requerido (al menos que "content" sea usado, ver abajo): URL(s) ordenadas
-          // al archivo fuente, protocolo es menos arbitrario, pero un
-          // URL swarm es recomendado
+          // al archivo fuente, el protocolo es menos arbitrario, pero se recomienda una
+          // URL de Swarm
           "urls": [ "bzzr://56ab..." ]
         },
         "mortal": {
@@ -287,46 +287,46 @@ razones explicativos.
           "content": "contract mortal is owned { function kill() { if (msg.sender == owner) selfdestruct(owner); } }"
         }
       },
-      // Required: Compiler settings
+      // Requerido: Configuración del compilador
       settings:
       {
         // Requerido para Solidity: Lista ordenada de remappeos
         remappings: [ ":g/dir" ],
-        // Opcional: Configuración optimizador (por defecto falso)
+        // Opcional: Configuración del optimizador (por defecto falso)
         optimizer: {
           enabled: true,
           runs: 500
         },
         // Requerido para Solidity: Archivo y nombre del contrato o librería para
-        // la librería al cual es creado este archivo metadata.
+        // la librería para el cual es creado este archivo metadata.
         compilationTarget: {
           "myFile.sol": "MyContract"
         },
-        // Requerido para Solidity: Direcciones para librerías usadas
+        // Requerido para Solidity: Direcciones de las librerías usadas
         libraries: {
           "MyLib": "0x123123..."
         }
       },
-      // Requerido Información generada sobre el contrato.
+      // Requerido: Información generada sobre el contrato.
       output:
       {
         // Requerido: definición ABI del contrato
         abi: [ ... ],
-        // Requerido: documentación usuario del contrato de NatSpec
+        // Requerido: documentación de usuario del contrato de NatSpec
         userdoc: [ ... ],
-        // Requerido: documentación desarrollador del contrato de NatSpec
+        // Requerido: documentación de desarrollador del contrato de NatSpec
         devdoc: [ ... ],
       }
     }
 
 .. note::
-    Nótese que la definición ABI arriba no tiene orden fijo. Puede cambiar con versiones de compilador.
+    Nótese que la definición ABI de arriba no tiene orden fijo. Puede cambiar en distintas versiones del compilador.
 
 .. note::
     Ya que el bytecode del contrato resultante contiene el hash del metadata, cualquier cambio
     a la metadata resultará en un cambio en el bytecode. Además, ya que la metadata incluye
-    un hash de todos las fuentes usadas, un simple espacio blanco cambiada en cualquiera de los
-    archivos de fuente resultará en metadata diferente, y posteriormente en bytecode diferente.
+    un hash de todos los fuentes usados, un simple espacio en blanco en cualquiera de los
+    archivos de fuente resultará en un metadata diferente, y posteriormente en bytecode diferente.
 
 
 Encodaje del hash de metadata en el bytecode
