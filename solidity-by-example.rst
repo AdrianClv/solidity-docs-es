@@ -11,7 +11,7 @@ Votación
 ********
 
 El siguiente contrato es bastante complejo, pero muestra
-muchas de las caractersticas de Solidity. Es un contrato
+muchas de las características de Solidity. Es un contrato
 de votación. Uno de los principales problemas de la votación
 electrónica es la asignación de los derechos de voto a las
 personas correctas para evitar la manipulación. No vamos a resolver
@@ -59,10 +59,10 @@ devolverá la propuesta más votada.
         // almacena una estructura de datos `Voter` para cada posible dirección.
         mapping(address => Voter) public voters;
 
-        // Una array dinámico de estructuras de datos de tipo `Proposal`.
+        // Una matriz dinámica de estructuras de datos de tipo `Proposal`.
         Proposal[] public proposals;
 
-        /// Crea una nueva votación para elegir uno de los `proposalNames`.
+        // Crea una nueva votación para elegir uno de los `proposalNames`.
         function Ballot(bytes32[] proposalNames) {
             chairperson = msg.sender;
             voters[chairperson].weight = 1;
@@ -104,11 +104,10 @@ devolverá la propuesta más votada.
             // No se permite la delegación a uno mismo.
             require(to != msg.sender);
 
-            // Propaga la delegación en tanto que
-            // `to` también delegue.
+            // Propaga la delegación en tanto que `to` también delegue.
             // Por norma general, los bucles son muy peligrosos
             // porque si tienen muchas iteracciones puede darse el caso
-            // de que empleen más gas del disponible en un boque.
+            // de que empleen más gas del disponible en un bloque.
             // En este caso, eso implica que la delegación no será ejecutada,
             // pero en otros casos puede suponer que un
             // contrato se quede completamente bloqueado.
@@ -129,8 +128,8 @@ devolverá la propuesta más votada.
                 // se añade directamente al número de votos.
                 proposals[delegate.vote].voteCount += sender.weight;
             } else {
-                // Si la persona en la que se ha delegado el voto todavía no ha votado,
-                // se añade al peso de su voto.
+                // Si la persona en la que se ha delegado el voto
+                // todavía no ha votado, se añade al peso de su voto.
                 delegate.weight += sender.weight;
             }
         }
@@ -143,7 +142,7 @@ devolverá la propuesta más votada.
             sender.voted = true;
             sender.vote = proposal;
 
-            // Si `proposal` está fuera del rango del array,
+            // Si `proposal` está fuera del rango de la matriz,
             // esto lanzará automáticamente una excepción y
             // se revocarán todos los cambios
             proposals[proposal].voteCount += sender.weight;
@@ -261,7 +260,7 @@ su dinero - los contratos no pueden activarse por sí mismos.
             // es necesaria para que la función pueda recibir Ether.
 
             // Revierte la llamada si el periodo
-            // se pujas ha finalizado.
+            // de pujas ha finalizado.
             require(now <= (auctionStart + biddingTime));
 
             // Si la puja no es la más alta,
@@ -271,7 +270,7 @@ su dinero - los contratos no pueden activarse por sí mismos.
             if (highestBidder != 0) {
                 // Devolver el dinero usando
                 // highestBidder.send(highestBid) es un riesgo
-                // para la seguridad, porque la llamada puede ser evitada
+                // de seguridad, porque la llamada puede ser evitada
                 // por el usuario elevando la pila de llamadas a 1023.
                 // Siempre es más seguro dejar que los receptores
                 // saquen su propio dinero.
@@ -293,7 +292,7 @@ su dinero - los contratos no pueden activarse por sí mismos.
 
                 if (!msg.sender.send(amount)) {
                     // Aquí no es necesario lanzar una excepción.
-                    // Basta con devolver la cantidad a su valor anterior.
+                    // Basta con reiniciar la cantidad que se debe devolver.
                     pendingReturns[msg.sender] = amount;
                     return false;
                 }
@@ -301,8 +300,7 @@ su dinero - los contratos no pueden activarse por sí mismos.
             return true;
         }
 
-        /// Finaliza la subasta y envía la puja más alta
-        /// al beneficiario.
+        /// Finaliza la subasta y envía la puja más alta al beneficiario.
         function auctionEnd() {
             // Es una buena práctica estructurar las funciones que interactúan
             // con otros contratos (i.e. llaman a funciones o envían ether)
@@ -310,7 +308,7 @@ su dinero - los contratos no pueden activarse por sí mismos.
             // 1. comprobación de las condiciones
             // 2. ejecución de las acciones (pudiendo cambiar las condiciones)
             // 3. interacción con otros contratos
-            // Si estas fases se entremezclasen, otros contratos podrían 
+            // Si estas fases se entremezclasen, otros contratos podrían
             // volver a llamar a este contrato y modificar el estado
             // o hacer que algunas partes (pago de ether) se ejecute multiples veces.
             // Si se llama a funciones internas que interactúan con otros contratos,
@@ -339,13 +337,13 @@ Crear una subasta a ciegas en una plataforma de computación
 transparente puede parecer contradictorio, pero la criptografía
 lo hace posible.
 
-Durante el **periodo de puja**, una pujador no envía su puja
+Durante el **periodo de puja**, un pujador no envía su puja
 como tal, sino una versión hasheada de la misma.
 Puesto que en la actualidad se considera que es prácticamente
 imposible encontrar dos valores (suficientemente largos)
 cuyos hashes son iguales, el pujador realiza la puja de esa forma.
 Tras el periodo de puja, los pujadores tienen que revelar
-sus pujas. Para ello, envían los valores descrifrados y el 
+sus pujas. Para ello, envían los valores descrifrados y el
 contrato comprueba que el valor del hash se corresponde con
 el proporcionado durante el periodo de puja.
 
@@ -390,7 +388,7 @@ inválidas con valores altos o bajos.
         mapping(address => uint) pendingReturns;
 
         event AuctionEnded(address winner, uint highestBid);
-        
+
         /// Los modificadores son una forma cómoda de validar los
         /// inputs de las funciones. Abajo se puede ver cómo
         /// `onlyBefore` se aplica a `bid`.
@@ -409,10 +407,10 @@ inválidas con valores altos o bajos.
             biddingEnd = now + _biddingTime;
             revealEnd = biddingEnd + _revealTime;
         }
-        
+
         /// Efectúa la puja de manera oculta con `_blindedBid`=
         /// keccak256(value, fake, secret).
-        /// El ether enviado sólo se recuperará si la puja se revela de 
+        /// El ether enviado sólo se recuperará si la puja se revela de
         /// forma correcta durante la fase de revelacin. La puja es
         /// válida si el ether junto al que se envía es al menos "value"
         /// y "fake" no es cierto. Poner "fake" como verdadero y no enviar
@@ -428,8 +426,8 @@ inválidas con valores altos o bajos.
                 deposit: msg.value
             }));
         }
-    
-        /// Revela tus pujas ocultas. Recuperarás los fondos de todas 
+
+        /// Revela tus pujas ocultas. Recuperarás los fondos de todas
         /// las pujas inválidas ocultadas de forma correcta y de
         /// todas las pujas salvo en aquellos casos en que sea la más alta.
         function reveal(
@@ -466,7 +464,7 @@ inválidas con valores altos o bajos.
             }
             msg.sender.transfer(refund);
         }
-        
+
         // Esta función es "internal", lo que significa que sólo
         // se podrá llamar desde el propio contrato (o contratos
         // que deriven de él).
@@ -477,14 +475,15 @@ inválidas con valores altos o bajos.
                 return false;
             }
             if (highestBidder != 0) {
-                // Refund the previously highest bidder.
+                // Devolverle el dinero de la puja
+                // al anterior pujador con la puja más alta.
                 pendingReturns[highestBidder] += highestBid;
             }
             highestBid = value;
             highestBidder = bidder;
             return true;
         }
-        
+
         /// Retira una puja que ha sido superada.
         function withdraw() returns (bool) {
             var amount = pendingReturns[msg.sender];
@@ -498,7 +497,7 @@ inválidas con valores altos o bajos.
 
                 if (!msg.sender.send(amount)){
                     // Aquí no es necesario lanzar una excepción.
-                    // Basta con devolver la cantidad a su valor anterior.
+                    // Basta con reiniciar la cantidad que se debe devolver.
                     pendingReturns[msg.sender] = amount;
                     return false;
                 }
@@ -566,7 +565,7 @@ Compra a distancia segura
         event Aborted();
         event PurchaseConfirmed();
         event ItemReceived();
-        
+
         /// Aborta la compra y reclama el ether.
         /// Sólo puede ser llamado por el vendedor
         /// antes de que el contrato se cierre.
@@ -578,7 +577,7 @@ Compra a distancia segura
             state = State.Inactive;
             seller.transfer(this.balance);
         }
-        
+
         /// Confirma la compra por parte del comprador.
         /// La transacción debe incluir la cantidad de ether
         /// multiplicada por 2. El ether quedará bloqueado
@@ -592,7 +591,7 @@ Compra a distancia segura
             buyer = msg.sender;
             state = State.Locked;
         }
-        
+
         /// Confirma que tú (el comprador) has recibido el
         /// artículo. Esto desbloqueará el ether.
         function confirmReceived()
@@ -600,7 +599,7 @@ Compra a distancia segura
             inState(State.Locked)
         {
             ItemReceived();
-            // Es importante que primero se cambie el estado para
+            // Es importante que primero se cambie el estado
             // para evitar que los contratos a los que se llama
             // abajo mediante `send` puedan volver a ejecutar esto.
             state = State.Inactive;
