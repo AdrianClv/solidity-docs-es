@@ -11,19 +11,19 @@ Diseño básico
 
 La Application Binary Interface (Interfaz Binaria de Aplicación) es el modo estándar de interactuar con contratos en el ecosistema Ethereum, tanto desde fuera de la blockchain como en interacciones contrato-contrato. Los datos se codifican siguiendo su tipo acorde a esta especificación.
 
-Asumimos que la Application Binary Interface (ABI) está extremadamente definida, conocida en tiempo de compilación y estática. No se van a proveer mecanismos de introspección. Además, afirmamos que los contratos tendrán las definiciones de la interfaz de cada contrato que vayan a llamar en tiempo de compilación.
+Asumimos que la Application Binary Interface (ABI) está extremadamente definida, es conocida en tiempo de compilación y es estática. No se van a proveer mecanismos de introspección. Además, afirmamos que los contratos tendrán las definiciones de la interfaz de cada contrato que vayan a llamar en tiempo de compilación.
 
 Esta especificación no abarca los contratos cuya interfaz es dinámica o conocida exclusivamente en tiempo de ejecución. Estos casos, de volverse importantes, podrían manejarse adecuadamente como servicios construídos dentro del ecosistema Ethereum.
 
 Función Selector
 =================
 
-Los primeros cuatro bytes de lo datos de una llamada a una función especifiacan la función a llamar. Se trata de los primeros (más a la izquierda, más extremos) cuatro bytes del Keccak (SHA-3) hash de la firma de la función. La firma se define como la expresión canónica del prototipo básico, por ejemplo, el nombre de la función con la lista de parámetros entre paréntesis. Los tipos de parámetros se separan por comas, no por espacios.
+Los primeros cuatro bytes de lo datos de una llamada a una función especifiacan la función a llamar. Se trata de los primeros (los más a la izquierda, los más extremos por orden) cuatro bytes del hash Keccak (SHA-3) de la firma de la función. La firma se define como la expresión canónica del prototipo básico como puede ser el nombre de la función con la lista de parámetros entre paréntesis. Los tipos de parámetros se separan por comas, no por espacios.
 
 Codificación de argumentos
 ==========================
 
-A partir del quinto byte, prosiguen los argumentos codificados. Esta codificación es también usada en otros sitios, por ejemplo, los valores de retorno y también los argumentos de eventos se codifican de esta manera, sin los cuatro bytes especificando la función.
+A partir del quinto byte, prosiguen los argumentos codificados. Esta codificación es también usada en otros sitios, por ejemplo, en los valores de retorno y también en los argumentos de eventos, sin los cuatro bytes especificando la función.
 
 Tipos
 =====
@@ -50,11 +50,11 @@ Los tipos elementales existentes son:
 
 - `function`: equivalente a `bytes24`: un address, seguido de la función selector
 
-El siguiente array, de tipo fijo, existente:
+El siguiente array, de tipo fijo, existente es:
 
 - `<type>[M]`: un array de longitud fija del tipo de longitud fija dado.
 
-Los siguientes tipos de tamaño no fijo existentes: 
+Los siguientes tipos de tamaño no fijo existentes son: 
 
 - `bytes`: secuancia de bytes de tamaño dinámico.
 
@@ -76,7 +76,7 @@ Vamos a especificar formalmente la codificación, de tal forma que tendrá las s
 
 Propiedades:
 
-  1. El número de lecturas necesaria para acceder a un valor es como mucha equivalente a la máxima profunidadad del array, por ejemplo, cuatro lecturas se requieren para obtener `a_i[k][l][r]`. En una versión previa de la ABI, el número de lecturas escalaba linearmente con el número total de parámetros dinámicos en el peor caso.
+  1. El número de lecturas necesarias para acceder a un valor es como mucho equivalente a la máxima profundidad del array. Por ejemplo, cuatro lecturas se requieren para obtener `a_i[k][l][r]`. En una versión previa de la ABI, el número de lecturas escalaba linearmente con el número total de parámetros dinámicos en el peor caso.
 
   2. Los datos de una variable o elemento de un array no se intercalan con otros datos y son recolocables. Por ejemplo, sólo usa "addresses" relativos.
 
@@ -93,9 +93,9 @@ Todo el resto de tipos son "estáticos".
 **Definición:** `len(a)` es el número de bytes en un string binario `a`.
 El tipo de `len(a)` se presume como `uint256`.
 
-Definimos `enc`, la codificación actual, como un mapping de valores de tipos de la ABI types a string binarios como `len(enc(X))` depende del valor de `X` si y solo si el tipo de `X` es dinámico.
+Definimos `enc`, la codificación actual, como un mapping de valores de tipos de la ABI a string binarios como `len(enc(X))` depende del valor de `X` si y solo si el tipo de `X` es dinámico.
 
-**Definición:** Para cada valor de ABI `X`, definimos recursivamente `enc(X)`, ddependiendo del tipo de `X` siendo
+**Definición:** Para cada valor de ABI `X`, definimos recursivamente `enc(X)`, dependiendo del tipo de `X` siendo
 
 - `(T1,...,Tk)` para `k >= 0` y cualquier tipo `T1`, ..., `Tk`
 
@@ -129,7 +129,7 @@ Definimos `enc`, la codificación actual, como un mapping de valores de tipos de
 
 - `bytes`, de longitud `k` (que se presume que es del tipo `uint256`):
 
-  `enc(X) = enc(k) pad_right(X)`, por ejemplo, el número de bytes es codificado como un `uint256` fseguido del valor actual de `X` como una secuancia de bytes, continuado por el número mínimo de bytes-cero como que `len(enc(X))` es un múltiplo de 32.
+  `enc(X) = enc(k) pad_right(X)`. Por ejemplo, el número de bytes es codificado como un `uint256` seguido del valor actual de `X` como una secuancia de bytes, continuado por el número mínimo de bytes-cero como que `len(enc(X))` es un múltiplo de 32.
 
 - `string`:
 
