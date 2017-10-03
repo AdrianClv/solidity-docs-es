@@ -95,48 +95,41 @@ El tipo de `len(a)` se presume como `uint256`.
 
 Definimos `enc`, la codificación actual, como un mapping de valores de tipos de la ABI types a string binarios como `len(enc(X))` depende del valor de `X` si y solo si el tipo de `X` es dinámico.
 
-**Definition:** For any ABI value `X`, we recursively define `enc(X)`, depending
-on the type of `X` being
+**Definición:** Para cada valor de ABI `X`, definimos recursivamente `enc(X)`, ddependiendo del tipo de `X` siendo
 
-- `(T1,...,Tk)` for `k >= 0` and any types `T1`, ..., `Tk`
+- `(T1,...,Tk)` para `k >= 0` y cualquier tipo `T1`, ..., `Tk`
 
   `enc(X) = head(X(1)) ... head(X(k-1)) tail(X(0)) ... tail(X(k-1))`
 
-  where `X(i)` is the `ith` component of the value, and
-  `head` and `tail` are defined for `Ti` being a static type as
+  donde `X(i)` es el `ith` componente del valor, y
+  `head` y `tail` son definidos por `Ti` siendo un tipo estático como
 
-    `head(X(i)) = enc(X(i))` and `tail(X(i)) = ""` (the empty string)
+    `head(X(i)) = enc(X(i))` y `tail(X(i)) = ""` (el string vacío)
 
-  and as
+  y como
 
     `head(X(i)) = enc(len(head(X(0)) ... head(X(k-1)) tail(X(0)) ... tail(X(i-1))))`
     `tail(X(i)) = enc(X(i))`
 
-  otherwise, i.e. if `Ti` is a dynamic type.
+  de otra manera, como `Ti` es un tipo dinámico.
 
-  Note that in the dynamic case, `head(X(i))` is well-defined since the lengths of
-  the head parts only depend on the types and not the values. Its value is the offset
-  of the beginning of `tail(X(i))` relative to the start of `enc(X)`.
+  Hay que tener en cuenta que en el caso dinámico, `head(X(i))` está bien definido ya que las longitudes de las partes de head sólo dependen de los tipos y no de los valores. Su valor es el offset del principio de `tail(X(i))` relativo al comienzo de `enc(X)`.
   
-- `T[k]` for any `T` and `k`:
+- `T[k]` para cada `T` y `k`:
 
   `enc(X) = enc((X[0], ..., X[k-1]))`
   
-  i.e. it is encoded as if it were an anonymous struct with `k` elements
-  of the same type.
+  como ejemplo, es codificado como si fuera un struct anónimo de `k` elementos del mismo tipo.
   
-- `T[]` where `X` has `k` elements (`k` is assumed to be of type `uint256`):
+- `T[]` donde `X` tiene `k` elementos (`k` se presume que es del tipo `uint256`):
 
   `enc(X) = enc(k) enc([X[1], ..., X[k]])`
 
-  i.e. it is encoded as if it were an array of static size `k`, prefixed with
-  the number of elements.
+  Otro ejemplo codificado como si fuera un array estático de tamaño `k`, prefijado con el número de elementos.
 
-- `bytes`, of length `k` (which is assumed to be of type `uint256`):
+- `bytes`, de longitud `k` (que se presume que es del tipo `uint256`):
 
-  `enc(X) = enc(k) pad_right(X)`, i.e. the number of bytes is encoded as a
-    `uint256` followed by the actual value of `X` as a byte sequence, followed by
-    the minimum number of zero-bytes such that `len(enc(X))` is a multiple of 32.
+  `enc(X) = enc(k) pad_right(X)`, por ejemplo, el número de bytes es codificado como un `uint256` fseguido del valor actual de `X` como una secuancia de bytes, continuado por el número mínimo de bytes-cero como que `len(enc(X))` es un múltiplo de 32.
 
 - `string`:
 
