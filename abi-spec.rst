@@ -36,67 +36,64 @@ Los tipos elementales existentes son:
 
 - `address`: equivalente a `uint160`, exceptuando la interpretación asumida y la tipología de idioma.
 
-- `uint`, `int`: sinónimos de `uint256`, `int256` respectivamente (no para serusados con la función selector).
+- `uint`, `int`: sinónimos de `uint256`, `int256` respectivamente (no para ser usados con la función selector).
 
 - `bool`: equivalente a `uint8` restringido a los valores 0 y 1.
 
-- `fixed<M>x<N>`: signed fixed-point decimal number of `M` bits, `0 < M <= 256`, `M % 8 ==0`, and `0 < N <= 80`, which denotes the value `v` as `v / (10 ** N)`.
+- `fixed<M>x<N>`: número decimal con signo y formato decimal fijo de `M` bits, `0 < M <= 256`, `M % 8 ==0`, y `0 < N <= 80`, que denota el valor `v` como `v / (10 ** N)`.
 
-- `ufixed<M>x<N>`: unsigned variant of `fixed<M>x<N>`.
+- `ufixed<M>x<N>`: variante sin signo de `fixed<M>x<N>`.
 
-- `fixed`, `ufixed`: synonyms for `fixed128x19`, `ufixed128x19` respectively (not to be used for computing the function selector).
+- `fixed`, `ufixed`: sinónimos de `fixed128x19`, `ufixed128x19` respectivamente (no para ser usados con la función selector).
 
-- `bytes<M>`: binary type of `M` bytes, `0 < M <= 32`.
+- `bytes<M>`: tipo binario de `M` bytes, `0 < M <= 32`.
 
-- `function`: equivalent to `bytes24`: an address, followed by a function selector
+- `function`: equivalente a `bytes24`: un address, seguido de la función selector
 
-The following (fixed-size) array type exists:
+El siguiente array, de tipo fijo, existente:
 
-- `<type>[M]`: a fixed-length array of the given fixed-length type.
+- `<type>[M]`: un array de longitud fija del tipo de longitud fija dado.
 
-The following non-fixed-size types exist: 
+Los siguientes tipos de tamaño no fijo existentes: 
 
-- `bytes`: dynamic sized byte sequence.
+- `bytes`: secuancia de bytes de tamaño dinámico.
 
-- `string`: dynamic sized unicode string assumed to be UTF-8 encoded.
+- `string`: string unicode de tamaño dinámico codificado como UTF-8.
 
-- `<type>[]`: a variable-length array of the given fixed-length type.
+- `<type>[]`: array de longitud variable del tipo de longitud fija dado.
 
-Types can be combined to anonymous structs by enclosing a finite non-negative number
-of them inside parentheses, separated by commas:
+Los distintos tipos se pueden combinar en structs anónimos cerrando un número finito no negativo de ellos entre paréntesis, separados por comas:
 
-- `(T1,T2,...,Tn)`: anonymous struct (ordered tuple) consisting of the types `T1`, ..., `Tn`, `n >= 0`
+- `(T1,T2,...,Tn)`: struct anónimo (tupla ordenada) consistente de los tipos `T1`, ..., `Tn`, `n >= 0`
 
-It is possible to form structs of structs, arrays of structs and so on.
+Es posible formar structs de structs, arrays de structs, etc.
 
 
-Formal Specification of the Encoding
-====================================
+Especificación formal de la codificación
+========================================
 
-We will now formally specify the encoding, such that it will have the following
-properties, which are especially useful if some arguments are nested arrays:
+Vamos a especificar formalmente la codificación, de tal forma que tendrá las siguientes propiedades, que son especialmente útiles si los argumentos son arrays anidados:
 
-Properties:
+Propiedades:
 
-  1. The number of reads necessary to access a value is at most the depth of the value inside the argument array structure, i.e. four reads are needed to retrieve `a_i[k][l][r]`. In a previous version of the ABI, the number of reads scaled linearly with the total number of dynamic parameters in the worst case.
+  1. El número de lecturas necesaria para acceder a un valor es como mucha equivalente a la máxima profunidadad del array, por ejemplo, cuatro lecturas se requieren para obtener `a_i[k][l][r]`. En una versión previa de la ABI, el número de lecturas escalaba linearmente con el número total de parámetros dinámicos en el peor caso.
 
-  2. The data of a variable or array element is not interleaved with other data and it is relocatable, i.e. it only uses relative "addresses"
+  2. Los datos de una variable o elemento de un array no se intercalan con otros datos y son recolocables. Por ejemplo, sólo usa "addresses" relativos.
 
-We distinguish static and dynamic types. Static types are encoded in-place and dynamic types are encoded at a separately allocated location after the current block.
+Distinguimos entre tipos estáticos y dinámicos. Los estáticos se codifican insitu y los dinámicos se codifican en una posición asignada separadamente después del bloque actual.
 
-**Definition:** The following types are called "dynamic":
+**Definición:** Los siguientes tipos se llaman "dinámicos":
 * `bytes`
 * `string`
-* `T[]` for any `T`
-* `T[k]` for any dynamic `T` and any `k > 0`
+* `T[]` para cada `T`
+* `T[k]` para cualquier dinámico `T` y todo `k > 0`
 
-All other types are called "static".
+Todo el resto de tipos son "estáticos".
 
-**Definition:** `len(a)` is the number of bytes in a binary string `a`.
-The type of `len(a)` is assumed to be `uint256`.
+**Definición:** `len(a)` es el número de bytes en un string binario `a`.
+El tipo de `len(a)` se presume como `uint256`.
 
-We define `enc`, the actual encoding, as a mapping of values of the ABI types to binary strings such
-that `len(enc(X))` depends on the value of `X` if and only if the type of `X` is dynamic.
+Definimos `enc`, la codificación actual, como un mapping de valores de tipos de la ABI types a string binarios como `len(enc(X))` depende del valor de `X` si y solo si el tipo de `X` es dinámico.
 
 **Definition:** For any ABI value `X`, we recursively define `enc(X)`, depending
 on the type of `X` being
