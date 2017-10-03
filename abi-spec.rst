@@ -13,14 +13,12 @@ La Application Binary Interface (Interfaz Binaria de Aplicación) es el modo est
 
 Asumimos que la Application Binary Interface (ABI) está extremadamente definida, conocida en tiempo de compilación y estática. No se van a proveer mecanismos de introspección. Además, afirmamos que los contratos tendrán las definiciones de la interfaz de cada contrato que vayan a llamar en tiempo de compilación.
 
-This specification does not address contracts whose interface is dynamic or otherwise known only at run-time. Should these cases become important they can be adequately handled as facilities built within the Ethereum ecosystem.
+Esta especificación no abarca los contratos cuya interfaz es dinámica o conocida exclusivamente en tiempo de ejecución. Estos casos, de volverse importantes, podrían manejarse adecuadamente como servicios contruidos dentro del ecosistema Ethereum.
 
-Function Selector
+Función Selector
 =================
 
-The first four bytes of the call data for a function call specifies the function to be called. It is the
-first (left, high-order in big-endian) four bytes of the Keccak (SHA-3) hash of the signature of the function. The signature is defined as the canonical expression of the basic prototype, i.e.
-the function name with the parenthesised list of parameter types. Parameter types are split by a single comma - no spaces are used.
+Los primeros cuatro bytes de lo datos de una llamada a una función especifiacan la función a llamar. Se trata de los primeros (más a la izquierda, más extremos) cuatro bytes del Keccak (SHA-3) hash de la firma de la función. La firma se define como la expresión canónica del prototipo básico, por ejemplo, el nombre de la función con la lista de parámetros entre paréntesis). Los tipos de parámetros se separan por comas, no por espacios.
 
 Argument Encoding
 =================
