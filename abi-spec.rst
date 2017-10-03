@@ -13,14 +13,14 @@ La Application Binary Interface (Interfaz Binaria de Aplicación) es el modo est
 
 Asumimos que la Application Binary Interface (ABI) está extremadamente definida, conocida en tiempo de compilación y estática. No se van a proveer mecanismos de introspección. Además, afirmamos que los contratos tendrán las definiciones de la interfaz de cada contrato que vayan a llamar en tiempo de compilación.
 
-Esta especificación no abarca los contratos cuya interfaz es dinámica o conocida exclusivamente en tiempo de ejecución. Estos casos, de volverse importantes, podrían manejarse adecuadamente como servicios contruidos dentro del ecosistema Ethereum.
+Esta especificación no abarca los contratos cuya interfaz es dinámica o conocida exclusivamente en tiempo de ejecución. Estos casos, de volverse importantes, podrían manejarse adecuadamente como servicios construídos dentro del ecosistema Ethereum.
 
 Función Selector
 =================
 
-Los primeros cuatro bytes de lo datos de una llamada a una función especifiacan la función a llamar. Se trata de los primeros (más a la izquierda, más extremos) cuatro bytes del Keccak (SHA-3) hash de la firma de la función. La firma se define como la expresión canónica del prototipo básico, por ejemplo, el nombre de la función con la lista de parámetros entre paréntesis). Los tipos de parámetros se separan por comas, no por espacios.
+Los primeros cuatro bytes de lo datos de una llamada a una función especifiacan la función a llamar. Se trata de los primeros (más a la izquierda, más extremos) cuatro bytes del Keccak (SHA-3) hash de la firma de la función. La firma se define como la expresión canónica del prototipo básico, por ejemplo, el nombre de la función con la lista de parámetros entre paréntesis. Los tipos de parámetros se separan por comas, no por espacios.
 
-Argument Encoding
+Codificación de argumentos
 =================
 
 Starting from the fifth byte, the encoded arguments follow. This encoding is also used in other places, e.g. the return values and also event arguments are encoded in the same way, without the four bytes specifying the function.
