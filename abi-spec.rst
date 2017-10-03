@@ -3,17 +3,15 @@
 .. _ABI:
 
 ******************************************
-Application Binary Interface Specification
+Especificación de Application Binary Interface
 ******************************************
 
-Basic design
+Diseño básico
 ============
 
-The Application Binary Interface is the standard way to interact with contracts in the Ethereum ecosystem, both
-from outside the blockchain and for contract-to-contract interaction. Data is encoded following its type,
-according to this specification.
+La Application Binary Interface (Interfaz Binaria de Aplicación) es el modo estándar de interactuar con contratos en el ecosistema Ethereum, tanto desde fuera de la blockchain como en interacciones contrato-contrato. Los datos se codifican siguiendo su tipo acorde a esta especificación.
 
-We assume the Application Binary Interface (ABI) is strongly typed, known at compilation time and static. No introspection mechanism will be provided. We assert that all contracts will have the interface definitions of any contracts they call available at compile-time.
+Asumimos que la Application Binary Interface (ABI) está extremadamente definida, conocida en tiempo de compilación y estática. No se van a proveer mecanismos de introspección. Además, afirmamos que los contratos tendrán las definiciones de la interfaz de cada contrato que vayan a llamar en tiempo de compilación.
 
 This specification does not address contracts whose interface is dynamic or otherwise known only at run-time. Should these cases become important they can be adequately handled as facilities built within the Ethereum ecosystem.
 
