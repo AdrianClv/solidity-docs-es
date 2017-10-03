@@ -21,24 +21,24 @@ Función Selector
 Los primeros cuatro bytes de lo datos de una llamada a una función especifiacan la función a llamar. Se trata de los primeros (más a la izquierda, más extremos) cuatro bytes del Keccak (SHA-3) hash de la firma de la función. La firma se define como la expresión canónica del prototipo básico, por ejemplo, el nombre de la función con la lista de parámetros entre paréntesis. Los tipos de parámetros se separan por comas, no por espacios.
 
 Codificación de argumentos
-=================
+==========================
 
-Starting from the fifth byte, the encoded arguments follow. This encoding is also used in other places, e.g. the return values and also event arguments are encoded in the same way, without the four bytes specifying the function.
+A partir del quinto byte, prosiguen los argumentos codificados. Esta codificación es también usada en otros sitios, por ejemplo, los valores de retorno y también los argumentos de eventos se codifican de esta manera, sin los cuatro bytes especificando la función.
 
-Types
+Tipos
 =====
 
-The following elementary types exist:
+Los tipos elementales existentes son:
 
-- `uint<M>`: unsigned integer type of `M` bits, `0 < M <= 256`, `M % 8 == 0`. e.g. `uint32`, `uint8`, `uint256`.
+- `uint<M>`: enteros sin signo de `M` bits, `0 < M <= 256`, `M % 8 == 0`. Ejemplos: `uint32`, `uint8`, `uint256`.
 
-- `int<M>`: two's complement signed integer type of `M` bits, `0 < M <= 256`, `M % 8 == 0`.
+- `int<M>`: enteros con signo de `M` bits, `0 < M <= 256`, `M % 8 == 0`.
 
-- `address`: equivalent to `uint160`, except for the assumed interpretation and language typing.
+- `address`: equivalente a `uint160`, exceptuando la interpretación asumida y la tipología de idioma.
 
-- `uint`, `int`: synonyms for `uint256`, `int256` respectively (not to be used for computing the function selector).
+- `uint`, `int`: sinónimos de `uint256`, `int256` respectivamente (no para serusados con la función selector).
 
-- `bool`: equivalent to `uint8` restricted to the values 0 and 1
+- `bool`: equivalente a `uint8` restringido a los valores 0 y 1.
 
 - `fixed<M>x<N>`: signed fixed-point decimal number of `M` bits, `0 < M <= 256`, `M % 8 ==0`, and `0 < N <= 80`, which denotes the value `v` as `v / (10 ** N)`.
 
