@@ -138,10 +138,10 @@ La opción ``.gas()`` está disponible en los 3 métodos, mientras que la opció
     usando ``this.balance``.
 
 .. warning::
-    Todas estas funciones son funciones de bajo nivel y debe usarse con cuidado.
+    Todas estas funciones son funciones de bajo nivel y deben usarse con cuidado.
     Específicamente, cualquier contrato desconocido puede ser malicioso y si se le llama,
     se le da el control a ese contrato, que luego puede llamar de vuelta a tu contrato,
-    así que prepárense para cambios a tus variables de estado cuando el llamado retorna.
+    así que prepárense para cambios a tus variables de estado cuando el llamado retorna el valor.
 
 .. index:: byte array, bytes32
 
@@ -155,7 +155,7 @@ Operadores:
 
 * Comparaciones: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evalúa a ``bool``)
 * Operadores Bit: ``&``, ``|``, ``^`` (exclusivo bitwise or), ``~`` (negación bitwise), ``<<`` (shift izquierdo), ``>>`` (shift derecho)
-* Acceso index: Si ``x`` es de tipo ``bytesI``, entonces ``x[k]`` para ``0 <= k < I`` devuelve el byte ``k`` (lectura sólo).
+* Acceso index: Si ``x`` es de tipo ``bytesI``, entonces ``x[k]`` para ``0 <= k < I`` devuelve el byte ``k`` (sólo lectura).
 
 El operador shift funcióna con cualquier entero como operador derecho (pero
 devuelve el tipo del operador izquierdo, que denota el número de bits a desplazarse.
@@ -163,7 +163,7 @@ Desplazarse por un número negativo arroja una excepción runtime.
 
 Miembros:
 
-* ``.length`` devuelve el largo fijo del array byte (lectura sólo).
+* ``.length`` devuelve el largo fijo del array byte (sólo lectura).
 
 Array byte de tamaño dinámico
 -----------------------------
@@ -232,16 +232,16 @@ el tipo ``ufixed0x256`` porque ``1/3`` no es finitamente representable en binari
 aproximado.
 
 Cualquier operador que puede ser aplicado a enteros también puede ser aplicado a una expresión de
-número literal con tal que los operadores sea enteros. Si cualquiera de los dos es fraccional, las
+número literal con tal que los operadores sean enteros. Si cualquiera de los dos es fraccional, las
 operaciones de bit no son permitidas y la exponenciación no es permitida si el exponente es fraccional
 (porque eso puede resultar en un número no racional).
 
 .. note::
-    Solidity tiene tipo literal de número para cada número racional.
+    Solidity tiene un tipo literal de número para cada número racional.
     Literales enteros y números racionales literales pertenecen a los tipos de números
-    literales. Por otra parte, todos las expresiones literales (ej. las expresiones que
+    literales. Por otra parte, todas las expresiones literales (p.ej. las expresiones que
     contienen sólo números literales y operadores) pertenecen a tipos de números literales.
-    Entonces las expresiones de números literales  ``1 + 2`` y ``2 + 1`` ambas
+    Entonces las expresiones de números literales ``1 + 2`` y ``2 + 1`` ambas
     pertenecen al mismo tipo de número literal para el número racional tres.
 
 .. note::
@@ -251,14 +251,14 @@ operaciones de bit no son permitidas y la exponenciación no es permitida si el 
     especificar la precisión buscada: ``x + ufixed(5.3743)``.
 
 .. warning::
-    División en enteros literales usados para truncar en versiones anteriores, pero ahora se convertirá en un número racional, ej. ``5 / 2`` no es igual a ``1``, más bien a ``2.5``.
+    La división de enteros literales solía truncar en versiones anteriores, pero ahora se convertirá 
+    en un número racional, ej. ``5 / 2`` no es igual a ``1``, más bien a ``2.5``.
 
 .. note::
-    Expresiones de números literales son convertidas en tipos no literales tan pronto como ellas son usadas con expresiones
-    no literales. Aunque sabemos que el valor de la expresión
-    asignada a ``b`` en el siguiente ejemplo evalúa a un entero, sigue usando
-    tipos de punto fijo (y no números literales racionales) entremedio y entonces
-    el código no compila.
+    Expresiones de números literales son convertidas en tipos no literales tan pronto como ellas son usadas 
+    con expresiones no literales. Aunque sabemos que el valor de la expresión asignada a ``b`` 
+    en el siguiente ejemplo evalúa a un entero, sigue usando tipos de punto fijo (y no números literales racionales) 
+    entremedio y entonces el código no compila.
 
 ::
 
@@ -270,10 +270,9 @@ operaciones de bit no son permitidas y la exponenciación no es permitida si el 
 Literales cadenas
 -----------------
 
-Las cadenas literales son cerrados con comillas simples o dobles (``"foo"`` or ``'bar'``). No hay ceros implícitos como en C; ``"foo"`` representa tres bytes, no cuatro. Como con lietrales enteros, su tpo puede variar, pero son implícitamente convertibles a ``bytes1``, ..., ``bytes32``, si caben a ``bytes`` y a ``string``.
+Las cadenas literales son cerradas con comillas simples o dobles (``"foo"`` or ``'bar'``). No hay ceros implícitos como en C; ``"foo"`` representa tres bytes, no cuatro. Como con literales enteros, su tipo puede variar, pero son implícitamente convertibles a ``bytes1``, ..., ``bytes32``, si caben a ``bytes`` y a ``string``.
 
-
-Las cadenas literales soportan caracteres de escape, tales como ``\n``, ``\xNN`` y ``\uNNNN``. ``\xNN`` toma un valor e inserta el byte apropiado, mientras que ``\uNNNN`` toma un codepoint Unicode e inserta una secuencia UTF-8.
+Las cadenas literales soportan carácteres de escape, tales como ``\n``, ``\xNN`` y ``\uNNNN``. ``\xNN`` toma un valor e inserta el byte apropiado, mientras que ``\uNNNN`` toma un codepoint Unicode e inserta una secuencia UTF-8.
 
 
 .. index:: literal, bytes
@@ -284,7 +283,7 @@ Literales hexadecimales
 
 Los literales hexadecimales son prefijos con la palabra clave ``hex`` y son cerrados por comillas simples o dobles (``hex"001122FF"``). Su contenido debe ser una cadena hexadecimal y su valor será la representación binaria de esos valores.
 
-Los literales hexadecimales se comportan como los literales de cadena y tienen los mismas restricciones de convertibilidad.
+Los literales hexadecimales se comportan como los literales de cadena y tienen las mismas restricciones de convertibilidad.
 
 
 .. index:: enum
@@ -294,8 +293,8 @@ Los literales hexadecimales se comportan como los literales de cadena y tienen l
 Enums
 -----
 
-Enums son una manera de hacer tipos creados por usuario en Solidity. Son explícitamente convertibles
-a y desde todo tipos de enteros pero la conversión implícita no se permite. Las conversiones explícitas
+Enums son una manera para el usuario de crear sus propios tipos en Solidity. Son explícitamente convertibles
+a y desde todos los tipos de enteros, pero la conversión implícita no se permite. Las conversiones explícitas
 revisan los valores de rangos en runtime y una falla causa una excepción. Enums necesitan al menos un miembro.
 
 ::
@@ -312,10 +311,10 @@ revisan los valores de rangos en runtime y una falla causa una excepción. Enums
         }
 
         // Ya que los tipos enum no son parte del ABI, la firma de "getChoice"
-        // automáticamente será cambiada a "getChoice() returns (unit8)"
+        // será automáticamente cambiada a "getChoice() returns (unit8)"
         // para todo lo externo a Solidity. El tipo entero usado es apenas
-        // suficientemente grande para guardar todos los valores enum, ej. si
-        // tienes más valores, `unit16` será utilizado y así.
+        // suficientemente grande para guardar todos los valores enum, p.ej. si
+        // tienes más valores, `unit16` será utilizado y así sucesivamente.
         function getChoice() returns (ActionChoices) {
             return choice;
         }
@@ -333,44 +332,44 @@ Función
 -------
 
 Los tipos función son tipos de función. Variables de tipo función
-pueden ser asignados desde funciónes y parámetros de funciónes de tipo función
-pueden ser usadas para pasar funciónes y retornar funciónes de llamados de funciónes.
-Los tipos de función hay de dos tipos - *internas* y *externas*:
+pueden ser asignados desde funciones y parámetros de funciones de tipo función
+pueden ser usadas para pasar funciones y retornar funciones de llamados de funciones.
+Los tipos de función, los hay de dos tipos: *internas* y *externas*:
 
-Las funciónes internas sólo pueden ser usadas dentro del contrato actual (específicamente,
-dentro de la unidad de code actual, que también incluye funciónes librerías internas
-y funciónes heredadas) porque no pueden ser ejecutadas fuera del
-contexto del contrato actual. Llamando una función interna se realiza
+Las funciones internas sólo pueden ser usadas dentro del contrato actual (específicamente,
+dentro de la unidad de código actual, que también incluye funciones de librerías internas
+y funciones heredadas) porque no pueden ser ejecutadas fuera del
+contexto del contrato actual. Llamar una función interna se realiza
 saltando a su label de entrada, tal como cuando se llama una función interna del
 contrato actual.
 
-funciónes externas están compuestas de una dirección y una firma de función y pueden
+Las funciones externas están compuestas de una dirección y una firma de función y pueden
 ser pasadas y devueltas desde una llamada de función externa.
 
-Los tipos de funciónes son notadas como sigue::
+Los tipos de funciones son notadas como sigue::
 
     function (<parameter types>) {internal|external} [constant] [payable] [returns (<return types>)]
 
-En contraste a los tipos de parámetros, los tipos de retorno no pueden estar vacíos - si
+A diferencia de los tipos de parámetros, los tipos de retorno no pueden estar vacíos - si
 el tipo función no debe retornar nada, la parte ``returns (<return types>)``
 tiene que ser omitida.
 
-Por defecto, las funciónes son de tipo interna, así que la palabra clave ``internal``
+Por defecto, las funciones son de tipo interna, así que la palabra clave ``internal``
 puede ser omitida.
 
 Hay dos formas de acceder una función en el contrato actual: o bien directamente
 con su nombre, ``f``, o usando ``this.f``. Usando el nombre resultará en una función
 interna, y con ``this`` habrá una función externa.
 
-Si una variable de tipo función no es inicializada, llamarla resultará
-resultar en una excepción. Lo mismo ocurre si llamas una función después de usar
+Si una variable de tipo función no es inicializada, llamarla resultará 
+en una excepción. Lo mismo ocurre si llamas una función después de usar
 ``delete`` en ella.
 
-Si funciónes externas son usadas fuera del contexto de Solidity, son tratadas
+Si funciones externas son usadas fuera del contexto de Solidity, son tratadas
 como tipo ``function``, que codifica la dirección seguida por el identificador
 de la función junto con un tipo ``bytes24``.
 
-Nótese que las funciónes públicas del contrato actual pueden ser usado tanto
+Nótese que las funciones públicas del contrato actual pueden ser usadas tanto
 como una función interna y externa. Para usar ``f`` como función interna, sólo
 se le llama como ``f``, y si se quiere usar como externa, usar ``this.f``.
 
@@ -380,8 +379,8 @@ Ejemplo que muestra como usar tipos de función internas::
     pragma solidity ^0.4.5;
 
     library ArrayUtils {
-      // las funciónes internas pueden ser usadas en funciónes de librerías
-      // internas porque serán parte del mismo contexto de código
+      // las funciones internas pueden ser usadas en funciones de librerías
+      // internas porque serán parte del mismo contexto de código.
       function map(uint[] memory self, function (uint) returns (uint) f)
         internal
         returns (uint[] memory r)
@@ -440,13 +439,13 @@ Otro ejemplo que usa tipos de función externa::
         NewRequest(requests.length - 1);
       }
       function reply(uint requestID, bytes response) {
-        // Aquí se revisa que el respuesta viene de una fuente de confianza
+        // Aquí se revisa que la respuesta viene de una fuente de confianza
         requests[requestID].callback(response);
       }
     }
 
     contract OracleUser {
-      Oracle constant oracle = Oracle(0x1234567); // known contract
+      Oracle constant oracle = Oracle(0x1234567); // contrato conocido
       function buySomething() {
         oracle.query("USD", this.oracleResponse);
       }
@@ -456,11 +455,11 @@ Otro ejemplo que usa tipos de función externa::
       }
     }
 
-Notar que los lambda o funciónes inline están planeadas pero no están aún implementados.
+Nótese que las funciones lambda o inline están planeadas pero no están aún implementadas.
 
 .. index:: ! type;reference, ! reference type, storage, memory, location, array, struct
 
-Tipos de Referencia
+Tipos de referencia
 ===================
 
 Tipos complejos, ej. tipos que no siempre caben en 256 bits tienen que ser manejadas
