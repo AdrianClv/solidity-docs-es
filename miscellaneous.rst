@@ -329,60 +329,60 @@ razones explicativos.
     archivos de fuente resultará en un metadata diferente, y posteriormente en bytecode diferente.
 
 
-Encodaje del hash de metadata en el bytecode
-============================================
+Codificación del hash de metadata en el bytecode
+================================================
 
-Porque podremos soportar otras maneras de consultar el archivo metadata en el futuro,
+Ya que en el futuro puede que soportemos otras maneras de consultar el archivo metadata,
 el mapping ``{"bzzr0": <Swarm hash>}`` es guardado
-encodado en [CBOR](https://tools.ietf.org/html/rfc7049). Ya que el principio de ese
-encodaje no es fácil de encontrar, su largo es sumado y un encodaje two-byte big-endian.
+codificado en [CBOR](https://tools.ietf.org/html/rfc7049). Ya que el principio de esa
+codificación no es fácil de encontrar, la longitud se añade en una codificación two-byte big-endian.
 La versión actual del compilador de Solidity entonces agrega lo siguiente al final
-de bytecode desplegado::
+del bytecode desplegado::
 
     0xa1 0x65 'b' 'z' 'z' 'r' '0' 0x58 0x20 <32 bytes swarm hash> 0x00 0x29
 
-Entonces para recuperar estos datos, el final del bytecode desplegado puede ser
-revisado para coincidir ese patrón y usar el Swarm hash para recuperar el archivo.
+Para recuperar estos datos, el final del bytecode desplegado puede ser
+revisado para ver si coincide con ese patrón y usar el hash de Swarm para recuperar el archivo.
 
 
-Uso para Generación de Interfaz Automática y NatSpec
-====================================================
+Uso para generar automáticamente la interfaz y NatSpec
+======================================================
 
-El metadata es usado de la siguiente forma: Un componente que quiere interactuar
+El metadata es usado de la siguiente forma: un componente que quiere interactuar
 con un contrato (ej. Mist) obtiene el código del contrato, a partir de eso el
-hash Swarm de un archivo que luego es recuperado.
+hash de Swarm de un archivo que luego es recuperado.
 Ese archivo es un JSON con la estructura como la de arriba.
 
 El componente puede luego usar el ABI para generar automáticamente una rudimentaria
 interfaz de usuario para el contrato.
 
 Además, Mist puede usar el userdoc para mostrar un mensaje de confirmación al usuario
-cuando sea que interactúe con el contrato.
+cuando interactúe con el contrato.
 
 
-Uso de Verificación de Código Fuente
-====================================
+Uso para la verificación de código fuente
+=========================================
 
-A fin de verificar la compilación, las fuentes pueden ser recuperadas de Swarm
+A fin de verificar la compilación, el código fuente pueden ser recuperado de Swarm
 desde el enlace en el archivo metadata.
-El compilador de la versión correcta (que es luego revisado para ser parte de los compiladores
-"oficiales") es invocado en esa entrada con la configuración específica. El resultado
+La versión correcta del compilador (que se comprueba que sea parte de los compiladores
+"oficiales") es invocada en esa entrada con la configuración específicada. El resultado
 bytecode es comparado a los datos de la transacción de creación o a datos del opcode CREATE.
 Esto verifica automáticamente la metadata ya que su hash es parte del bytecode.
-Datos en exceso corresponden a los datos de entrada del constructor, que debiera ser decodificado
-de acuerdo a la interfaz y presentada al usuario.
+Datos en exceso corresponden a los datos de entrada del constructor, que deben ser decodificados
+de acuerdo a la interfaz y presentados al usuario.
 
 
 *****************
-Trucos y Consejos
+Trucos y consejos
 *****************
 
 * Usar ``delete`` en arrays para borrar sus elementos.
-* Usat tipos mas cortos para elementos struct y ordenarlos para que los elementos mas cortos estén agrupados. Esto puede disminuir los costes de gas ya que múltiples operaciones SSTORE puden ser combinadas en una sóla (SSTORE cuesta 5000 o 20000 gas, así que esto es lo que se optimiza). Usar el estimador de precio de gas (con optimizador activado) para probar!
-* Hacer las variables de estado púlicas - el compilador creará :ref:`getters <visibility-and-getters>` automáticamente.
+* Usar tipos mas cortos para elementos struct y ordenarlos para que los elementos mas cortos estén agrupados. Esto puede disminuir los costes de gas ya que múltiples operaciones SSTORE puden ser combinadas en una sóla (SSTORE cuesta 5000 o 20000 gas, así que esto es lo que se optimiza). ¡Usa el estimador de precio de gas (con optimizador activado) para probar!
+* Hacer las variables de estado públicas - el compilador creará :ref:`getters <visibility-and-getters>` automáticamente.
 * Si revisa las condiciones de entrada o de estado muchas veces en el inicio de las funciones, intenta usar :ref:`modifiers`.
 * Si tu contrato tiene una función llamada ``send`` pero quieres usar la función interna de envío, usa ``address(contractVariable).send(amount)``.
-* Inicia structs de almacenamiento con una sóla asignación: ``x = MyStruct({a: 1, b: 2});``
+* Inicia structs de almacenamiento con una sola asignación: ``x = MyStruct({a: 1, b: 2});``
 
 **********
 Cheatsheet
@@ -392,7 +392,7 @@ Cheatsheet
 
 .. _order:
 
-Orden de preferencia de Operadores
+Orden de preferencia de operadores
 ==================================
 
 El siguiente es el orden de precedencia para operadores, listado en orden de evaluación.
@@ -402,9 +402,9 @@ El siguiente es el orden de precedencia para operadores, listado en orden de eva
 +============+=====================================+============================================+
 | *1*        | Postfix incremento y decremento     | ``++``, ``--``                             |
 +            +-------------------------------------+--------------------------------------------+
-|            | llamado tipo Function               | ``<func>(<args...>)``                      |
+|            | llamada de tipo función             | ``<func>(<args...>)``                      |
 +            +-------------------------------------+--------------------------------------------+
-|            | subscripting de Array               | ``<array>[<index>]``                       |
+|            | subíndice de array                  | ``<array>[<index>]``                       |
 +            +-------------------------------------+--------------------------------------------+
 |            | Acceso de miembro                   | ``<object>.<member>``                      |
 +            +-------------------------------------+--------------------------------------------+
@@ -412,13 +412,13 @@ El siguiente es el orden de precedencia para operadores, listado en orden de eva
 +------------+-------------------------------------+--------------------------------------------+
 | *2*        | Prefijo incremento y decremento     | ``++``, ``--``                             |
 +            +-------------------------------------+--------------------------------------------+
-|            | Unary más y menos                   | ``+``, ``-``                               |
+|            | Más y menos unarios                 | ``+``, ``-``                               |
 +            +-------------------------------------+--------------------------------------------+
-|            | Operaciones Unary                   | ``delete``                                 |
+|            | Operaciones unarias                 | ``delete``                                 |
 +            +-------------------------------------+--------------------------------------------+
-|            | Logical NOT                         | ``!``                                      |
+|            | NOT lógico                          | ``!``                                      |
 +            +-------------------------------------+--------------------------------------------+
-|            | Bitwise NOT                         | ``~``                                      |
+|            | NOT a nivel de bits                 | ``~``                                      |
 +------------+-------------------------------------+--------------------------------------------+
 | *3*        | Exponenciación                      | ``**``                                     |
 +------------+-------------------------------------+--------------------------------------------+
@@ -426,21 +426,21 @@ El siguiente es el orden de precedencia para operadores, listado en orden de eva
 +------------+-------------------------------------+--------------------------------------------+
 | *5*        | Adición and sustracción             | ``+``, ``-``                               |
 +------------+-------------------------------------+--------------------------------------------+
-| *6*        | Operadores Bitwise shift            | ``<<``, ``>>``                             |
+| *6*        | Desplazamiento de bits              | ``<<``, ``>>``                             |
 +------------+-------------------------------------+--------------------------------------------+
-| *7*        | Bitwise AND                         | ``&``                                      |
+| *7*        | AND a nivel de bits                 | ``&``                                      |
 +------------+-------------------------------------+--------------------------------------------+
-| *8*        | Bitwise XOR                         | ``^``                                      |
+| *8*        | XOR a nivel de bits                 | ``^``                                      |
 +------------+-------------------------------------+--------------------------------------------+
-| *9*        | Bitwise OR                          | ``|``                                      |
+| *9*        | OR a nivel de bits                  | ``|``                                      |
 +------------+-------------------------------------+--------------------------------------------+
-| *10*       | Operadores de Inigualdad            | ``<``, ``>``, ``<=``, ``>=``               |
+| *10*       | Operadores de desigualdad           | ``<``, ``>``, ``<=``, ``>=``               |
 +------------+-------------------------------------+--------------------------------------------+
 | *11*       | Operadores de igualdad              | ``==``, ``!=``                             |
 +------------+-------------------------------------+--------------------------------------------+
-| *12*       | Logical AND                         | ``&&``                                     |
+| *12*       | AND lógico                          | ``&&``                                     |
 +------------+-------------------------------------+--------------------------------------------+
-| *13*       | Logical OR                          | ``||``                                     |
+| *13*       | OR lógico                           | ``||``                                     |
 +------------+-------------------------------------+--------------------------------------------+
 | *14*       | Operador ternario                   | ``<conditional> ? <if-true> : <if-false>`` |
 +------------+-------------------------------------+--------------------------------------------+
@@ -453,11 +453,11 @@ El siguiente es el orden de precedencia para operadores, listado en orden de eva
 
 .. index:: assert, block, coinbase, difficulty, number, block;number, timestamp, block;timestamp, msg, data, gas, sender, value, now, gas price, origin, revert, require, keccak256, ripemd160, sha256, ecrecover, addmod, mulmod, cryptography, this, super, selfdestruct, balance, send
 
-Variables Globales
+Variables globales
 ==================
 
-- ``block.blockhash(uint blockNumber) devuelve (bytes32)``: hash del bloque dado - sólo funciona para los últimos 256 bloques
-- ``block.coinbase`` (``address``): address del actual minero de bloque
+- ``block.blockhash(uint blockNumber) returns (bytes32)``: hash del bloque dado - sólo funciona para los últimos 256 bloques
+- ``block.coinbase`` (``address``): address del minero del bloque actual
 - ``block.difficulty`` (``uint``): dificultad del bloque actual
 - ``block.gaslimit`` (``uint``): gaslimit del bloque actual
 - ``block.number`` (``uint``): número del bloque actual
@@ -465,31 +465,31 @@ Variables Globales
 - ``msg.data`` (``bytes``): calldata completa
 - ``msg.gas`` (``uint``): gas restante
 - ``msg.sender`` (``address``): sender del mensaje (llamada actual)
-- ``msg.value`` (``uint``): números de wei enviados con el mensaje
+- ``msg.value`` (``uint``): número de wei enviados con el mensaje
 - ``now`` (``uint``): timestamp del bloque actual (alias para ``block.timestamp``)
 - ``tx.gasprice`` (``uint``): precio de gas de la transacción
-- ``tx.origin`` (``address``): sender de la transacción (cadena de llamado completo)
-- ``assert(bool condition)``: abortar ejecución y dehacer cambios de estado si la condición es ``false`` (uso para error interno)
-- ``require(bool condition)``: abortar ejecución y dehacer cambios de estado si la condición es ``false`` (uso para entradas erroneas)
+- ``tx.origin`` (``address``): sender de la transacción (cadena de llamada completa)
+- ``assert(bool condition)``: abortar ejecución y deshacer cambios de estado si la condición es ``false`` (uso para error interno)
+- ``require(bool condition)``: abortar ejecución y deshacer cambios de estado si la condición es ``false`` (uso para entradas erróneas)
 - ``revert()``: abortar ejecución y deshacer cambios de estado
-- ``keccak256(...) devuelve (bytes32)``: computar el hash Ethereum-SHA-3 (Keccak-256) de los argumentos (empacados)
-- ``sha3(...) devuelve (bytes32)``: un alias a `keccak256()`
-- ``sha256(...) devuelve (bytes32)``: computar el hash SHA-256 de los argumentos (empacados)
-- ``ripemd160(...) devuelve (bytes20)``: computa el hash RIPEMD-160 de los argumentos (empacados)
-- ``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``: recuperar address asociada con la llave pública desde la firma de la curva elíptica, devuelve cero en error
-- ``addmod(uint x, uint y, uint k) devuelve (uint)``: computa ``(x + y) % k`` donde la suma es hecha con precisión arbitraria y no envuelve ``2**256``
-- ``mulmod(uint x, uint y, uint k) devuelve (uint)``: computa ``(x * y) % k`` donde la multiplicación es hecha con precisión arbitraria y no envuelve ``2**256``
+- ``keccak256(...) returns (bytes32)``: computar el hash Ethereum-SHA-3 (Keccak-256) de los argumentos (empacados)
+- ``sha3(...) returns (bytes32)``: un alias a `keccak256()`
+- ``sha256(...) returns (bytes32)``: computar el hash SHA-256 de los argumentos (empacados)
+- ``ripemd160(...) returns (bytes20)``: computar el hash RIPEMD-160 de los argumentos (empacados)
+- ``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``: recuperar address asociada con la llave pública desde la firma de la curva elíptica, devuelve cero en caso de error
+- ``addmod(uint x, uint y, uint k) returns (uint)``: computa ``(x + y) % k`` donde la suma es hecha con precisión arbitraria y no envuelve ``2**256``
+- ``mulmod(uint x, uint y, uint k) returns (uint)``: computa ``(x * y) % k`` donde la multiplicación es hecha con precisión arbitraria y no envuelve ``2**256``
 - ``this`` (tipo del contrato actual): el contrato actual, explícitamente convertible a ``address``
 - ``super``: el contrato un nivel más alto en la jerarquía de herencia
-- ``selfdestruct(address recipient)``: destruir el contrato actual, enviando sus fondos a la address dada
+- ``selfdestruct(address recipient)``: destruir el contrato actual, enviando sus fondos al address dada
 - ``<address>.balance`` (``uint256``): saldo de :ref:`address` en Wei
-- ``<address>.send(uint256 amount) devuelve (bool)``: enviar monto dado de Wei a :ref:`address`, devuelve ``false`` en error
-- ``<address>.transfer(uint256 amount)``: enviar monto dado de Wei a :ref:`address`, arroja si falla
+- ``<address>.send(uint256 amount) returns (bool)``: enviar monto dado de Wei a :ref:`address`, devuelve ``false`` en caso de error
+- ``<address>.transfer(uint256 amount)``: enviar monto dado de Wei a :ref:`address`, arroja excepción si falla
 
 
 .. index:: visibility, public, private, external, internal
 
-Especificadores de Visibilidad de Función
+Especificadores de visibilidad de función
 =========================================
 
 ::
@@ -498,9 +498,9 @@ Especificadores de Visibilidad de Función
         return true;
     }
 
-- ``public``: visible externa y internamente (crea función getter para almacenamiento/variables de estado)
+- ``public``: visible externa e internamente (crea función getter para almacenamiento/variables de estado)
 - ``private``: sólo visible en el contrato actual
-- ``external``: sólo visible del exterior (sólo para funciones) - e.j. sólo puede ser mensaje-llamado (via ``this.func``)
+- ``external``: sólo visible desde el exterior (sólo para funciones) - e.j. sólo puede ser llamado mediante mensajes (via ``this.func``)
 - ``internal``: sólo visible internamente
 
 
@@ -510,23 +510,23 @@ Modificadores
 =============
 
 - ``constant`` para variables de estado: no permite asignaciones (excepto inicialización), no ocupa un slot de almacenamiento.
-- ``constant`` para funciones: no permite modificación de estado - esto no está enforzado aún.
+- ``constant`` para funciones: no permite modificación de estado - no está forzado aún.
 - ``anonymous`` para eventos: no guarda la firma del evento como topic.
 - ``indexed`` para parámetros de eventos: guarda el parámetro como topic.
 - ``payable`` para funciones: les permite recibir ether junto a una llamada.
 
 
-Keywords Reservadas
+Keywords reservadas
 ===================
 
 
-Estas palabras son reservadas en Solidity. Pueden incorporarse a la sintaxis en el futuro:
+Estas palabras están reservadas en Solidity. Pueden incorporarse a la sintaxis en el futuro:
 
 ``abstract``, ``after``, ``case``, ``catch``, ``default``, ``final``, ``in``, ``inline``, ``interface``, ``let``, ``match``, ``null``,
 ``of``, ``pure``, ``relocatable``, ``static``, ``switch``, ``try``, ``type``, ``typeof``, ``view``.
 
-Language Grammar
-================
+Gramática del lenguaje
+======================
 
 .. literalinclude:: grammar.txt
    :language: none
