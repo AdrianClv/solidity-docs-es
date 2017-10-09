@@ -7,7 +7,7 @@ Especificación de Application Binary Interface
 ******************************************
 
 Diseño básico
-============
+=============
 
 La Application Binary Interface (Interfaz Binaria de Aplicación) es el modo estándar de interactuar con contratos en el ecosistema Ethereum, tanto desde fuera de la blockchain como en interacciones contrato-contrato. Los datos se codifican siguiendo su tipo acorde a esta especificación.
 
@@ -137,15 +137,15 @@ Definimos `enc`, la codificación actual, como un mapping de valores de tipos de
 
 - `uint<M>`: `enc(X)` es el mayor extremo de la codificación de `X`, rellenado en el lado de orden mayor (izquierda) con bytes cero de tal forma que la longitud acabe siendo de 32 bytes.
 - `address`: como en el caso de `uint160`
-- `int<M>`: `enc(X)` is the big-endian two's complement encoding of `X`, padded on the higher-oder (left) side with `0xff` for negative `X` and with zero bytes for positive `X` such that the length is a multiple of 32 bytes.
-- `bool`: as in the `uint8` case, where `1` is used for `true` and `0` for `false`
-- `fixed<M>x<N>`: `enc(X)` is `enc(X * 10**N)` where `X * 10**N` is interpreted as a `int256`.
-- `fixed`: as in the `fixed128x19` case
-- `ufixed<M>x<N>`: `enc(X)` is `enc(X * 10**N)` where `X * 10**N` is interpreted as a `uint256`.
-- `ufixed`: as in the `ufixed128x19` case
-- `bytes<M>`: `enc(X)` is the sequence of bytes in `X` padded with zero-bytes to a length of 32.
+- `int<M>`: `enc(X)` es el complemento a dos de mayor extremo en la codificación de `X`, rellenado con ek lado de mayor orden (izquierda) con `0xff` para `X` negativo y bytes cero para `X` positivo de tal forma que la longitud final sea un múltiplo de 32 bytes.
+- `bool`: como en el caso de `uint8`, donde `1` se usa para `true` y `0` para `false`
+- `fixed<M>x<N>`: `enc(X)` es `enc(X * 10**N)` donde `X * 10**N` se interpreta como un `int256`.
+- `fixed`: como en el caso de `fixed128x19`
+- `ufixed<M>x<N>`: `enc(X)` es `enc(X * 10**N)` donde `X * 10**N` se interpreta como un `uint256`.
+- `ufixed`: como en el caso de `ufixed128x19`
+- `bytes<M>`: `enc(X)` es la secuencia de bytes en `X` rellenado con bytes cero hasta una longitud de 32.
 
-Note that for any `X`, `len(enc(X))` is a multiple of 32.
+Resaltar que para cada `X`, `len(enc(X))` es un múltiplo de 32.
 
 Function Selector and Argument Encoding
 =======================================
