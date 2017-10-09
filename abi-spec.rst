@@ -133,11 +133,11 @@ Definimos `enc`, la codificación actual, como un mapping de valores de tipos de
 
 - `string`:
 
-  `enc(X) = enc(enc_utf8(X))`, en este caso `X` se codifica como utf-8 y su valor se interpreta como de tipo `bytes` y codificado posteriormente. Hay que tener en cuenta que la longitus usada en la subsecuente codificación es el número de bytes del string codificado como utf-8, no su número de caracteres.
+  `enc(X) = enc(enc_utf8(X))`, en este caso `X` se codifica como utf-8 y su valor se interpreta como de tipo `bytes` y codificado posteriormente. Hay que tener en cuenta que la longitud usada en la subsecuente codificación es el número de bytes del string codificado como utf-8, no su número de caracteres.
 
 - `uint<M>`: `enc(X)` es el mayor extremo de la codificación de `X`, rellenado en el lado de orden mayor (izquierda) con bytes cero de tal forma que la longitud acabe siendo de 32 bytes.
 - `address`: como en el caso de `uint160`
-- `int<M>`: `enc(X)` es el complemento a dos de mayor extremo en la codificación de `X`, rellenado con ek lado de mayor orden (izquierda) con `0xff` para `X` negativo y bytes cero para `X` positivo de tal forma que la longitud final sea un múltiplo de 32 bytes.
+- `int<M>`: `enc(X)` es el complemento a dos de mayor extremo en la codificación de `X`, rellenado en el lado de mayor orden (izquierda) con `0xff` para `X` negativo y bytes cero para `X` positivo de tal forma que la longitud final sea un múltiplo de 32 bytes.
 - `bool`: como en el caso de `uint8`, donde `1` se usa para `true` y `0` para `false`
 - `fixed<M>x<N>`: `enc(X)` es `enc(X * 10**N)` donde `X * 10**N` se interpreta como un `int256`.
 - `fixed`: como en el caso de `fixed128x19`
@@ -147,20 +147,20 @@ Definimos `enc`, la codificación actual, como un mapping de valores de tipos de
 
 Resaltar que para cada `X`, `len(enc(X))` es un múltiplo de 32.
 
-Function Selector and Argument Encoding
-=======================================
+Función Selector y codificación de argumentos
+=============================================
 
-All in all, a call to the function `f` with parameters `a_1, ..., a_n` is encoded as
+Siempre, una llamada a la función `f` con parámetros `a_1, ..., a_n` se codifican como 
 
   `function_selector(f) enc((a_1, ..., a_n))`
 
-and the return values `v_1, ..., v_k` of `f` are encoded as
+y los valores de retorno `v_1, ..., v_k` de `f` son codificados como
 
   `enc((v_1, ..., v_k))`
 
-i.e. the values are combined into an anonymous struct and encoded.
+p.ej.: los valores se combinan en struct anónimos y codificados.
 
-Examples
+Ejemplos
 ========
 
 Given the contract:
