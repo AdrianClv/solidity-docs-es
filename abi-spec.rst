@@ -133,10 +133,10 @@ Definimos `enc`, la codificación actual, como un mapping de valores de tipos de
 
 - `string`:
 
-  `enc(X) = enc(enc_utf8(X))`, i.e. `X` is utf-8 encoded and this value is interpreted as of `bytes` type and encoded further. Note that the length used in this subsequent encoding is the number of bytes of the utf-8 encoded string, not its number of characters.
+  `enc(X) = enc(enc_utf8(X))`, en este caso `X` se codifica como utf-8 y su valor se interpreta como de tipo `bytes` y codificado posteriormente. Hay que tener en cuenta que la longitus usada en la subsecuente codificación es el número de bytes del string codificado como utf-8, no su número de caracteres.
 
-- `uint<M>`: `enc(X)` is the big-endian encoding of `X`, padded on the higher-order (left) side with zero-bytes such that the length is a multiple of 32 bytes.
-- `address`: as in the `uint160` case
+- `uint<M>`: `enc(X)` es el mayor extremo de la codificación de `X`, rellenado en el lado de orden mayor (izquierda) con bytes cero de tal forma que la longitud acabe siendo de 32 bytes.
+- `address`: como en el caso de `uint160`
 - `int<M>`: `enc(X)` is the big-endian two's complement encoding of `X`, padded on the higher-oder (left) side with `0xff` for negative `X` and with zero bytes for positive `X` such that the length is a multiple of 32 bytes.
 - `bool`: as in the `uint8` case, where `1` is used for `true` and `0` for `false`
 - `fixed<M>x<N>`: `enc(X)` is `enc(X * 10**N)` where `X * 10**N` is interpreted as a `int256`.
