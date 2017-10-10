@@ -19,7 +19,7 @@ ver :ref:`order`.
 
 .. index:: ! value type, ! type;value
 
-Tipos de Valor
+Tipos de valor
 ==============
 
 Los siguientes tipos también son llamados tipos de valor porque las variables
@@ -41,36 +41,37 @@ Operadores:
 *  ``==`` (igualdad)
 *  ``!=`` (inigualdad)
 
-Los operadores ``||`` y ``&&`` aplican las reglas comunes de corto circuitos. Esto significa que en la expresión ``f(x) || g(y)``, si ``f(x)`` evalúa a ``true``, ``g(y)`` no será evaluado incluso si tuviera efectos segundarios.
+Los operadores ``||`` y ``&&`` aplican las reglas comunes de corto circuitos. Esto significa que en la expresión ``f(x) || g(y)``, si ``f(x)`` evalúa a ``true``, ``g(y)`` no será evaluado incluso si tuviera efectos secundarios.
 
 .. index:: ! uint, ! int, ! integer
 
 Enteros
 -------
 
-``int`` / ``uint``: Enteros con y sin signo de varios tamaños. Las palabras clave ``uint8`` a ``uint256`` en pasos de ``8`` (sin signo de 8 hasta 256 bits) y ``int8`` a ``int256``. ``uint`` y ``int`` son aliases para ``uint256`` y ``int256``, respectivamente.
+``int`` / ``uint``: Enteros con y sin signo de varios tamaños. Las palabras clave ``uint8`` a ``uint256`` en pasos de ``8`` (sin signo de 8 hasta 256 bits) y ``int8`` a ``int256``. ``uint`` y ``int`` son alias para ``uint256`` y ``int256``, respectivamente.
 
 Operadores:
 
 * Comparaciones: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evalúa a ``bool``)
-* Operadores bit: ``&``, ``|``, ``^`` (bitwise exclusivo or), ``~`` (negación bitwise)
-* Operadores aritméticos: ``+``, ``-``, unary ``-``, unary ``+``, ``*``, ``/``, ``%`` (restante), ``**`` (exponenciales), ``<<`` (shift izquierda), ``>>`` (shift derecha)
+* Operadores bit: ``&``, ``|``, ``^`` (OR exclusivo a nivel de bit), ``~`` (negación a nivel de bit)
+* Operadores aritméticos: ``+``, ``-``, ``-`` unario, ``+`` unario, ``*``, ``/``, ``%`` (restante), ``**`` (exponenciales), ``<<`` (desplazamiento a la izquierda), ``>>`` (desplazamiento a la derecha)
 
-La división siempre trunca (está compilado a la opcode DIV de la EVM), pero no trunca si los dos
+La división siempre trunca (está compilada a la opcode DIV de la EVM), pero no trunca si los dos
 operadores son :ref:`literales<rational_literals>` (o expresiones literales).
 
-División por cero y modulus con cero arrojan una excepción runtime.
+División por cero y módulos con cero arrojan una excepción en tiempo de ejecución.
 
-El resultado de una operación shift es el tipo de operador izquierdo. La
+El resultado de una operación de desplazamiento es del tipo del operador izquierdo. La
 expresión ``x << y`` es equivalente a ``x * 2**y`` y ``x >> y`` es
-equivalente a ``x / 2**y``. Esto significa que hacer un shift de números negativos
-extiende en signo. Haciendo shift por un número negativo arroja una excepción runtime.
+equivalente a ``x / 2**y``. Esto significa que hacer un desplazamiento de números negativos
+extiende en signo. Hacer un desplazamiento por un número negativo arroja una excepción en tiempo de ejecución.
 
 .. warning::
-    Los resultados producidos por shift derecho de valores negativos de tipos de enteros con signo es diferente de esos producidos
-    por otros lenguajes de programación. En Solidity, shift derecho mapea la división para que los valores negativos de shift
-    sean redondeados hacia cero (truncado). En otros lenguajes de programación el shift derecho de valores negativos
-    funcióna como una división con redondeo hacia abajo (hacia infinito negativo).
+    Los resultados producidos por desplazamientos a la derecha de valores negativos de tipos enteros con signo
+    son diferentes de los producidos por otros lenguajes de programación. En Solidity, el desplazamiento a la derecha
+    mapea la división para que los valores negativos del desplazamiento a la derecha sean redondeados hacia cero (truncado).
+    En otros lenguajes de programación el desplazamiento a la derecha de valores negativos funcióna como una división
+    con redondeohacia abajo (hacia infinito negativo).
 
 .. index:: address, balance, send, call, callcode, delegatecall, transfer
 
@@ -79,7 +80,7 @@ extiende en signo. Haciendo shift por un número negativo arroja una excepción 
 Address
 -------
 
-``address``: Contiene un valor de 20 byte (tamaño de una dirección Ethereum). Los tipos de address también tienen miembros y sirven como base para todos los contratos.
+``address``: Contiene un valor de 20 bytes (tamaño de una dirección de Ethereum). Los tipos address también tienen miembros y sirven como base para todos los contratos.
 
 Operadores:
 
@@ -102,22 +103,22 @@ y de enviar Ether (en unidades de wei) a una dirección usando la función ``tra
     if (x.balance < 10 && myAddress.balance >= 10) x.transfer(10);
 
 .. note::
-    Si ``x`` es una dirección de contrato, su código (específicamente: su función de fallback, si es que está presente) será ejecutada con el llamado ``transfer`` (esta es la limitación de la EVM y no puede ser prevenida). Si esa ejecución acaba el gas o falla de cualquier forma, el Ether transferido será revertido y el contrato actual se detendrá con una excepción.
+    Si ``x`` es una dirección de contrato, su código (específicamente: su función de fallback, si es que está presente) será ejecutada con el llamado ``transfer`` (esta es una limitación de la EVM y no puede ser prevenida). Si esa ejecución agota el gas o falla de cualquier forma, el Ether transferido será revertido y el contrato actual se detendrá con una excepción.
 
 * ``send``
 
-Send es la contrapartida de bajo nivel de ``transfer``. Si la ejecución falla, el contrato actual no se detendrá con una excepción, pero ``send`` devuelve ``false``.
+Send es la contrapartida de bajo nivel de ``transfer``. Si la ejecución falla, el contrato actual no se detendrá con una excepción, sino que ``send`` devolverá ``false``.
 
 .. warning::
     Hay algunos peligros en utilizar ``send``: La transferencia falla si la profundidad de la llamada es de 1024
     (esto puede ser forzado por el llamador) y también falla si al recipiente se le acaba el gas. Entonces para
-    hacer transferencia de Ether seguras, siempre revisar el valor devuelto por ``send``, usar ``transfer`` o incluso mejor:
+    hacer transferencias de Ether seguras, siempre revisar el valor devuelto por ``send``, usar ``transfer`` o incluso mejor:
     usar un patrón donde el recipiente retira el dinero.
 
 * ``call``, ``callcode`` y ``delegatecall``
 
-Además, para interfazar con contratos que no adhieren al ABI,
-la función ``call`` es prevista que tome un número arbitrario de argumentos de cualquier tipo. Estos argumentos son acolchados a 32 bytes y concatenados. Una excepción es el caso donde el primer argumento es codificado a exactamente 4 bytes. En este caso, no está acolchado para permitir el uso de firmas de función aquí.
+Además, para interactuar con contratos que no se adhieren al ABI,
+la función ``call`` es prevista que tome un número arbitrario de argumentos de cualquier tipo. Estos argumentos son acolchados a 32 bytes y concatenados. Una excepción es el caso donde el primer argumento es codificado a exactamente 4 bytes. En este caso, no está acolchado para permitir el uso de firmas de función.
 
 ::
 
@@ -125,9 +126,9 @@ la función ``call`` es prevista que tome un número arbitrario de argumentos de
     nameReg.call("register", "MyName");
     nameReg.call(bytes4(keccak256("fun(uint256)")), a);
 
-``call`` devuelve un booleano indicando si la función llamada terminó (``true``) o causó una excepción del EVM (``false``). No es posible acceder a los datos reales devueltos (para esto necesitaremos saber de antemano el tamaño de codificación).
+``call`` devuelve un booleano indicando si la función llamada terminó (``true``) o causó una excepción de la EVM (``false``). No es posible acceder a los datos reales devueltos (para esto necesitaremos saber de antemano el tamaño de codificación).
 
-En una forma similar, ``delegatecall`` puede ser usado: la diferencia es que solo se usa el código de la dirección dada, todos los demás aspectos (almacenamiento, saldo, ...) salen directamente del contrato actual. El propósito de ``delegatecall`` es usar el código de librería que está almacenado en otro contrato. El usuario tiene que asegurarse de que el layout del almacenamiento en ambos contratos es correcto para usar ``delegatecall``. Antes de homestead, sólo una versión limitada llamada ``callcode`` estaba disponible pero no daba acceso a los valores ``msg.sender`` y ``msg.value`` originales.
+``delegatecall`` puede ser usado de forma similar: la diferencia es que sólo se usa el código de la dirección dada, todos los demás aspectos (almacenamiento, saldo, ...) salen directamente del contrato actual. El propósito de ``delegatecall`` es usar el código de librería que está almacenado en otro contrato. El usuario tiene que asegurarse de que el layout del almacenamiento en ambos contratos es correcto para usar ``delegatecall``. Antes de homestead, sólo una versión limitada llamada ``callcode`` estaba disponible pero no daba acceso a los valores ``msg.sender`` y ``msg.value`` originales.
 
 Las tres funciones ``call``, ``delegatecall`` y ``callcode`` son funciones de muy bajo nivel y deben usarse sólo como medida de último recurso ya que rompen la seguridad de tipo de Solidity.
 
@@ -141,31 +142,31 @@ La opción ``.gas()`` está disponible en los 3 métodos, mientras que la opció
     Todas estas funciones son funciones de bajo nivel y deben usarse con cuidado.
     Específicamente, cualquier contrato desconocido puede ser malicioso y si se le llama,
     se le da el control a ese contrato, que luego puede llamar de vuelta a tu contrato,
-    así que prepárense para cambios a tus variables de estado cuando el llamado retorna el valor.
+    así que prepárate para cambios a tus variables de estado cuando la llamada retorna el valor.
 
 .. index:: byte array, bytes32
 
 
-Colleción de byte de tamaño fijo
---------------------------------
+Arrays de bytes de tamaño fijo
+------------------------------
 
 ``bytes1``, ``bytes2``, ``bytes3``, ..., ``bytes32``. ``byte`` es un alias para ``bytes1``.
 
 Operadores:
 
 * Comparaciones: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evalúa a ``bool``)
-* Operadores Bit: ``&``, ``|``, ``^`` (exclusivo bitwise or), ``~`` (negación bitwise), ``<<`` (shift izquierdo), ``>>`` (shift derecho)
-* Acceso index: Si ``x`` es de tipo ``bytesI``, entonces ``x[k]`` para ``0 <= k < I`` devuelve el byte ``k`` (sólo lectura).
+* Operadores Bit: ``&``, ``|``, ``^`` (OR exclusivo a nivel de bits), ``~`` (negación a nivel de bits), ``<<`` (desplazamiento a la izquierda), ``>>`` (desplazamiento a la derecha)
+* Acceso por índice: Si ``x`` es de tipo ``bytesI``, entonces ``x[k]`` para ``0 <= k < I`` devuelve el byte ``k`` (sólo lectura).
 
-El operador shift funcióna con cualquier entero como operador derecho (pero
+El operador de desplazamiento funciona con cualquier entero como operador derecho (pero
 devuelve el tipo del operador izquierdo, que denota el número de bits a desplazarse.
-Desplazarse por un número negativo arroja una excepción runtime.
+Desplazarse por un número negativo arroja una excepción en tiempo de ejecución.
 
 Miembros:
 
 * ``.length`` devuelve el largo fijo del array byte (sólo lectura).
 
-Array byte de tamaño dinámico
+Arrays de bytes de tamaño dinámico
 -----------------------------
 
 ``bytes``:
