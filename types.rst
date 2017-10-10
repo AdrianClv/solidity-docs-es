@@ -71,7 +71,7 @@ extiende en signo. Hacer un desplazamiento por un número negativo arroja una ex
     son diferentes de los producidos por otros lenguajes de programación. En Solidity, el desplazamiento a la derecha
     mapea la división para que los valores negativos del desplazamiento a la derecha sean redondeados hacia cero (truncado).
     En otros lenguajes de programación el desplazamiento a la derecha de valores negativos funcióna como una división
-    con redondeohacia abajo (hacia infinito negativo).
+    con redondeo hacia abajo (hacia infinito negativo).
 
 .. index:: address, balance, send, call, callcode, delegatecall, transfer
 
