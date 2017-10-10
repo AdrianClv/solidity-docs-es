@@ -1,78 +1,73 @@
 ******************
-Using the compiler
+Uso del compilador
 ******************
 
 .. index:: ! commandline compiler, compiler;commandline, ! solc, ! linker
 
 .. _commandline-compiler:
 
-Using the Commandline Compiler
-******************************
+Utilizar el compilador de línea de comandos
+*******************************************
 
-One of the build targets of the Solidity repository is ``solc``, the solidity commandline compiler.
-Using ``solc --help`` provides you with an explanation of all options. The compiler can produce various outputs, ranging from simple binaries and assembly over an abstract syntax tree (parse tree) to estimations of gas usage.
-If you only want to compile a single file, you run it as ``solc --bin sourceFile.sol`` and it will print the binary. Before you deploy your contract, activate the optimizer while compiling using ``solc --optimize --bin sourceFile.sol``. If you want to get some of the more advanced output variants of ``solc``, it is probably better to tell it to output everything to separate files using ``solc -o outputDirectory --bin --ast --asm sourceFile.sol``.
+Uno de los objetivos de compilación del repositorio de Solidity es ``solc``, el compilador de línea de comandos de solidity.
 
-The commandline compiler will automatically read imported files from the filesystem, but
-it is also possible to provide path redirects using ``prefix=path`` in the following way:
+Utilizando ``solc --help`` proporciona una explicación de todas las opciones. El compilador puede producir varias salidas, desde binarios simples y ensamblador sobre un árbol de sintaxis abstracto (árbol de análisis) hasta estimaciones de uso de gas.
+Si sólo deseas compilar un único archivo, lo ejecutas como ``solc --bin sourceFile.sol`` y se imprimirá el binario. Antes de implementar tu contrato, activa el optimizador mientras compilas usando ``solc --optimize --bin sourceFile.sol``. Si deseas obtener algunas de las variantes de salida más avanzadas de ``solc``, probablemente sea mejor decirle que salga todo por ficheros separados usando``solc -o outputDirectory --bin --ast --asm sourceFile.sol``.
+
+El compilador de línea de comandos leerá automáticamente los archivos importados del sistema de archivos, aunque es posible proporcionar un redireccionamiento de ruta utilizando ``prefix=path`` de la siguiente manera:
 
 ::
 
     solc github.com/ethereum/dapp-bin/=/usr/local/lib/dapp-bin/ =/usr/local/lib/fallback file.sol
 
-This essentially instructs the compiler to search for anything starting with
-``github.com/ethereum/dapp-bin/`` under ``/usr/local/lib/dapp-bin`` and if it does not
-find the file there, it will look at ``/usr/local/lib/fallback`` (the empty prefix
-always matches). ``solc`` will not read files from the filesystem that lie outside of
-the remapping targets and outside of the directories where explicitly specified source
-files reside, so things like ``import "/etc/passwd";`` only work if you add ``=/`` as a remapping.
+Esencialmente esto instruye al compilador a buscar cualquier cosa que empiece con
+``github.com/ethereum/dapp-bin/`` bajo ``/usr/local/lib/dapp-bin`` y si no localiza el fichero ahí, mirará en ``/usr/local/lib/fallback`` (el prefijo vacío siempre coincide). ``solc`` no leerá ficheros del sistema de ficheros que se encuentren fuera de los objetivos de reasignación y fuera de los directorios donde se especifica explícitamente la fuente de ficheros donde residen, con lo cual cosas como ``import "/etc/passwd";`` sólo funcionan si le añades ``=/`` como una reasignacion.
 
-If there are multiple matches due to remappings, the one with the longest common prefix is selected.
+Si hay coincidencias múltiples debido a reasignaciones, se selecciona el prefijo común más largo.
 
-For security reasons the compiler has restrictions what directories it can access. Paths (and their subdirectories) of source files specified on the commandline and paths defined by remappings are allowed for import statements, but everything else is rejected. Additional paths (and their subdirectories) can be allowed via the ``--allow-paths /sample/path,/another/sample/path`` switch.
+Por razones de seguridad, el compilador tiene restricciones sobre a qué directorios puede acceder. Las rutas de acceso (y sus subdirectorios) de los archivos de origen especificados en la línea de comandos y las rutas definidas por las reasignaciones se permiten para las instrucciones de importación, pero todo lo demás se rechaza. Se pueden permitir rutas adicionales (y sus subdirectorios) a través de la opción ``--allow-paths /sample/path,/another/sample/path``.
 
-If your contracts use :ref:`libraries <libraries>`, you will notice that the bytecode contains substrings of the form ``__LibraryName______``. You can use ``solc`` as a linker meaning that it will insert the library addresses for you at those points:
+Si tus contratos usan :ref:`bibliotecas <libraries>`, notarás que el bytecode contiene subcadenas del tipo ``__LibraryName______``. Puedes utilizar ``solc`` como un enlazador, lo que significa que insertará las direcciones de la biblioteca en esos puntos:
 
-Either add ``--libraries "Math:0x12345678901234567890 Heap:0xabcdef0123456"`` to your command to provide an address for each library or store the string in a file (one library per line) and run ``solc`` using ``--libraries fileName``.
+Agregue ``--libraries "Math:0x12345678901234567890 Heap:0xabcdef0123456"`` a su comando para proporcionar una dirección para cada biblioteca o almacenar la cadena en un archivo (una biblioteca por línea) y ejecutar `` solc`` usando `` --libraries fileName``.
 
-If ``solc`` is called with the option ``--link``, all input files are interpreted to be unlinked binaries (hex-encoded) in the ``__LibraryName____``-format given above and are linked in-place (if the input is read from stdin, it is written to stdout). All options except ``--libraries`` are ignored (including ``-o``) in this case.
+Si ``solc`` se llama con la opción ``--link``, todos los archivos de entrada se interpretan como binarios desvinculados (codificados en hexadecimal) en el ``__LibraryName____``-format dado anteriormente y están enlazados in situ (si la entrada se lee desde stdin, se escribe en stdout). Todas las opciones excepto ``--libraries`` son ignoradas (incluyendo ``-o``) en este caso.
 
-If ``solc`` is called with the option ``--standard-json``, it will expect a JSON input (as explained below) on the standard input, and return a JSON output on the standard output.
+Si ``solc`` se llama con la opción ``--standard-json``, esperará una entrada JSON (como se explica a continuación) en la entrada estándar, y devolverá una salida JSON a la salida estándar.
 
 .. _compiler-api:
 
-Compiler Input and Output JSON Description
-******************************************
+Compilador de entrada y salida JSON Descripción
+***********************************************
 
-These JSON formats are used by the compiler API as well as are available through ``solc``. These are subject to change,
-some fields are optional (as noted), but it is aimed at to only make backwards compatible changes.
+Estos formatos JSON son utilizados por la API del compilador y están disponibles a través de ``solc``. Estos están sujetos a cambios, algunos campos son opcionales (como se ha señalado), pero está dirigido a hacer sólo cambios compatibles hacia atrás.
 
-The compiler API expects a JSON formatted input and outputs the compilation result in a JSON formatted output.
+La API del compilador espera una entrada con formato JSON y genera el resultado de la compilación en una salida con formato JSON.
 
-Comments are of course not permitted and used here only for explanatory purposes.
+Por supuesto, los comentarios no se permiten y se utilizan aquí sólo con fines explicativos.
 
-Input Description
------------------
+Descripción de entrada
+----------------------
 
 .. code-block:: none
 
     {
-      // Required: Source code language, such as "Solidity", "serpent", "lll", "assembly", etc.
-      language: "Solidity",
-      // Required
-      sources:
-      {
-        // The keys here are the "global" names of the source files,
-        // imports can use other files via remappings (see below).
+        // Requerido: Lenguaje del código fuente, tal como "Solidity", "serpent", "lll", "assembly", etc.
+        language: "Solidity",
+        // Requerido
+        sources:
+        {
+        // Las claves aquí son los nombres "globales" de los ficheros fuente,
+        // las importaciones pueden utilizar otros ficheros mediante remappings (vér más abajo).
         "myFile.sol":
         {
-          // Optional: keccak256 hash of the source file
-          // It is used to verify the retrieved content if imported via URLs.
+          // Opcional: keccak256 hash del fichero fuente
+          // Se utiliza para verificar el contenido recuperado si se importa a través de URLs.
           "keccak256": "0x123...",
-          // Required (unless "content" is used, see below): URL(s) to the source file.
-          // URL(s) should be imported in this order and the result checked against the
-          // keccak256 hash (if available). If the hash doesn't match or none of the
-          // URL(s) result in success, an error should be raised.
+          // Requerido (a menos que se use "contenido", ver abajo): URL (s) al fichero fuente.
+          // URL(s) deben ser importadas en este orden y el resultado debe ser verificado contra el fichero
+          // keccak256 hash (si está disponible). Si el hash no coincide con ninguno de los
+          // URL(s) resultado en el éxito, un error debe ser elevado.
           "urls":
           [
             "bzzr://56ab...",
@@ -82,78 +77,79 @@ Input Description
         },
         "mortal":
         {
-          // Optional: keccak256 hash of the source file
+          // Opcional: keccak256 hash del fichero fuente
           "keccak256": "0x234...",
-          // Required (unless "urls" is used): literal contents of the source file
+          // Requerido (a menos que se use "urls"): contenido literal del fichero fuente
           "content": "contract mortal is owned { function kill() { if (msg.sender == owner) selfdestruct(owner); } }"
         }
-      },
-      // Optional
-      settings:
-      {
-        // Optional: Sorted list of remappings
+        },
+        // Opcional
+        settings:
+        {
+        // Opcional: Lista ordenada de remappings
         remappings: [ ":g/dir" ],
-        // Optional: Optimizer settings (enabled defaults to false)
-        optimizer: {
+        // Opcional: Ajustes de optimización (activación de valores predeterminados a false)
+        optimizador: {
           enabled: true,
           runs: 500
         },
-        // Metadata settings (optional)
+        // Configuración de metadatos (opcional)
         metadata: {
-          // Use only literal content and not URLs (false by default)
+          // Usar sólo contenido literal y no URLs (falso por defecto)
           useLiteralContent: true
         },
-        // Addresses of the libraries. If not all libraries are given here, it can result in unlinked objects whose output data is different.
+        // Direcciones de las bibliotecas. Si no todas las bibliotecas se dan aquí, puede resultar con objetos no vinculados cuyos datos de salida son diferentes.
         libraries: {
-          // The top level key is the the name of the source file where the library is used.
-          // If remappings are used, this source file should match the global path after remappings were applied.
-          // If this key is an empty string, that refers to a global level.
+          // La clave superior es el nombre del fichero fuente donde se utiliza la biblioteca.
+          // Si se utiliza remappings, este fichero fuente debe coincidir con la ruta global después de que se hayan aplicado los remappings.
+          // Si esta clave es una cadena vacía, se refiere a un nivel global.
+
           "myFile.sol": {
             "MyLib": "0x123123..."
           }
         }
-        // The following can be used to select desired outputs.
-        // If this field is omitted, then the compiler loads and does type checking, but will not generate any outputs apart from errors.
-        // The first level key is the file name and the second is the contract name, where empty contract name refers to the file itself,
-        // while the star refers to all of the contracts.
+        // Para seleccionar las salidas deseadas se puede utilizar lo siguiente.
+        // Si este campo se omite, el compilador se carga y comprueba el tipo, pero no genera ninguna salida aparte de errores.
+        // La clave de primer nivel es el nombre del fichero y la segunda es el nombre del contrato, donde el nombre vacío del contrato se refiere al fichero mismo,
+        // mientras que la estrella se refiere a todos los contratos.
         //
-        // The available output types are as follows:
+        // Las clases de mensajes disponibles son las siguientes:
         //   abi - ABI
-        //   ast - AST of all source files
-        //   legacyAST - legacy AST of all source files
-        //   devdoc - Developer documentation (natspec)
-        //   userdoc - User documentation (natspec)
-        //   metadata - Metadata
-        //   ir - New assembly format before desugaring
-        //   evm.assembly - New assembly format after desugaring
-        //   evm.legacyAssembly - Old-style assembly format in JSON
-        //   evm.bytecode.object - Bytecode object
-        //   evm.bytecode.opcodes - Opcodes list
-        //   evm.bytecode.sourceMap - Source mapping (useful for debugging)
-        //   evm.bytecode.linkReferences - Link references (if unlinked object)
-        //   evm.deployedBytecode* - Deployed bytecode (has the same options as evm.bytecode)
-        //   evm.methodIdentifiers - The list of function hashes
-        //   evm.gasEstimates - Function gas estimates
-        //   ewasm.wast - eWASM S-expressions format (not supported atm)
-        //   ewasm.wasm - eWASM binary format (not supported atm)
+        //   ast - AST de todos los ficheros fuente
+        //   legacyAST - legado AST de todos los ficheros fuente
+        //   devdoc - Documentación para desarrolladores (natspec)
+        //   userdoc - Documentación de usuario (natspec)
+        //   metadata - Metadatos
+        //   ir - Nuevo formato de ensamblador antes del desazucarado
+        //   evm.assembly - Nuevo formato de ensamblador después del desazucarado
+        //   evm.legacyAssembly - Formato de ensamblador antiguo en JSON
+        //   evm.bytecode.object - Objeto bytecode
+        //   evm.bytecode.opcodes - Lista de Opcodes
+        //   evm.bytecode.sourceMap - Asignación de fuentes (útil para depuración)
+        //   evm.bytecode.linkReferences - Referencias de enlace (si es objeto no enlazado)
+        //   evm.deployedBytecode* - Desplegado bytecode (tiene las mismas opciones que evm.bytecode)
+        //   evm.methodIdentifiers - La lista de funciones de hashes 
+        //   evm.gasEstimates - Funcion de estimación de gas
+        //   ewasm.wast - eWASM S-formato de expresiones (no compatible por el momento)
+        //   ewasm.wasm - eWASM formato binario (no compatible por el momento)
         //
-        // Note that using a using `evm`, `evm.bytecode`, `ewasm`, etc. will select every
-        // target part of that output.
+        // Ten en cuenta que el uso de `evm`, `evm.bytecode`, `ewasm`, etc. seleccionara cada
+        // parte objetiva de esa salida.
         //
         outputSelection: {
-          // Enable the metadata and bytecode outputs of every single contract.
+          // Habilita los metadatos y las salidas de bytecode de cada contrato.
           "*": {
             "*": [ "metadata", "evm.bytecode" ]
           },
-          // Enable the abi and opcodes output of MyContract defined in file def.
+          // Habilitar la salida abi y opcodes de MyContract definida en el fichero def.
           "def": {
             "MyContract": [ "abi", "evm.opcodes" ]
           },
-          // Enable the source map output of every single contract.
+          // Habilita la salida del mapa de fuentes de cada contrato individual.
           "*": {
             "*": [ "evm.sourceMap" ]
           },
-          // Enable the legacy AST output of every single file.
+          // Habilita la salida AST heredada de cada archivo.
           "*": {
             "": [ "legacyAST" ]
           }
@@ -161,79 +157,78 @@ Input Description
       }
     }
 
-
-Output Description
-------------------
+Descripción de los mensajes de salida
+-------------------------------------
 
 .. code-block:: none
 
     {
-      // Optional: not present if no errors/warnings were encountered
-      errors: [
+        // Opcional: no está presente si no se han encontrado errores/avisos
+        errors: [
         {
-          // Optional: Location within the source file.
+          // Opcional: Ubicación dentro del fichero fuente.
           sourceLocation: {
             file: "sourceFile.sol",
             start: 0,
             end: 100
           ],
-          // Mandatory: Error type, such as "TypeError", "InternalCompilerError", "Exception", etc
+          // Obligatorio: Tipo de error, como "TypeError", "InternalCompilerError", "Exception", etc
           type: "TypeError",
-          // Mandatory: Component where the error originated, such as "general", "ewasm", etc.
+          // Obligatorio: Componente donde se originó el error, como "general", "ewasm", etc.
           component: "general",
-          // Mandatory ("error" or "warning")
+          // Obligatorio ("error" o "warning")
           severity: "error",
-          // Mandatory
+          // Obligatorio
           message: "Invalid keyword"
-          // Optional: the message formatted with source location
+          // Opcional: el mensaje formateado con la ubicación de origen
           formattedMessage: "sourceFile.sol:100: Invalid keyword"
         }
-      ],
-      // This contains the file-level outputs. In can be limited/filtered by the outputSelection settings.
-      sources: {
+        ],
+        // Contiene las salidas a nivel de fichero. Puede ser limitado/filtrado por los ajustes de outputSelection.
+        sources: {
         "sourceFile.sol": {
-          // Identifier (used in source maps)
+          // Identificador (utilizado en los mapas fuente)
           id: 1,
-          // The AST object
+          // El objeto AST
           ast: {},
-          // The legacy AST object
+          // El objeto legado AST 
           legacyAST: {}
         }
-      },
-      // This contains the contract-level outputs. It can be limited/filtered by the outputSelection settings.
-      contracts: {
+        },
+        // Contiene las salidas contract-level. Puede ser limitado/filtrado por los ajustes de outputSelection.
+        contracts: {
         "sourceFile.sol": {
-          // If the language used has no contract names, this field should equal to an empty string.
+          // Si el idioma utilizado no tiene nombres de contrato, este campo debe ser igual a una cadena vacía.
           "ContractName": {
-            // The Ethereum Contract ABI. If empty, it is represented as an empty array.
-            // See https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI
+            // El ABI del contrato de Ethereum. Si está vacío, se representa como una matriz vacía.
+            // Ver https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI
             abi: [],
-            // See the Metadata Output documentation (serialised JSON string)
+            // Ver la documentación de salida de metadatos (cadena JSON seriada)
             metadata: "{...}",
-            // User documentation (natspec)
+            // Documentación de usuario (natspec)
             userdoc: {},
-            // Developer documentation (natspec)
+            // Documentación para desarrolladores (natspec)
             devdoc: {},
-            // Intermediate representation (string)
+            // Representación intermedia (cadena)
             ir: "",
-            // EVM-related outputs
+            // EVM-salidas relacionadas 
             evm: {
-              // Assembly (string)
+              // Ensamblador (cadena)
               assembly: "",
-              // Old-style assembly (object)
+              // Ensamblador antiguo (objeto)
               legacyAssembly: {},
-              // Bytecode and related details.
+              // Bytecode y detalles relacionados.
               bytecode: {
-                // The bytecode as a hex string.
+                // El bytecode como una cadena hexadecimal.
                 object: "00fe",
-                // Opcodes list (string)
+                // Lista de Opcodes (cadena)
                 opcodes: "",
-                // The source mapping as a string. See the source mapping definition.
+                // El mapeo de fuentes como una cadena. Ve la definición del mapeo de fuentes.
                 sourceMap: "",
-                // If given, this is an unlinked object.
+                // Si se da, este es un objeto no ligado.
                 linkReferences: {
                   "libraryFile.sol": {
-                    // Byte offsets into the bytecode. Linking replaces the 20 bytes located there.
+                    // Traslados de bytes en el bytecode. El enlace sustituye a los 20 bytes que se encuentran allí.
                     "Library1": [
                       { start: 0, length: 20 },
                       { start: 200, length: 20 }
@@ -241,13 +236,13 @@ Output Description
                   }
                 }
               },
-              // The same layout as above.
+              // La misma disposición que la anterior.
               deployedBytecode: { },
-              // The list of function hashes
+              // La lista de hashes de función
               methodIdentifiers: {
                 "delegate(address)": "5c19a95c"
               },
-              // Function gas estimates
+              // Estimación de gas de la función
               gasEstimates: {
                 creation: {
                   codeDepositCost: "420000",
@@ -262,11 +257,11 @@ Output Description
                 }
               }
             },
-            // eWASM related outputs
+            // eWASM resultados relacionados
             ewasm: {
-              // S-expressions format
+              // S-formato de expressiones
               wast: "",
-              // Binary format (hex string)
+              // Formato Binario (cadena hexagonal)
               wasm: ""
             }
           }
