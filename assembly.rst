@@ -4,48 +4,32 @@ Ensamblador de Solidity
 
 .. index:: ! assembly, ! asm, ! evmasm
 
-Solidity define un lenguaje ensamblador que también puede ser usado sin Solidity.
-Este lenguaje ensamblador también se puede usar como "ensamblador inline" dentro del
-código fuente de Solidity. Vamos a comenzar explicando cómo usar ensamblador inline y 
-sus diferencias con ensamblador independiente, y luego la especificación de ensamblador.
+Solidity define un lenguaje ensamblador que también puede ser usado sin Solidity. Este lenguaje ensamblador también se puede usar como "ensamblador inline" dentro del código fuente de Solidity. Vamos a comenzar explicando cómo usar el ensamblador inline y sus diferencias con el ensamblador independiente, y luego especificaremos el ensamblador propiamente dicho.
 
-TODO: Escribir sobre de qué manera el ámbito del ensamblador inline es un poco diferente
-y las complicaciones que aparecen cuando, por ejemplo, se usan funciones internas
-o librerías. Además, escribir sobre los símbolos definidos por el compilador.
+PENDIENTE DE HACER: Escribir sobre de qué manera el ámbito del ensamblador inline es un poco diferente y las complicaciones que aparecen cuando, por ejemplo, se usan funciones internas o librerías. Además, escribir sobre los símbolos definidos por el compilador.
 
 Ensamblador inline
 ==================
 
-Para un control más fino
+Para tener un control más fino, especialmente para mejorar el lenguaje excribiendo librerías, es posible intercalar las declaraciones hechas en Solidity con el ensamblador inline en un lenguaje cercano al lenguaje de la máquina virtual. Debido a que el EVM (la máquina virtual de Ethereum) es un máquina de tipo pila (stack machine), suele ser difícil dirigirse a la posición correcta de la pila y proporcinar los argumentos a los opcodes en el punto correcto en la pila. El ensamblador inline de Solidity intenta facilitar esto, y otras complicaciones que ocurren cuando se escribe el ensamblador de forma manual, con las siguientes funcinalidades:
 
-For more fine-grained control especially in order to enhance the language by writing libraries,
-it is possible to interleave Solidity statements with inline assembly in a language close
-to the one of the virtual machine. Due to the fact that the EVM is a stack machine, it is
-often hard to address the correct stack slot and provide arguments to opcodes at the correct
-point on the stack. Solidity's inline assembly tries to facilitate that and other issues
-arising when writing manual assembly by the following features:
+* opcodes de estilo funcional: ``mul(1, add(2, 3))`` en lugar de ``push1 3 push1 2 add push1 1 mul``
+* variables de ensamblador local: ``let x := add(2, 3)  let y := mload(0x40)  x := add(x, y)``
+* acceso a variables externas: ``function f(uint x) { assembly { x := sub(x, 1) } }``
+* etiquetas: ``let x := 10  repeat: x := sub(x, 1) jumpi(repeat, eq(x, 0))``
+* bucles: ``for { let i := 0 } lt(i, x) { i := add(i, 1) } { y := mul(2, y) }``
+* declaraciones de intercambio: ``switch x case 0 { y := mul(x, 2) } default { y := 0 }``
+* llamadas a funciones: ``function f(x) -> y { switch x case 0 { y := 1 } default { y := mul(x, f(sub(x, 1))) }   }``
 
-* functional-style opcodes: ``mul(1, add(2, 3))`` instead of ``push1 3 push1 2 add push1 1 mul``
-* assembly-local variables: ``let x := add(2, 3)  let y := mload(0x40)  x := add(x, y)``
-* access to external variables: ``function f(uint x) { assembly { x := sub(x, 1) } }``
-* labels: ``let x := 10  repeat: x := sub(x, 1) jumpi(repeat, eq(x, 0))``
-* loops: ``for { let i := 0 } lt(i, x) { i := add(i, 1) } { y := mul(2, y) }``
-* switch statements: ``switch x case 0 { y := mul(x, 2) } default { y := 0 }``
-* function calls: ``function f(x) -> y { switch x case 0 { y := 1 } default { y := mul(x, f(sub(x, 1))) }   }``
-
-We now want to describe the inline assembly language in detail.
+Ahora queremos decribir el lenguaje del ensamblador inline en detalles.
 
 .. warning::
-    Inline assembly is a way to access the Ethereum Virtual Machine
-    at a low level. This discards several important safety
-    features of Solidity.
+    El ensamblador inline es una forma de acceder a un nivel bajo a la Máquina Virtuala de Etherem. Esto descarta varios elementos de seguridad de Solidity.
 
-Example
+Ejemplo
 -------
 
-The following example provides library code to access the code of another contract and
-load it into a ``bytes`` variable. This is not possible at all with "plain Solidity" and the
-idea is that assembly libraries will be used to enhance the language in such ways.
+El siguiente ejemplo proporciona el código de librería que permite acceder al código de otro contrato y cargarlo en una variable ``byte``. Esto no es para nada factible con "Solidity puro". La idea es que se usen librerías de ensamblador para aumentar las capacidades del lenguaje en ese sentido.
 
 .. code::
 
@@ -54,16 +38,16 @@ idea is that assembly libraries will be used to enhance the language in such way
     library GetCode {
         function at(address _addr) returns (bytes o_code) {
             assembly {
-                // retrieve the size of the code, this needs assembly
+                // recupera el tamaño del código - esto necesita ensamblador
                 let size := extcodesize(_addr)
-                // allocate output byte array - this could also be done without assembly
-                // by using o_code = new bytes(size)
+                // asigna ***(output byte array) - esto se podría hacer también sin ensamblador
+                // usando o_code = new bytes(size)
                 o_code := mload(0x40)
-                // new "memory end" including padding
+                // nuevo "fin de memoria" incluyendo el ***relleno (padding)
                 mstore(0x40, add(o_code, and(add(add(size, 0x20), 0x1f), not(0x1f))))
-                // store length in memory
+                // almacenar el tamaño en memoria
                 mstore(o_code, size)
-                // actually retrieve the code, this needs assembly
+                // recuperar de verdad el código - esto necesita ensamblador
                 extcodecopy(_addr, add(o_code, 0x20), 0, size)
             }
         }
