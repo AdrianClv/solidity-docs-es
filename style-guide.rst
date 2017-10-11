@@ -9,7 +9,7 @@ Introducción
 ************
 
 Esta guía pretende proporcionar convenciones de codificación para escribir código con Solidity.
-Esta guía debe ser entendida como un documento en evolución que cambiará con el tiempo, mientras nuevas convenciones útiles se encuentran y antiguas convenciones se vuelven obsoletas.
+Esta guía debe ser entendida como un documento en evolución que cambiará con el tiempo según aparecen nuevas convenciones útiles y antiguas convenciones se vuelven obsoletas.
 
 Muchos proyectos implementarán sus propias guías de estilo. En el caso de conflictos, las guías de estilo específicas del proyecto tendran prioridad.
 
@@ -72,7 +72,7 @@ No::
         ...
     }
 
-Dentro de un contrato rodeé las declaraciones de una función con una sola línea en blanco.
+Dentro de un contrato, rodee las declaraciones de una función con una sola línea en blanco.
 
 Las líneas en blanco se pueden omitir entre grupos de una frase relacionada (tales como las funciones stub en un contrato abstracto)
 
@@ -157,7 +157,7 @@ Las funciones deben agruparse de acuerdo con su visibilidad y ser ordenadas de a
 - internal
 - private
 
-Dentro de un grupo, coloque las funciones `` constant`` de último.
+Dentro de un grupo, coloque las funciones ``constant`` de último.
 
 Sí::
 
@@ -165,23 +165,23 @@ Sí::
         function A() {
             ...
         }
-        
+
         function() {
             ...
         }
-        
+
         // External functions
         // ...
-        
+
         // External functions that are constant
         // ...
-        
+
         // Public functions
         // ...
-        
+
         // Internal functions
         // ...
-        
+
         // Private functions
         // ...
     }
@@ -189,7 +189,7 @@ Sí::
 No::
 
     contract A {
-        
+
         // External functions
         // ...
 
@@ -202,7 +202,7 @@ No::
         function A() {
             ...
         }
-        
+
         function() {
             ...
         }
@@ -240,8 +240,7 @@ No::
 
     function spam(uint i , Coin coin) ;
 
-Más de un espacio alrededor de una asignación u otro operador para alinearlo con
-  otro:
+Más de un espacio alrededor de una asignación u otro operador para alinearlo con otro:
 
 Sí::
 
@@ -264,21 +263,19 @@ Sí::
     }
 
 No::
-   
+
     function () {
         ...
     }
 
-Estructuras de control 
+Estructuras de control
 ======================
 
-Las llaves que denotan el cuerpo de un contrato, biblioteca, funciones y estructuras
-deberán:
+Las llaves que denotan el cuerpo de un contrato, biblioteca, funciones y estructuras deberán:
 
 * Abrir en la misma línea que la declaración
-* Cerrar en la misma línea en el mismo nivel de sangría que el
-  declaración.
-* La llaves de apertura deben ser procedidas por un solo espacio.
+* Cerrar en la misma línea en el mismo nivel de sangría que la declaración.
+* La llave de apertura debe ser procedida por un solo espacio.
 
 Sí::
 
@@ -299,8 +296,7 @@ No::
         }
     }
 
-Las mismas recomendaciones se aplican a las estructuras de control ``if``, ``else``, ``while``,
-y ``for``.
+Las mismas recomendaciones se aplican a las estructuras de control ``if``, ``else``, ``while`` y ``for``.
 
 Además, debería existir un único espacio entre las estructuras de control ``if``, ``while``, y ``for`` Y el bloque entre paréntesis que representa el condicional, así como un único espacio entre el bloque del paréntesis condicional y la llave de apertura.
 
@@ -327,8 +323,7 @@ No::
     for (...) {
         ...;}
 
-For control structures whose body contains a single statement, omitting the
-braces is ok *if* the statement is contained on a single line.
+Para las estructuras de control cuyo cuerpo sólo contiene declaraciones únicas, se puede omitir los corchetes *si* la declaración cabe en una sola línea.
 
 Yes::
 
@@ -343,9 +338,7 @@ No::
             value: 42
         }));
 
-For ``if`` blocks which have an ``else`` or ``else if`` clause, the ``else`` should be
-placed on the same line as the ``if``'s closing brace. This is an exception compared
-to the rules of other block-like structures.
+Para los bloques ``if`` que contienen una condición ``else`` o ``else if``, el ``else`` debe estar en la misma línea que el corchete de cierre del ``if``. Esto es una excepción en comparación con las reglas de otras estructuras de de tipo bloque.
 
 Yes::
 
@@ -372,16 +365,14 @@ No::
         x -= 1;
     }
 
-Function Declaration
-====================
+Declaración de funciones
+========================
 
-For short function declarations, it is recommended for the opening brace of the
-function body to be kept on the same line as the function declaration.
+Para declaraciones de función cortas, se recomienda dejar el corchete de apertura del cuerpo de la función en la misma línea que la declaración de la función.
 
-The closing brace should be at the same indentation level as the function
-declaration.
+El corchete de cierre debe estar al mismo nivel de sangría que la declaración de la función.
 
-The opening brace should be preceeded by a single space.
+El corchete de apertura debe ser procedido por un solo espacio.
 
 Yes::
 
@@ -411,8 +402,7 @@ No::
     function increment(uint x) returns (uint) {
         return x + 1;}
 
-The visibility modifiers for a function should come before any custom
-modifiers.
+Se debe especificar la visibilidad de los modificadores para una función antes de cualquier modificador personalizado.
 
 Yes::
 
@@ -426,10 +416,7 @@ No::
         selfdestruct(owner);
     }
 
-For long function declarations, it is recommended to drop each argument onto
-it's own line at the same indentation level as the function body.  The closing
-parenthesis and opening bracket should be placed on their own line as well at
-the same indentation level as the function declaration.
+Para las declaraciones de función largas, se recomienda dejar a cada argumento su propia línea al mismo nivel de sangría que el cuerpo de la función. La paréntesis de cierre y el corchete de apertura deben de estar en su propia línea también y con el mismo nivel de sangría que la declaración de la función.
 
 Yes::
 
@@ -470,8 +457,7 @@ No::
         doSomething();
     }
 
-If a long function declaration has modifiers, then each modifier should be
-dropped to it's own line.
+Si una declaración de función larga tiene modificadores, cada uno de ellos debe de estar en su propia línea.
 
 Yes::
 
@@ -521,9 +507,7 @@ No::
         doSomething();
     }
 
-For constructor functions on inherited contracts whose bases require arguments,
-it is recommended to drop the base constructors onto new lines in the same
-manner as modifiers if the function declaration is long or hard to read.
+Para las funciones de tipo constructor en contratos heredados que requieren argumentos, si la declaración de la función es larga o difícil de leer, se recomienda poner cada constructor base en su propia línea de la misma manera que con los modificadores.
 
 Yes::
 
@@ -558,26 +542,23 @@ No::
         }
     }
 
-When declaring short functions with a single statement, it is permissible to do it on a single line.
+Cuando se declara funciones cortas con una sola declaración, está permitido hacerlo en una solo línea.
 
 Permissible::
 
     function shortFunction() { doSomething(); }
 
-These guidelines for function declarations are intended to improve readability.
-Authors should use their best judgement as this guide does not try to cover all
-possible permutations for function declarations.
+Esta guía sobre la declaración de funciones está pensada para mejorar la legibilidad. Sin embargo, los autores deberían utilizar su mejor juicio, ya que está guía tampoco intenta cubrir todas las posibles permutaciones para las declaraciones de función.
 
-Mappings
-========
+Mapeo
+=====
 
-TODO
+Pendiente de hacer
 
-Variable Declarations
-=====================
+Declaración de variable
+=======================
 
-Declarations of array variables should not have a space between the type and
-the brackets.
+La declaración de variables tipo array not deben incluir un espacio entre el tipo y el corchete.
 
 Yes::
 
@@ -588,10 +569,10 @@ No::
     uint [] x;
 
 
-Other Recommendations
-=====================
+Otras recommendaciones
+======================
 
-* Strings should be quoted with double-quotes instead of single-quotes.
+* Los strings deben de citarse con doble comillas en lugar de comillas únicas.
 
 Yes::
 
@@ -603,7 +584,7 @@ No::
     str = 'bar';
     str = '"Be yourself; everyone else is already taken." -Oscar Wilde';
 
-* Surround operators with a single space on either side.
+* Se envuelve los operadores con un solo espacio de cada lado.
 
 Yes::
 
@@ -619,10 +600,7 @@ No::
     x += 3+4;
     x |= y&&z;
 
-* Operators with a higher priority than others can exclude surrounding
-  whitespace in order to denote precedence.  This is meant to allow for
-  improved readability for complex statement. You should always use the same
-  amount of whitespace on either side of an operator:
+* Para los operadores con una prioridad mayor que otros, se pueden omitir los espacios de cada lado del operador para marcar la precedencia. Esto se hace para mejorar la legibilidad de declaraciones complejas. Se debe usar siempre el mismo número de espacios de cada lado de un operador.
 
 Yes::
 
@@ -637,106 +615,96 @@ No::
     x +=1;
 
 
-******************
-Naming Conventions
-******************
+************************
+Convención sobre nombres
+************************
 
-Naming conventions are powerful when adopted and used broadly.  The use of
-different conventions can convey significant *meta* information that would
-otherwise not be immediately available.
+Convenciones sobre nombres es extremadamente útil siempre y cuando se usa de forma ámplia. El uso de diferentes convenciones puede transmitir *meta* información significativa al que de no usarse las convenciones, no tendríamos acceso inmediatamente.
 
-The naming recommendations given here are intended to improve the readability,
-and thus they are not rules, but rather guidelines to try and help convey the
-most information through the names of things.
+Las recomendaciones de nombres que se dan aquí están pensadas para mejorar la legibilidad, y por lo tanto no se deben considerar como reglas. Son más bien una guía para intentar transmitir la mayor información posible a través del nombre de las cosas.
 
-Lastly, consistency within a codebase should always supercede any conventions
-outlined in this document.
+Finalmente, la consistencia dentro de un bloque de código siempre debe prevalecer sobre cualquier convención destacada en este documento.
 
 
-Naming Styles
-=============
-
-To avoid confusion, the following names will be used to refer to different
-naming styles.
-
-* ``b`` (single lowercase letter)
-* ``B`` (single uppercase letter)
-* ``lowercase``
-* ``lower_case_with_underscores``
-* ``UPPERCASE``
-* ``UPPER_CASE_WITH_UNDERSCORES``
-* ``CapitalizedWords`` (or CapWords)
-* ``mixedCase`` (differs from CapitalizedWords by initial lowercase character!)
-* ``Capitalized_Words_With_Underscores``
-
-.. note:: When using abbreviations in CapWords, capitalize all the letters of the abbreviation. Thus HTTPServerError is better than HttpServerError.
-
-
-Names to Avoid
-==============
-
-* ``l`` - Lowercase letter el
-* ``O`` - Uppercase letter oh
-* ``I`` - Uppercase letter eye
-
-Never use any of these for single letter variable names.  They are often
-indistinguishable from the numerals one and zero.
-
-
-Contract and Library Names
+Estilos para poner nombres
 ==========================
 
-Contracts and libraries should be named using the CapWords style.
+Para evitar confusiones, se usarán los siguiente nombres para referirse a diferentes estilos para poner nombres.
+
+* ``b`` (letra minuscula única)
+* ``B`` (letra mayuscula única)
+* ``minuscula``
+* ``minuscula_con_guiones_bajos``
+* ``MAYUSCULA``
+* ``MAYUSCULA_CON_GUIONES_BAJOS``
+* ``PalabrasConLaInicialEnMayuscula`` (también llamado CapWords)
+* ``mezclaEntreMinusculaYMayuscula`` (distinto a PalabrasConLaInicialEnMayuscula por el uso de una minuscula en la letra inicial!)
+* ``Palabras_Con_La_Inicial_En_Mayuscula_Y_Guiones_Bajos``
+
+.. note:: Cuando se usan abreviaciones en CapWords, usar mayusculas para todas las letras de la abreviación. Es decir que HTTPServerError es mejor que HttpServerError
 
 
-Events
-======
-
-Events should be named using the CapWords style.
-
-
-Function Names
-==============
-
-Functions should use mixedCase.
-
-
-Function Arguments
+Nombres que evitar
 ==================
 
-When writing library functions that operate on a custom struct, the struct
-should be the first argument and should always be named ``self``.
+* ``l`` - Letra minuscula el
+* ``O`` - Letra mayuscula o
+* ``I`` - Letra mayuscula i
+
+No usa jamás ninguna de estas letras únicas para nombrar una variable. Estas letras generalmente no se diferencian de los dígitos uno y cero.
 
 
-Local and State Variables
-=========================
+Contratos y librerías de nombres
+================================
 
-Use mixedCase.
-
-
-Constants
-=========
-
-Constants should be named with all capital letters with underscores separating
-words.  (for example:``MAX_BLOCKS``)
+Contratos y librerías deben de nombrarse usando el estilo CapWord (PalabrasConLaInicialEnMayuscula).
 
 
-Modifiers
-=========
+Eventos
+=======
 
-Use mixedCase.
-
-
-Avoiding Collisions
-===================
-
-* ``single_trailing_underscore_``
-
-This convention is suggested when the desired name collides with that of a
-built-in or otherwise reserved name.
+Los eventos deben de nombrarse usando el estilo CapWord (PalabrasConLaInicialEnMayuscula).
 
 
-General Recommendations
+Nombres para funciones
+======================
+
+Las funciones deben de nombrarse usando el estilo mezclaEntreMinusculaYMayuscula.
+
+
+Argumentos de funciones
 =======================
 
-TODO
+Cuando se escriben funciones de librerías que operan sobre un struct personalizado, el struct debe ser el primer argumento y debe nombrarse siempre ``self``.
+
+
+Variables locales y de estado
+=============================
+
+Usar el estilo mezclaEntreMinusculaYMayuscula.
+
+
+Constantes
+==========
+
+Las constantes deben de nombrarse con todas las letras mayusculas y guiones bajos para separar las palabras (p.ej. ``MAX_BLOCKS``).
+
+
+Modificadores
+=============
+
+Use Usar el estilo mezclaEntreMinusculaYMayuscula.
+
+
+Evitar Colisiones
+=================
+
+* ``guion_bajo_unico_con_cola_``
+
+Se recomienda usar esta convención cuando el nombre deseado colisiona con un nombre inherente al sistema o reservado.
+
+
+Recommendaciones generales
+==========================
+
+Pendiente de hacer
