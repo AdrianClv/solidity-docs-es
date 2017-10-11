@@ -269,7 +269,7 @@ No::
         ...
     }
 
-Estructuras de control
+Estructuras de control 
 ======================
 
 Las llaves que denotan el cuerpo de un contrato, biblioteca, funciones y estructuras
