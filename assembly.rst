@@ -13,8 +13,10 @@ TODO: Escribir sobre de qué manera el ámbito del ensamblador inline es un poco
 y las complicaciones que aparecen cuando, por ejemplo, se usan funciones internas
 o librerías. Además, escribir sobre los símbolos definidos por el compilador.
 
-Ensalblador inline
+Ensamblador inline
 ==================
+
+Para un control más fino
 
 For more fine-grained control especially in order to enhance the language by writing libraries,
 it is possible to interleave Solidity statements with inline assembly in a language close
