@@ -53,26 +53,21 @@ El siguiente ejemplo proporciona el código de librería que permite acceder al 
         }
     }
 
-Inline assembly could also be beneficial in cases where the optimizer fails to produce
-efficient code. Please be aware that assembly is much more difficult to write because
-the compiler does not perform checks, so you should use it for complex things only if
-you really know what you are doing.
+El ensamblador inline también es útil es los casos en los que el optimizador falla en producir un código eficiente. Tenga en cuenta que es mucho más difíciil escribir el ensamblador porque el compilador no realiza controles, por lo tanto use ensamblador solamente para cosas complejas y solo si sabe lo que está haciendo.
 
 .. code::
 
     pragma solidity ^0.4.0;
 
     library VectorSum {
-        // This function is less efficient because the optimizer currently fails to
-        // remove the bounds checks in array access.
+        // Esta función es menos eficiente porque el optimizador falla en quitar los controles de límite en el acceso al array.
         function sumSolidity(uint[] _data) returns (uint o_sum) {
             for (uint i = 0; i < _data.length; ++i)
                 o_sum += _data[i];
         }
 
-        // We know that we only access the array in bounds, so we can avoid the check.
-        // 0x20 needs to be added to an array because the first slot contains the
-        // array length.
+        // Sabemos que solamente accedemos al array dentro de los límites, así que podemos evitar los controles.
+        // Se tiene que añadir 0x20 a un array porque la primera posición contiene el tamaño del array.
         function sumAsm(uint[] _data) returns (uint o_sum) {
             for (uint i = 0; i < _data.length; ++i) {
                 assembly {
@@ -83,80 +78,75 @@ you really know what you are doing.
     }
 
 
-Syntax
-------
+Síntaxis
+--------
 
-Assembly parses comments, literals and identifiers exactly as Solidity, so you can use the
-usual ``//`` and ``/* */`` comments. Inline assembly is marked by ``assembly { ... }`` and inside
-these curly braces, the following can be used (see the later sections for more details)
+El ensamblador analiza comentarios, literales e identificadores de igual manera que en Solidity, así que se puede usar los comentarios habituales: ``//`` and ``/* */``. El ensamblador inline está señalado por ``assembly { ... }`` y dentro de estos corchetes se pueden usar los siguentes elementos (véase las secciones más abajo para más detalles):
 
- - literals, i.e. ``0x123``, ``42`` or ``"abc"`` (strings up to 32 characters)
- - opcodes (in "instruction style"), e.g. ``mload sload dup1 sstore``, for a list see below
- - opcodes in functional style, e.g. ``add(1, mlod(0))``
- - labels, e.g. ``name:``
- - variable declarations, e.g. ``let x := 7`` or ``let x := add(y, 3)``
- - identifiers (labels or assembly-local variables and externals if used as inline assembly), e.g. ``jump(name)``, ``3 x add``
- - assignments (in "instruction style"), e.g. ``3 =: x``
- - assignments in functional style, e.g. ``x := add(y, 3)``
- - blocks where local variables are scoped inside, e.g. ``{ let x := 3 { let y := add(x, 1) } }``
+ - literales, es decir ``0x123``, ``42`` o ``"abc"`` (strings de hasta 32 carácteres)
+ - opcodes (en "estilo para instrucciones"), p.ej. ``mload sload dup1 sstore``, véase más abajo para tener una lista
+ - opcodes en estilo fucional, e.g. ``add(1, mlod(0))``
+ - etiquetas, p.ej. ``name:``
+ - declaraciones de variable, p.ej. ``let x := 7`` o ``let x := add(y, 3)``
+ - identificadores (etiquetas o variables de ensamblador local y externos si se usa como ensamblador inline), p.ej. ``jump(name)``, ``3 x add``
+ - tareas (en "estilo para instrucciones"), e.g. ``3 =: x``
+ - tareas en estilo fucional, p.ej. ``x := add(y, 3)``
+ - bloques donde las variables locales están incluidas dentro, p.ej. ``{ let x := 3 { let y := add(x, 1) } }``
 
 Opcodes
 -------
 
-This document does not want to be a full description of the Ethereum virtual machine, but the
-following list can be used as a reference of its opcodes.
+Este documento no preten de ser una descripción exhaustiva de la máquina virtual de Ethereum, pero la lista siguiente puede servir de referencia para sus opcodes.
 
-If an opcode takes arguments (always from the top of the stack), they are given in parentheses.
-Note that the order of arguments can be seen to be reversed in non-functional style (explained below).
-Opcodes marked with ``-`` do not push an item onto the stack, those marked with ``*`` are
-special and all others push exactly one item onte the stack.
+Si un opcode recibe un argumento (siempre desde lo más alto de la pila), se ponen entre paréntesis.
+Note que el orden de los argumentos puede verse invertido en estilo no funcional (se explica más abajo).
+Opcodes marcados con un ``-`` no empuja un elemento encima de la pila, los marcados con ``*`` son especiales, y todos los demás empujan exactamente un elemento encima de la pila.
 
-In the following, ``mem[a...b)`` signifies the bytes of memory starting at position ``a`` up to
-(excluding) position ``b`` and ``storage[p]`` signifies the storage contents at position ``p``.
+En el ejemplo ``mem[a...b)``, se indica los bytes de memoria empezando en la posición ``a`` hasta la posición (excluida) ``b`` y en el ejemplo ``storage[p]``, se indica los índices de almacenamiento en la posicón ``p``.
 
-The opcodes ``pushi`` and ``jumpdest`` cannot be used directly.
+Los opcodes ``pushi`` y ``jumpdest`` no se pueden usar directamente.
 
-In the grammar, opcodes are represented as pre-defined identifiers.
+En la gramática, los opcodes se representan como identificadores predefinidos.
 
-+-------------------------+------+-----------------------------------------------------------------+
-| stop                    + `-`  | stop execution, identical to return(0,0)                        |
-+-------------------------+------+-----------------------------------------------------------------+
-| add(x, y)               |      | x + y                                                           |
-+-------------------------+------+-----------------------------------------------------------------+
-| sub(x, y)               |      | x - y                                                           |
-+-------------------------+------+-----------------------------------------------------------------+
-| mul(x, y)               |      | x * y                                                           |
-+-------------------------+------+-----------------------------------------------------------------+
-| div(x, y)               |      | x / y                                                           |
-+-------------------------+------+-----------------------------------------------------------------+
-| sdiv(x, y)              |      | x / y, for signed numbers in two's complement                   |
-+-------------------------+------+-----------------------------------------------------------------+
-| mod(x, y)               |      | x % y                                                           |
-+-------------------------+------+-----------------------------------------------------------------+
-| smod(x, y)              |      | x % y, for signed numbers in two's complement                   |
-+-------------------------+------+-----------------------------------------------------------------+
-| exp(x, y)               |      | x to the power of y                                             |
-+-------------------------+------+-----------------------------------------------------------------+
-| not(x)                  |      | ~x, every bit of x is negated                                   |
-+-------------------------+------+-----------------------------------------------------------------+
-| lt(x, y)                |      | 1 if x < y, 0 otherwise                                         |
-+-------------------------+------+-----------------------------------------------------------------+
-| gt(x, y)                |      | 1 if x > y, 0 otherwise                                         |
-+-------------------------+------+-----------------------------------------------------------------+
-| slt(x, y)               |      | 1 if x < y, 0 otherwise, for signed numbers in two's complement |
-+-------------------------+------+-----------------------------------------------------------------+
-| sgt(x, y)               |      | 1 if x > y, 0 otherwise, for signed numbers in two's complement |
-+-------------------------+------+-----------------------------------------------------------------+
-| eq(x, y)                |      | 1 if x == y, 0 otherwise                                        |
-+-------------------------+------+-----------------------------------------------------------------+
-| iszero(x)               |      | 1 if x == 0, 0 otherwise                                        |
-+-------------------------+------+-----------------------------------------------------------------+
-| and(x, y)               |      | bitwise and of x and y                                          |
-+-------------------------+------+-----------------------------------------------------------------+
-| or(x, y)                |      | bitwise or of x and y                                           |
-+-------------------------+------+-----------------------------------------------------------------+
-| xor(x, y)               |      | bitwise xor of x and y                                          |
-+-------------------------+------+-----------------------------------------------------------------+
++-------------------------+------+-----------------------------------------------------------------------------+
+| stop                    + `-`  | parar ejecución, identico a return(0,0)                                     |
++-------------------------+------+-----------------------------------------------------------------------------+
+| add(x, y)               |      | x + y                                                                       |
++-------------------------+------+-----------------------------------------------------------------------------+
+| sub(x, y)               |      | x - y                                                                       |
++-------------------------+------+-----------------------------------------------------------------------------+
+| mul(x, y)               |      | x * y                                                                       |
++-------------------------+------+-----------------------------------------------------------------------------+
+| div(x, y)               |      | x / y                                                                       |
++-------------------------+------+-----------------------------------------------------------------------------+
+| sdiv(x, y)              |      | x / y, para números con signo en complemento de dos                         |
++-------------------------+------+-----------------------------------------------------------------------------+
+| mod(x, y)               |      | x % y                                                                       |
++-------------------------+------+-----------------------------------------------------------------------------+
+| smod(x, y)              |      | x % y, para números con signo en complemento de dos                         |
++-------------------------+------+-----------------------------------------------------------------------------+
+| exp(x, y)               |      | x elevado a y                                                               |
++-------------------------+------+-----------------------------------------------------------------------------+
+| not(x)                  |      | ~x, cada bit de x está negado                                               |
++-------------------------+------+-----------------------------------------------------------------------------+
+| lt(x, y)                |      | 1 si x < y, 0 de lo contrario                                               |
++-------------------------+------+-----------------------------------------------------------------------------+
+| gt(x, y)                |      | 1 si x > y, 0 de lo contrario                                               |
++-------------------------+------+-----------------------------------------------------------------------------+
+| slt(x, y)               |      | 1 si x < y, 0 de lo contrario, para números con signo en complemento de dos |
++-------------------------+------+-----------------------------------------------------------------------------+
+| sgt(x, y)               |      | 1 si x > y, 0 de lo contrario, para números con signo en complemento de dos |
++-------------------------+------+-----------------------------------------------------------------------------+
+| eq(x, y)                |      | 1 si x == y, 0 de lo contrario                                              |
++-------------------------+------+-----------------------------------------------------------------------------+
+| iszero(x)               |      | 1 si x == 0, 0 de lo contrario                                              |
++-------------------------+------+-----------------------------------------------------------------------------+
+| and(x, y)               |      | bitwise and de x e y                                                        |
++-------------------------+------+-----------------------------------------------------------------------------+
+| or(x, y)                |      | bitwise or of x and y                                                       |
++-------------------------+------+-----------------------------------------------------------------------------+
+| xor(x, y)               |      | bitwise xor of x and y                                                      |
++-------------------------+------+-----------------------------------------------------------------------------+
 | byte(n, x)              |      | nth byte of x, where the most significant byte is the 0th byte  |
 +-------------------------+------+-----------------------------------------------------------------+
 | addmod(x, y, m)         |      | (x + y) % m with arbitrary precision arithmetics                |
