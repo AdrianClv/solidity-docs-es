@@ -186,29 +186,29 @@ En total::
 
 Devuelve un `bool` simple. Si, por ejemplo, devolviese `false`, su salida sería un array de byte sencillo `0x0000000000000000000000000000000000000000000000000000000000000000`, un único bool.
 
-If we wanted to call `bar` with the argument `["abc", "def"]`, we would pass 68 bytes total, broken down into:
+Si quisiéramos llamar a `bar` con el argumento `["abc", "def"]`, pasaríamos 68 bytes en total, divido en:
 
-- `0xfce353f6`: the Method ID. This is derived from the signature `bar(bytes3[2])`.
-- `0x6162630000000000000000000000000000000000000000000000000000000000`: the first part of the first parameter, a `bytes3` value `"abc"` (left-aligned).
-- `0x6465660000000000000000000000000000000000000000000000000000000000`: the second part of the first parameter, a `bytes3` value `"def"` (left-aligned).
+- `0xfce353f6`: el ID del método. Este se deriva de la firma `bar(bytes3[2])`.
+- `0x6162630000000000000000000000000000000000000000000000000000000000`: La primera parte del primer parámetro, un valor `bytes3` `"abc"` (alineado a la izquierda).
+- `0x6465660000000000000000000000000000000000000000000000000000000000`: La segunda parte del primer parámetro, un vaor `bytes3` `"def"` (alineado a la izquierda).
 
-In total::
+En total::
 
     0xfce353f661626300000000000000000000000000000000000000000000000000000000006465660000000000000000000000000000000000000000000000000000000000
 
-If we wanted to call `sam` with the arguments `"dave"`, `true` and `[1,2,3]`, we would pass 292 bytes total, broken down into:
-- `0xa5643bf2`: the Method ID. This is derived from the signature `sam(bytes,bool,uint256[])`. Note that `uint` is replaced with its canonical representation `uint256`.
-- `0x0000000000000000000000000000000000000000000000000000000000000060`: the location of the data part of the first parameter (dynamic type), measured in bytes from the start of the arguments block. In this case, `0x60`.
-- `0x0000000000000000000000000000000000000000000000000000000000000001`: the second parameter: boolean true.
-- `0x00000000000000000000000000000000000000000000000000000000000000a0`: the location of the data part of the third parameter (dynamic type), measured in bytes. In this case, `0xa0`.
-- `0x0000000000000000000000000000000000000000000000000000000000000004`: the data part of the first argument, it starts with the length of the byte array in elements, in this case, 4.
-- `0x6461766500000000000000000000000000000000000000000000000000000000`: the contents of the first argument: the UTF-8 (equal to ASCII in this case) encoding of `"dave"`, padded on the right to 32 bytes.
-- `0x0000000000000000000000000000000000000000000000000000000000000003`: the data part of the third argument, it starts with the length of the array in elements, in this case, 3.
-- `0x0000000000000000000000000000000000000000000000000000000000000001`: the first entry of the third parameter.
-- `0x0000000000000000000000000000000000000000000000000000000000000002`: the second entry of the third parameter.
-- `0x0000000000000000000000000000000000000000000000000000000000000003`: the third entry of the third parameter.
+Si quisiéramos llamar a `sam` con los argumentos `"dave"`, `true` y `[1,2,3]`, pasaríamos 292 bytes en total, dividido en:
+- `0xa5643bf2`: el ID del método. Este se deriva de la firma `sam(bytes,bool,uint256[])`. Aquí `uint` se reemplaza por su representación canónica `uint256`.
+- `0x0000000000000000000000000000000000000000000000000000000000000060`: La localización de la parte de datos del primer parámetro (tipo dinámico), medido en bytes desde el principio del bloque de argumentos. En este caso, `0x60`.
+- `0x0000000000000000000000000000000000000000000000000000000000000001`: el segundo parámetro: boolean verdadero.
+- `0x00000000000000000000000000000000000000000000000000000000000000a0`: La localización de la parte de datos del tercer parámetro (tipo dinámico), medido en bytes. En este caso, `0xa0`.
+- `0x0000000000000000000000000000000000000000000000000000000000000004`: La parte de datos del primer argumento, comienza con la longitud del array de bytes en elementos, en este caso, 4.
+- `0x6461766500000000000000000000000000000000000000000000000000000000`: Los contenidos del primer argumento: el UTF-8 (equivalente a ASCII en este caso) codificación de `"dave"`, rellenado hasta 32 bytes por la derecha.
+- `0x0000000000000000000000000000000000000000000000000000000000000003`: La parte de datos del tercer argumento, comenzando con la longitud del array en elementos, en este caso, 3.
+- `0x0000000000000000000000000000000000000000000000000000000000000001`: la primera entrada del tercer parámetro.
+- `0x0000000000000000000000000000000000000000000000000000000000000002`: la segunda entrada del tercer parámetro.
+- `0x0000000000000000000000000000000000000000000000000000000000000003`: la tercera entrada del tercer parámetro.
 
-In total::
+En total::
 
     0xa5643bf20000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000464617665000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003
 
