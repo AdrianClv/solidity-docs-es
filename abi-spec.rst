@@ -2,9 +2,9 @@
 
 .. _ABI:
 
-******************************************
+**********************************************
 Especificación de Application Binary Interface
-******************************************
+**********************************************
 
 Diseño básico
 =============
@@ -163,7 +163,7 @@ p.ej.: los valores se combinan en struct anónimos y codificados.
 Ejemplos
 ========
 
-Given the contract:
+Para el siguiente contrato:
 
 ::
 
@@ -174,17 +174,17 @@ Given the contract:
     }
 
 
-Thus for our `Foo` example if we wanted to call `baz` with the parameters `69` and `true`, we would pass 68 bytes total, which can be broken down into:
+Para nuestro ejemplo `Foo`, si queremos llamar a `baz` pasando como parámetros `69` y `true`, emplearíamos 68 bytes en total, que se podrían dividir en las siguientes partes:
 
-- `0xcdcd77c0`: the Method ID. This is derived as the first 4 bytes of the Keccak hash of the ASCII form of the signature `baz(uint32,bool)`.
-- `0x0000000000000000000000000000000000000000000000000000000000000045`: the first parameter, a uint32 value `69` padded to 32 bytes
-- `0x0000000000000000000000000000000000000000000000000000000000000001`: the second parameter - boolean `true`, padded to 32 bytes
+- `0xcdcd77c0`: el ID del método. Se deriva como los 4 primeros bytes del hash Keccak en ASCII de la firma `baz(uint32,bool)`.
+- `0x0000000000000000000000000000000000000000000000000000000000000045`: el primer parámetro, in uint32 de valor `69` rellenado hasta 32 bytes
+- `0x0000000000000000000000000000000000000000000000000000000000000001`: el segundo parámetro - boolean `true`, rellendo hasta 32 bytes
 
-In total::
+En total::
 
     0xcdcd77c000000000000000000000000000000000000000000000000000000000000000450000000000000000000000000000000000000000000000000000000000000001
 
-It returns a single `bool`. If, for example, it were to return `false`, its output would be the single byte array `0x0000000000000000000000000000000000000000000000000000000000000000`, a single bool.
+Devuelve un `bool` simple. Si, por ejemplo, devolviese `false`, su salida sería un array de byte sencillo `0x0000000000000000000000000000000000000000000000000000000000000000`, un único bool.
 
 If we wanted to call `bar` with the argument `["abc", "def"]`, we would pass 68 bytes total, broken down into:
 
