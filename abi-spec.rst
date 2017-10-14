@@ -220,23 +220,23 @@ Una llamada a una función con la firma `f(uint,uint32[],bytes10,bytes)` con val
 Obtenemos los primeros cuatro bytes de `sha3("f(uint256,uint32[],bytes10,bytes)")`, p.ej.: `0x8be65246`.
 Entonces codificamos las cabeceras de los cuatro argumentos. Para los tipos estáticos `uint256` y `bytes10`, estos son los valores que queremos pasar directamente, miestras que para los tipos dinámicos `uint32[]` y `bytes`, usamos el offset en bytes hasta el inicio de su área de datos, contando desde el comienzo de la codificación del valor (p.ej.: sin contar los primeros cuatro bytes que contienen el hash de la firma de la función). Estos son:
 
- - `0x0000000000000000000000000000000000000000000000000000000000000123` (`0x123` padded to 32 bytes)
- - `0x0000000000000000000000000000000000000000000000000000000000000080` (offset to start of data part of second parameter, 4*32 bytes, exactly the size of the head part)
- - `0x3132333435363738393000000000000000000000000000000000000000000000` (`"1234567890"` padded to 32 bytes on the right)
- - `0x00000000000000000000000000000000000000000000000000000000000000e0` (offset to start of data part of fourth parameter = offset to start of data part of first dynamic parameter + size of data part of first dynamic parameter = 4\*32 + 3\*32 (see below))
+ - `0x0000000000000000000000000000000000000000000000000000000000000123` (`0x123` rellenado hasta 32 bytes)
+ - `0x0000000000000000000000000000000000000000000000000000000000000080` (offset del inicio de la parte de datos del seguno parámetro, 4*32 bytes, exactamente el tamaño de la parte de la cabecera)
+ - `0x3132333435363738393000000000000000000000000000000000000000000000` (`"1234567890"` rellenado hasta 32 bytes por la derecha)
+ - `0x00000000000000000000000000000000000000000000000000000000000000e0` (offset del comienzo de la parte de datos del cuarto parámetro = offset del inicio de la parte de datos del primer parámetro dinámico + tamaño de la parte de datos del primer parámetro dinámico = 4\*32 + 3\*32 (ver abajo))
 
-After this, the data part of the first dynamic argument, `[0x456, 0x789]` follows:
+Después de esto, la parte de datos del primer argumento dinámico, `[0x456, 0x789]` sigue así:
 
- - `0x0000000000000000000000000000000000000000000000000000000000000002` (number of elements of the array, 2)
- - `0x0000000000000000000000000000000000000000000000000000000000000456` (first element)
- - `0x0000000000000000000000000000000000000000000000000000000000000789` (second element)
+ - `0x0000000000000000000000000000000000000000000000000000000000000002` (número de elementos del array, 2)
+ - `0x0000000000000000000000000000000000000000000000000000000000000456` (primer elemento)
+ - `0x0000000000000000000000000000000000000000000000000000000000000789` (segundo elemento)
 
-Finally, we encode the data part of the second dynamic argument, `"Hello, world!"`:
+Finalmente, codificamos la parte de datos del segundo argumento dinámico, `"¡Hola mundo!"`:
 
- - `0x000000000000000000000000000000000000000000000000000000000000000d` (number of elements (bytes in this case): 13)
- - `0x48656c6c6f2c20776f726c642100000000000000000000000000000000000000` (`"Hello, world!"` padded to 32 bytes on the right)
+ - `0x000000000000000000000000000000000000000000000000000000000000000d` (número de elementos (bytes en este caso): 13)
+ - `0x48656c6c6f2c20776f726c642100000000000000000000000000000000000000` (`"¡Hola mundo!"` rellenado hasta 32 bytes por la derecha)
 
-All together, the encoding is (newline after function selector and each 32-bytes for clarity):
+Todo junto, la codificación es (nueva línea después de la función selector y cada 32-bytes por claridad):
 
 ::
 
