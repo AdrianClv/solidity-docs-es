@@ -13,7 +13,7 @@ La Application Binary Interface (Interfaz Binaria de Aplicación) es el modo est
 
 Asumimos que la Application Binary Interface (ABI) está extremadamente definida, es conocida en tiempo de compilación y es estática. No se van a proveer mecanismos de introspección. Además, afirmamos que los contratos tendrán las definiciones de la interfaz de cada contrato que vayan a llamar en tiempo de compilación.
 
-Esta especificación no abarca los contratos cuya interfaz es dinámica o conocida exclusivamente en tiempo de ejecución. Estos casos, de volverse importantes, podrían manejarse adecuadamente como servicios construídos dentro del ecosistema Ethereum.
+Esta especificación no abarca los contratos cuya interfaz sea dinámica o conocida exclusivamente en tiempo de ejecución. Estos casos, de volverse importantes, podrían manejarse adecuadamente como servicios construídos dentro del ecosistema Ethereum.
 
 Función Selector
 =================
@@ -52,7 +52,7 @@ Los tipos elementales existentes son:
 
 El siguiente array, de tipo fijo, existente es:
 
-- `<type>[M]`: un array de longitud fija del tipo de longitud fija dado.
+- `<type>[M]`: un array de longitud fija del tipo de longitud fija dada.
 
 Los siguientes tipos de tamaño no fijo existentes son: 
 
@@ -60,7 +60,7 @@ Los siguientes tipos de tamaño no fijo existentes son:
 
 - `string`: string unicode de tamaño dinámico codificado como UTF-8.
 
-- `<type>[]`: array de longitud variable del tipo de longitud fija dado.
+- `<type>[]`: array de longitud variable del tipo de longitud fija dada.
 
 Los distintos tipos se pueden combinar en structs anónimos cerrando un número finito no negativo de ellos entre paréntesis, separados por comas:
 
@@ -78,7 +78,7 @@ Propiedades:
 
   1. El número de lecturas necesarias para acceder a un valor es como mucho equivalente a la máxima profundidad del array. Por ejemplo, cuatro lecturas se requieren para obtener `a_i[k][l][r]`. En una versión previa de la ABI, el número de lecturas escalaba linearmente con el número total de parámetros dinámicos en el peor caso.
 
-  2. Los datos de una variable o elemento de un array no se intercalan con otros datos y son recolocables. Por ejemplo, sólo usa "addresses" relativos.
+  2. Los datos de una variable o elemento de un array no se intercalan con otros datos y son recolocables. Por ejemplo, sólo usan "addresses" relativos.
 
 Distinguimos entre tipos estáticos y dinámicos. Los estáticos se codifican insitu y los dinámicos se codifican en una posición asignada separadamente después del bloque actual.
 
@@ -129,7 +129,7 @@ Definimos `enc`, la codificación actual, como un mapping de valores de tipos de
 
 - `bytes`, de longitud `k` (que se presume que es del tipo `uint256`):
 
-  `enc(X) = enc(k) pad_right(X)`. Por ejemplo, el número de bytes es codificado como un `uint256` seguido del valor actual de `X` como una secuancia de bytes, continuado por el número mínimo de bytes-cero como que `len(enc(X))` es un múltiplo de 32.
+  `enc(X) = enc(k) pad_right(X)`. Por ejemplo, el número de bytes es codificado como un `uint256` seguido del valor actual de `X` como una secuancia de bytes, seguido por el número mínimo de bytes-cero como que `len(enc(X))` es un múltiplo de 32.
 
 - `string`:
 
@@ -177,7 +177,7 @@ Para el siguiente contrato:
 Para nuestro ejemplo `Foo`, si queremos llamar a `baz` pasando como parámetros `69` y `true`, emplearíamos 68 bytes en total, que se podrían dividir en las siguientes partes:
 
 - `0xcdcd77c0`: el ID del método. Se deriva como los 4 primeros bytes del hash Keccak en ASCII de la firma `baz(uint32,bool)`.
-- `0x0000000000000000000000000000000000000000000000000000000000000045`: el primer parámetro, in uint32 de valor `69` rellenado hasta 32 bytes
+- `0x0000000000000000000000000000000000000000000000000000000000000045`: el primer parámetro, un uint32 de valor `69` rellenado hasta 32 bytes
 - `0x0000000000000000000000000000000000000000000000000000000000000001`: el segundo parámetro - boolean `true`, rellendo hasta 32 bytes
 
 En total::
@@ -212,13 +212,13 @@ En total::
 
     0xa5643bf20000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000000464617665000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003
 
-Use of Dynamic Types
-====================
+Uso de tipos dinámicos
+======================
 
-A call to a function with the signature `f(uint,uint32[],bytes10,bytes)` with values `(0x123, [0x456, 0x789], "1234567890", "Hello, world!")` is encoded in the following way:
+Una llamada a una función con la firma `f(uint,uint32[],bytes10,bytes)` con valores `(0x123, [0x456, 0x789], "1234567890", "Hello, world!")` se codifica de la siguiente manera:
 
-We take the first four bytes of `sha3("f(uint256,uint32[],bytes10,bytes)")`, i.e. `0x8be65246`.
-Then we encode the head parts of all four arguments. For the static types `uint256` and `bytes10`, these are directly the values we want to pass, whereas for the dynamic types `uint32[]` and `bytes`, we use the offset in bytes to the start of their data area, measured from the start of the value encoding (i.e. not counting the first four bytes containing the hash of the function signature). These are:
+Obtenemos los primeros cuatro bytes de `sha3("f(uint256,uint32[],bytes10,bytes)")`, p.ej.: `0x8be65246`.
+Entonces codificamos las cabeceras de los cuatro argumentos. Para los tipos estáticos `uint256` y `bytes10`, estos son los valores que queremos pasar directamente, miestras que para los tipos dinámicos `uint32[]` y `bytes`, usamos el offset en bytes hasta el inicio de su área de datos, contando desde el comienzo de la codificación del valor (p.ej.: sin contar los primeros cuatro bytes que contienen el hash de la firma de la función). Estos son:
 
  - `0x0000000000000000000000000000000000000000000000000000000000000123` (`0x123` padded to 32 bytes)
  - `0x0000000000000000000000000000000000000000000000000000000000000080` (offset to start of data part of second parameter, 4*32 bytes, exactly the size of the head part)
