@@ -81,7 +81,7 @@ El ensamblador inline también es útil es los casos en los que el optimizador f
 Síntaxis
 --------
 
-El ensamblador analiza comentarios, literales e identificadores de igual manera que en Solidity, así que se puede usar los comentarios habituales: ``//`` and ``/* */``. El ensamblador inline está señalado por ``assembly { ... }`` y dentro de estos corchetes se pueden usar los siguentes elementos (véase las secciones más abajo para más detalles):
+El ensamblador analiza comentarios, literales e identificadores de igual manera que en Solidity, así que se puede usar los comentarios habituales: ``//`` y ``/* */``. El ensamblador inline está señalado por ``assembly { ... }`` y dentro de estos corchetes se pueden usar los siguentes elementos (véase las secciones más abajo para más detalles):
 
  - literales, es decir ``0x123``, ``42`` o ``"abc"`` (strings de hasta 32 carácteres)
  - opcodes (en "estilo para instrucciones"), p.ej. ``mload sload dup1 sstore``, véase más abajo para tener una lista
@@ -108,168 +108,181 @@ Los opcodes ``pushi`` y ``jumpdest`` no se pueden usar directamente.
 
 En la gramática, los opcodes se representan como identificadores predefinidos.
 
-+-------------------------+------+-----------------------------------------------------------------------------+
-| stop                    + `-`  | parar ejecución, identico a return(0,0)                                     |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| add(x, y)               |      | x + y                                                                       |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| sub(x, y)               |      | x - y                                                                       |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| mul(x, y)               |      | x * y                                                                       |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| div(x, y)               |      | x / y                                                                       |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| sdiv(x, y)              |      | x / y, para números con signo en complemento de dos                         |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| mod(x, y)               |      | x % y                                                                       |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| smod(x, y)              |      | x % y, para números con signo en complemento de dos                         |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| exp(x, y)               |      | x elevado a y                                                               |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| not(x)                  |      | ~x, cada bit de x está negado                                               |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| lt(x, y)                |      | 1 si x < y, 0 de lo contrario                                               |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| gt(x, y)                |      | 1 si x > y, 0 de lo contrario                                               |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| slt(x, y)               |      | 1 si x < y, 0 de lo contrario, para números con signo en complemento de dos |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| sgt(x, y)               |      | 1 si x > y, 0 de lo contrario, para números con signo en complemento de dos |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| eq(x, y)                |      | 1 si x == y, 0 de lo contrario                                              |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| iszero(x)               |      | 1 si x == 0, 0 de lo contrario                                              |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| and(x, y)               |      | bitwise and de x e y                                                        |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| or(x, y)                |      | bitwise or of x and y                                                       |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| xor(x, y)               |      | bitwise xor of x and y                                                      |
-+-------------------------+------+-----------------------------------------------------------------------------+
-| byte(n, x)              |      | nth byte of x, where the most significant byte is the 0th byte  |
 +-------------------------+------+-----------------------------------------------------------------+
-| addmod(x, y, m)         |      | (x + y) % m with arbitrary precision arithmetics                |
+| stop                    + `-`  | parar ejecución, identico a return(0,0)                         |
 +-------------------------+------+-----------------------------------------------------------------+
-| mulmod(x, y, m)         |      | (x * y) % m with arbitrary precision arithmetics                |
+| add(x, y)               |      | x + y                                                           |
 +-------------------------+------+-----------------------------------------------------------------+
-| signextend(i, x)        |      | sign extend from (i*8+7)th bit counting from least significant  |
+| sub(x, y)               |      | x - y                                                           |
++-------------------------+------+-----------------------------------------------------------------+
+| mul(x, y)               |      | x * y                                                           |
++-------------------------+------+-----------------------------------------------------------------+
+| div(x, y)               |      | x / y                                                           |
++-------------------------+------+-----------------------------------------------------------------+
+| sdiv(x, y)              |      | x / y, para números con signo en complemento de dos             |
++-------------------------+------+-----------------------------------------------------------------+
+| mod(x, y)               |      | x % y                                                           |
++-------------------------+------+-----------------------------------------------------------------+
+| smod(x, y)              |      | x % y, para números con signo en complemento de dos             |
++-------------------------+------+-----------------------------------------------------------------+
+| exp(x, y)               |      | x elevado a y                                                   |
++-------------------------+------+-----------------------------------------------------------------+
+| not(x)                  |      | ~x, cada bit de x está negado                                   |
++-------------------------+------+-----------------------------------------------------------------+
+| lt(x, y)                |      | 1 si x < y, 0 de lo contrario                                   |
++-------------------------+------+-----------------------------------------------------------------+
+| gt(x, y)                |      | 1 si x > y, 0 de lo contrario                                   |
++-------------------------+------+-----------------------------------------------------------------+
+| slt(x, y)               |      | 1 si x < y, 0 de lo contrario, para números con signo en        |
+|                         |      | complemento de dos                                              |
++-------------------------+------+-----------------------------------------------------------------+
+| sgt(x, y)               |      | 1 si x > y, 0 de lo contrario, para números con signo en        |
+|                         |      | complemento de dos                                              |
++-------------------------+------+-----------------------------------------------------------------+
+| eq(x, y)                |      | 1 si x == y, 0 de lo contrario                                  |
++-------------------------+------+-----------------------------------------------------------------+
+| iszero(x)               |      | 1 si x == 0, 0 de lo contrario                                  |
++-------------------------+------+-----------------------------------------------------------------+
+| and(x, y)               |      | bitwise and de x e y                                            |
++-------------------------+------+-----------------------------------------------------------------+
+| or(x, y)                |      | bitwise or of x and y                                           |
++-------------------------+------+-----------------------------------------------------------------+
+| xor(x, y)               |      | bitwise xor of x and y                                          |
++-------------------------+------+-----------------------------------------------------------------+
+| byte(n, x)              |      | n byte de x, donde el más significante byte es el byte 0        |
++-------------------------+------+-----------------------------------------------------------------+
+| addmod(x, y, m)         |      | (x + y) % m con una precisión aritmética arbitraria             |
++-------------------------+------+-----------------------------------------------------------------+
+| mulmod(x, y, m)         |      | (x * y) % m con una precisión aritmética arbitraria             |
++-------------------------+------+-----------------------------------------------------------------+
+| signextend(i, x)        |      | el signo se extiende desde el bit (i*8+7) contando desde el     |
+|                         |      | menos significante                                              |
 +-------------------------+------+-----------------------------------------------------------------+
 | keccak256(p, n)         |      | keccak(mem[p...(p+n)))                                          |
 +-------------------------+------+-----------------------------------------------------------------+
 | sha3(p, n)              |      | keccak(mem[p...(p+n)))                                          |
 +-------------------------+------+-----------------------------------------------------------------+
-| jump(label)             | `-`  | jump to label / code position                                   |
+| jump(label)             | `-`  | saltar a la posición de label / código                          |
 +-------------------------+------+-----------------------------------------------------------------+
-| jumpi(label, cond)      | `-`  | jump to label if cond is nonzero                                |
+| jumpi(label, cond)      | `-`  | saltar a label si cond no es cero                               |
 +-------------------------+------+-----------------------------------------------------------------+
-| pc                      |      | current position in code                                        |
+| pc                      |      | posición actual en el código                                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| pop(x)                  | `-`  | remove the element pushed by x                                  |
+| pop(x)                  | `-`  | quitar el elemento empujado por x                               |
 +-------------------------+------+-----------------------------------------------------------------+
-| dup1 ... dup16          |      | copy ith stack slot to the top (counting from top)              |
+| dup1 ... dup16          |      | copiar posición i de la pila en la posición de arriba           |
+|                         |      | (contando desde arriba)                                         |
 +-------------------------+------+-----------------------------------------------------------------+
-| swap1 ... swap16        | `*`  | swap topmost and ith stack slot below it                        |
+| swap1 ... swap16        | `*`  | intercambiar la posición la más arriba con la posición i de     |
+|                         |      | la pila justo debajo                                            |
 +-------------------------+------+-----------------------------------------------------------------+
 | mload(p)                |      | mem[p..(p+32))                                                  |
 +-------------------------+------+-----------------------------------------------------------------+
 | mstore(p, v)            | `-`  | mem[p..(p+32)) := v                                             |
 +-------------------------+------+-----------------------------------------------------------------+
-| mstore8(p, v)           | `-`  | mem[p] := v & 0xff    - only modifies a single byte             |
+| mstore8(p, v)           | `-`  | mem[p] := v & 0xff    - sólo modifica un único byte             |
 +-------------------------+------+-----------------------------------------------------------------+
 | sload(p)                |      | storage[p]                                                      |
 +-------------------------+------+-----------------------------------------------------------------+
 | sstore(p, v)            | `-`  | storage[p] := v                                                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| msize                   |      | size of memory, i.e. largest accessed memory index              |
+| msize                   |      | ***tamaño de la memoria , es decir el índice más grande de      |
+|                         |      | la memoria que ha sido accedida                                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| gas                     |      | gas still available to execution                                |
+| gas                     |      | el gas todavía disponible para ejecución                        |
 +-------------------------+------+-----------------------------------------------------------------+
-| address                 |      | address of the current contract / execution context             |
+| address                 |      | dirección del contrato actual / contexto de ejecución           |
 +-------------------------+------+-----------------------------------------------------------------+
-| balance(a)              |      | wei balance at address a                                        |
+| balance(a)              |      | balance en wei de la dirección a                                |
 +-------------------------+------+-----------------------------------------------------------------+
-| caller                  |      | call sender (excluding delegatecall)                            |
+| caller                  |      | llamar el remitente (excluyendo delegatecall)                   |
 +-------------------------+------+-----------------------------------------------------------------+
-| callvalue               |      | wei sent together with the current call                         |
+| callvalue               |      | wei que se enviaron junto con la llamada actual                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| calldataload(p)         |      | call data starting from position p (32 bytes)                   |
+| calldataload(p)         |      | llamar datos empezando por la posición p (32 bytes)             |
 +-------------------------+------+-----------------------------------------------------------------+
-| calldatasize            |      | size of call data in bytes                                      |
+| calldatasize            |      | tamaño de la llamada a datos en bytes                           |
 +-------------------------+------+-----------------------------------------------------------------+
-| calldatacopy(t, f, s)   | `-`  | copy s bytes from calldata at position f to mem at position t   |
+| calldatacopy(t, f, s)   | `-`  | copiar s bytes de la llamada a datos en la posición f a         |
+|                         |      | la ***memoria en la posición t                                  |
 +-------------------------+------+-----------------------------------------------------------------+
-| codesize                |      | size of the code of the current contract / execution context    |
+| codesize                |      | tamaño del código de contrato actual / contexto de ejecución    |
 +-------------------------+------+-----------------------------------------------------------------+
-| codecopy(t, f, s)       | `-`  | copy s bytes from code at position f to mem at position t       |
+| codecopy(t, f, s)       | `-`  | copiar s bytes del código en la posición f a la ***memoria      |
+|                         |      | en la posición t                                                |
 +-------------------------+------+-----------------------------------------------------------------+
-| extcodesize(a)          |      | size of the code at address a                                   |
+| extcodesize(a)          |      | tamaño del código en la dirección a                             |
 +-------------------------+------+-----------------------------------------------------------------+
-| extcodecopy(a, t, f, s) | `-`  | like codecopy(t, f, s) but take code at address a               |
+| extcodecopy(a, t, f, s) | `-`  | igual que codecopy(t, f, s) pero tomando el código de           |
+|                         |      | la dirección a                                                  |
 +-------------------------+------+-----------------------------------------------------------------+
-| returndatasize          |      | size of the last returndata                                     |
+| returndatasize          |      | tamaño del último returndata                                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| returndatacopy(t, f, s) | `-`  | copy s bytes from returndata at position f to mem at position t |
+| returndatacopy(t, f, s) | `-`  | copiar s bytes de returndata de la posición f a la ***memoria   |
+|                         |      | en la posición t                                                |
 +-------------------------+------+-----------------------------------------------------------------+
-| create(v, p, s)         |      | create new contract with code mem[p..(p+s)) and send v wei      |
-|                         |      | and return the new address                                      |
+| create(v, p, s)         |      | crear un nuevo contrato con el código mem[p..(p+s))             |
+|                         |      | y mandar v wei y devolver la nueva dirección                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| create2(v, n, p, s)     |      | create new contract with code mem[p..(p+s)) at address          |
-|                         |      | keccak256(<address> . n . keccak256(mem[p..(p+s))) and send v   |
-|                         |      | wei and return the new address                                  |
+| create2(v, n, p, s)     |      | crear un nuevo contrato con el código mem[p..(p+s)) en la       |
+|                         |      | dirección keccak256(<address> . n . keccak256(mem[p..(p+s)))    |
+|                         |      | y mandar v wei y devolver la nueva dirección                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| call(g, a, v, in,       |      | call contract at address a with input mem[in..(in+insize))      |
-| insize, out, outsize)   |      | providing g gas and v wei and output area                       |
-|                         |      | mem[out..(out+outsize)) returning 0 on error (eg. out of gas)   |
-|                         |      | and 1 on success                                                |
+| call(g, a, v, in,       |      | llamar el contrato a la dirección a con la entrada              |
+| insize, out, outsize)   |      | mem[in..(in+insize)) proporcionando g gas y v wei y el campo    |
+|                         |      | de salida mem[out..(out+outsize)) devolviendo 0 si hay un error |
+|                         |      | (por ejemplo si se queda sin gas) y 1 si es un éxito            |
 +-------------------------+------+-----------------------------------------------------------------+
-| callcode(g, a, v, in,   |      | identical to `call` but only use the code from a and stay       |
-| insize, out, outsize)   |      | in the context of the current contract otherwise                |
+| callcode(g, a, v, in,   |      | indentico a `call` pero usando solo el código de a y si no,     |
+| insize, out, outsize)   |      | quedarse en el contexto del contrato actual                     |
 +-------------------------+------+-----------------------------------------------------------------+
-| delegatecall(g, a, in,  |      | identical to `callcode` but also keep ``caller``                |
-| insize, out, outsize)   |      | and ``callvalue``                                               |
+| delegatecall(g, a, in,  |      | indentico a `callcode` pero mantener también ``caller``         |
+| insize, out, outsize)   |      | y ``callvalue``                                                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| staticcall(g, a, in,    |      | identical to `call(g, a, 0, in, insize, out, outsize)` but do   |
-| insize, out, outsize)   |      | not allow state modifications                                   |
+| staticcall(g, a, in,    |      | identico a `call(g, a, 0, in, insize, out, outsize)` pero       |
+| insize, out, outsize)   |      | no admite modificaciones de etado                               |
 +-------------------------+------+-----------------------------------------------------------------+
-| return(p, s)            | `-`  | end execution, return data mem[p..(p+s))                        |
+| return(p, s)            | `-`  | termina la ejecución, ***devuelve los datos de mem[p..(p+s))    |
 +-------------------------+------+-----------------------------------------------------------------+
-| revert(p, s)            | `-`  | end execution, revert state changes, return data mem[p..(p+s))  |
+| revert(p, s)            | `-`  | termina la ejecución, revierte los cambios de estado, ***devuelve|
+|                         |      | los datos de mem[p..(p+s))                                      |
 +-------------------------+------+-----------------------------------------------------------------+
-| selfdestruct(a)         | `-`  | end execution, destroy current contract and send funds to a     |
+| selfdestruct(a)         | `-`  | termina la ejecución, destruye el contrato actual y manda los   |
+|                         |      | fondos a a                                                      |
 +-------------------------+------+-----------------------------------------------------------------+
-| invalid                 | `-`  | end execution with invalid instruction                          |
+| invalid                 | `-`  | termina la ejecución con una instrucción no válida              |
 +-------------------------+------+-----------------------------------------------------------------+
-| log0(p, s)              | `-`  | log without topics and data mem[p..(p+s))                       |
+| log0(p, s)              | `-`  | log sin tópicos y datos mem[p..(p+s))                           |
 +-------------------------+------+-----------------------------------------------------------------+
-| log1(p, s, t1)          | `-`  | log with topic t1 and data mem[p..(p+s))                        |
+| log1(p, s, t1)          | `-`  | log sin tópicos t1 y datos mem[p..(p+s))                        |
 +-------------------------+------+-----------------------------------------------------------------+
-| log2(p, s, t1, t2)      | `-`  | log with topics t1, t2 and data mem[p..(p+s))                   |
+| log2(p, s, t1, t2)      | `-`  | log sin tópicos t1, t2 y datos mem[p..(p+s))                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| log3(p, s, t1, t2, t3)  | `-`  | log with topics t1, t2, t3 and data mem[p..(p+s))               |
+| log3(p, s, t1, t2, t3)  | `-`  | log sin tópicos t1, t2, t3 y datos mem[p..(p+s))                |
 +-------------------------+------+-----------------------------------------------------------------+
-| log4(p, s, t1, t2, t3,  | `-`  | log with topics t1, t2, t3, t4 and data mem[p..(p+s))           |
+| log4(p, s, t1, t2, t3,  | `-`  | log sin tópicos t1, t2, t3, t4 y datos mem[p..(p+s))            |
 | t4)                     |      |                                                                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| origin                  |      | transaction sender                                              |
+| origin                  |      | remitente de la transacción                                     |
 +-------------------------+------+-----------------------------------------------------------------+
-| gasprice                |      | gas price of the transaction                                    |
+| gasprice                |      | precio del gas price de la transacción                          |
 +-------------------------+------+-----------------------------------------------------------------+
-| blockhash(b)            |      | hash of block nr b - only for last 256 blocks excluding current |
+| blockhash(b)            |      | hash del bloque número b - solamente para los últimos           |
+|                         |      | 256 bloques, exluyendo al bloque actual                         |
 +-------------------------+------+-----------------------------------------------------------------+
-| coinbase                |      | current mining beneficiary                                      |
+| coinbase                |      | el beneficiario actual del minado                               |
 +-------------------------+------+-----------------------------------------------------------------+
-| timestamp               |      | timestamp of the current block in seconds since the epoch       |
+| timestamp               |      | timestamp en segundos del bloque actual desde la época          |
 +-------------------------+------+-----------------------------------------------------------------+
-| number                  |      | current block number                                            |
+| number                  |      | número del bloque actual                                        |
 +-------------------------+------+-----------------------------------------------------------------+
-| difficulty              |      | difficulty of the current block                                 |
+| difficulty              |      | dificultad del bloque actual                                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| gaslimit                |      | block gas limit of the current block                            |
+| gaslimit                |      | límite de gas del bloque para el bloque actual                  |
 +-------------------------+------+-----------------------------------------------------------------+
 
-Literals
---------
+Literales
+---------
 
 You can use integer constants by typing them in decimal or hexadecimal notation and an
 appropriate ``PUSHi`` instruction will automatically be generated. The following creates code
