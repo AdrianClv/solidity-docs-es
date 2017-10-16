@@ -167,12 +167,12 @@ Miembros:
 * ``.length`` devuelve el largo fijo del array byte (sólo lectura).
 
 Arrays de bytes de tamaño dinámico
------------------------------
+----------------------------------
 
 ``bytes``:
-    Array byte de tamaño dinámico, ver :ref:`arrays`. No un tipo de valor!
+    Array bytes de tamaño dinámico, ver :ref:`arrays`. ¡No un tipo de valor!
 ``string``:
-    Cadena de caracteres UTF-8-codificado de tamaño dinámico, ver :ref:`arrays`. No un tipo de valor!
+    Cadena de caracteres UTF-8-codificado de tamaño dinámico, ver :ref:`arrays`. ¡No un tipo de valor!
 
 Como regla general, usa ``bytes`` para data raw byte de tamaño arbitrario y ``string``
 para una cadena de caracteres (UTF-8) de tamaño arbitrario. Si puedes limitar el tamaño a un cierto
@@ -189,13 +189,13 @@ Números de punto fijo
 
 .. _address_literals:
 
-Address LIterales
+Address literales
 -----------------
 
 Literales hexadecimales que pasan el test checksum, por ejemplo
 ``0xdCad3a6d3569DF655070DEd06cb7A1b2Ccd1D3AF`` es de tipo ``address``.
 Literales hexadecimales que están entre 39 y 41 dígitos de largo y
-no pasan test de checksum producen una advertencia y son tratados como
+no pasan el test de checksum producen una advertencia y son tratados como
 números racionales literales regulares.
 
 .. index:: literal, literal;rational
@@ -207,26 +207,24 @@ Literales racionales y enteros
 
 Literales enteros son formados por una secuencia de números en el rango 0-9.
 Son interpretados como decimales. Por ejemplo, ``69`` significa sesenta y nueve.
-Literales octales no existen en Solidity y ceros a la izquierda son inválidos.
+Literales octales no existen en Solidity y los ceros a la izquierda son inválidos.
 
 Literales de fracciones decimales son formados por un ``.`` con al menos un número en
 un lado. Ejemplos incluyen ``1.``, ``.1`` y ``1.3``.
 
-La notación científica está también soportada, donde la base puede tener fracciones, mientras el exponente no puede.
+La notación científica está también soportada, donde la base puede tener fracciones, mientras que el exponente no puede.
 Ejemplos incluyen ``2e10``, ``-2e10``, ``2e-10``, ``2.5e1``.
 
 Expresiones de números literales retienen precisión arbitraria hasta que son convertidas a un tipo no literal (ej. usándolas
 juntas con una expresión no literal).
-Esto significa que las computaciones no se desbordan y las divisiones no se truncan
-en expresiones de números literales.
+Esto significa que las computaciones no se desbordan y las divisiones no se truncan en expresiones de números literales.
 
 Por ejemplo, ``(2**800 + 1) - 2**800`` resulta en la constante ``1`` (de tipo ``uint8``)
 aunque resultados intermedios ni siquiera serían del tamaño de la palabra. Además, ``.5 * 8`` resulta
-en el entero ``4`` (aunque no enteros fueron usados entremedio).
+en el entero ``4`` (aunque no se hayan usado enteros entremedias).
 
-Si el resultado no es un entero,
-un tipo apropiado ``ufixed`` o ``fixed`` es usado del cual el número de bits fraccionales es tan grande
-como se necesite (aproximando el número racional en el peor de los casos).
+Si el resultado no es un entero, un tipo apropiado ``ufixed`` o ``fixed`` es usado del cual el número
+de bits fraccionales es tan grande como se necesite (aproximando el número racional en el peor de los casos).
 
 En ``var x = 1/4;``, ``x`` recibirá el tipo ``ufixed0x8`` mientras que en ``var x = 1/3`` recibirá
 el tipo ``ufixed0x256`` porque ``1/3`` no es finitamente representable en binario y entonces será
@@ -246,13 +244,13 @@ operaciones de bit no son permitidas y la exponenciación no es permitida si el 
     pertenecen al mismo tipo de número literal para el número racional tres.
 
 .. note::
-    La mayoría de fracciones decimales finitas como ``5.3743`` no son finitamente representable en binario.
+    La mayoría de fracciones decimales finitas como ``5.3743`` no son finitamente representables en binario.
     El tipo correcto para ``5.3743`` es ``ufixed8x248`` porque permite la mejor aproximación del número. Si
-    quieres usar el número junto con tipos como ``ufixed`` (ej. ``ufixed128x128``), tienes que explícitamente
-    especificar la precisión buscada: ``x + ufixed(5.3743)``.
+    quieres usar el número junto con tipos como ``ufixed`` (ej. ``ufixed128x128``), tienes que
+    especificar la precisión buscada de forma explícita: ``x + ufixed(5.3743)``.
 
 .. warning::
-    La división de enteros literales solía truncar en versiones anteriores, pero ahora se convertirá 
+    La división de enteros literales se solía truncar en versiones anteriores, pero ahora se convertirá 
     en un número racional, ej. ``5 / 2`` no es igual a ``1``, más bien a ``2.5``.
 
 .. note::
