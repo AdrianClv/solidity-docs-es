@@ -477,23 +477,16 @@ El ejemplo siguiente computa la suma de un área en la memoria.
         }
     }
 
-Functions
+Funciones
 ---------
 
-Assembly allows the definition of low-level functions. These take their
-arguments (and a return PC) from the stack and also put the results onto the
-stack. Calling a function looks the same way as executing a functional-style
-opcode.
+El ensamblador permite la definición de funciones de bajo nivel. Éstas toman sus argumentos (y un ***return PC) desde la pila y también ponen los resultados arriba de la pila. Llamar una función se parece a la ejecución de un opcode de estilo funcional.
 
-Functions can be defined anywhere and are visible in the block they are
-declared in. Inside a function, you cannot access local variables
-defined outside of that function. There is no explicit ``return``
-statement.
+Las funciones pueden definirse en cualquier lugar y son visibles en el bloque en el que se han declarado. Dentro de una función, no se permite acceder a variables locales definidas fuera de esta función. No existe una declaración ``return`` explícita.
 
-If you call a function that returns multiple values, you have to assign
-them to a tuple using ``a, b := f(x)`` or ``let a, b := f(x)``.
+Si se llama una función que devuelve múltiples valores, es obligatorio asignarlos a un ***tuple usando ``a, b := f(x)`` o ``let a, b := f(x)``.
 
-The following example implements the power function by square-and-multiply.
+El siguiente ejemplo implementa la función de potencia con ***cuadrados y multiplicaciones.
 
 .. code::
 
@@ -510,70 +503,38 @@ The following example implements the power function by square-and-multiply.
         }
     }
 
-Things to Avoid
----------------
+Cosas a evitar
+--------------
 
-Inline assembly might have a quite high-level look, but it actually is extremely
-low-level. Function calls, loops and switches are converted by simple
-rewriting rules and after that, the only thing the assembler does for you is re-arranging
-functional-style opcodes, managing jump labels, counting stack height for
-variable access and removing stack slots for assembly-local variables when the end
-of their block is reached. Especially for those two last cases, it is important
-to know that the assembler only counts stack height from top to bottom, not
-necessarily following control flow. Furthermore, operations like swap will only
-swap the contents of the stack but not the location of variables.
+Aunque el ensamblador inline puede dar la sensación de tener un aspecto de alto nivel, es en realidad de nivel extremadamente bajo. Se convierten las llamadas a funciones, los bucles y los ***interruptores con simples reglas de reescritura y luego, lo único que el ensamblador hace para el usuario es reorganizar los opcodes en estilo funcional, manejando etiquetas de salto, contando la altura de la pila para el acceso a variables y quitando posiciones en la pila para variables ***locales del ensamblador cuando se alcanza el final de su bloque. Especialmente en estos dos últimos casos, es importante saber que el ensamblador solo cuenta la altura de la pila desde arriba abajo, y no necesariamente siguiendo el flujo de control. Además, las operaciones como los intercambios solo van a intercambiar los contenidos de la pila pero no la ubicación de las variables.
 
-Conventions in Solidity
------------------------
+Convenciones en Solidity
+------------------------
 
-In contrast to EVM assembly, Solidity knows types which are narrower than 256 bits,
-e.g. ``uint24``. In order to make them more efficient, most arithmetic operations just
-treat them as 256-bit numbers and the higher-order bits are only cleaned at the
-point where it is necessary, i.e. just shortly before they are written to memory
-or before comparisons are performed. This means that if you access such a variable
-from within inline assembly, you might have to manually clean the higher order bits
-first.
+A cambio del ensamblador EVM, Solidity conoce tipos que son más estrechos que 256 bits, por ejemplo ``uint24``. Para hacerlos más eficientes, la mayoría de las operaciones aritméticas los tratan como números de 256 bits y los bits de mayor orden sólo se limpian cuando es necesario, es decir sólo un poco antes de almacenarse en memoria o antes de realizar comparaciones. Lo que significa que si se accede dicha variable desde dentro del ensamblador inline, puede que se tenga primero que limpiar los bits de mayor orden.
 
-Solidity manages memory in a very simple way: There is a "free memory pointer"
-at position ``0x40`` in memory. If you want to allocate memory, just use the memory
-from that point on and update the pointer accordingly.
+Solidity maneja la memoria de una manera muy simple: hay un "***cursor de memoria disponible" en la posición ``0x40`` de la memoria. Si se desea asignar memoria, tan solo se tiene que usar la memoria a partir de este punto y actualizar el cursor en consecuencia.
 
-Elements in memory arrays in Solidity always occupy multiples of 32 bytes (yes, this is
-even true for ``byte[]``, but not for ``bytes`` and ``string``). Multi-dimensional memory
-arrays are pointers to memory arrays. The length of a dynamic array is stored at the
-first slot of the array and then only the array elements follow.
+En Solidity, los elementos en arrays de memoria siempre ocupan múltiples de 32 bytes (y si, esto también es cierto para ``byte[]``, pero no para ``bytes`` y ``string``). Arrays multidimensionales son cursores de arrays de memoria. La longitud de un array dinámico se almacena en la primera posición del array y luego sólo le siguen elementos del array.
 
 .. warning::
-    Statically-sized memory arrays do not have a length field, but it will be added soon
-    to allow better convertibility between statically- and dynamically-sized arrays, so
-    please do not rely on that.
+    Arrays de memoria estáticos en tamaño no tienen un campo para la longitud, pero se añadirá pronto para permitir una mejor convertibilidad entre arrays de tamaño estático y dinñamico, pero es importante no contar con esto por ahora.
 
 
-Standalone Assembly
-===================
+Ensamblador independiente
+=========================
 
-The assembly language described as inline assembly above can also be used
-standalone and in fact, the plan is to use it as an intermediate language
-for the Solidity compiler. In this form, it tries to achieve several goals:
+El lenguage ensamblador que hemos descrito más arriba como ensamblador inline también puede usarse de forma independiente. De hecho, el plan es de usarlo como un lenguage intermedio para el compilador de Solidity. De esta forma, intenta cumplir con varios objetivos:
 
-1. Programs written in it should be readable, even if the code is generated by a compiler from Solidity.
-2. The translation from assembly to bytecode should contain as few "surprises" as possible.
-3. Control flow should be easy to detect to help in formal verification and optimization.
+1. Los programas escritos en el lenguage ensamblador deben de ser legibles, aunque el código sea generado por un compilador de Solidity.
+2. La traducción del lenguage ensamblador al bytecode deben de contener el número de sorpresas el más reducido posible.
+3. El control de flujo debe de ser fácil de detectar para ayudar a la verificación formal y a la optimización.
 
-In order to achieve the first and last goal, assembly provides high-level constructs
-like ``for`` loops, ``switch`` statements and function calls. It should be possible
-to write assembly programs that do not make use of explicit ``SWAP``, ``DUP``,
-``JUMP`` and ``JUMPI`` statements, because the first two obfuscate the data flow
-and the last two obfuscate control flow. Furthermore, functional statements of
-the form ``mul(add(x, y), 7)`` are preferred over pure opcode statements like
-``7 y x add mul`` because in the first form, it is much easier to see which
-operand is used for which opcode.
+Para cumplir con el primero y el útlimo de los objetivos, el ensamblador proporciona constructs de alto nivel como bucles ``for``, declaraciones ``switch`` y llamadas a funciones. Debería de ser posible de escribir programas de ensamblador que no hacen uso de declaraciones explícitas de tipo ``SWAP``, ``DUP``, ``JUMP`` y ``JUMPI``, porque las dos primeras declaraciones ofuscan el flujo de datos y las dos últimas ofuscan el control de flujo. Además, hay que privilegiar declaraciones funcionales del tipo ``mul(add(x, y), 7)`` a las declaraciones de opcodes puras como ``7 y x add mul`` porque en la primera, es mucho más fácil ver qué operando se usa para qué opcode.
 
-The second goal is achieved by introducing a desugaring phase that only removes
-the higher level constructs in a very regular way and still allows inspecting
-the generated low-level assembly code. The only non-local operation performed
-by the assembler is name lookup of user-defined identifiers (functions, variables, ...),
-which follow very simple and regular scoping rules and cleanup of local variables from the stack.
+El segundo objetivo se cumple introduciendo una fase ***(desaguring) que sólo quita los constructs de más alto nivel de una forma muy regular pero permitiendo todavía la inspección el código ensamblador de bajo nivel generado. La única operación no local realizada por el ensamblador es la búsqueda de nombre de identificadores (funciones, variables, ...) definidos por el usuario, (***) lo que se hace siguiendo reglas con un alcance muy simple y regular y con un proceso de limpieza de variables locales desde la pila.
+
+Alcance: 
 
 Scoping: An identifier that is declared (label, variable, function, assembly)
 is only visible in the block where it was declared (including nested blocks
