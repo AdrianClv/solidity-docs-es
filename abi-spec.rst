@@ -129,7 +129,7 @@ Definimos `enc`, la codificación actual, como un mapping de valores de tipos de
 
 - `bytes`, de longitud `k` (que se presume que es del tipo `uint256`):
 
-  `enc(X) = enc(k) pad_right(X)`. Por ejemplo, el número de bytes es codificado como un `uint256` seguido del valor actual de `X` como una secuancia de bytes, seguido por el número mínimo de bytes-cero como que `len(enc(X))` es un múltiplo de 32.
+  `enc(X) = enc(k) pad_right(X)`. Por ejemplo, el número de bytes es codificado como un `uint256` seguido del valor actual de `X` como una secuencia de bytes, seguido por el número mínimo de bytes-cero como que `len(enc(X))` es un múltiplo de 32.
 
 - `string`:
 
