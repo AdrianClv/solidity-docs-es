@@ -270,13 +270,13 @@ JSON
 
 El formato JSON para la interfaz de un contrato viene dada por una array de descripciones de función y/o evento. Una descripción de función es un objeto JSON con los siguientes campos:
 
-- `type`: `"function"`, `"constructor"`, o `"fallback"` (the :ref:`unnamed "default" function <fallback-function>`);
+- `type`: `"function"`, `"constructor"`, o `"fallback"` (el :ref:`función sin nombre "default" <fallback-function>`);
 - `name`: nombre de la función;
 - `inputs`: array de objetos, cada uno contiene:
   * `name`: nombre del parámetro;
   * `type`: tipo canónico del parámetro.
-- `outputs`: un array de objet0s similar a `inputs`, puede omotirse si la función no devuelve nada;
-- `constant`: `true` si la función es :ref:`specified to not modify blockchain state <constant-functions>`);
+- `outputs`: un array de objetos similar a `inputs`, puede omitirse si la función no devuelve nada;
+- `constant`: `true` si la función es :ref:`especificada para no modificar el estado de la blockchain <constant-functions>`);
 - `payable`: `true` si la función acepta ether, por defecto a `false`.
 
 `type` se puede omitir, dejándolo por defecto a `"function"`.
