@@ -256,7 +256,7 @@ Eventos
 
 Los eventos son una abstracción del protocolo de monitorización de eventos de Ethereum. Las entradas de log proveen la dirección del contrato, una cadena de máximo cuatro tópicos y algún dato binario de longitud arbitraria. Los eventos apalancan la función ABI existente para poder interpretarla (junto con una especificación de interfaz) como una estructura apropiada.
 
-Dado un nombre de evento y una serie de parámetros de evento, los separamos en dos sub-series: las que están indexadas y las que no. Las indexadas, cuyo número podría llegar hasta tres, se usan junto al hash Keccack de la firma del evento para formar los tópicos de la entrada de log. Los no indexados forman el array de bytes del evento.
+Dado un nombre de evento y una serie de parámetros de evento, los separamos en dos sub-series: los que están indexados y los que no. Los indexados, cuyo número podría llegar hasta tres, se usan junto al hash Keccack de la firma del evento para formar los tópicos de la entrada de log. Los no indexados forman el array de bytes del evento.
 
 En efecto, una entrada de log que usa esta ABI se define como:
 
