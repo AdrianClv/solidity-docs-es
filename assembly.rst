@@ -84,12 +84,12 @@ Síntaxis
 El ensamblador analiza comentarios, literales e identificadores de igual manera que en Solidity, así que se puede usar los comentarios habituales: ``//`` y ``/* */``. El ensamblador inline está señalado por ``assembly { ... }`` y dentro de estos corchetes se pueden usar los siguentes elementos (véase las secciones más abajo para más detalles):
 
  - literales, es decir ``0x123``, ``42`` o ``"abc"`` (strings de hasta 32 carácteres)
- - opcodes (en "estilo para instrucciones"), p.ej. ``mload sload dup1 sstore``, véase más abajo para tener una lista
+ - opcodes (en "estilo instruccional"), p.ej. ``mload sload dup1 sstore``, véase más abajo para tener una lista
  - opcodes en estilo fucional, e.g. ``add(1, mlod(0))``
  - etiquetas, p.ej. ``name:``
  - declaraciones de variable, p.ej. ``let x := 7`` o ``let x := add(y, 3)``
  - identificadores (etiquetas o variables de ensamblador local y externos si se usa como ensamblador inline), p.ej. ``jump(name)``, ``3 x add``
- - tareas (en "estilo para instrucciones"), e.g. ``3 =: x``
+ - tareas (en "estilo instruccional"), e.g. ``3 =: x``
  - tareas en estilo fucional, p.ej. ``x := add(y, 3)``
  - bloques donde las variables locales están incluidas dentro, p.ej. ``{ let x := 3 { let y := add(x, 1) } }``
 
@@ -284,63 +284,45 @@ En la gramática, los opcodes se representan como identificadores predefinidos.
 Literales
 ---------
 
-You can use integer constants by typing them in decimal or hexadecimal notation and an
-appropriate ``PUSHi`` instruction will automatically be generated. The following creates code
-to add 2 and 3 resulting in 5 and then computes the bitwise and with the string "abc".
-Strings are stored left-aligned and cannot be longer than 32 bytes.
+Se pueden usar constantes ***íntegras usando la notación decimal o hexadecimal y con eso, una instrucción apropiada ``PUSHi`` sereá automáticamente generada. El siguiente código suma 2 con 3, lo que resulta en 5 y luego computa el ***bitwise con el string "abc". Los strings están almacenados alineados a la izquierda y no pueden ser más largos que 32 bytes.
 
 .. code::
 
     assembly { 2 3 add "abc" and }
 
-Functional Style
------------------
+Estilo funcional
+----------------
 
-You can type opcode after opcode in the same way they will end up in bytecode. For example
-adding ``3`` to the contents in memory at position ``0x80`` would be
+Se puede entrar opcodes uno trás el otro de la misma manera que van aparecer en el bytecode. Por ejemplo sumar ''3'' al contenido de la memoria en la posición ``0x80`` sería:
 
 .. code::
 
     3 0x80 mload add 0x80 mstore
 
-As it is often hard to see what the actual arguments for certain opcodes are,
-Solidity inline assembly also provides a "functional style" notation where the same code
-would be written as follows
+Como suele ser complicado ver cuales son los argumentos actuales para algunos de los opcodes, el ensamblador inline de Solidity proporciona también una notación de "estilo fucinonal" donde el mismo código se escribiría de la siguiente manera:
 
 .. code::
 
     mstore(0x80, add(mload(0x80), 3))
 
-Functional style expressions cannot use instructional style internally, i.e.
-``1 2 mstore(0x80, add)`` is not valid assembly, it has to be written as
-``mstore(0x80, add(2, 1))``. For opcodes that do not take arguments, the
-parentheses can be omitted.
+Expresiones en estilo funcional no pueden hacer uso internamente del estilo instruccional, es decir que ``1 2 mstore(0x80, add)`` no es ensamblador válido, debería escribirse como ``mstore(0x80, add(2, 1))``. Para los opcodes que no toman argumentos, las parentésis pueden obviarse.
 
-Note that the order of arguments is reversed in functional-style as opposed to the instruction-style
-way. If you use functional-style, the first argument will end up on the stack top.
+Nótese que el orden de los argumentos está invertido en estilo funcional con respecto al estilo instruccional. Si hace uso del estilo funcional, el primer argumento aparecerá arriba de la pila.
 
 
-Access to External Variables and Functions
-------------------------------------------
+Acceso a variables y funciones internas
+---------------------------------------
 
-Solidity variables and other identifiers can be accessed by simply using their name.
-For memory variables, this will push the address and not the value onto the
-stack. Storage variables are different: Values in storage might not occupy a
-full storage slot, so their "address" is composed of a slot and a byte-offset
-inside that slot. To retrieve the slot pointed to by the variable ``x``, you
-used ``x_slot`` and to retrieve the byte-offset you used ``x_offset``.
+Se accede a las variables y otros identificadores de Solidity simplemente por su nombre. Para las variables de memoria, esto tiene como consecuencia que es la dirección y no el nombre que se empuja en la pila. Con las variables de almacenamiento es diferente: los valores en almacenamiento podrían no ocupar una posición completa en la pila, de tal manera que su dirección estaría compuesta por una posición y un decalage en bytes dentro de esta posición. Para recuperar la posición a la que apunta la variable ``x``, se usa ``x_slot`` y para recuperar el decalage en bytes se usa ``x_offset``.
 
-In assignments (see below), we can even use local Solidity variables to assign to.
+En las asignaciones (ver abajo), hasta se pueden usar las variables locales de Solidity y ***asignarlas.
 
-Functions external to inline assembly can also be accessed: The assembly will
-push their entry label (with virtual function resolution applied). The calling semantics
-in solidity are:
+También se puede acceder a las funciones externas al ensamblador inline: el ensamblador empujará su etiqueta de entrada (aplicando la resolución de funciones virtuales). Las semánticas de llamada en Solidity son las siguientes:
 
- - the caller pushes return label, arg1, arg2, ..., argn
- - the call returns with ret1, ret2, ..., retm
+ - el que llama empuja return etiqueta, arg1, arg2, ..., argn
+ - la llamada devuelve ret1, ret2, ..., retm
 
-This feature is still a bit cumbersome to use, because the stack offset essentially
-changes during the call, and thus references to local variables will be wrong.
+Esta funcionalidad está todavía un poco dificultosa de usar, esensialmente porque el decalage de pila cambia durante la llamada, y por lo tanto las referencias a las variables locales estarán mal.
 
 .. code::
 
@@ -350,19 +332,15 @@ changes during the call, and thus references to local variables will be wrong.
         uint b;
         function f(uint x) returns (uint r) {
             assembly {
-                r := mul(x, sload(b_slot)) // ignore the offset, we know it is zero
+                r := mul(x, sload(b_slot)) // ignorar el decalage, sabemos que es cero
             }
         }
     }
 
-Labels
-------
+Etiquetas
+---------
 
-Another problem in EVM assembly is that ``jump`` and ``jumpi`` use absolute addresses
-which can change easily. Solidity inline assembly provides labels to make the use of
-jumps easier. Note that labels are a low-level feature and it is possible to write
-efficient assembly without labels, just using assembly functions, loops and switch instructions
-(see below). The following code computes an element in the Fibonacci series.
+Otro de los problemas en el ensamblador del EVM es que ``jump`` y ``jumpi`` hacen uso de direcciones absolutas que pueden facilmente cambiar. El ensamblador inline de Solidity proporciona etiquetas para hacer el uso de saltos más cómodo. Nótese que las etiquetas son una funcionalidad de bajo nivel y que es perfectamente posible escribir un ensamblador eficicente sin etiquetas, usando solo funciones de ensamblador, bucles e instrucciones de intercambio (ver abajo). El siguiente código computa un elemento en una serie de Fibonacci.
 
 .. code::
 
@@ -380,14 +358,9 @@ efficient assembly without labels, just using assembly functions, loops and swit
         return(0, 0x20)
     }
 
-Please note that automatically accessing stack variables can only work if the
-assembler knows the current stack height. This fails to work if the jump source
-and target have different stack heights. It is still fine to use such jumps, but
-you should just not access any stack variables (even assembly variables) in that case.
+Tenga en cuenta que acceder automáticamente a variables de pila sólo funciona si el ensamblador conoce la altura de la pila actual. Esto falla si el inicio y el destino del salto tienen alturas de pila distintas. Aún así se pueden usar estos saltos, pero no debería entonces acceder a ninguna variables de pila (incluso variables de ensamblador)
 
-Furthermore, the stack height analyser goes through the code opcode by opcode
-(and not according to control flow), so in the following case, the assembler
-will have a wrong impression about the stack height at label ``two``:
+Además, el analizador de la altura de la pila lee el código opcode por opcode (y no acorde al control de flujo), por lo tanto y según indica al ejemplo que figura abajo, el ensamblador tendría una falsa idea de la altura de la pila al llegar a la etiqueta ``two``:
 
 .. code::
 
@@ -395,52 +368,42 @@ will have a wrong impression about the stack height at label ``two``:
         let x := 8
         jump(two)
         one:
-            // Here the stack height is 2 (because we pushed x and 7),
-            // but the assembler thinks it is 1 because it reads
-            // from top to bottom.
-            // Accessing the stack variable x here will lead to errors.
+            // Aquí la altura de la pila es de 2 (porque empujamos x y 7), pero el ensamblador cree que la altura es de 1 porque lee desde arriba abajo.
+            // Acceder a la variable de pila x aquí nos llevaría a un error.
             x := 9
             jump(three)
         two:
-            7 // push something onto the stack
+            7 // empujar algo arriba de la pila
             jump(one)
         three:
     }
 
-This problem can be fixed by manually adjusting the stack height for the
-assembler - you can provide a stack height delta that is added
-to the stack height just prior to the label.
-Note that you will not have to care about these things if you just use
-loops and assembly-level functions.
+Este problema puede resolverse manualmente ajustando la altura de la pila en lugar de que lo haga el ensamblador - puede proporcionar un delta de altura de pila que se suma a la altura de la pila justo antes de la etiqueta.
+Nótese que no va a tener que preocuparse por estas cosas si sólo usa bucles y funciones de nivel ensamblador.
 
-As an example how this can be done in extreme cases, please see the following.
+Para ilustrar cómo esto se puede hacer en casos extremos, véase el ejemplo siguiente:
 
 .. code::
 
     {
         let x := 8
         jump(two)
-        0 // This code is unreachable but will adjust the stack height correctly
+        0 // Este código no se puede acceder pero se ajustará correctamente la altura de la pila
         one:
-            x := 9 // Now x can be accessed properly.
+            x := 9 // Ahora se puede acceder correctamente a x
             jump(three)
-            pop // Similar negative correction.
+            pop // Corrección negativa similar
         two:
-            7 // push something onto the stack
+            7 // Empujar algo arriba de la pila
             jump(one)
         three:
-        pop // We have to pop the manually pushed value here again.
+        pop // Tenemos que hacer pop con el valor empujado manualmente aqui otra vez
     }
 
-Declaring Assembly-Local Variables
-----------------------------------
+Declarando variables de ensamblador local
+-----------------------------------------
 
-You can use the ``let`` keyword to declare variables that are only visible in
-inline assembly and actually only in the current ``{...}``-block. What happens
-is that the ``let`` instruction will create a new stack slot that is reserved
-for the variable and automatically removed again when the end of the block
-is reached. You need to provide an initial value for the variable which can
-be just ``0``, but it can also be a complex functional-style expression.
+Puede usar la palabra clave ``let`` para declarar variables que están visibles solamente en ensamblador inline y en realidad solamente en el bloque actual ``{...}``. Lo que pasa es que la instrucción ``let`` crea una nueva posición en la pila que está reservada para la variable. Esta posición se quitará automaticamente cuando se llegue al final del bloque. Es necesario proporcionar un valor inicial para la variable, que puede ser simplemente ``0``, pero también puede ser una expresión compleja en el estilo funcional.
 
 .. code::
 
@@ -454,38 +417,33 @@ be just ``0``, but it can also be a complex functional-style expression.
                 {
                     let y := add(sload(v), 1)
                     b := y
-                } // y is "deallocated" here
+                } // aquí se "desasigna" y
                 b := add(b, v)
-            } // v is "deallocated" here
+            } // aquí se "desasigna" v
         }
     }
 
 
-Assignments
------------
+Asignaciones
+------------
 
-Assignments are possible to assembly-local variables and to function-local
-variables. Take care that when you assign to variables that point to
-memory or storage, you will only change the pointer and not the data.
+Las asignaciones son posibles para las variables de ensamblador local y para las variables de función local. ***Tenga cuidado que cuando usted asigna a variables que apuntan a la memoria o al almacenamiento, usted sólo cambiará lo que apunta pero no los datos.
 
-There are two kinds of assignments: functional-style and instruction-style.
-For functional-style assignments (``variable := value``), you need to provide a value in a
-functional-style expression that results in exactly one stack value
-and for instruction-style (``=: variable``), the value is just taken from the stack top.
-For both ways, the colon points to the name of the variable. The assignment
-is performed by replacing the variable's value on the stack by the new value.
+Existen asignaciones de dos tipos: las de estilo funcional y las de estilo instruccional. Para las asignaciones de estilo funcional, (``variable := value``), se requiere proporcionarun valor dentro de una expresión de estilo funcional que resulta en exactamente un valor de pila. Para las asignaciones de estilo instruccional (``=: variable``), el valor simplemente se toma desde arriba de la pila. Para ambas maneras, la coma apunta al nombre de la variable. La asignación se ejecuta remplazando el valor de la variable en la pila por el valor nuevo.
 
 .. code::
 
     assembly {
-        let v := 0 // functional-style assignment as part of variable declaration
+        let v := 0 // asignación de estilo funcional como parte de la declaración de variable
         let g := add(v, 2)
         sload(10)
-        =: v // instruction style assignment, puts the result of sload(10) into v
+        =: v // asignación de estilo instruccional, pone el resultado de sload(10) en v
     }
 
-Switch
-------
+Intercambio
+-----------
+
+Se puede usar una declaración de intercambio como una versión muy básica de un "if/else". Toma el valor de una expresión y lo compara con distintas constantes.
 
 You can use a switch statement as a very basic version of "if/else".
 It takes the value of an expression and compares it to several constants.
