@@ -261,41 +261,41 @@ Dado un nombre de evento y una serie de parámetros de evento, los separamos en 
 En efecto, una entrada de log que usa esta ABI se define como:
 
 - `address`: la dirección del contrato (intrínsicamente provista por Ethereum);
-- `topics[0]`: `keccak(EVENT_NAME+"("+EVENT_ARGS.map(canonical_type_of).join(",")+")")` (`canonical_type_of` is a function that simply returns the canonical type of a given argument, e.g. for `uint indexed foo`, it would return `uint256`). If the event is declared as `anonymous` the `topics[0]` is not generated;
-- `topics[n]`: `EVENT_INDEXED_ARGS[n - 1]` (`EVENT_INDEXED_ARGS` is the series of `EVENT_ARGS` that are indexed);
-- `data`: `abi_serialise(EVENT_NON_INDEXED_ARGS)` (`EVENT_NON_INDEXED_ARGS` is the series of `EVENT_ARGS` that are not indexed, `abi_serialise` is the ABI serialisation function used for returning a series of typed values from a function, as described above).
+- `topics[0]`: `keccak(EVENT_NAME+"("+EVENT_ARGS.map(canonical_type_of).join(",")+")")` (`canonical_type_of` es una función que simplemente devuelve el tipo canónico del argumento dado, p.ej.: para `uint indexed foo`, devolvería `uint256`). Si el evento se declara como `anonymous` no se genera `topics[0]`;
+- `topics[n]`: `EVENT_INDEXED_ARGS[n - 1]` (`EVENT_INDEXED_ARGS` es la serie de `EVENT_ARGS` que están indexados);
+- `data`: `abi_serialise(EVENT_NON_INDEXED_ARGS)` (`EVENT_NON_INDEXED_ARGS` es la serie de `EVENT_ARGS` que no están indexados, `abi_serialise` es la función de serialización ABI usada para devolver una serie de valores tipificados desde una función, como se detalla abajo).
 
 JSON
 ====
 
-The JSON format for a contract's interface is given by an array of function and/or event descriptions. A function description is a JSON object with the fields:
+El formato JSON para la interfaz de un contrato viene dada por una array de función y/o descripciones de evento. Una descripción de función es un objeto JSON con los siguientes campos:
 
-- `type`: `"function"`, `"constructor"`, or `"fallback"` (the :ref:`unnamed "default" function <fallback-function>`);
-- `name`: the name of the function;
-- `inputs`: an array of objects, each of which contains:
-  * `name`: the name of the parameter;
-  * `type`: the canonical type of the parameter.
-- `outputs`: an array of objects similar to `inputs`, can be omitted if function doesn't return anything;
-- `constant`: `true` if function is :ref:`specified to not modify blockchain state <constant-functions>`);
-- `payable`: `true` if function accepts ether, defaults to `false`.
+- `type`: `"function"`, `"constructor"`, o `"fallback"` (the :ref:`unnamed "default" function <fallback-function>`);
+- `name`: nombre de la función;
+- `inputs`: array de objetos, cada uno contiene:
+  * `name`: nombre del parámetro;
+  * `type`: tipo canónico del parámetro.
+- `outputs`: un array de objet0s similar a `inputs`, puede omotirse si la función no devuelve nada;
+- `constant`: `true` si la función es :ref:`specified to not modify blockchain state <constant-functions>`);
+- `payable`: `true` si la función acepta ether, por defecto a `false`.
 
-`type` can be omitted, defaulting to `"function"`.
+`type` se puede omitir, dejándolo por defecto a `"function"`.
 
-Constructor and fallback function never have `name` or `outputs`. Fallback function doesn't have `inputs` either.
+La función Constructor y fallback nunca tienen `name` o `outputs`. Fallback tampoco tiene `inputs`.
 
-Sending non-zero ether to non-payable function will throw. Don't do it.
+Enviar ether no-cero a una función no pagable se disparará. No lo hagas.
 
-An event description is a JSON object with fairly similar fields:
+Una descripción de evento es un objeto JSON con prácticamente los mismos campos:
 
-- `type`: always `"event"`
-- `name`: the name of the event;
-- `inputs`: an array of objects, each of which contains:
-  * `name`: the name of the parameter;
-  * `type`: the canonical type of the parameter.
-  * `indexed`: `true` if the field is part of the log's topics, `false` if it one of the log's data segment.
-- `anonymous`: `true` if the event was declared as `anonymous`.
+- `type`: siempre `"event"`
+- `name`: nombre del evento;
+- `inputs`: array de objetos, cada uno contiene:
+  * `name`: nombre del parámetro;
+  * `type`: tipo canónico del parámetro.
+  * `indexed`: `true` si el campo es parte de los tópicos del log, `false` si es parte del segmento de datos del log.
+- `anonymous`: `true` si el evento se declaró `anonymous`.
 
-For example, 
+Por ejemplo, 
 
 ::
 
@@ -307,7 +307,7 @@ For example,
     bytes32 b;
   }
 
-would result in the JSON:
+resultaría en el JSON:
 
 .. code:: json
 
