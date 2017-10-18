@@ -111,7 +111,7 @@ Definimos `enc`, la codificación actual, como un mapping de valores de tipos de
     `head(X(i)) = enc(len(head(X(0)) ... head(X(k-1)) tail(X(0)) ... tail(X(i-1))))`
     `tail(X(i)) = enc(X(i))`
 
-  de otra manera, como `Ti` es un tipo dinámico.
+  en otros casos como si, por ejemplo, `Ti` es un tipo dinámico.
 
   Hay que tener en cuenta que en el caso dinámico, `head(X(i))` está bien definido ya que las longitudes de las partes de head sólo dependen de los tipos y no de los valores. Su valor es el offset del principio de `tail(X(i))` relativo al comienzo de `enc(X)`.
   
