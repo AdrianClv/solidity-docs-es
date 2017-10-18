@@ -76,7 +76,7 @@ Vamos a especificar formalmente la codificación, de tal forma que tendrá las s
 
 Propiedades:
 
-  1. El número de lecturas necesarias para acceder a un valor es como mucho equivalente a la máxima profundidad del array. Por ejemplo, cuatro lecturas se requieren para obtener `a_i[k][l][r]`. En una versión previa de la ABI, el número de lecturas escalaba linearmente con el número total de parámetros dinámicos en el peor caso.
+  1. El número de lecturas necesarias para acceder a un valor es, como mucho, equivalente a la máxima profundidad del array. Por ejemplo, cuatro lecturas se requieren para obtener `a_i[k][l][r]`. En una versión previa de la ABI, el número de lecturas escalaba linearmente con el número total de parámetros dinámicos en el peor caso.
 
   2. Los datos de una variable o elemento de un array no se intercalan con otros datos y son recolocables. Por ejemplo, sólo usan "addresses" relativos.
 
