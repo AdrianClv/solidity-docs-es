@@ -190,7 +190,7 @@ Si quisiéramos llamar a `bar` con el argumento `["abc", "def"]`, pasaríamos 68
 
 - `0xfce353f6`: el ID del método. Este se deriva de la firma `bar(bytes3[2])`.
 - `0x6162630000000000000000000000000000000000000000000000000000000000`: La primera parte del primer parámetro, un valor `bytes3` `"abc"` (alineado a la izquierda).
-- `0x6465660000000000000000000000000000000000000000000000000000000000`: La segunda parte del primer parámetro, un vaor `bytes3` `"def"` (alineado a la izquierda).
+- `0x6465660000000000000000000000000000000000000000000000000000000000`: La segunda parte del primer parámetro, un valor `bytes3` `"def"` (alineado a la izquierda).
 
 En total::
 
