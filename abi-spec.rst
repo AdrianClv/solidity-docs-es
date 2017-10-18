@@ -32,7 +32,7 @@ Los tipos elementales existentes son:
 
 - `uint<M>`: enteros sin signo de `M` bits, `0 < M <= 256`, `M % 8 == 0`. Ejemplos: `uint32`, `uint8`, `uint256`.
 
-- `int<M>`: enteros con signo de `M` bits, `0 < M <= 256`, `M % 8 == 0`.
+- `int<M>`: enteros con signo complemento a dos de `M` bits, `0 < M <= 256`, `M % 8 == 0`.
 
 - `address`: equivalente a `uint160`, exceptuando la interpretación asumida y la tipología de idioma.
 
