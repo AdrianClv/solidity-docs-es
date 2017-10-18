@@ -268,7 +268,7 @@ En efecto, una entrada de log que usa esta ABI se define como:
 JSON
 ====
 
-El formato JSON para la interfaz de un contrato viene dada por una array de función y/o descripciones de evento. Una descripción de función es un objeto JSON con los siguientes campos:
+El formato JSON para la interfaz de un contrato viene dada por una array de descripciones de función y/o evento. Una descripción de función es un objeto JSON con los siguientes campos:
 
 - `type`: `"function"`, `"constructor"`, o `"fallback"` (the :ref:`unnamed "default" function <fallback-function>`);
 - `name`: nombre de la función;
