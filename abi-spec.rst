@@ -36,7 +36,7 @@ Los tipos elementales existentes son:
 
 - `address`: equivalente a `uint160`, exceptuando la interpretación asumida y la tipología de idioma.
 
-- `uint`, `int`: sinónimos de `uint256`, `int256` respectivamente (no para ser usados con la función selector).
+- `uint`, `int`: sinónimos de `uint256`, `int256` respectivamente (no para ser usados para computar la función selector).
 
 - `bool`: equivalente a `uint8` restringido a los valores 0 y 1.
 
