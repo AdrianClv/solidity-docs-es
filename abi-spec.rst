@@ -44,7 +44,7 @@ Los tipos elementales existentes son:
 
 - `ufixed<M>x<N>`: variante sin signo de `fixed<M>x<N>`.
 
-- `fixed`, `ufixed`: sinónimos de `fixed128x19`, `ufixed128x19` respectivamente (no para ser usados con la función selector).
+- `fixed`, `ufixed`: sinónimos de `fixed128x19`, `ufixed128x19` respectivamente (no para ser usados para computar la función selector).
 
 - `bytes<M>`: tipo binario de `M` bytes, `0 < M <= 32`.
 
