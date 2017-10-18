@@ -534,16 +534,9 @@ Para cumplir con el primero y el útlimo de los objetivos, el ensamblador propor
 
 El segundo objetivo se cumple introduciendo una fase ***(desaguring) que sólo quita los constructs de más alto nivel de una forma muy regular pero permitiendo todavía la inspección el código ensamblador de bajo nivel generado. La única operación no local realizada por el ensamblador es la búsqueda de nombre de identificadores (funciones, variables, ...) definidos por el usuario, (***) lo que se hace siguiendo reglas con un alcance muy simple y regular y con un proceso de limpieza de variables locales desde la pila.
 
-Alcance: 
+Alcance: Un identificador que está declarado (etiqueta, variable, función, ensamblador) sólo es visible en el bloque donde ha sido declarado (incluyendo bloques anidados dentro del bloque actual). No es legal acceder variables locales cruzando los límites de la función, aunque estas variables estuvieran dentro del alcance. ***Ocultar no está permitido. No se puede acceder variables locales antes de que estén declaradas, ***pero está permitido acceder etiquetas, funciones y ensambladores sin que lo estén. Ensambladores son bloques especiales que se usan para, por ejemplo, devolver el tiempo de ejecución del código o crear contratos. Identificadores externos a un ensamblador no son visibles en un sub ensamblador.
 
-Scoping: An identifier that is declared (label, variable, function, assembly)
-is only visible in the block where it was declared (including nested blocks
-inside the current block). It is not legal to access local variables across
-function borders, even if they would be in scope. Shadowing is not allowed.
-Local variables cannot be accessed before they were declared, but labels,
-functions and assemblies can. Assemblies are special blocks that are used
-for e.g. returning runtime code or creating contracts. No identifier from an
-outer assembly is visible in a sub-assembly.
+Si 
 
 If control flow passes over the end of a block, pop instructions are inserted
 that match the number of local variables declared in that block.
