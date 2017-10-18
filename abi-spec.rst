@@ -221,7 +221,7 @@ Obtenemos los primeros cuatro bytes de `sha3("f(uint256,uint32[],bytes10,bytes)"
 Entonces codificamos las cabeceras de los cuatro argumentos. Para los tipos estáticos `uint256` y `bytes10`, estos son los valores que queremos pasar directamente, miestras que para los tipos dinámicos `uint32[]` y `bytes`, usamos el offset en bytes hasta el inicio de su área de datos, contando desde el comienzo de la codificación del valor (p.ej.: sin contar los primeros cuatro bytes que contienen el hash de la firma de la función). Estos son:
 
  - `0x0000000000000000000000000000000000000000000000000000000000000123` (`0x123` rellenado hasta 32 bytes)
- - `0x0000000000000000000000000000000000000000000000000000000000000080` (offset del inicio de la parte de datos del seguno parámetro, 4*32 bytes, exactamente el tamaño de la parte de la cabecera)
+ - `0x0000000000000000000000000000000000000000000000000000000000000080` (offset del inicio de la parte de datos del segundo parámetro, 4*32 bytes, exactamente el tamaño de la parte de la cabecera)
  - `0x3132333435363738393000000000000000000000000000000000000000000000` (`"1234567890"` rellenado hasta 32 bytes por la derecha)
  - `0x00000000000000000000000000000000000000000000000000000000000000e0` (offset del comienzo de la parte de datos del cuarto parámetro = offset del inicio de la parte de datos del primer parámetro dinámico + tamaño de la parte de datos del primer parámetro dinámico = 4\*32 + 3\*32 (ver abajo))
 
