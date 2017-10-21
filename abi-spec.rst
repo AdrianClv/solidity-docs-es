@@ -13,7 +13,7 @@ La Application Binary Interface (Interfaz Binaria de Aplicación) o ABI es el mo
 
 Asumimos que la Application Binary Interface (ABI) está extremadamente definida, es conocida en tiempo de compilación y es estática. No se van a proveer mecanismos de introspección. Además, afirmamos que los contratos tendrán las definiciones de la interfaz de cada contrato que vayan a llamar en tiempo de compilación.
 
-Esta especificación no abarca los contratos cuya interfaz sea dinámica o conocida exclusivamente en tiempo de ejecución. Estos casos, de volverse importantes, podrían manejarse adecuadamente como servicios construídos dentro del ecosistema Ethereum.
+Esta especificación no abarca los contratos cuya interfaz sea dinámica o conocida exclusivamente en tiempo de ejecución. Estos casos, de volverse importantes, podrían manejarse adecuadamente como servicios construidos dentro del ecosistema Ethereum.
 
 Función Selector
 =================
@@ -178,7 +178,7 @@ Para nuestro ejemplo `Foo`, si queremos llamar a `baz` pasando como parámetros 
 
 - `0xcdcd77c0`: el ID del método. Se deriva como los 4 primeros bytes del hash Keccak en ASCII de la firma `baz(uint32,bool)`.
 - `0x0000000000000000000000000000000000000000000000000000000000000045`: el primer parámetro, un uint32 de valor `69` rellenado hasta 32 bytes
-- `0x0000000000000000000000000000000000000000000000000000000000000001`: el segundo parámetro - boolean `true`, rellendo hasta 32 bytes
+- `0x0000000000000000000000000000000000000000000000000000000000000001`: el segundo parámetro - boolean `true`, rellenado hasta 32 bytes
 
 En total::
 
@@ -218,7 +218,7 @@ Uso de tipos dinámicos
 Una llamada a una función con la firma `f(uint,uint32[],bytes10,bytes)` con valores `(0x123, [0x456, 0x789], "1234567890", "Hello, world!")` se codifica de la siguiente manera:
 
 Obtenemos los primeros cuatro bytes de `sha3("f(uint256,uint32[],bytes10,bytes)")`, p.ej.: `0x8be65246`.
-Entonces codificamos las cabeceras de los cuatro argumentos. Para los tipos estáticos `uint256` y `bytes10`, estos son los valores que queremos pasar directamente, miestras que para los tipos dinámicos `uint32[]` y `bytes`, usamos el offset en bytes hasta el inicio de su área de datos, contando desde el comienzo de la codificación del valor (p.ej.: sin contar los primeros cuatro bytes que contienen el hash de la firma de la función). Estos son:
+Entonces codificamos las cabeceras de los cuatro argumentos. Para los tipos estáticos `uint256` y `bytes10`, estos son los valores que queremos pasar directamente, mientras que para los tipos dinámicos `uint32[]` y `bytes`, usamos el offset en bytes hasta el inicio de su área de datos, contando desde el comienzo de la codificación del valor (p.ej.: sin contar los primeros cuatro bytes que contienen el hash de la firma de la función). Estos son:
 
  - `0x0000000000000000000000000000000000000000000000000000000000000123` (`0x123` rellenado hasta 32 bytes)
  - `0x0000000000000000000000000000000000000000000000000000000000000080` (offset del inicio de la parte de datos del segundo parámetro, 4*32 bytes, exactamente el tamaño de la parte de la cabecera)
@@ -260,7 +260,7 @@ Dado un nombre de evento y una serie de parámetros de evento, los separamos en 
 
 En efecto, una entrada de log que usa esta ABI se define como:
 
-- `address`: la dirección del contrato (intrínsicamente provista por Ethereum);
+- `address`: la dirección del contrato (intrinsicamente provista por Ethereum);
 - `topics[0]`: `keccak(EVENT_NAME+"("+EVENT_ARGS.map(canonical_type_of).join(",")+")")` (`canonical_type_of` es una función que simplemente devuelve el tipo canónico del argumento dado, p.ej.: para `uint indexed foo`, devolvería `uint256`). Si el evento se declara como `anonymous` no se genera `topics[0]`;
 - `topics[n]`: `EVENT_INDEXED_ARGS[n - 1]` (`EVENT_INDEXED_ARGS` es la serie de `EVENT_ARGS` que están indexados);
 - `data`: `abi_serialise(EVENT_NON_INDEXED_ARGS)` (`EVENT_NON_INDEXED_ARGS` es la serie de `EVENT_ARGS` que no están indexados, `abi_serialise` es la función de serialización ABI usada para devolver una serie de valores tipificados desde una función, como se detalla abajo).
@@ -268,7 +268,7 @@ En efecto, una entrada de log que usa esta ABI se define como:
 JSON
 ====
 
-El formato JSON para la interfaz de un contrato viene dada por una array de descripciones de función y/o evento. Una descripción de función es un objeto JSON con los siguientes campos:
+El formato JSON para la interfaz de un contrato viene dada por un array de descripciones de función y/o evento. Una descripción de función es un objeto JSON con los siguientes campos:
 
 - `type`: `"function"`, `"constructor"`, o `"fallback"` (el :ref:`función sin nombre "default" <fallback-function>`);
 - `name`: nombre de la función;
