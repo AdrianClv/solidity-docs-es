@@ -1,6 +1,6 @@
-********************************
-Layout of a Solidity Source File
-********************************
+********************************************
+Composición de un fichero fuente de Solidity
+********************************************
 
 Source files can contain an arbitrary number of contract definitions, include directives
 and pragma directives.
