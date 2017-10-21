@@ -536,34 +536,18 @@ El segundo objetivo se cumple introduciendo una fase ***(desaguring) que sólo q
 
 Alcance: Un identificador que está declarado (etiqueta, variable, función, ensamblador) sólo es visible en el bloque donde ha sido declarado (incluyendo bloques anidados dentro del bloque actual). No es legal acceder variables locales cruzando los límites de la función, aunque estas variables estuvieran dentro del alcance. ***Ocultar no está permitido. No se puede acceder variables locales antes de que estén declaradas, ***pero está permitido acceder etiquetas, funciones y ensambladores sin que lo estén. Ensambladores son bloques especiales que se usan para, por ejemplo, devolver el tiempo de ejecución del código o crear contratos. Identificadores externos a un ensamblador no son visibles en un sub ensamblador.
 
-Si 
+Si el flujo de control va más allá del final de un bloque, se insertan instrucciones ***pop que corresponden al número de variables locales declaradas en este bloque. Cuando se referencia una variables local, el generador de código necesita saber su posición relativa actual en la pila y por lo tanto necesita hacer un seguimiento de la así llamada altura actual de la pila. Como se quitan todas las variables locales al final de un bloque, la altura de la pila antes y después de un bloque debería ser la misma. Si esto no fuera el caso, se emite un aviso.
 
-If control flow passes over the end of a block, pop instructions are inserted
-that match the number of local variables declared in that block.
-Whenever a local variable is referenced, the code generator needs
-to know its current relative position in the stack and thus it needs to
-keep track of the current so-called stack height. Since all local variables
-are removed at the end of a block, the stack height before and after the block
-should be the same. If this is not the case, a warning is issued.
+¿Por qué usamos constructs de alto nivel como ``switch``, ``for`` y funciones:
 
-Why do we use higher-level constructs like ``switch``, ``for`` and functions:
+Usando ``switch``, ``for`` y funciones, debería ser posible escribir códigos complejos sin usar ``jump`` o ``jumpi`` manualmente. Esto simplifica mucho el análisis del control de flujo, lo que permite hacer mejor la verificación formal y la optimización.
 
-Using ``switch``, ``for`` and functions, it should be possible to write
-complex code without using ``jump`` or ``jumpi`` manually. This makes it much
-easier to analyze the control flow, which allows for improved formal
-verification and optimization.
+Además, si se permiten los saltos manuales, computar la altura de la pila se hace bastante complicado. Se necesita saber la posición de todas las variables locales de la pila, de lo contrario ni las referencias a las vairables locales ni quitar automáticamente variables locales de la pila al final de un bloque funcionará correctamente. El mecanismo de ***desugaring inserta operaciones correctamente en bloques inalcanzables que ajustan correctamente la altura de la pila en el caso de tener saltos que no tengan un control de flujo en marcha.
 
-Furthermore, if manual jumps are allowed, computing the stack height is rather complicated.
-The position of all local variables on the stack needs to be known, otherwise
-neither references to local variables nor removing local variables automatically
-from the stack at the end of a block will work properly. The desugaring
-mechanism correctly inserts operations at unreachable blocks that adjust the
-stack height properly in case of jumps that do not have a continuing control flow.
+Ejemplo:
 
-Example:
-
-We will follow an example compilation from Solidity to desugared assembly.
-We consider the runtime bytecode of the following Solidity program::
+Vamos a seguir un ejemplo de compilación de Solidity a ensamblador ***desugared.
+Consideramos el tiempo de ejecución del bytecode del siguiente programa escrito en Solidity::
 
     contract C {
       function f(uint x) returns (uint y) {
@@ -573,11 +557,11 @@ We consider the runtime bytecode of the following Solidity program::
       }
     }
 
-The following assembly will be generated::
+Se va a generar el siguiente ensamblador::
 
     {
-      mstore(0x40, 0x60) // store the "free memory pointer"
-      // function dispatcher
+      mstore(0x40, 0x60) // almacenar el "***cursor de memoria disponible"
+      // función dispatcher
       switch div(calldataload(0), exp(2, 226))
       case 0xb3de648b {
         let (r) = f(calldataload(4))
@@ -586,12 +570,12 @@ The following assembly will be generated::
         return(ret, 0x20)
       }
       default { revert(0, 0) }
-      // memory allocator
+      // repartidor de memoria
       function $allocate(size) -> pos {
         pos := mload(0x40)
         mstore(0x40, add(pos, size))
       }
-      // the contract function
+      // la función del contrato
       function f(x) -> y {
         y := 1
         for { let i := 0 } lt(i, x) { i := add(i, 1) } {
@@ -600,7 +584,7 @@ The following assembly will be generated::
       }
     }
 
-After the desugaring phase it looks as follows::
+Después del la fase de ***desugaring, se parece a lo siguiente::
 
     {
       mstore(0x40, 0x60)
@@ -610,22 +594,18 @@ After the desugaring phase it looks as follows::
         jump($caseDefault)
         $case1:
         {
-          // the function call - we put return label and arguments on the stack
+          // la llamada de función – ponemos la etiqueta return y los argumentos encima de la pila
           $ret1 calldataload(4) jump(f)
-          // This is unreachable code. Opcodes are added that mirror the
-          // effect of the function on the stack height: Arguments are
-          // removed and return values are introduced.
+          // Esto es código inalcanzable. Se añaden opcodes que reproducen el efecto de la función ***sobre la altura de la pila: se quitan argumentos y se introducen valores devueltos.
           pop pop
           let r := 0
-          $ret1: // the actual return point
+          $ret1: // el ***cursor de retorno acutal
           $ret2 0x20 jump($allocate)
           pop pop let ret := 0
           $ret2:
           mstore(ret, r)
           return(ret, 0x20)
-          // although it is useless, the jump is automatically inserted,
-          // since the desugaring process is a purely syntactic operation that
-          // does not analyze control-flow
+          // aunque no sirva de nada, se inserta el salto automáticamente, ya que el proceso de ***desugaring es una operación puramente sintáctica que no analiza el control de flujo.
           jump($endswitch)
         }
         $caseDefault:
@@ -638,20 +618,19 @@ After the desugaring phase it looks as follows::
       jump($afterFunction)
       allocate:
       {
-        // we jump over the unreachable code that introduces the function arguments
+        // nos saltamos el código inalcanzable que introduce los argumentos de la función
         jump($start)
         let $retpos := 0 let size := 0
         $start:
-        // output variables live in the same scope as the arguments and is
-        // actually allocated.
+        // las variables de salida están dentro del mismo alcance que los argumentos y ***ahora se reparten (***incoherencia con el singular/plural de la frase).
         let pos := 0
         {
           pos := mload(0x40)
           mstore(0x40, add(pos, size))
         }
-        // This code replaces the arguments by the return values and jumps back.
+        // Este código remplaza los argumentos por los valores de retorno y los saltos hacía atrás.
         swap1 pop swap1 jump
-        // Again unreachable code that corrects stack height.
+        // Esto es, de nuevo, código inalcanzable que corrige la altura de la pila.
         0 0
       }
       f:
@@ -671,7 +650,7 @@ After the desugaring phase it looks as follows::
           { i := add(i, 1) }
           jump($for_begin)
           $for_end:
-        } // Here, a pop instruction will be inserted for i
+        } // Aquí, se inserta una instrucción ***pop para i
         swap1 pop swap1 jump
         0 0
       }
@@ -680,35 +659,30 @@ After the desugaring phase it looks as follows::
     }
 
 
-Assembly happens in four stages:
+El ensamblador sucede en cuatro etapas:
 
-1. Parsing
-2. Desugaring (removes switch, for and functions)
-3. Opcode stream generation
-4. Bytecode generation
+1. Análisis sintático (o parsing en inglés)
+2. Desugaring (quita switch, for y funciones)
+3. Generación de la transmisión de opcodes
+4. Generación del bytecode
 
-We will specify steps one to three in a pseudo-formal way. More formal
-specifications will follow.
+Vamos a especificar las etapas uno a tres de una forma pseudo formal. Especificaciones más formales se darán luego.
 
 
-Parsing / Grammar
------------------
+Análisis sintático / Gramática
+------------------------------
 
-The tasks of the parser are the following:
+Éstas son las tareas del módulo de análisis (o del parser en inglés):
 
-- Turn the byte stream into a token stream, discarding C++-style comments
-  (a special comment exists for source references, but we will not explain it here).
-- Turn the token stream into an AST according to the grammar below
-- Register identifiers with the block they are defined in (annotation to the
-  AST node) and note from which point on, variables can be accessed.
+- Convertir la transmisión de byte en una transmisión de token, desechando comentarios de tipo C++ (existe un comentario especial para las referencias fuente, pero no lo vamos a explicar aquí).
+- Convertir la transmisión de token en un AST según la gramática que figura más abajo.
+- Registrar identificadores con el bloque en el que están definidos (anotación al nodo AST) y una ***nota sobre el punto a partir del cual se puede acceder a las variables.
 
-The assembly lexer follows the one defined by Solidity itself.
+El ensamblador ***lexer sigue el ensamblador definido por Solidity.
 
-Whitespace is used to delimit tokens and it consists of the characters
-Space, Tab and Linefeed. Comments are regular JavaScript/C++ comments and
-are interpreted in the same way as Whitespace.
+El espacio blanco se usa para delimitar tokens y consiste en el carácter ***Espacio, ***Tab y ***Linefeed. Los comentarios aceptados son comentarios típicos de JavaScript/C++ y se interpretan de la misma manera que el ***Espacio.
 
-Grammar::
+Gramática::
 
     AssemblyBlock = '{' AssemblyItem* '}'
     AssemblyItem =
@@ -751,16 +725,12 @@ Grammar::
     DecimalNumber = [0-9]+
 
 
-Desugaring
+***Desugaring
 ----------
 
-An AST transformation removes for, switch and function constructs. The result
-is still parseable by the same parser, but it will not use certain constructs.
-If jumpdests are added that are only jumped to and not continued at, information
-about the stack content is added, unless no local variables of outer scopes are
-accessed or the stack height is the same as for the previous instruction.
+Una transformación AST quita los for, switch y funciones constructs. El resultados aún es pasible de ser analizado desde el punto de vista sintáctico por el mismo analizador, pero no usará algunos de los constructs. Si se añaden ***jumpdests a los que sólo se salta y desde los que luego no se continúa, se añade información sobre el contenido de la pila, a no ser que no se acceda a ningúna variable local de alcance externo o que la altura de la pila sea la misma que para la instrucción anterior.
 
-Pseudocode::
+Pseudo código::
 
     desugar item: AST -> AST =
     match item {
@@ -778,8 +748,8 @@ Pseudocode::
       }
     AssemblyFor('for' { init } condition post body) ->
       {
-        init // cannot be its own block because we want variable scope to extend into the body
-        // find I such that there are no labels $forI_*
+        init // no puede ser su propio bloque porque queremos que el ***alcance de la variable se extienda hasta el cuerpo
+        // encontrar I de tal manera que no haya etiquetas $forI_*
         $forI_begin:
         jumpi($forI_end, iszero(condition))
         { body }
@@ -790,7 +760,7 @@ Pseudocode::
       }
     'break' ->
       {
-        // find nearest enclosing scope with label $forI_end
+        // encontrar el alcance que ***encierra más cercano con la etiqueta $forI_end
         pop all local variables that are defined at the current point
         but not at $forI_end
         jump($forI_end)
@@ -798,7 +768,7 @@ Pseudocode::
       }
     'continue' ->
       {
-        // find nearest enclosing scope with label $forI_continue
+        // encontrar el alcance que ***encierra más cercano con la etiqueta $forI_continue
         pop all local variables that are defined at the current point
         but not at $forI_continue
         jump($forI_continue)
@@ -806,7 +776,7 @@ Pseudocode::
       }
     AssemblySwitch(switch condition cases ( default: defaultBlock )? ) ->
       {
-        // find I such that there is no $switchI* label or variable
+        // ***encontrar I de tal manera que no haya etiqueta o variable $switchI*
         let $switchI_value := condition
         for each of cases match {
           case val: -> jumpi($switchI_caseJ, eq($switchI_value, val))
@@ -822,7 +792,7 @@ Pseudocode::
       {
         if identifier is function <name> with n args and m ret values ->
           {
-            // find I such that $funcallI_* does not exist
+            // encontrar I de tal manera que no exista $funcallI_*
             $funcallI_return argn  ... arg2 arg1 jump(<name>)
             pop (n + 1 times)
             if the current context is `let (id1, ..., idm) := f(...)` ->
@@ -840,21 +810,12 @@ Pseudocode::
       desugar(children of node)
     }
 
-Opcode Stream Generation
-------------------------
+Generación de la transmisión de opcodes
+---------------------------------------
 
-During opcode stream generation, we keep track of the current stack height
-in a counter,
-so that accessing stack variables by name is possible. The stack height is modified with every opcode
-that modifies the stack and with every label that is annotated with a stack
-adjustment. Every time a new
-local variable is introduced, it is registered together with the current
-stack height. If a variable is accessed (either for copying its value or for
-assignment), the appropriate DUP or SWAP instruction is selected depending
-on the difference bitween the current stack height and the
-stack height at the point the variable was introduced.
+Durante la generación de la transmisión de opcodes, hacemos un seguimiento de la altura de la pila en un contador, de tal manera que se pueda acceder a la variables de la pila por su nombre. Se modifica la altura de la pila con cada opcode que modifica la pila y con cada etiqueta que se anota con un ajuste de la pila. Cada vez que se introduce una nueva variable local, se registra junto con la altua actual de la pila. Si se accede a una variable (bien para copiar su valor, bien para asignar algo), se selecciona la instrucción DUP o SWAP, dependiendo de la diferencia entre la altura actual de la pila y la altura de la pila en el momento en que se introdujo esta variable.
 
-Pseudocode::
+Pseudo código::
 
     codegen item: AST -> opcode_stream =
     match item {
@@ -870,7 +831,7 @@ Pseudocode::
         Local Variable ->
           DUPi where i = 1 + stack_height - stack_height_of_identifier(id)
         Label ->
-          // reference to be resolved during bytecode generation
+          // se tendrá que resolver esta referencia durante la generación del bytecode
           PUSH<bytecode position of label>
         SubAssembly ->
           PUSH<bytecode position of subassembly data>
