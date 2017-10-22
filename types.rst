@@ -920,8 +920,8 @@ caracteres hex), que es -3 en la representación de 256 bits de los complementos
 Si un tipo es explícitamente convertido a un tipo más pequeño, los bits de orden mayor son
 eliminados::
 
-uint32 a = 0x12345678;
-uint16 b = uint16(a); // b será 0x5678 ahora
+    uint32 a = 0x12345678;
+    uint16 b = uint16(a); // b será 0x5678 ahora
 
 .. index:: ! type;deduction, ! var
 
