@@ -565,17 +565,17 @@ De modo que ``bytes`` siempre será preferible a ``byte[]`` ya que es más barat
     estás accediendo a los bytes a bajo nivel de la representación en UTF-8,
     y no a los caracteres individualmente!
 
-It is possible to mark arrays ``public`` and have Solidity create a getter.
-The numeric index will become a required parameter for the getter.
+Es posible marcar arrays como ``public`` y dejar que Solidity cree un getter.
+El índice numérico se convertirá en un parámetro requerido por el getter.
 
 .. index:: ! array;allocating, new
 
-Allocating Memory Arrays
-^^^^^^^^^^^^^^^^^^^^^^^^
+Asignación de memoria en Arrays
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Creating arrays with variable length in memory can be done using the ``new`` keyword.
-As opposed to storage arrays, it is **not** possible to resize memory arrays by assigning to
-the ``.length`` member.
+Crear arrays con longitud variable en memoria se puede hacer usando la palabra clave ``new``.
+Al contrario que con los arrays en storage, no es posible redimensionar los arrays en memoria
+mediante asignación al miembro ``.length``.
 
 ::
 
@@ -585,18 +585,18 @@ the ``.length`` member.
         function f(uint len) {
             uint[] memory a = new uint[](7);
             bytes memory b = new bytes(len);
-            // Here we have a.length == 7 and b.length == len
+            // Aquí tenemos a.length == 7 y b.length == len
             a[6] = 8;
         }
     }
 
 .. index:: ! array;literals, !inline;arrays
 
-Array Literals / Inline Arrays
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Array Literales / Arrays en linea
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Array literals are arrays that are written as an expression and are not
-assigned to a variable right away.
+Los Array literales son arrays que se escriben como una expresión y no están
+asignados a una variable al momento.
 
 ::
 
@@ -611,11 +611,11 @@ assigned to a variable right away.
         }
     }
 
-El tipo de array literal es un array de memoria de tamaño fijo de la cual el tipo
+El tipo de array literal es un array de memoria de tamaño fijo del cual el tipo
 base es el tipo común de los elementos dados. El tipo de ``[1, 2, 3]`` es
-``uint[3] memory``, porque el tipo de cada de estas constantes es ``uint8``.
+``uint[3] memory``, porque el tipo de cada una de estas constantes es ``uint8``.
 Por eso, fue necesario convertir el primer elemento en el ejemplo arriba
-a ``uint``. Nótese que actualmente, array de memoria de tamaño fijo no pueden
+a ``uint``. Nótese que actualmente, los arrays de memoria de tamaño fijo no pueden
 ser asignados a arrays de memoria de tamaño dinámico, ej. lo siguiente
 no es posible:
 
@@ -639,20 +639,20 @@ Miembros
 ^^^^^^^^
 
 **length**:
-    Arrays tienen un miembro ``length`` para guardar su número de elementos.
+    Los arrays tienen un miembro ``length`` para guardar su número de elementos.
     Arrays dinámicos pueden ser modificados en almacenamiento (no en memoria) cambiando
-    el miembro ``.length``. Ésto no ocurre automáticamente cuando se intenta acceder los elementos fuera del length actual. El tamaño de arrays de memoria es fijo (pero dinámico, ej. puede depender de parámetros runtime) cuando son creados.
+    el miembro ``.length``. Ésto no ocurre automáticamente cuando se intenta acceder a los elementos fuera de la longitud actual. El tamaño de arrays de memoria es fijo (pero dinámico, ej. puede depender de parámetros en tiempo de ejecución) cuando son creados.
 **push**:
-    Arrays de almacenamiento dinámico y ``bytes`` (no ``string``) tienen una función miembro llamada ``push`` que puede ser usada para agregar un elemento al final del array. La función devuelve el nuevo length.
+    Los arrays de almacenamiento dinámico y ``bytes`` (no ``string``) tienen una función miembro llamada ``push`` que puede ser usada para agregar un elemento al final del array. La función devuelve el nuevo length.
 
 .. warning::
     Aún no es posible usar arrays en funciónes externas.
 
 .. warning::
-    Dado a las limitaciones de la EVM, no es posible retornar
+    Debido a las limitaciones de la EVM, no es posible retornar
     contenido dinámico de las funciónes externas . La función ``f`` en
     ``contract C { function f() returns (uint[]) { ... } }`` devolverá
-    algo si es llamdo del web3.js, pero no si se llama desde Solidity.
+    algo si es llamado desde web3.js, pero no si se llama desde Solidity.
 
     La única alternativa por ahora es usar grandes arrays de tamaño estático.
 
@@ -663,10 +663,10 @@ Miembros
 
     contract ArrayContract {
         uint[2**20] m_aLotOfIntegers;
-        // Nótese que el siguiente no es un par de arrays dinámicos, sino
+        // Nótese que el siguiente no es un par de arrays dinámicos, sino un
         // array dinámico de pares (ej. de arrays de tamaño fijo de length 2).
         bool[2][] m_pairsOfFlags;
-        // newPairs es almacenado en memoria - el defecto para argumentos de función
+        // newPairs es almacenado en memoria - por defecto para argumentos de función
 
         function setAllFlagPairs(bool[2][] newPairs) {
             // asignación a un array de almacenamiento reemplaza el array completo
@@ -696,7 +696,7 @@ Miembros
 
         function byteArrays(bytes data) {
             // byte arrays ("bytes") son diferentes ya que no son almacenados sin padding,
-            // pero pueden tratados idénticamente a "uint8[]"
+            // pero pueden ser tratados idénticamente a "uint8[]"
             m_byteData = data;
             m_byteData.length += 7;
             m_byteData[3] = 8;
@@ -753,7 +753,7 @@ mostrado en el siguiente ejemplo:
 
         function newCampaign(address beneficiary, uint goal) returns (uint campaignID) {
             campaignID = numCampaigns++; // campaignID es variable de retorno
-            // Crea un nuevo sruct y guarda en almacenamiento. Dejamos fuera el tipo mapping.
+            // Crea un nuevo struct y lo guarda en almacenamiento. Dejamos fuera el tipo mapping.
             campaigns[campaignID] = Campaign(beneficiary, goal, 0, 0);
         }
 
@@ -761,7 +761,7 @@ mostrado en el siguiente ejemplo:
             Campaign c = campaigns[campaignID];
             // Crea un nuevo struct de memoria temporal, inicializado con los valores dados
             // y lo copia al almacenamiento.
-            // Nótese que también se puede usar Funder(msg.sender, msg.value) para inicializar
+            // Nótese que también se puede usar Funder(msg.sender, msg.value) para inicializarlo
             c.funders[c.numFunders++] = Funder({addr: msg.sender, amount: msg.value});
             c.amount += msg.value;
         }
@@ -777,12 +777,12 @@ mostrado en el siguiente ejemplo:
         }
     }
 
-El contrato no provee funcionalidad total de un contrato crowdfunding,
-peor contiene los conceptos básicos necesarios para entender structs.
-Tipos structs pueden ser usados dentro de mappings y arrays y pueden ellos
-mismos, contener mappings y arrays.
+El contrato no provee la funcionalidad total de un contrato crowdfunding,
+pero contiene los conceptos básicos necesarios para entender structs.
+Los tipos struct pueden ser usados dentro de mappings y arrays, y ellos mismos
+pueden contener mappings y arrays.
 
-No es posible para un struct de contener un miembro de su propio tipo,
+No es posible para un struct contener un miembro de su propio tipo,
 aunque el struct puede ser el tipo valor de un miembro mapping.
 Esta restricción es necesaria, ya que el tamaño del struct tiene que ser finito.
 
@@ -791,7 +791,7 @@ Nótese como en todas las funciónes, un tipo struct es asignado a la variable l
 Esto no copia el struct pero guarda una referencia para que las asignaciones
 a miembros de la variable local realmente escriban al estado.
 
-Por supuesto, puedes diréctamente acceder los miembros del struct sin
+Por supuesto, puedes diréctamente acceder a los miembros del struct sin
 asignarlos a la variable local, como en
 ``campaigns[campaignID].amount = 0``.
 
@@ -801,21 +801,21 @@ Mappings
 ========
 
 Tipos mapping son declarados como ``mapping(_KeyType => _ValueType)``.
-Aquí ``_KeyType`` puede ser casi cualquier tipo excepto por mapping, un array de tamaño dinámico, un contrato, un enum y un struct.
+Aquí ``_KeyType`` puede ser casi cualquier tipo excepto mapping, un array de tamaño dinámico, un contrato, un enum y un struct.
 ``_ValueType`` puede ser cualquier tipo, incluyendo mappings.
 
-Mappings pueden verse como 'has tables <https://en.wikipedia.org/wiki/Hash_table>'_ que son virtualmente inicializadas ya que
+Mappings pueden verse como 'tablas hash <https://en.wikipedia.org/wiki/Hash_table>'_ que son virtualmente inicializadas ya que
 cada posible clase existe y es mapeada a un valor que su representación byte es
-todo ceros: el valor :ref:`por defecto <default-value> de un tipo. Aunque la similitud termina aquí: los datos clave no son realmente
+todo ceros: el valor :ref:`por defecto <default-value>` de un tipo. Aunque la similitud termina aquí: los datos clave no son realmente
 almacenados en el mapping, sólo su hash ``keccak256`` usado para buscar el valor.
 
-Por esto, mappings no tienen un length o un concepto de "fijar" clave o valor.
+Por esto, los mappings no tienen un length o un concepto de "fijar" clave o valor.
 
-Mappings sólo son permitidas para variables de estado (o como tipos de referencia
-en funciónes internas).
+Los mappings sólo son permitidos para variables de estado (o como tipos de referencia
+en funciones internas).
 
 Es posible marcar los mappings ``public`` y hacer que Solidity cree un getter.
-El ``_KeyType`` será un parámetro requerido par el getter y devolverá ``_ValueType``.
+El ``_KeyType`` será un parámetro requerido para el getter y devolverá ``_ValueType``.
 
 El ``_ValueType`` puede ser un mapping también. El getter tendrá un parámetro
 para cada ``_KeyType``, recursivamente.
@@ -855,9 +855,9 @@ Si ``a`` es un LValue (ej. una variable o algo que puede ser asignado), los sigu
 delete
 ------
 
-``delete a`` asigna el valor inicial para el tipo a ``a``. Ej. para enteros, el equivalente es ``a = 0``, pero puede ser usado en arrays, donde él asigna un array dinámico de length cero o un array estático del mismo length con todos los elementos reseteados. Para structs, se asigna a struct con todos los miembros reseteados.
+``delete a`` asigna el valor inicial para el tipo a ``a``. Ej. para enteros, el equivalente es ``a = 0``, pero puede ser usado en arrays, donde se asigna un array dinámico de length cero o un array estático del mismo length con todos los elementos reseteados. Para structs, se asigna a struct con todos los miembros reseteados.
 
-``delete`` no tiene efecto en mappings enteras (ya que las claves de los mappings pueden ser arbitrarias y generalmente desconocidas). Así que si se hace delete a un struct, reseteará todos los miembros que no son mappings y también recurrirá a los miembros al menos que sean mappings. Sin embargo, las claves individuales y lo que pueden mapear puede ser deleted.
+``delete`` no tiene efecto en mappings enteros (ya que las claves de los mappings pueden ser arbitrarias y generalmente desconocidas). Así que si se hace delete a un struct, reseteará todos los miembros que no son mappings y también recursivamente a los miembros al menos que sean mappings. Sin embargo, las claves individuales y lo que pueden mapear pueden ser eliminados.
 
 Es importante notar que ``delete a`` en realidad se comporta como una asignación a ``a``, ej. almacena un nuevo objeto en ``a``.
 
@@ -871,13 +871,13 @@ Es importante notar que ``delete a`` en realidad se comporta como una asignació
 
         function f() {
             uint x = data;
-            delete x; // setea x to 0, no afecta los datos
-            delete data; // setea data a 0, no afecta x que aún tiene una copia
+            delete x; // setea x to 0, no afecta a los datos
+            delete data; // setea data a 0, no afecta a x que aún tiene una copia
             uint[] y = dataArray;
             delete dataArray; // esto setea dataArray.length a cero, pero como uint[] es un objecto complejo,
             // también y es afectado que es un alias al objeto de almacenamiento
             // Por otra parte: "delete y" no es válido, ya que asignaciones a variables locales
-            // haciendo referencia a objetos de almacenamiento sólo pueden ser hechos de
+            // haciendo referencia a objetos de almacenamiento sólo pueden ser hechas de
             // objetos de almacenamiento existentes.
         }
     }
@@ -893,8 +893,8 @@ Conversiones implícitas
 
 Si un operador es aplicado a diferentes tipos, el compilador intenta
 implícitamente convertir uno de los operadores al tipo del otro (lo mismo
-es verdad para asignaciones). En general, una conversión implícita entre tipos
-valores es posible si es tiene sentido semanticamente y no hay información
+es verdad para asignaciones). En general, una conversión implícita entre tipos de
+valores es posible si tiene sentido semanticamente y no hay información
 perdida: ``uint8`` es convertible a ``uint16`` y ``int128`` a ``int256``, pero
 ``int8`` no es convertible a ``uint256`` (porque ``uint256`` no puede contener ``-1``).
 Además, enteros sin signo pueden ser convertidos a bytes del mismo tamaño o más grande
@@ -906,8 +906,8 @@ Conversiones explícitas
 -----------------------
 
 Si el compilador no permite conversión implícita pero sabes lo que estás haciendo,
-una conversión explícita de tipo es a veces posible. Nótese que esto puede darte
-comportamiento inesperado así que asegúrate de probar que el resultado es lo que quieras!
+una conversión explícita de tipo es a veces posible. Nótese que esto puede darte un
+comportamiento inesperado, ¡así que asegúrate de probar que el resultado es el que querías!
 Este ejemplo es para convertir de un negativo ``int8`` a ``uint``:
 
 ::
@@ -932,18 +932,18 @@ uint16 b = uint16(a); // b será 0x5678 ahora
 Deducción de tipo
 =================
 
-Para conveniencia, no es siempre necesario de explícitamente especificar el tipo de
-una variable, el compilador infiere automáticamente el tipo del tipo de la primera
-expresión al cual es asignado esa variable::
+Por conveniencia, no es siempre necesario especificar explícitamente el tipo de
+una variable, el compilador infiere automáticamente el tipo del la primera
+expresión a la cual es asignada esa variable::
 
     uint24 x = 0x123;
     var y = x;
 
-Aquí, el tipo de ``y`` será ``uint24``. Usando ``var`` no es posible por parámetros de
-función de parámetros de devolución.
+Aquí, el tipo de ``y`` será ``uint24``. No es posible usar ``var`` para parámetros de
+función o parámetros de retorno.
 
 .. warning::
     El tipo es deducido sólo de la primera asignación, así que
-    el loop del siguiente snippet es infinito, ya que ``i`` tendrá el tipo
+    el bucle del siguiente snippet es infinito, ya que ``i`` tendrá el tipo
     ``uint8`` y cualquier valor de este tipo es más pequeño que ``2000``.
     ``for (var i = 0; i < 2000; i++) { ... }``
