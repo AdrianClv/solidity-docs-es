@@ -70,7 +70,7 @@ extiende en signo. Hacer un desplazamiento por un número negativo arroja una ex
     Los resultados producidos por desplazamientos a la derecha de valores negativos de tipos enteros con signo
     son diferentes de los producidos por otros lenguajes de programación. En Solidity, el desplazamiento a la derecha
     mapea la división para que los valores negativos del desplazamiento a la derecha sean redondeados hacia cero (truncado).
-    En otros lenguajes de programación el desplazamiento a la derecha de valores negativos funcióna como una división
+    En otros lenguajes de programación el desplazamiento a la derecha de valores negativos funciona como una división
     con redondeo hacia abajo (hacia infinito negativo).
 
 .. index:: address, balance, send, call, callcode, delegatecall, transfer
@@ -254,7 +254,7 @@ operaciones de bit no son permitidas y la exponenciación no es permitida si el 
     en un número racional, ej. ``5 / 2`` no es igual a ``1``, más bien a ``2.5``.
 
 .. note::
-    Expresiones de números literales son convertidas en tipos no literales tan pronto como ellas son usadas 
+    Expresiones de números literales son convertidas en tipos no literales tan pronto como sean usadas 
     con expresiones no literales. Aunque sabemos que el valor de la expresión asignada a ``b`` 
     en el siguiente ejemplo evalúa a un entero, sigue usando tipos de punto fijo (y no números literales racionales) 
     entremedio y entonces el código no compila.
@@ -266,12 +266,12 @@ operaciones de bit no son permitidas y la exponenciación no es permitida si el 
 
 .. index:: literal, literal;string, string
 
-Literales cadenas
------------------
+String literales
+----------------
 
-Las cadenas literales son cerradas con comillas simples o dobles (``"foo"`` or ``'bar'``). No hay ceros implícitos como en C; ``"foo"`` representa tres bytes, no cuatro. Como con literales enteros, su tipo puede variar, pero son implícitamente convertibles a ``bytes1``, ..., ``bytes32``, si caben a ``bytes`` y a ``string``.
+Los strings literales se escriben con comillas simples o dobles (``"foo"`` or ``'bar'``). No hay ceros implícitos como en C; ``"foo"`` representa tres bytes, no cuatro. Como con literales enteros, su tipo puede variar, pero son implícitamente convertibles a ``bytes1``, ..., ``bytes32``, si caben a ``bytes`` y a ``string``.
 
-Las cadenas literales soportan carácteres de escape, tales como ``\n``, ``\xNN`` y ``\uNNNN``. ``\xNN`` toma un valor e inserta el byte apropiado, mientras que ``\uNNNN`` toma un codepoint Unicode e inserta una secuencia UTF-8.
+Los strings literales soportan caracteres de escape, tales como ``\n``, ``\xNN`` y ``\uNNNN``. ``\xNN`` toma un valor e inserta el byte apropiado, mientras que ``\uNNNN`` toma un codepoint Unicode e inserta una secuencia UTF-8.
 
 
 .. index:: literal, bytes
@@ -282,7 +282,7 @@ Literales hexadecimales
 
 Los literales hexadecimales son prefijos con la palabra clave ``hex`` y son cerrados por comillas simples o dobles (``hex"001122FF"``). Su contenido debe ser una cadena hexadecimal y su valor será la representación binaria de esos valores.
 
-Los literales hexadecimales se comportan como los literales de cadena y tienen las mismas restricciones de convertibilidad.
+Los literales hexadecimales se comportan como los string literales y tienen las mismas restricciones de convertibilidad.
 
 
 .. index:: enum
@@ -292,9 +292,9 @@ Los literales hexadecimales se comportan como los literales de cadena y tienen l
 Enums
 -----
 
-Enums son una manera para el usuario de crear sus propios tipos en Solidity. Son explícitamente convertibles
+Los Enums son una manera para el usuario de crear sus propios tipos en Solidity. Son explícitamente convertibles
 a y desde todos los tipos de enteros, pero la conversión implícita no se permite. Las conversiones explícitas
-revisan los valores de rangos en runtime y una falla causa una excepción. Enums necesitan al menos un miembro.
+revisan los valores de rangos en tiempo de ejecución y un fallo causa una excepción. Los Enums necesitan al menos un miembro.
 
 ::
 
@@ -338,8 +338,8 @@ Los tipos de función, los hay de dos tipos: *internas* y *externas*:
 Las funciones internas sólo pueden ser usadas dentro del contrato actual (específicamente,
 dentro de la unidad de código actual, que también incluye funciones de librerías internas
 y funciones heredadas) porque no pueden ser ejecutadas fuera del
-contexto del contrato actual. Llamar una función interna se realiza
-saltando a su label de entrada, tal como cuando se llama una función interna del
+contexto del contrato actual. La llamada a una función interna se realiza
+saltando a su label de entrada, tal como cuando se llama a una función interna del
 contrato actual.
 
 Las funciones externas están compuestas de una dirección y una firma de función y pueden
@@ -369,7 +369,7 @@ como tipo ``function``, que codifica la dirección seguida por el identificador
 de la función junto con un tipo ``bytes24``.
 
 Nótese que las funciones públicas del contrato actual pueden ser usadas tanto
-como una función interna y externa. Para usar ``f`` como función interna, sólo
+como una función interna como externa. Para usar ``f`` como función interna, sólo
 se le llama como ``f``, y si se quiere usar como externa, usar ``this.f``.
 
 
@@ -461,8 +461,8 @@ Nótese que las funciones lambda o inline están planeadas pero no están aún i
 Tipos de referencia
 ===================
 
-Tipos complejos, ej. tipos que no siempre caben en 256 bits tienen que ser manejadas
-cn más cuidado que los tipos de valores que ya hemos visto. Ya que copiarlas puede
+Tipos complejos, ej. tipos que no siempre caben en 256 bits tienen que ser manejados
+con más cuidado que los tipos de valores que ya hemos visto. Ya que copiarlos puede
 ser muy caro, tenemos que pensar sobre si queremos que se almacenen en **memory**
 (que no es persistente) o en **storage** (donde las variables de estado se guardan).
 
@@ -472,16 +472,16 @@ Ubicación de datos
 Cada tipo complejo, ej. *arrays* y *structs*, tienen anotaciones
 adicionales, la "data location", con respecto a si es almacenado
 en memoria o en almacenamiento. Dependiendo del contexto, siempre hay un
-valor por defecto, pero puede ser remplazada añadiendo o bien
+valor por defecto, pero puede ser reemplazado añadiendo o bien
 ``storage`` o `memory`` al tipo. Por defecto para tipos parámetros de
 función (incluyendo parámetros de retorno) es ``memory``, por defecto para
 variables locales es ``storage`` y la ubicación es forzada a ``storage``
 para variables de estado (obviamente).
 
 Hay una tercera ubicación de datos, "calldata", un área que no es modificable
-y no persistente donde argumentos de función son almacenados. Parámetros de función
+ni persistente donde argumentos de función son almacenados. Parámetros de función
 (no parámetros de retorno) de funciónes externas son forzados a "calldata" y
-se comporta casi como memoria.
+se comportan casi como memoria.
 
 Las ubicaciones de datos son importantes porque cambian cómo las asignaciones se comportan:
 Las asignaciones entre almacenamiento y memoria y también de variables de estado (incluso desde otras
@@ -497,23 +497,23 @@ no crea una copia.
     pragma solidity ^0.4.0;
 
     contract C {
-        uint[] x; // the data location of x is storage
+        uint[] x; // la ubicación de los datos de x es storage
 
-        // la ubicacion de datos de memoryArray es memory
+        // la ubicación de datos de memoryArray es memory
         function f(uint[] memoryArray) {
-            x = memoryArray; // funcióna, copia el array entero al almacenamiento
-            var y = x; // funcióna, asigna una referencia, ubicación de datos de y es almacenamiento
+            x = memoryArray; // funciona, copia el array entero al almacenamiento
+            var y = x; // funciona, asigna una referencia, ubicación de datos de y es almacenamiento
             y[7]; // bien, devuelve el octavo elemento
-            y.length = 2; // bien, modifica de x a y
+            y.length = 2; // bien, modifica x a través de y
             delete x; // bien, limpia el array, también modifica y
-            // Lo siguiente no funcióna; debería crear un nuevo temporal/sin nombre
-            // array en almacenamiento, pero almacenamiento es asignado "estáticamente":
+            // Lo siguiente no funciona; debería crear un nuevo array temporal/sin nombre
+            // en almacenamiento, pero el almacenamiento es asignado "estáticamente":
             // y = memoryArray;
-            // Esto no funcióna tampoco, ya que resetearía el apuntador, pero no hay
+            // Esto no funciona tampoco, ya que resetearía el apuntador, pero no hay
             // ubicación donde podría apuntar
-            // borrar y;
+            // delete y;
             g(x); // llama g, dando referencia a x
-            h(x); // llama h y y crea una copia independiente y temporal en la memoria
+            h(x); // llama h y crea una copia independiente y temporal en la memoria
         }
 
         function g(uint[] storage storageArray) internal {}
@@ -525,11 +525,11 @@ Resumen
 ^^^^^^^
 
 Ubicación de datos forzada:
- - parámetros (no de retorno) de funciónes externas: calldata
+ - parámetros (no de retorno) de funciones externas: calldata
  - variables de estado: almacenamiento
 
 Ubicación de datos por defecto:
- - parámetros (también de retorno) de funciónes: memoria
+ - parámetros (también de retorno) de funciones: memoria
  - todas otras variables: almacenamiento
 
 .. index:: ! array
@@ -540,36 +540,30 @@ Arrays
 ------
 
 Los array pueden tener tamaño fijo en compilación o pueden ser dinámicos.
-Para arrays de almacenamiento, el tipo elemento puede ser arbitrario (ej. también
-otros arrays, mapeos o structs). Para arrays de memoria, no puede ser un mapping
+Para arrays de almacenamiento, el tipo del elemento puede ser arbitrario (ej. también
+otros arrays, mapeos o structs). Para arrays de memoria, no puede ser un mapping y
 tiene que ser un tipo ABI si es que es un argumento de una función públicamente
 visible.
 
 Un array de tamaño fijo ``k`` y elemento tipo ``T`` es escrito como ``T[k]``,
 un array de tamaño dinámico como ``T[]``. Como ejemplo, un array de 5 arrays
 dinámicos de ``uint`` es ``uint[][]`` (nótese que la notación es invertida
-cuando comparada a otros lenguajes). Para acceder la segunda uint en el tercer
-array dinámico, se utiliza ``x[2][1]`` ()
+comparada a otros lenguajes). Para acceder al segundo uint en el tercer
+array dinámico, se utiliza ``x[2][1]`` (los índices comienzan en 0 y el acceso
+funciona de forma opuesta a la declaración. i.e. ``x[2]`` reduce un nivel en el
+tipo desde la derecha)
 
-An array of fixed size ``k`` and element type ``T`` is written as ``T[k]``,
-an array of dynamic size as ``T[]``. As an example, an array of 5 dynamic
-arrays of ``uint`` is ``uint[][5]`` (note that the notation is reversed when
-compared to some other languages). To access the second uint in the
-third dynamic array, you use ``x[2][1]`` (indices are zero-based and
-access works in the opposite way of the declaration, i.e. ``x[2]``
-shaves off one level in the type from the right).
+Variables de tipo ``bytes`` y ``string`` son arrays especiales. Un ``bytes`` es similar a ``byte[]``,
+pero está junto en el calldata. ``string`` es igual a ``bytes`` pero no permite el acceso
+a la longitud o mediante índice (por ahora).
 
-Variables of type ``bytes`` and ``string`` are special arrays. A ``bytes`` is similar to ``byte[]``,
-but it is packed tightly in calldata. ``string`` is equal to ``bytes`` but does not allow
-length or index access (for now).
-
-So ``bytes`` should always be preferred over ``byte[]`` because it is cheaper.
+De modo que ``bytes`` siempre será preferible a ``byte[]`` ya que es más barato.
 
 .. note::
-    If you want to access the byte-representation of a string ``s``, use
-    ``bytes(s).length`` / ``bytes(s)[7] = 'x';``. Keep in mind
-    that you are accessing the low-level bytes of the UTF-8 representation,
-    and not the individual characters!
+    Si quieres acceder a la representación en bytes de un string ``s``, usa
+    ``bytes(s).length`` / ``bytes(s)[7] = 'x';``. ¡Ten en cuenta que
+    estás accediendo a los bytes a bajo nivel de la representación en UTF-8,
+    y no a los caracteres individualmente!
 
 It is possible to mark arrays ``public`` and have Solidity create a getter.
 The numeric index will become a required parameter for the getter.
@@ -783,7 +777,7 @@ mostrado en el siguiente ejemplo:
         }
     }
 
-El contrato no provee funciónalidad total de un contrato crowdfunding,
+El contrato no provee funcionalidad total de un contrato crowdfunding,
 peor contiene los conceptos básicos necesarios para entender structs.
 Tipos structs pueden ser usados dentro de mappings y arrays y pueden ellos
 mismos, contener mappings y arrays.
