@@ -901,7 +901,6 @@ Además, enteros sin signo pueden ser convertidos a bytes del mismo tamaño o m�
 pero no vice-versa. Cualquier tipo que puede ser convertido a ``uint160`` puede también
 ser convertido a ``address``.
 
-
 Conversiones explícitas
 -----------------------
 
@@ -923,7 +922,6 @@ eliminados::
 
 uint32 a = 0x12345678;
 uint16 b = uint16(a); // b será 0x5678 ahora
-
 
 .. index:: ! type;deduction, ! var
 
