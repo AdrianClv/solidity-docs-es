@@ -210,4 +210,3 @@ for the two input parameters and two returned values.
          p = 2 * (w + h);
      }
  }
-
