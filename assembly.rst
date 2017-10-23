@@ -24,12 +24,12 @@ Para tener un control más fino, especialmente para mejorar el lenguaje excribie
 Ahora queremos decribir el lenguaje del ensamblador inline en detalles.
 
 .. warning::
-    El ensamblador inline es una forma de acceder a un nivel bajo a la Máquina Virtuala de Etherem. Esto descarta varios elementos de seguridad de Solidity.
+    El ensamblador inline es una forma de acceder a bajo nivel a la Máquina Virtual de Ethereum. Esto ignora varios elementos de seguridad de Solidity.
 
 Ejemplo
 -------
 
-El siguiente ejemplo proporciona el código de librería que permite acceder al código de otro contrato y cargarlo en una variable ``byte``. Esto no es para nada factible con "Solidity puro". La idea es que se usen librerías de ensamblador para aumentar las capacidades del lenguaje en ese sentido.
+El siguiente ejemplo proporciona el código de librería que permite acceder al código de otro contrato y cargarlo en una variable ``bytes``. Esto no es para nada factible con "Solidity puro". La idea es que se usen librerías de ensamblador para aumentar las capacidades del lenguaje en ese sentido.
 
 .. code::
 
