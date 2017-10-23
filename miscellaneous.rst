@@ -1,52 +1,57 @@
-#############
-Miscellaneous
-#############
+#######
+Diverso
+#######
 
 .. index:: storage, state variable, mapping
 
-************************************
-Layout of State Variables in Storage
-************************************
+***************************************************
+Layout de las variables de estado en almacenamiento
+***************************************************
 
-Statically-sized variables (everything except mapping and dynamically-sized array types) are laid out contiguously in storage starting from position ``0``. Multiple items that need less than 32 bytes are packed into a single storage slot if possible, according to the following rules:
+Variables de tamaño estáticas (todo menos mapping y tipos arrays de tamaño variable) se disponen contiguamente en almacenamiento empezando de la posición ``0``. Cuando múltiples elementos necesitan menos de 32 bytes, son empaquetados en un slot de almacenamiento cuando es posible de acuerdo a las reglas:
 
-- The first item in a storage slot is stored lower-order aligned.
-- Elementary types use only that many bytes that are necessary to store them.
-- If an elementary type does not fit the remaining part of a storage slot, it is moved to the next storage slot.
-- Structs and array data always start a new slot and occupy whole slots (but items inside a struct or array are packed tightly according to these rules).
+- El primer elemento en un slot de almacenamiento es almacenado alineado en lower-order.
+- Tipos elementales sólo usan la cantidad de bytes que se necesita para almacenarlos.
+- Si un tipo elemental no cabe en la parte restante de un slot de almacenamiento, es movido al próximo slot de almacenamiento.
+- Structs y datos de array siempre comienzan en un nuevo slot y ocupan slots enteros (pero elementos dentro de un struct o array son empacados estrechamente de acuerdo a estas reglas).
+
 
 .. warning::
-    When using elements that are smaller than 32 bytes, your contract's gas usage may be higher.
-    This is because the EVM operates on 32 bytes at a time. Therefore, if the element is smaller
-    than that, the EVM must use more operations in order to reduce the size of the element from 32
-    bytes to the desired size.
+    Cuando se usan elementos que son más pequeños que 32 bytes, el uso del gas del contrato puede
+    ser más alto. Esto es porque la EVM opera en 32 bytes a la vez. Por lo tanto, si el elemento es
+    más pequeño que eso, la EVM usa más operaciones para reducir el tamaño del elemento de 32 bytes
+    al tamaño deseado.
 
-    It is only beneficial to use reduced-size arguments if you are dealing with storage values
-    because the compiler will pack multiple elements into one storage slot, and thus, combine
-    multiple reads or writes into a single operation. When dealing with function arguments or memory
-    values, there is no inherent benefit because the compiler does not pack these values.
+    Sólo es beneficioso reducir el tamaño de los argumentos si estás tratando con valores de
+    almacenamiento porque el compilador empacará múltiples elementos en un slot de almacenamiento,
+    y entonces, combina múltiples lecturas y escrituras en una sóla operación. Cuando se trata con
+    argumentos de función o valores de memoria, no hay beneficio inherente porque el compilador no
+    empaca estos valores.
 
-    Finally, in order to allow the EVM to optimize for this, ensure that you try to order your
-    storage variables and ``struct`` members such that they can be packed tightly. For example,
-    declaring your storage variables in the order of ``uint128, uint128, uint256`` instead of
-    ``uint128, uint256, uint128``, as the former will only take up two slots of storage whereas the
-    latter will take up three.
+    Finalmente, para permitir a la EVM optimizar esto, asegúrate de ordenar las variables de
+    almacenamiento y miembros ``struct`` para que puedan ser empacados estrechamente. Por ejemplo,
+    declarando tus variables de almacenamiento en el orden de ``uint128, uint128, uint256`` en vez de
+    ``uint128, uint256, uint128``, ya que el primero utilizará sólo dos slots de almacenamiento y éste
+    último tres.
 
-The elements of structs and arrays are stored after each other, just as if they were given explicitly.
+Los elementos de structs y arrays son almacenados después de ellos mismos, como si fueran dados explícitamente.
 
-Due to their unpredictable size, mapping and dynamically-sized array types use a Keccak-256 hash
-computation to find the starting position of the value or the array data. These starting positions are always full stack slots.
+Dado a su tamaño impredecible, los tipos de array dinámicos y de mapping usan computación hash Keccak-256
+para encontrar la posición de inicio del valor o del dato del array. Estas posiciones de inicio
+son siempre slots completos.
 
-The mapping or the dynamic array itself
-occupies an (unfilled) slot in storage at some position ``p`` according to the above rule (or by
-recursively applying this rule for mappings to mappings or arrays of arrays). For a dynamic array, this slot stores the number of elements in the array (byte arrays and strings are an exception here, see below). For a mapping, the slot is unused (but it is needed so that two equal mappings after each other will use a different hash distribution).
-Array data is located at ``keccak256(p)`` and the value corresponding to a mapping key
-``k`` is located at ``keccak256(k . p)`` where ``.`` is concatenation. If the value is again a
-non-elementary type, the positions are found by adding an offset of ``keccak256(k . p)``.
+El mapping o el array dinámico en sí ocupa un slot (sin llenar) en alguna posición ``p`` de acuerdo
+a la regla de arriba (o por aplicar esta regla de mappings a mappings o arrays de arrays). Para un
+array dinámico, este slot guarda el número de elementos en el array (los byte arrays y cadenas son
+excepciones aquí, mirar abajo). Para un mapping, el slot no es utilizado (pero es necesario para que
+dos mappings iguales seguidos usen diferentes distribuciones de hash).
+Datos de array son ubicados en ``kecakk256(p)`` y el valor correspondiente a una clave de mapping
+``k`` es ubicada en ``kecakk256(k . p)`` donde ``.`` es una concatenación. Si el valor de nuevo es
+un tipo no elemental, las posiciones son encontradas agregando un offset de ``keccak256(k . p)``.
 
-``bytes`` and ``string`` store their data in the same slot where also the length is stored if they are short. In particular: If the data is at most ``31`` bytes long, it is stored in the higher-order bytes (left aligned) and the lowest-order byte stores ``length * 2``. If it is longer, the main slot stores ``length * 2 + 1`` and the data is stored as usual in ``keccak256(slot)``.
+``bytes`` y ``string`` almacenan sus datos en el mismo slot junto con su longitud si es corta. En particular: si los datos son al menos ``31`` bytes de largo, es almacenado en bytes de orden mayor (alineados a la izquierda) y el byte de orden menor almacena ``length * 2``. Si es más largo, el slot principal almacena ``length * 2 + 1`` y los datos son almacenados como siempre en ``keccak256(slot)``.
 
-So for the following contract snippet::
+Entonces para el siguiente sinppet de contrato::
 
     contract C {
       struct s { uint a; uint b; }
@@ -54,102 +59,101 @@ So for the following contract snippet::
       mapping(uint => mapping(uint => s)) data;
     }
 
-The position of ``data[4][9].b`` is at ``keccak256(uint256(9) . keccak256(uint256(4) . uint256(1))) + 1``.
+La posición de ``data[4][9].b`` está en ``keccak256(uint256(9) . keccak256(uint256(4) . uint256(1))) + 1``.
 
 .. index: memory layout
 
-****************
-Layout in Memory
-****************
+*****************
+Layout en memoria
+*****************
 
-Solidity reserves three 256-bit slots:
+Solidity reserva tres slots de 256-bits:
 
--  0 - 64: scratch space for hashing methods
-- 64 - 96: currently allocated memory size (aka. free memory pointer)
+- 0 - 64: espacio de scratch para métodos de hash
+- 64 - 96: tamaño de memoria actualmente asignada (también conocida como free memory pointer)
 
-Scratch space can be used between statements (ie. within inline assembly).
+El espacio de scratch puede ser usado entre declaraciones (ej. dento de inline assembly).
 
-Solidity always places new objects at the free memory pointer and memory is never freed (this might change in the future).
+Solidity siempre emplaza los nuevos objetos en el puntero de memoria libre y la memoria nunca es liberada (esto puede cambiar en el futuro).
 
 .. warning::
-  There are some operations in Solidity that need a temporary memory area larger than 64 bytes and therefore will not fit into the scratch space. They will be placed where the free memory points to, but given their short lifecycle, the pointer is not updated. The memory may or may not be zeroed out. Because of this, one shouldn't expect the free memory to be zeroed out.
-
+  Hay algunas operaciones en Solidity que necesitan un área temporal de memoria mas grande que 64 bytes y por lo tanto no caben en el espacio scratch. Estas operaciones serán emplazadas donde apunta la memoria libre, pero dado su corta vida, el puntero no es actualizado. La memoria puede o no ser puesta a cero. Por esto, uno no debiera esperar que la memoria libre sea puesta a cero.
 
 .. index: calldata layout
 
 *******************
-Layout of Call Data
+Layout de Call Data
 *******************
 
-When a Solidity contract is deployed and when it is called from an
-account, the input data is assumed to be in the format in `the ABI
-specification
-<https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI>`_.  The
-ABI specification requires arguments to be padded to multiples of 32
-bytes.  The internal function calls use a different convention.
-
+Cuando un contrato de Solidity es desplegado y cuando es llamado desde una
+cuenta, los datos de entrada se asume que están en el formato de la
+`especificación ABI <https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI>`_.
+La especificación ABI requiere que los argumentos sean ajustados a
+múltiplos de 32 bytes. Las llamadas de función internas usan otra convención.
 
 .. index: variable cleanup
 
-*********************************
-Internals - Cleaning Up Variables
-*********************************
+******************************
+Internas - Limpiando variables
+******************************
 
-When a value is shorter than 256-bit, in some cases the remaining bits
-must be cleaned.
-The Solidity compiler is designed to clean such remaining bits before any operations
-that might be adversely affected by the potential garbage in the remaining bits.
-For example, before writing a value to the memory, the remaining bits need
-to be cleared because the memory contents can be used for computing
-hashes or sent as the data of a message call.  Similarly, before
-storing a value in the storage, the remaining bits need to be cleaned
-because otherwise the garbled value can be observed.
+Cuando un valor es más corto que 256-bit, en algunos casos los bits
+restantes tienen que ser limpiados.
+El compilador de Solidity está diseñado para limpiar estos bits restantes antes
+de cualquier operación que pueda ser afectada adversamente por la potencial
+basura en los bits restantes.
+Por ejemplo, antes de escribir un valor en la memoria, los bits restantes tienen
+que ser limpiados porque los contenidos de la memoria pueden ser usados para
+computar hashes o ser enviados como datos en una llamada. De manera similar,
+antes de almacenar un valor en el almacenamiento, los bits restantes tienen
+que ser limpiados porque si no, el valor ilegible puede ser observado.
 
-On the other hand, we do not clean the bits if the immediately
-following operation is not affected.  For instance, since any non-zero
-value is considered ``true`` by ``JUMPI`` instruction, we do not clean
-the boolean values before they are used as the condition for
-``JUMPI``.
+Por otro lado, no limpiamos los bits si la operación siguiente no es afectada.
+Por ejemplo, ya que cualquier valor no-cero es considerado ``true`` por
+una instrucción ``JUMPI``, no limpiamos los valores booleanos antes de que sean utilizados
+como condición para ``JUMPI``.
 
-In addition to the design principle above, the Solidity compiler
-cleans input data when it is loaded onto the stack.
+Además de este principio de diseño, el compilador de Solidity
+limpia los datos de entrada cuando está cargado en el stack.
 
-Different types have different rules for cleaning up invalid values:
+Diferentes tipos tienen diferentes reglas para limpiar valores inválidos:
 
-+---------------+---------------+-------------------+
-|Type           |Valid Values   |Invalid Values Mean|
-+===============+===============+===================+
-|enum of n      |0 until n - 1  |exception          |
-|members        |               |                   |
-+---------------+---------------+-------------------+
-|bool           |0 or 1         |1                  |
-+---------------+---------------+-------------------+
-|signed integers|sign-extended  |currently silently |
-|               |word           |wraps; in the      |
-|               |               |future exceptions  |
-|               |               |will be thrown     |
-|               |               |                   |
-|               |               |                   |
-+---------------+---------------+-------------------+
-|unsigned       |higher bits    |currently silently |
-|integers       |zeroed         |wraps; in the      |
-|               |               |future exceptions  |
-|               |               |will be thrown     |
-+---------------+---------------+-------------------+
++---------------+---------------+--------------------+
+|Tipo           |Valores válidos|Val. inv. significan|
++===============+===============+====================+
+|enum de n      |0 hasta n - 1  |excepción           |
+|miembros       |               |                    |
++---------------+---------------+--------------------+
+|bool           |0 o  1         |1                   |
++---------------+---------------+--------------------+
+|enteros con    |palabra        |por ahora envuelve  |
+|signo          |extendida por  |silenciosamente;    |
+|               |signo          |en el futuro esto   |
+|               |               |arrojará            |
+|               |               |excepciones         |
+|               |               |                    |
++---------------+---------------+--------------------+
+|enteros        |altos bits     |por ahora envuelve  |
+|sin signos     |a cero         |silenciosamente;    |
+|               |               |en el futuro esto   |
+|               |               |arrojará            |
+|               |               |excepciones         |
++---------------+---------------+--------------------+
+
 
 .. index:: optimizer, common subexpression elimination, constant propagation
 
 *************************
-Internals - The Optimizer
+Internos - El optimizador
 *************************
 
-The Solidity optimizer operates on assembly, so it can be and also is used by other languages. It splits the sequence of instructions into basic blocks at JUMPs and JUMPDESTs. Inside these blocks, the instructions are analysed and every modification to the stack, to memory or storage is recorded as an expression which consists of an instruction and a list of arguments which are essentially pointers to other expressions. The main idea is now to find expressions that are always equal (on every input) and combine them into an expression class. The optimizer first tries to find each new expression in a list of already known expressions. If this does not work, the expression is simplified according to rules like ``constant + constant = sum_of_constants`` or ``X * 1 = X``. Since this is done recursively, we can also apply the latter rule if the second factor is a more complex expression where we know that it will always evaluate to one. Modifications to storage and memory locations have to erase knowledge about storage and memory locations which are not known to be different: If we first write to location x and then to location y and both are input variables, the second could overwrite the first, so we actually do not know what is stored at x after we wrote to y. On the other hand, if a simplification of the expression x - y evaluates to a non-zero constant, we know that we can keep our knowledge about what is stored at x.
+El optimizador de solidity funciona con ensamblador, así que puede y es usado con otros lenguajes. Divide la secuencia de las instrucciones en bloques básicos de JUMPs y JUMPDESTs. Dentro de estos bloques, las instrucciones son analizadas y cada modificación al stack, a la memoria o al almacenamiento son guardadas como una expresión que consiste en una instrucción y una lista de argumentos que son esencialmente punteros a otras expresiones. La idea principal es encontrar expresiones que sean siempre iguales (en cada entrada) y combinarlas a una clase de expresión. El optimizador primero intenta encontrar una nueva expresión en una lista de expresiones conocidas. Si esto no funciona, la expresión es simplificada de acuerdo a reglas como ``constante + constante = suma_de_constantes`` o ``X * 1 = X``. Ya que esto es hecho recursivamente, también podemos aplicar la última regla si el segundo factor es una expresión más compleja donde sabemos que siempre evaluará a uno. Modificaciones al almacenamiento y ubicaciones de memoria tienen que borrar el conocimiento de almacenamiento y ubicaciones de memoria que no son conocidas como diferentes: Si primero escribimos a ubicación `x` y luego a ubicación `y` y ambas son variables de entrada, la segunda puede sobrescribir la primera, entonces no sabemos realmente lo que es almacenado en `x` después de escribir a `y`. Por otro lado, si una simplificación de la expresión `x - y` evalúa a una constante distinta de cero, sabemos que podemos mantener nuestro conocimiento de lo que es almacenado en x.
 
-At the end of this process, we know which expressions have to be on the stack in the end and have a list of modifications to memory and storage. This information is stored together with the basic blocks and is used to link them. Furthermore, knowledge about the stack, storage and memory configuration is forwarded to the next block(s). If we know the targets of all JUMP and JUMPI instructions, we can build a complete control flow graph of the program. If there is only one target we do not know (this can happen as in principle, jump targets can be computed from inputs), we have to erase all knowledge about the input state of a block as it can be the target of the unknown JUMP. If a JUMPI is found whose condition evaluates to a constant, it is transformed to an unconditional jump.
+Al final de este proceso, sabemos qué expresiones tienen que estar al final del stack y tienen una lista de modificaciones a la memoria y almacenamiento. Esta información es almacenada junto con los bloques básicos y es usada para unirlas. Además, información sobre el stack, almacenamiento y configuración de memoria es enviada al (los) próximo(s) bloque(s). Si sabemos los objetivos de cada una de las instrucciones JUMP y JUMPI, podemos construir un gráfico de flujo completo del programa. Si hay un sólo objetivo que no conocemos (esto puede pasar ya que en principio, los objetivos de jumps pueden ser computados de las entradas), tenemos que borrar toda información sobre los estados de entrada de un bloque ya que puede ser el objetivo del JUMP desconocido. Si se encuentra un JUMPI cuya condición evalúa a una constante, es transformado en un jump incondicional.
 
-As the last step, the code in each block is completely re-generated. A dependency graph is created from the expressions on the stack at the end of the block and every operation that is not part of this graph is essentially dropped. Now code is generated that applies the modifications to memory and storage in the order they were made in the original code (dropping modifications which were found not to be needed) and finally, generates all values that are required to be on the stack in the correct place.
+Como en el último paso, el código en cada bloque es completamente regenerado. Un gráfico de dependencias es creado de la expresión en el stack al final del bloque y cada operación que no es parte de este gráfico es esencialmente olvidada. Ahora se genera código que aplica las modificaciones a la memoria y al almacenamiento en el orden en que fueron hechas en el código original (olvidando modificaciones que fueron encontradas innecesarias) y finalmente, genera todos los valores que son requeridos para estar en el stack en el lugar correcto.
 
-These steps are applied to each basic block and the newly generated code is used as replacement if it is smaller. If a basic block is split at a JUMPI and during the analysis, the condition evaluates to a constant, the JUMPI is replaced depending on the value of the constant, and thus code like
+Estos pasos son aplicados a cada bloque básico y el nuevo código generado se usa como reemplazo si es más pequeño. Si un bloque básico es dividido en un JUMPI y durante el análisis la condición evalúa a una constante, el JUMPI es reemplazado dependiendo del valor de la constante, y por lo tanto código como
 
 ::
 
@@ -160,221 +164,225 @@ These steps are applied to each basic block and the newly generated code is used
     else
       return 1;
 
-is simplified to code which can also be compiled from
+es simplificado a código que también puede ser compilado de
 
 ::
 
     data[7] = 9;
     return 1;
 
-even though the instructions contained a jump in the beginning.
+aunque las instrucciones contenían un jump en el inicio.
 
 .. index:: source mappings
 
-***************
-Source Mappings
-***************
+******************
+Mappings de fuente
+******************
 
-As part of the AST output, the compiler provides the range of the source
-code that is represented by the respective node in the AST. This can be
-used for various purposes ranging from static analysis tools that report
-errors based on the AST and debugging tools that highlight local variables
-and their uses.
+Como parte del AST (Abstract syntax tree) de salida, el compilador provee el rango del código fuente
+que es representado por el nodo respecto al AST. Esto puede ser usado
+para varios propósitos desde herramientas de análisis estático que reportan
+errores basados en el AST y herramientas de debugging que demarcan variables
+locales y sus usos.
 
-Furthermore, the compiler can also generate a mapping from the bytecode
-to the range in the source code that generated the instruction. This is again
-important for static analysis tools that operate on bytecode level and
-for displaying the current position in the source code inside a debugger
-or for breakpoint handling.
+Además, el compilador también puede generar un mapping del bytecode
+al rango en el código fuente que generó la instrucción. Esto es importante
+para herramientas de análisis estático que operan a nivel bytecode y
+para mostrar la posición actual en el código fuente dentro del debugger
+o para manejar los breakpoints.
 
-Both kinds of source mappings use integer indentifiers to refer to source files.
-These are regular array indices into a list of source files usually called
-``"sourceList"``, which is part of the combined-json and the output of
-the json / npm compiler.
+Ambos tipos de mappings de fuente usan identificadores enteros para referirse a
+archivos fuente. Estos son índices de arrays regulares en una lista de archivos
+fuente habitualmente llamados ``"sourcelist"``, que es parte del combined-json y
+el output del compilador json / npm.
 
-The source mappings inside the AST use the following
-notation:
+Los mappings de fuente dentro del AST usan la siguiente notación:
 
 ``s:l:f``
 
-Where ``s`` is the byte-offset to the start of the range in the source file,
-``l`` is the length of the source range in bytes and ``f`` is the source
-index mentioned above.
+Donde ``s`` es el byte-offset de el inicio del rango en el archivo fuente,
+``l`` es el largo del rango de la fuente en bytes y ``f`` es el índice de fuente
+mencionado arriba.
 
-The encoding in the source mapping for the bytecode is more complicated:
-It is a list of ``s:l:f:j`` separated by ``;``. Each of these
-elements corresponds to an instruction, i.e. you cannot use the byte offset
-but have to use the instruction offset (push instructions are longer than a single byte).
-The fields ``s``, ``l`` and ``f`` are as above and ``j`` can be either
-``i``, ``o`` or ``-`` signifying whether a jump instruction goes into a
-function, returns from a function or is a regular jump as part of e.g. a loop.
+La codificación en el mapping de fuente para el bytecode es más complicada:
+Es una lista de ``s:l:f:j`` separada por ``;``. Cada una de estos elementos
+corresponde a una instrucción, i.e. no puedes usar el byte-offset
+si no que tienes que usar la instrucción offset (las instrucciones push son mas largas
+que un sólo byte).
+Los campos ``s``, ``l`` y ``f`` son como detallamos arriba y ``j`` puede ser ``i``,
+``o`` o ``-`` y significa si una instrucción jump va en la función, devuelve desde
+una función o si es un jump regular como parte de un (ej) bucle.
 
-In order to compress these source mappings especially for bytecode, the
-following rules are used:
+A fin de comprimir estos mappings de fuente especialmente para bytecode, las
+siguientes reglas son usadas:
 
- - If a field is empty, the value of the preceding element is used.
- - If a ``:`` is missing, all following fields are considered empty.
+ - Si un campo está vacío, el valor del elemento precedente es usado.
+ - Si falta un ``:``, todos los campos siguientes son considerados vacíos.
 
-This means the following source mappings represent the same information:
+Esto significa que los siguientes mappings de fuente representan la misma información:
 
 ``1:2:1;1:9:1;2:1:2;2:1:2;2:1:2``
 
 ``1:2:1;:9;2::2;;``
 
-*****************
-Contract Metadata
-*****************
+*********************
+Metadata del contrato
+*********************
 
-The Solidity compiler automatically generates a JSON file, the
-contract metadata, that contains information about the current contract.
-It can be used to query the compiler version, the sources used, the ABI
-and NatSpec documentation in order to more safely interact with the contract
-and to verify its source code.
+El compilador de Solidity genera automáticamente un archivo JSON, el
+metadata del contrato, que contiene información sobre el contrato actual.
+Se puede usar para consultar la versión del compilador, las fuentes usadas,
+el ABI y documentación NatSpec a fin de interactuar con más seguridad con el
+contrato y verificar su código fuente.
 
-The compiler appends a Swarm hash of the metadata file to the end of the
-bytecode (for details, see below) of each contract, so that you can retrieve
-the file in an authenticated way without having to resort to a centralized
-data provider.
+El compilador agrega un hash Swarm del archivo metadata al final del bytecode
+(para detalles, mirar abajo) de cada contrato, para que se pueda recuperar el
+archivo en una manera autentificada sin tener que usar un proveedor de datos
+centrales.
 
-Of course, you have to publish the metadata file to Swarm (or some other service)
-so that others can access it. The file can be output by using ``solc --metadata``
-and the file will be called ``ContractName_meta.json``.
-It will contain Swarm references to the source code, so you have to upload
-all source files and the metadata file.
+Sin embargo, se tiene que publicar el archivo metadata a Swarm (o otro servicio)
+para que otros puedan verlo. El archivo puede ser producido usando ``solc --metadata``
+y el archivo será llamado ``NombreContrato_meta.json``.
+Contendrá referencias Swarm al código fuente, así que tienes que subir
+todos los archivos de código fuente y el archivo metadata.
 
-The metadata file has the following format. The example below is presented in a
-human-readable way. Properly formatted metadata should use quotes correctly,
-reduce whitespace to a minimum and sort the keys of all objects to arrive at a
-unique formatting.
-Comments are of course also not permitted and used here only for explanatory purposes.
+El archivo metadata tiene el formato siguiente. El ejemplo de abajo es presentado de
+manera legible por humanos. Los metadatos formateados correctamente deben usar comillas
+correctamente, reducir el espacio en blanco a un mínimo y ordenarse de manera diferente.
+Los comentarios obviamente tampoco son permitidos y son usados aquí sólo por
+razones explicativos.
 
 .. code-block:: none
 
     {
-      // Required: The version of the metadata format
+      // Requerido: La versión del formato de metadata
       version: "1",
-      // Required: Source code language, basically selects a "sub-version"
-      // of the specification
+      // Requerido: lenguaje de código fuente, settea una "sub-versión"
+      // de la especificación
       language: "Solidity",
-      // Required: Details about the compiler, contents are specific
-      // to the language.
+      // Requerido: Detalles del compilador, los contenidos son específicos
+      // al lenguaje
       compiler: {
-        // Required for Solidity: Version of the compiler
+        // Requerido para Solidity: Version del compilador
         version: "0.4.6+commit.2dabbdf0.Emscripten.clang",
-        // Optional: Hash of the compiler binary which produced this output
+        // Opcional: Hash del compilador binario que produjo este resultado
         keccak256: "0x123..."
       },
-      // Required: Compilation source files/source units, keys are file names
+      // Requerido: Compilación de archivos fuente/unidades fuente, las claves son
+      // nombres de archivos
       sources:
       {
         "myFile.sol": {
-          // Required: keccak256 hash of the source file
+          // Requerido: keccak256 hash del archivo fuente
           "keccak256": "0x123...",
-          // Required (unless "content" is used, see below): Sorted URL(s)
-          // to the source file, protocol is more or less arbitrary, but a
-          // Swarm URL is recommended
+          // Requerido (al menos que "content" sea usado, ver abajo): URL(s) ordenadas
+          // al archivo fuente, el protocolo es menos arbitrario, pero se recomienda una
+          // URL de Swarm
           "urls": [ "bzzr://56ab..." ]
         },
         "mortal": {
-          // Required: keccak256 hash of the source file
+          // Requerido: hash keccak256 del archivo fuente
           "keccak256": "0x234...",
-          // Required (unless "url" is used): literal contents of the source file
+          // Requerido (al menos que "url" sea usado): contenidos literales del archivo fuente
           "content": "contract mortal is owned { function kill() { if (msg.sender == owner) selfdestruct(owner); } }"
         }
       },
-      // Required: Compiler settings
+      // Requerido: Configuración del compilador
       settings:
       {
-        // Required for Solidity: Sorted list of remappings
+        // Requerido para Solidity: Lista ordenada de remappeos
         remappings: [ ":g/dir" ],
-        // Optional: Optimizer settings (enabled defaults to false)
+        // Opcional: Configuración del optimizador (por defecto falso)
         optimizer: {
           enabled: true,
           runs: 500
         },
-        // Required for Solidity: File and name of the contract or library this
-        // metadata is created for.
+        // Requerido para Solidity: Archivo y nombre del contrato o librería para
+        // la librería para el cual es creado este archivo metadata.
         compilationTarget: {
           "myFile.sol": "MyContract"
         },
-        // Required for Solidity: Addresses for libraries used
+        // Requerido para Solidity: Direcciones de las librerías usadas
         libraries: {
           "MyLib": "0x123123..."
         }
       },
-      // Required: Generated information about the contract.
+      // Requerido: Información generada sobre el contrato.
       output:
       {
-        // Required: ABI definition of the contract
+        // Requerido: definición ABI del contrato
         abi: [ ... ],
-        // Required: NatSpec user documentation of the contract
+        // Requerido: documentación de usuario del contrato de NatSpec
         userdoc: [ ... ],
-        // Required: NatSpec developer documentation of the contract
+        // Requerido: documentación de desarrollador del contrato de NatSpec
         devdoc: [ ... ],
       }
     }
 
 .. note::
-    Note the ABI definition above has no fixed order. It can change with compiler versions.
+    Nótese que la definición ABI de arriba no tiene orden fijo. Puede cambiar en distintas versiones del compilador.
 
 .. note::
-    Since the bytecode of the resulting contract contains the metadata hash, any change to
-    the metadata will result in a change of the bytecode. Furthermore, since the metadata
-    includes a hash of all the sources used, a single whitespace change in any of the source
-    codes will result in a different metadata, and subsequently a different bytecode.
+    Ya que el bytecode del contrato resultante contiene el hash del metadata, cualquier cambio
+    a la metadata resultará en un cambio en el bytecode. Además, ya que la metadata incluye
+    un hash de todos los fuentes usados, un simple espacio en blanco en cualquiera de los
+    archivos de fuente resultará en un metadata diferente, y posteriormente en bytecode diferente.
 
-Encoding of the Metadata Hash in the Bytecode
-=============================================
 
-Because we might support other ways to retrieve the metadata file in the future,
-the mapping ``{"bzzr0": <Swarm hash>}`` is stored
-[CBOR](https://tools.ietf.org/html/rfc7049)-encoded. Since the beginning of that
-encoding is not easy to find, its length is added in a two-byte big-endian
-encoding. The current version of the Solidity compiler thus adds the following
-to the end of the deployed bytecode::
+Codificación del hash de metadata en el bytecode
+================================================
+
+Ya que en el futuro puede que soportemos otras maneras de consultar el archivo metadata,
+el mapping ``{"bzzr0": <Swarm hash>}`` es guardado
+codificado en [CBOR](https://tools.ietf.org/html/rfc7049). Ya que el principio de esa
+codificación no es fácil de encontrar, la longitud se añade en una codificación two-byte big-endian.
+La versión actual del compilador de Solidity entonces agrega lo siguiente al final
+del bytecode desplegado::
 
     0xa1 0x65 'b' 'z' 'z' 'r' '0' 0x58 0x20 <32 bytes swarm hash> 0x00 0x29
 
-So in order to retrieve the data, the end of the deployed bytecode can be checked
-to match that pattern and use the Swarm hash to retrieve the file.
-
-Usage for Automatic Interface Generation and NatSpec
-====================================================
-
-The metadata is used in the following way: A component that wants to interact
-with a contract (e.g. Mist) retrieves the code of the contract, from that
-the Swarm hash of a file which is then retrieved.
-That file is JSON-decoded into a structure like above.
-
-The component can then use the ABI to automatically generate a rudimentary
-user interface for the contract.
-
-Furthermore, Mist can use the userdoc to display a confirmation message to the user
-whenever they interact with the contract.
-
-Usage for Source Code Verification
-==================================
-
-In order to verify the compilation, sources can be retrieved from Swarm
-via the link in the metadata file.
-The compiler of the correct version (which is checked to be part of the "official" compilers)
-is invoked on that input with the specified settings. The resulting
-bytecode is compared to the data of the creation transaction or CREATE opcode data.
-This automatically verifies the metadata since its hash is part of the bytecode.
-Excess data corresponds to the constructor input data, which should be decoded
-according to the interface and presented to the user.
+Para recuperar estos datos, el final del bytecode desplegado puede ser
+revisado para ver si coincide con ese patrón y usar el hash de Swarm para recuperar el archivo.
 
 
-***************
-Tips and Tricks
-***************
+Uso para generar automáticamente la interfaz y NatSpec
+======================================================
 
-* Use ``delete`` on arrays to delete all its elements.
-* Use shorter types for struct elements and sort them such that short types are grouped together. This can lower the gas costs as multiple SSTORE operations might be combined into a single (SSTORE costs 5000 or 20000 gas, so this is what you want to optimise). Use the gas price estimator (with optimiser enabled) to check!
-* Make your state variables public - the compiler will create :ref:`getters <visibility-and-getters>` for you automatically.
-* If you end up checking conditions on input or state a lot at the beginning of your functions, try using :ref:`modifiers`.
-* If your contract has a function called ``send`` but you want to use the built-in send-function, use ``address(contractVariable).send(amount)``.
-* Initialise storage structs with a single assignment: ``x = MyStruct({a: 1, b: 2});``
+El metadata es usado de la siguiente forma: un componente que quiere interactuar
+con un contrato (ej. Mist) obtiene el código del contrato, a partir de eso el
+hash de Swarm de un archivo que luego es recuperado.
+Ese archivo es un JSON con la estructura como la de arriba.
+
+El componente puede luego usar el ABI para generar automáticamente una rudimentaria
+interfaz de usuario para el contrato.
+
+Además, Mist puede usar el userdoc para mostrar un mensaje de confirmación al usuario
+cuando interactúe con el contrato.
+
+
+Uso para la verificación de código fuente
+=========================================
+
+A fin de verificar la compilación, el código fuente pueden ser recuperado de Swarm
+desde el enlace en el archivo metadata.
+La versión correcta del compilador (que se comprueba que sea parte de los compiladores
+"oficiales") es invocada en esa entrada con la configuración específicada. El resultado
+bytecode es comparado a los datos de la transacción de creación o a datos del opcode CREATE.
+Esto verifica automáticamente la metadata ya que su hash es parte del bytecode.
+Datos en exceso corresponden a los datos de entrada del constructor, que deben ser decodificados
+de acuerdo a la interfaz y presentados al usuario.
+
+
+*****************
+Trucos y consejos
+*****************
+
+* Usar ``delete`` en arrays para borrar sus elementos.
+* Usar tipos mas cortos para elementos struct y ordenarlos para que los elementos mas cortos estén agrupados. Esto puede disminuir los costes de gas ya que múltiples operaciones SSTORE puden ser combinadas en una sóla (SSTORE cuesta 5000 o 20000 gas, así que esto es lo que se optimiza). ¡Usa el estimador de precio de gas (con optimizador activado) para probar!
+* Hacer las variables de estado públicas - el compilador creará :ref:`getters <visibility-and-getters>` automáticamente.
+* Si revisa las condiciones de entrada o de estado muchas veces en el inicio de las funciones, intenta usar :ref:`modifiers`.
+* Si tu contrato tiene una función llamada ``send`` pero quieres usar la función interna de envío, usa ``address(contractVariable).send(amount)``.
+* Inicia structs de almacenamiento con una sola asignación: ``x = MyStruct({a: 1, b: 2});``
 
 **********
 Cheatsheet
@@ -384,104 +392,105 @@ Cheatsheet
 
 .. _order:
 
-Order of Precedence of Operators
-================================
+Orden de preferencia de operadores
+==================================
 
-The following is the order of precedence for operators, listed in order of evaluation.
+El siguiente es el orden de precedencia para operadores, listado en orden de evaluación.
 
 +------------+-------------------------------------+--------------------------------------------+
-| Precedence | Description                         | Operator                                   |
+| Precedencia| Descripción                         | Operador                                   |
 +============+=====================================+============================================+
-| *1*        | Postfix increment and decrement     | ``++``, ``--``                             |
+| *1*        | Postfix incremento y decremento     | ``++``, ``--``                             |
 +            +-------------------------------------+--------------------------------------------+
-|            | Function-like call                  | ``<func>(<args...>)``                      |
+|            | llamada de tipo función             | ``<func>(<args...>)``                      |
 +            +-------------------------------------+--------------------------------------------+
-|            | Array subscripting                  | ``<array>[<index>]``                       |
+|            | subíndice de array                  | ``<array>[<index>]``                       |
 +            +-------------------------------------+--------------------------------------------+
-|            | Member access                       | ``<object>.<member>``                      |
+|            | Acceso de miembro                   | ``<object>.<member>``                      |
 +            +-------------------------------------+--------------------------------------------+
-|            | Parentheses                         | ``(<statement>)``                          |
+|            | Paréntesis                          | ``(<statement>)``                          |
 +------------+-------------------------------------+--------------------------------------------+
-| *2*        | Prefix increment and decrement      | ``++``, ``--``                             |
+| *2*        | Prefijo incremento y decremento     | ``++``, ``--``                             |
 +            +-------------------------------------+--------------------------------------------+
-|            | Unary plus and minus                | ``+``, ``-``                               |
+|            | Más y menos unarios                 | ``+``, ``-``                               |
 +            +-------------------------------------+--------------------------------------------+
-|            | Unary operations                    | ``delete``                                 |
+|            | Operaciones unarias                 | ``delete``                                 |
 +            +-------------------------------------+--------------------------------------------+
-|            | Logical NOT                         | ``!``                                      |
+|            | NOT lógico                          | ``!``                                      |
 +            +-------------------------------------+--------------------------------------------+
-|            | Bitwise NOT                         | ``~``                                      |
+|            | NOT a nivel de bits                 | ``~``                                      |
 +------------+-------------------------------------+--------------------------------------------+
-| *3*        | Exponentiation                      | ``**``                                     |
+| *3*        | Exponenciación                      | ``**``                                     |
 +------------+-------------------------------------+--------------------------------------------+
-| *4*        | Multiplication, division and modulo | ``*``, ``/``, ``%``                        |
+| *4*        | Multiplicación, división and módulo | ``*``, ``/``, ``%``                        |
 +------------+-------------------------------------+--------------------------------------------+
-| *5*        | Addition and subtraction            | ``+``, ``-``                               |
+| *5*        | Adición and sustracción             | ``+``, ``-``                               |
 +------------+-------------------------------------+--------------------------------------------+
-| *6*        | Bitwise shift operators             | ``<<``, ``>>``                             |
+| *6*        | Desplazamiento de bits              | ``<<``, ``>>``                             |
 +------------+-------------------------------------+--------------------------------------------+
-| *7*        | Bitwise AND                         | ``&``                                      |
+| *7*        | AND a nivel de bits                 | ``&``                                      |
 +------------+-------------------------------------+--------------------------------------------+
-| *8*        | Bitwise XOR                         | ``^``                                      |
+| *8*        | XOR a nivel de bits                 | ``^``                                      |
 +------------+-------------------------------------+--------------------------------------------+
-| *9*        | Bitwise OR                          | ``|``                                      |
+| *9*        | OR a nivel de bits                  | ``|``                                      |
 +------------+-------------------------------------+--------------------------------------------+
-| *10*       | Inequality operators                | ``<``, ``>``, ``<=``, ``>=``               |
+| *10*       | Operadores de desigualdad           | ``<``, ``>``, ``<=``, ``>=``               |
 +------------+-------------------------------------+--------------------------------------------+
-| *11*       | Equality operators                  | ``==``, ``!=``                             |
+| *11*       | Operadores de igualdad              | ``==``, ``!=``                             |
 +------------+-------------------------------------+--------------------------------------------+
-| *12*       | Logical AND                         | ``&&``                                     |
+| *12*       | AND lógico                          | ``&&``                                     |
 +------------+-------------------------------------+--------------------------------------------+
-| *13*       | Logical OR                          | ``||``                                     |
+| *13*       | OR lógico                           | ``||``                                     |
 +------------+-------------------------------------+--------------------------------------------+
-| *14*       | Ternary operator                    | ``<conditional> ? <if-true> : <if-false>`` |
+| *14*       | Operador ternario                   | ``<conditional> ? <if-true> : <if-false>`` |
 +------------+-------------------------------------+--------------------------------------------+
-| *15*       | Assignment operators                | ``=``, ``|=``, ``^=``, ``&=``, ``<<=``,    |
+| *15*       | Operador de asignación              | ``=``, ``|=``, ``^=``, ``&=``, ``<<=``,    |
 |            |                                     | ``>>=``, ``+=``, ``-=``, ``*=``, ``/=``,   |
 |            |                                     | ``%=``                                     |
 +------------+-------------------------------------+--------------------------------------------+
-| *16*       | Comma operator                      | ``,``                                      |
+| *16*       | Operador de coma                    | ``,``                                      |
 +------------+-------------------------------------+--------------------------------------------+
 
 .. index:: assert, block, coinbase, difficulty, number, block;number, timestamp, block;timestamp, msg, data, gas, sender, value, now, gas price, origin, revert, require, keccak256, ripemd160, sha256, ecrecover, addmod, mulmod, cryptography, this, super, selfdestruct, balance, send
 
-Global Variables
-================
+Variables globales
+==================
 
-- ``block.blockhash(uint blockNumber) returns (bytes32)``: hash of the given block - only works for 256 most recent blocks
-- ``block.coinbase`` (``address``): current block miner's address
-- ``block.difficulty`` (``uint``): current block difficulty
-- ``block.gaslimit`` (``uint``): current block gaslimit
-- ``block.number`` (``uint``): current block number
-- ``block.timestamp`` (``uint``): current block timestamp
-- ``msg.data`` (``bytes``): complete calldata
-- ``msg.gas`` (``uint``): remaining gas
-- ``msg.sender`` (``address``): sender of the message (current call)
-- ``msg.value`` (``uint``): number of wei sent with the message
-- ``now`` (``uint``): current block timestamp (alias for ``block.timestamp``)
-- ``tx.gasprice`` (``uint``): gas price of the transaction
-- ``tx.origin`` (``address``): sender of the transaction (full call chain)
-- ``assert(bool condition)``: abort execution and revert state changes if condition is ``false`` (use for internal error)
-- ``require(bool condition)``: abort execution and revert state changes if condition is ``false`` (use for malformed input)
-- ``revert()``: abort execution and revert state changes
-- ``keccak256(...) returns (bytes32)``: compute the Ethereum-SHA-3 (Keccak-256) hash of the (tightly packed) arguments
-- ``sha3(...) returns (bytes32)``: an alias to `keccak256()`
-- ``sha256(...) returns (bytes32)``: compute the SHA-256 hash of the (tightly packed) arguments
-- ``ripemd160(...) returns (bytes20)``: compute the RIPEMD-160 hash of the (tightly packed) arguments
-- ``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``: recover address associated with the public key from elliptic curve signature, return zero on error
-- ``addmod(uint x, uint y, uint k) returns (uint)``: compute ``(x + y) % k`` where the addition is performed with arbitrary precision and does not wrap around at ``2**256``
-- ``mulmod(uint x, uint y, uint k) returns (uint)``: compute ``(x * y) % k`` where the multiplication is performed with arbitrary precision and does not wrap around at ``2**256``
-- ``this`` (current contract's type): the current contract, explicitly convertible to ``address``
-- ``super``: the contract one level higher in the inheritance hierarchy
-- ``selfdestruct(address recipient)``: destroy the current contract, sending its funds to the given address
-- ``<address>.balance`` (``uint256``): balance of the :ref:`address` in Wei
-- ``<address>.send(uint256 amount) returns (bool)``: send given amount of Wei to :ref:`address`, returns ``false`` on failure
-- ``<address>.transfer(uint256 amount)``: send given amount of Wei to :ref:`address`, throws on failure
+- ``block.blockhash(uint blockNumber) returns (bytes32)``: hash del bloque dado - sólo funciona para los últimos 256 bloques
+- ``block.coinbase`` (``address``): address del minero del bloque actual
+- ``block.difficulty`` (``uint``): dificultad del bloque actual
+- ``block.gaslimit`` (``uint``): gaslimit del bloque actual
+- ``block.number`` (``uint``): número del bloque actual
+- ``block.timestamp`` (``uint``): timestamp del bloque actual
+- ``msg.data`` (``bytes``): calldata completa
+- ``msg.gas`` (``uint``): gas restante
+- ``msg.sender`` (``address``): sender del mensaje (llamada actual)
+- ``msg.value`` (``uint``): número de wei enviados con el mensaje
+- ``now`` (``uint``): timestamp del bloque actual (alias para ``block.timestamp``)
+- ``tx.gasprice`` (``uint``): precio de gas de la transacción
+- ``tx.origin`` (``address``): sender de la transacción (cadena de llamada completa)
+- ``assert(bool condition)``: abortar ejecución y deshacer cambios de estado si la condición es ``false`` (uso para error interno)
+- ``require(bool condition)``: abortar ejecución y deshacer cambios de estado si la condición es ``false`` (uso para entradas erróneas)
+- ``revert()``: abortar ejecución y deshacer cambios de estado
+- ``keccak256(...) returns (bytes32)``: computar el hash Ethereum-SHA-3 (Keccak-256) de los argumentos (empacados)
+- ``sha3(...) returns (bytes32)``: un alias a `keccak256()`
+- ``sha256(...) returns (bytes32)``: computar el hash SHA-256 de los argumentos (empacados)
+- ``ripemd160(...) returns (bytes20)``: computar el hash RIPEMD-160 de los argumentos (empacados)
+- ``ecrecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) returns (address)``: recuperar address asociada con la llave pública desde la firma de la curva elíptica, devuelve cero en caso de error
+- ``addmod(uint x, uint y, uint k) returns (uint)``: computa ``(x + y) % k`` donde la suma es hecha con precisión arbitraria y no envuelve ``2**256``
+- ``mulmod(uint x, uint y, uint k) returns (uint)``: computa ``(x * y) % k`` donde la multiplicación es hecha con precisión arbitraria y no envuelve ``2**256``
+- ``this`` (tipo del contrato actual): el contrato actual, explícitamente convertible a ``address``
+- ``super``: el contrato un nivel más alto en la jerarquía de herencia
+- ``selfdestruct(address recipient)``: destruir el contrato actual, enviando sus fondos al address dada
+- ``<address>.balance`` (``uint256``): saldo de :ref:`address` en Wei
+- ``<address>.send(uint256 amount) returns (bool)``: enviar monto dado de Wei a :ref:`address`, devuelve ``false`` en caso de error
+- ``<address>.transfer(uint256 amount)``: enviar monto dado de Wei a :ref:`address`, arroja excepción si falla
+
 
 .. index:: visibility, public, private, external, internal
 
-Function Visibility Specifiers
-==============================
+Especificadores de visibilidad de función
+=========================================
 
 ::
 
@@ -489,33 +498,35 @@ Function Visibility Specifiers
         return true;
     }
 
-- ``public``: visible externally and internally (creates getter function for storage/state variables)
-- ``private``: only visible in the current contract
-- ``external``: only visible externally (only for functions) - i.e. can only be message-called (via ``this.func``)
-- ``internal``: only visible internally
+- ``public``: visible externa e internamente (crea función getter para almacenamiento/variables de estado)
+- ``private``: sólo visible en el contrato actual
+- ``external``: sólo visible desde el exterior (sólo para funciones) - e.j. sólo puede ser llamado mediante mensajes (via ``this.func``)
+- ``internal``: sólo visible internamente
 
 
 .. index:: modifiers, constant, anonymous, indexed
 
-Modifiers
-=========
+Modificadores
+=============
 
-- ``constant`` for state variables: Disallows assignment (except initialisation), does not occupy storage slot.
-- ``constant`` for functions: Disallows modification of state - this is not enforced yet.
-- ``anonymous`` for events: Does not store event signature as topic.
-- ``indexed`` for event parameters: Stores the parameter as topic.
-- ``payable`` for functions: Allows them to receive Ether together with a call.
+- ``constant`` para variables de estado: no permite asignaciones (excepto inicialización), no ocupa un slot de almacenamiento.
+- ``constant`` para funciones: no permite modificación de estado - no está forzado aún.
+- ``anonymous`` para eventos: no guarda la firma del evento como topic.
+- ``indexed`` para parámetros de eventos: guarda el parámetro como topic.
+- ``payable`` para funciones: les permite recibir ether junto a una llamada.
 
-Reserved Keywords
-=================
 
-These keywords are reserved in Solidity. They might become part of the syntax in the future:
+Keywords reservadas
+===================
+
+
+Estas palabras están reservadas en Solidity. Pueden incorporarse a la sintaxis en el futuro:
 
 ``abstract``, ``after``, ``case``, ``catch``, ``default``, ``final``, ``in``, ``inline``, ``interface``, ``let``, ``match``, ``null``,
 ``of``, ``pure``, ``relocatable``, ``static``, ``switch``, ``try``, ``type``, ``typeof``, ``view``.
 
-Language Grammar
-================
+Gramática del lenguaje
+======================
 
 .. literalinclude:: grammar.txt
    :language: none
