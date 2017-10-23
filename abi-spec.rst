@@ -11,14 +11,14 @@ Diseño básico
 
 La Application Binary Interface (Interfaz Binaria de Aplicación) o ABI es el modo estándar de interactuar con contratos en el ecosistema Ethereum, tanto desde fuera de la blockchain como en interacciones contrato-contrato. Los datos se codifican siguiendo su tipo acorde a esta especificación.
 
-Asumimos que la Application Binary Interface (ABI) está extremadamente definida, es conocida en tiempo de compilación y es estática. No se van a proveer mecanismos de introspección. Además, afirmamos que los contratos tendrán las definiciones de la interfaz de cada contrato que vayan a llamar en tiempo de compilación.
+Asumimos que la Application Binary Interface (ABI) está fuertemente tipada, es conocida en tiempo de compilación y es estática. No se van a proveer mecanismos de introspección. Además, afirmamos que los contratos tendrán las definiciones de la interfaz de cada contrato que vayan a llamar en tiempo de compilación.
 
 Esta especificación no abarca los contratos cuya interfaz sea dinámica o conocida exclusivamente en tiempo de ejecución. Estos casos, de volverse importantes, podrían manejarse adecuadamente como servicios construidos dentro del ecosistema Ethereum.
 
 Función Selector
-=================
+================
 
-Los primeros cuatro bytes de lo datos de una llamada a una función especifican la función a llamar. Se trata de los primeros (los más a la izquierda, los más extremos por orden) cuatro bytes del hash Keccak (SHA-3) de la firma de la función. La firma se define como la expresión canónica del prototipo básico como puede ser el nombre de la función con la lista de parámetros entre paréntesis. Los tipos de parámetros se separan por comas, no por espacios.
+Los primeros cuatro bytes de los datos de una llamada a una función especifican la función a llamar. Se trata de los primeros (los más a la izquierda, los más extremos por orden) cuatro bytes del hash Keccak (SHA-3) de la firma de la función. La firma se define como la expresión canónica del prototipo básico como puede ser el nombre de la función con la lista de parámetros entre paréntesis. Los tipos de parámetros se separan por comas, no por espacios.
 
 Codificación de argumentos
 ==========================
@@ -34,7 +34,7 @@ Los tipos elementales existentes son:
 
 - `int<M>`: enteros con signo complemento a dos de `M` bits, `0 < M <= 256`, `M % 8 == 0`.
 
-- `address`: equivalente a `uint160`, exceptuando la interpretación asumida y la tipología de idioma.
+- `address`: equivalente a `uint160`, exceptuando la interpretación asumida y la tipología del lenguaje.
 
 - `uint`, `int`: sinónimos de `uint256`, `int256` respectivamente (no para ser usados para computar la función selector).
 
@@ -56,7 +56,7 @@ El siguiente array, de tipo fijo, existente es:
 
 Los siguientes tipos de tamaño no fijo existentes son: 
 
-- `bytes`: secuancia de bytes de tamaño dinámico.
+- `bytes`: secuencia de bytes de tamaño dinámico.
 
 - `string`: string unicode de tamaño dinámico codificado como UTF-8.
 
@@ -231,10 +231,10 @@ Después de esto, la parte de datos del primer argumento dinámico, `[0x456, 0x7
  - `0x0000000000000000000000000000000000000000000000000000000000000456` (primer elemento)
  - `0x0000000000000000000000000000000000000000000000000000000000000789` (segundo elemento)
 
-Finalmente, codificamos la parte de datos del segundo argumento dinámico, `"¡Hola mundo!"`:
+Finalmente, codificamos la parte de datos del segundo argumento dinámico, `"Hello, world!"`:
 
  - `0x000000000000000000000000000000000000000000000000000000000000000d` (número de elementos (bytes en este caso): 13)
- - `0x48656c6c6f2c20776f726c642100000000000000000000000000000000000000` (`"¡Hola mundo!"` rellenado hasta 32 bytes por la derecha)
+ - `0x48656c6c6f2c20776f726c642100000000000000000000000000000000000000` (`"Hello, world!"` rellenado hasta 32 bytes por la derecha)
 
 Todo junto, la codificación es (nueva línea después de la función selector y cada 32-bytes por claridad):
 
@@ -260,7 +260,7 @@ Dado un nombre de evento y una serie de parámetros de evento, los separamos en 
 
 En efecto, una entrada de log que usa esta ABI se define como:
 
-- `address`: la dirección del contrato (intrinsicamente provista por Ethereum);
+- `address`: la dirección del contrato (intrínsecamente provista por Ethereum);
 - `topics[0]`: `keccak(EVENT_NAME+"("+EVENT_ARGS.map(canonical_type_of).join(",")+")")` (`canonical_type_of` es una función que simplemente devuelve el tipo canónico del argumento dado, p.ej.: para `uint indexed foo`, devolvería `uint256`). Si el evento se declara como `anonymous` no se genera `topics[0]`;
 - `topics[n]`: `EVENT_INDEXED_ARGS[n - 1]` (`EVENT_INDEXED_ARGS` es la serie de `EVENT_ARGS` que están indexados);
 - `data`: `abi_serialise(EVENT_NON_INDEXED_ARGS)` (`EVENT_NON_INDEXED_ARGS` es la serie de `EVENT_ARGS` que no están indexados, `abi_serialise` es la función de serialización ABI usada para devolver una serie de valores tipificados desde una función, como se detalla abajo).
@@ -283,7 +283,7 @@ El formato JSON para la interfaz de un contrato viene dada por un array de descr
 
 La función Constructor y fallback nunca tienen `name` o `outputs`. Fallback tampoco tiene `inputs`.
 
-Enviar ether no-cero a una función no pagable se disparará. No lo hagas.
+Enviar una cantidad de ether no-nula a una función no payable lanzará excepción. No lo hagas.
 
 Una descripción de evento es un objeto JSON con prácticamente los mismos campos:
 
