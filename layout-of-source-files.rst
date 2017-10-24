@@ -2,138 +2,96 @@
 Composición de un fichero fuente de Solidity
 ********************************************
 
-Source files can contain an arbitrary number of contract definitions, include directives
-and pragma directives.
+Los ficheros fuente pueden contener un número arbitrario de definiciones de contrato, incluir directivas y directivas de pragma.
 
 .. index:: ! pragma, version
 
 .. _version_pragma:
 
-Version Pragma
-==============
+Versión de Pragma
+=================
 
-Source files can (and should) be annotated with a so-called version pragma to reject
-being compiled with future compiler versions that might introduce incompatible
-changes. We try to keep such changes to an absolute minimum and especially
-introduce changes in a way that changes in semantics will also require changes
-in the syntax, but this is of course not always possible. Because of that, it is always
-a good idea to read through the changelog at least for releases that contain
-breaking changes, those releases will always have versions of the form
-``0.x.0`` or ``x.0.0``.
+Es altamente recomendable anotar los ficheros fuente con la versión de pragma para impedir que se compilen con una version posterior del compilador que podría introducir cambios incompatibles. Intentamos mantener este tipo de cambios al mínimo y que los cambios que introduzcamos y modifiquen la semántica requieran también un cambio en la ***sintáxis, pero esto no siempre es posible. Por ese motivo, siempre es buena idea repasar el registro de cambios por lo menos para las nuevas versiones que contienen cambios de ruptura. Estas nuevas versiones siempre tendrán un número de versión del tipo ``0.x.0`` o ``x.0.0``.
 
-The version pragma is used as follows::
+La versión de pragma se usa de la siguiente manera:
 
   pragma solidity ^0.4.0;
 
-Such a source file will not compile with a compiler earlier than version 0.4.0
-and it will also not work on a compiler starting from version 0.5.0 (this
-second condition is added by using ``^``). The idea behind this is that
-there will be no breaking changes until version ``0.5.0``, so we can always
-be sure that our code will compile the way we intended it to. We do not fix
-the exact version of the compiler, so that bugfix releases are still possible.
+Un fichero como este no se compilará con un compilador con una versión anterior a 0.4.0 y tampoco funcionará con un compilador que tiene una versión posterior a 0.5.0 (se especifíca esta segunda condición usando el ``^``). La idea detrás de esto es que no va a haber un cambio de ruptura antes de la versión ``0.5.0``, así que podemos estar seguro de que nuestro código se compilará de la manera en que nosotros esperamos. No fijamos la versión exacta del compilador, de manera que puodemos liberar nuevas versiones que corrigen bugs.
 
-It is possible to specify much more complex rules for the compiler version,
-the expression follows those used by `npm <https://docs.npmjs.com/misc/semver>`_.
+Se puede especificar reglas mucho más complejas para la versión del compilador, ***la expresión sigue las que se han usan por `npm <https://docs.npmjs.com/misc/semver>`_.
 
 .. index:: source file, ! import
 
 .. _import:
 
-Importing other Source Files
-============================
+Importar otros ficheros fuente
+==============================
 
-Syntax and Semantics
+Sintáxis y semántica
 --------------------
 
-Solidity supports import statements that are very similar to those available in JavaScript
-(from ES6 on), although Solidity does not know the concept of a "default export".
+Soidity soporta la importación de declaraciones, que son muy similares a las que se hacen en JavaScript (a partir de ES6), aunque Solidity no conoce el concepto de "default export".
 
-At a global level, you can use import statements of the following form:
+A nivel global, se puede usar la importación de declaraciones de la siguiente manera:
 
 ::
 
   import "filename";
 
-This statement imports all global symbols from "filename" (and symbols imported there) into the
-current global scope (different than in ES6 but backwards-compatible for Solidity).
+Esta declaración importa todos los símbolos globales de "filename" (junto con los símbolos importados desde allí) en el alcance global actual (es diferente de ES6 pero ***compatible con Solidity).
 
 ::
 
   import * as symbolName from "filename";
 
-...creates a new global symbol ``symbolName`` whose members are all the global symbols from ``"filename"``.
+...crea un nuevo símbolo global ``symbolName`` cuyos miembros son todos los símbolos globales de ``"filename"``.
 
 ::
 
   import {symbol1 as alias, symbol2} from "filename";
 
-...creates new global symbols ``alias`` and ``symbol2`` which reference ``symbol1`` and ``symbol2`` from ``"filename"``, respectively.
+...crea un nuevo símbolo global ``alias`` y ``symbol2`` que referencia respectivamente ``symbol1`` y ``symbol2`` desde ``"filename"``.
 
-Another syntax is not part of ES6, but probably convenient:
+Esta otra sintaxis no forma parte de ES6 pero es probablemente conveniente:
 
 ::
 
   import "filename" as symbolName;
 
-which is equivalent to ``import * as symbolName from "filename";``.
+lo que es equivalente a ``import * as symbolName from "filename";``.
 
-Paths
------
+Ruta
+----
 
-In the above, ``filename`` is always treated as a path with ``/`` as directory separator,
-``.`` as the current and ``..`` as the parent directory.  When ``.`` or ``..`` is followed by a character except ``/``,
-it is not considered as the current or the parent directory.
-All path names are treated as absolute paths unless they start with the current ``.`` or the parent directory ``..``.
+En lo que hemos visto más arriba, ``filename`` siempre se trata como una ruta con el ``/`` como separador de directorio, ``.`` como el directorio actual y ``..`` como el directorio ***padre. Cuando ``.`` o ``..`` es seguido por un carácter excepto ``/``, no se considera como el directorio actual o directorio padre. Se tratan todos los nombres de ruta como rutas absolutas, a no ser que empiecen por ``.`` o el directorio padre ``..``.
 
-To import a file ``x`` from the same directory as the current file, use ``import "./x" as x;``.
-If you use ``import "x" as x;`` instead, a different file could be referenced
-(in a global "include directory").
+Para importar un fichero ``x`` desde el mismo directorio que el fichero actual, se usa `import "./x" as x;``. Si en lugar de esa expresión se usa ``import "x" as x;``, podría ser que se referencie un fichero distinto (***en un "include directory" global).
 
-It depends on the compiler (see below) how to actually resolve the paths.
-In general, the directory hierarchy does not need to strictly map onto your local
-filesystem, it can also map to resources discovered via e.g. ipfs, http or git.
+Cómo se resuelve la ruta depende del compilador (ver más abajo). En general, la jerarquía de directorios no necesita ***mapear estrictamente su sistema local de ficheros, también puede mapear recursos que se descubren con por ejemplo ipfs, http or git.
 
-Use in Actual Compilers
------------------------
+Uso en compiladores actuales
+----------------------------
 
-When the compiler is invoked, it is not only possible to specify how to
-discover the first element of a path, but it is possible to specify path prefix
-remappings so that e.g. ``github.com/ethereum/dapp-bin/library`` is remapped to
-``/usr/local/dapp-bin/library`` and the compiler will read the files from there.
-If multiple remappings can be applied, the one with the longest key is tried first. This
-allows for a "fallback-remapping" with e.g. ``""`` maps to
-``"/usr/local/include/solidity"``. Furthermore, these remappings can
-depend on the context, which allows you to configure packages to
-import e.g. different versions of a library of the same name.
+Cuando se invoca el compilador, no sólo se puede especificar la manera en que se descubre el primer elemento de la ruta, también es posible especificar un prefijo de ruta de remapeo, de tal manera que por ejemplo ``github.com/ethereum/dapp-bin/library`` se remapee por ``/usr/local/dapp-bin/library`` y el compilador lea el fichero desde allí. Si bien se pueden hacer múltiples remapeos, se intentará primero con el remapeo con la clave más larga. Esto permite "fallback-remapping" con, por ejemplo, ``""`` ***mapea ``"/usr/local/include/solidity"``. Además, estos remapeos pueden depender del contexto, lo que permite configurar paquetes para importar por ejemplo diferentes versiones de una librería con el mismo nombre.
 
 **solc**:
 
-For solc (the commandline compiler), these remappings are provided as
-``context:prefix=target`` arguments, where both the ``context:`` and the
-``=target`` parts are optional (where target defaults to prefix in that
-case). All remapping values that are regular files are compiled (including
-their dependencies). This mechanism is completely backwards-compatible (as long
-as no filename contains = or :) and thus not a breaking change. All imports
-in files in or below the directory ``context`` that import a file that
-starts with ``prefix`` are redirected by replacing ``prefix`` by ``target``.
+Para solc (el compilador de ***línea de comando), los remapeos se proporcionan como argumentos ``context:prefix=target``, donde tanto la parte ``context:`` como la parte ``=target`` son opcionales (en este caso target toma por defecto el valor de prefix). Todos los valores que remapean que son ficheros estándares son compilados (incluyendo sus dependencias). Este mecanismo es completamente compatible ***al revés (siempre y cuando ningún nombre de fichero contenga = o :) y por lo tanto no es un cambio de ruptura. Todas las importaciones en los ficheros en el diretorio ``context`` (o debajo de el) que importa un fichero que empieza con un ``prefix`` están redireccionados remplazando ``prefix`` por ``target``.
 
-So as an example, if you clone
-``github.com/ethereum/dapp-bin/`` locally to ``/usr/local/dapp-bin``, you can use
-the following in your source file:
+Como ejemplo, si se clona ``github.com/ethereum/dapp-bin/`` en local ``/usr/local/dapp-bin``, se puede usar el código siguiente en el fichero fuente:
 
 ::
 
   import "github.com/ethereum/dapp-bin/library/iterable_mapping.sol" as it_mapping;
 
-and then run the compiler as
+y luego se corre el compilador de esa manera:
 
 .. code-block:: bash
 
   solc github.com/ethereum/dapp-bin/=/usr/local/dapp-bin/ source.sol
 
-As a more complex example, suppose you rely on some module that uses a
-very old version of dapp-bin. That old version of dapp-bin is checked
-out at ``/usr/local/dapp-bin_old``, then you can use
+Como ejemplo un poco más complejo, imaginemos que nos basamos en algún módulo que utiliza un versión muy antigua de dapp-bin. Esta versión anterior de dapp-bin se comprueba en ``/usr/local/dapp-bin_old``, y luego se puede usar:
 
 .. code-block:: bash
 
@@ -141,57 +99,39 @@ out at ``/usr/local/dapp-bin_old``, then you can use
        module2:github.com/ethereum/dapp-bin/=/usr/local/dapp-bin_old/ \
        source.sol
 
-so that all imports in ``module2`` point to the old version but imports
-in ``module1`` get the new version.
+así, todas las importaciones en ``module2`` apuntan a la versión anterior pero las importaciones en ``module1`` consiguen la nueva versión.
 
-Note that solc only allows you to include files from certain directories:
-They have to be in the directory (or subdirectory) of one of the explicitly
-specified source files or in the directory (or subdirectory) of a remapping
-target. If you want to allow direct absolute includes, just add the
-remapping ``=/``.
+Nótese que solc sólo permite incluir ficheros desde algunos directorios. Tienen que estar en el diretorio (o subdirectorio) de uno de los ficheros fuente explícitamente especificado o en el directorio (o subdirectorio) de un ***target de remapeo. Si se desea permitir inclusiones directas absolutas, sólo hace falta añadir el ``=/`` de remapeo.
 
-If there are multiple remappings that lead to a valid file, the remapping
-with the longest common prefix is chosen.
+Si hay múltiples remapeos que conducen a un fichero válido, se elige el remapeo con el prefijo común más largo.
 
 **Remix**:
 
-`Remix <https://remix.ethereum.org/>`_
-provides an automatic remapping for github and will also automatically retrieve
-the file over the network:
-You can import the iterable mapping by e.g.
-``import "github.com/ethereum/dapp-bin/library/iterable_mapping.sol" as it_mapping;``.
+`Remix <https://remix.ethereum.org/>`_ proporciona un remapeo automático para github y también recupera automáticamente el fichero desde la red: se puede importar el mapeo ***iterable con por ejemplo ``import "github.com/ethereum/dapp-bin/library/iterable_mapping.sol" as it_mapping;``.
 
-Other source code providers may be added in the future.
+A futuro se podrían añadir otros proveedores de código fuente.
 
 
 .. index:: ! comment, natspec
 
-Comments
-========
+Comentarios
+===========
 
-Single-line comments (``//``) and multi-line comments (``/*...*/``) are possible.
+Se aceptan los comentarios de línea simple (``//``) y los comentarios de múltiples líneas (``/*...*/``).
 
 ::
 
-  // This is a single-line comment.
+  // Esto es un comentario de simple línea.
 
   /*
-  This is a
-  multi-line comment.
+  Esto es un comentario
+  de múltiples líneas.
   */
 
 
-Additionally, there is another type of comment called a natspec comment,
-for which the documentation is not yet written. They are written with a
-triple slash (``///``) or a double asterisk block(``/** ... */``) and
-they should be used directly above function declarations or statements.
-You can use `Doxygen <https://en.wikipedia.org/wiki/Doxygen>`_-style tags inside these comments to document
-functions, annotate conditions for formal verification, and provide a
-**confirmation text** which is shown to users when they attempt to invoke a
-function.
+Adicionalmente, existe otro tipo de comentario llamado natspec, pero la documentación todavía no está escrita. Estos comentarios se escriben con tres barras ***óblicas (``///``) o como un bloque de comentarios con doble asterísco (``/** ... */``) y se deben usar justo arriba de las declaraciones de función o instrucciones. Para documentar funciones, anotar condiciones para la verificación formal y para proporcionar un **texto de confirmation** al usuario cuando intentan invocar una función, se puede usar etiquetas del tipo `Doxygen <https://en.wikipedia.org/wiki/Doxygen>`_ dentro de estos comentarios.
 
-In the following example we document the title of the contract, the explanation
-for the two input parameters and two returned values.
+En el siguiente ejemplo, documentamos el título del contrato, la explicación para los dos parametros de entrada y para los dos valores de retorno.
 
 ::
 
