@@ -17,9 +17,9 @@ La versión de pragma se usa de la siguiente manera:
 
   pragma solidity ^0.4.0;
 
-Un fichero como este no se compilará con un compilador con una versión anterior a 0.4.0 y tampoco funcionará con un compilador que tiene una versión posterior a 0.5.0 (se especifíca esta segunda condición usando el ``^``). La idea detrás de esto es que no va a haber un cambio de ruptura antes de la versión ``0.5.0``, así que podemos estar seguro de que nuestro código se compilará de la manera en que nosotros esperamos. No fijamos la versión exacta del compilador, de manera que puodemos liberar nuevas versiones que corrigen bugs.
+Un fichero como este no se compilará con un compilador con una versión anterior a ``0.4.0`` y tampoco funcionará con un compilador que tiene una versión posterior a ``0.5.0`` (se especifíca esta segunda condición usando el ``^``). La idea detrás de esto es que no va a haber un cambio de ruptura antes de la versión ``0.5.0``, así que podemos estar seguro de que nuestro código se compilará de la manera en que nosotros esperamos. No fijamos la versión exacta del compilador, de manera que podemos liberar nuevas versiones que corrigen bugs.
 
-Se puede especificar reglas mucho más complejas para la versión del compilador, ***la expresión sigue las que se han usan por `npm <https://docs.npmjs.com/misc/semver>`_.
+Se puede especificar reglas mucho más complejas para la versión del compilador, la expresión sigue a las utilizadas por `npm <https://docs.npmjs.com/misc/semver>`_.
 
 .. index:: source file, ! import
 
@@ -31,7 +31,7 @@ Importar otros ficheros fuente
 Sintáxis y semántica
 --------------------
 
-Soidity soporta la importación de declaraciones, que son muy similares a las que se hacen en JavaScript (a partir de ES6), aunque Solidity no conoce el concepto de "default export".
+Solidity soporta la importación de declaraciones, que son muy similares a las que se hacen en JavaScript (a partir de ES6), aunque Solidity no conoce el concepto de "default export".
 
 A nivel global, se puede usar la importación de declaraciones de la siguiente manera:
 
@@ -39,7 +39,7 @@ A nivel global, se puede usar la importación de declaraciones de la siguiente m
 
   import "filename";
 
-Esta declaración importa todos los símbolos globales de "filename" (junto con los símbolos importados desde allí) en el alcance global actual (es diferente de ES6 pero ***compatible con Solidity).
+Esta declaración importa todos los símbolos globales de "filename" (junto con los símbolos importados desde allí) en el alcance global actual (diferente que en ES6 pero compatible con versiones anteriores de Solidity).
 
 ::
 
@@ -68,18 +68,18 @@ En lo que hemos visto más arriba, ``filename`` siempre se trata como una ruta c
 
 Para importar un fichero ``x`` desde el mismo directorio que el fichero actual, se usa `import "./x" as x;``. Si en lugar de esa expresión se usa ``import "x" as x;``, podría ser que se referencie un fichero distinto (***en un "include directory" global).
 
-Cómo se resuelve la ruta depende del compilador (ver más abajo). En general, la jerarquía de directorios no necesita ***mapear estrictamente su sistema local de ficheros, también puede mapear recursos que se descubren con por ejemplo ipfs, http or git.
+Cómo se resuelve la ruta depende del compilador (ver más abajo). En general, la jerarquía de directorios no necesita mapear estrictamente su sistema local de ficheros, también puede mapear recursos que se descubren con por ejemplo ipfs, http or git.
 
 Uso en compiladores actuales
 ----------------------------
 
-Cuando se invoca el compilador, no sólo se puede especificar la manera en que se descubre el primer elemento de la ruta, también es posible especificar un prefijo de ruta de remapeo, de tal manera que por ejemplo ``github.com/ethereum/dapp-bin/library`` se remapee por ``/usr/local/dapp-bin/library`` y el compilador lea el fichero desde allí. Si bien se pueden hacer múltiples remapeos, se intentará primero con el remapeo con la clave más larga. Esto permite "fallback-remapping" con, por ejemplo, ``""`` ***mapea ``"/usr/local/include/solidity"``. Además, estos remapeos pueden depender del contexto, lo que permite configurar paquetes para importar por ejemplo diferentes versiones de una librería con el mismo nombre.
+Cuando se invoca el compilador, no sólo se puede especificar la manera en que se descubre el primer elemento de la ruta, también es posible especificar un prefijo de ruta de remapeo, de tal manera que por ejemplo ``github.com/ethereum/dapp-bin/library`` se remapee por ``/usr/local/dapp-bin/library`` y el compilador lea el fichero desde allí. Si bien se pueden hacer múltiples remapeos, se intentará primero con el remapeo con la clave más larga. Esto permite "fallback-remapping" con, por ejemplo, ``""`` mapea a ``/usr/local/include/solidity``. Además, estos remapeos pueden depender del contexto, lo que permite configurar paquetes para importar por ejemplo diferentes versiones de una librería con el mismo nombre.
 
 **solc**:
 
-Para solc (el compilador de ***línea de comando), los remapeos se proporcionan como argumentos ``context:prefix=target``, donde tanto la parte ``context:`` como la parte ``=target`` son opcionales (en este caso target toma por defecto el valor de prefix). Todos los valores que remapean que son ficheros estándares son compilados (incluyendo sus dependencias). Este mecanismo es completamente compatible ***al revés (siempre y cuando ningún nombre de fichero contenga = o :) y por lo tanto no es un cambio de ruptura. Todas las importaciones en los ficheros en el diretorio ``context`` (o debajo de el) que importa un fichero que empieza con un ``prefix`` están redireccionados remplazando ``prefix`` por ``target``.
+Para solc (el compilador de línea de comando), los remapeos se proporcionan como argumentos ``context:prefix=target``, donde tanto la parte ``context:`` como la parte ``=target`` son opcionales (en este caso target toma por defecto el valor de prefix). Todos los valores que remapean que son ficheros estándares son compilados (incluyendo sus dependencias). Este mecanismo es completamente compatible con versiones anteriores (siempre y cuando ningún nombre de fichero contenga = o :) y por lo tanto no es un cambio de ruptura. Todas las importaciones en los ficheros en el directorio ``context`` (o debajo de el) que importa un fichero que empieza con un ``prefix`` están redireccionados reemplazando ``prefix`` por ``target``.
 
-Como ejemplo, si se clona ``github.com/ethereum/dapp-bin/`` en local ``/usr/local/dapp-bin``, se puede usar el código siguiente en el fichero fuente:
+Como ejemplo, si clonas ``github.com/ethereum/dapp-bin/`` en tu local a ``/usr/local/dapp-bin``, puedes usar lo siguiente en tu código fuente:
 
 ::
 
@@ -107,7 +107,7 @@ Si hay múltiples remapeos que conducen a un fichero válido, se elige el remape
 
 **Remix**:
 
-`Remix <https://remix.ethereum.org/>`_ proporciona un remapeo automático para github y también recupera automáticamente el fichero desde la red: se puede importar el mapeo ***iterable con por ejemplo ``import "github.com/ethereum/dapp-bin/library/iterable_mapping.sol" as it_mapping;``.
+`Remix <https://remix.ethereum.org/>`_ proporciona un remapeo automático para github y también recupera automáticamente el fichero desde la red: se puede importar el mapeo iterable con por ejemplo ``import "github.com/ethereum/dapp-bin/library/iterable_mapping.sol" as it_mapping;``.
 
 A futuro se podrían añadir otros proveedores de código fuente.
 
