@@ -271,6 +271,7 @@ Tienes que hacerlo manualmente por ahora.
 Por qué la función de bajo nivel ``.call()`` es menos favorable que instanciando un contrato con ua vaiable (``ContractBb;``) y ejecutando sus funcioens (``b.doSomething();``)?
 ==========================================================================================================================================================================================
 
+TODO: 
 Si usar reales funciones, el compilador le dirá si los tipos de
 los argumentos no concuerdan, si la función no existe
 o no es visible y hará el empaquetamiento de los argumentos
@@ -349,11 +350,11 @@ y bastate caro usarlo.
 La segunda es "memory", esto es usado para guardar valores temporales. Es
 borrado entre llamdas de función (externas) y es más barato usar.
 
-La tercera es en el stack, que es usado para gurdar pequeñas variables locales.
+La tercera es en el stack, que es usado para guardar pequeñas variables locales.
 Es casi gratis para usar, pero sólo puede guardar una cantidad limitada de valores.
 
 Para casi todos los tipos, no puedes especificar donde deben ser gurdadas, porque
-son copiadas cad vez que se usan.
+son copiadas cada vez que se usan.
 
 Los tipos donde la storage-location es importante son structs
 y arrays. Si, por ejemplo, pasaras estas variables en llamadas de función, su
@@ -483,18 +484,18 @@ Ver `replicator.sol <https://github.com/fivedogit/solidity-baby-steps/blob/maste
 
 Ver `2D_array.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/55_2D_array.sol>`_.
 
+Nótese que llenando un cuadrado de 10x10 de ``uint8`` + creación de contrato tomó mas de ``800,000``
+gas en el momento de escribir este contrato. 17x17 tomó ``2,000,000`` gas. Con un límite a
+3.14 millones, bueno, hay poco espacio para esto.
 
-Note that filling a 10x10 square of ``uint8`` + contract creation took more than ``800,000``
-gas at the time of this writing. 17x17 took ``2,000,000`` gas. With the limit at
-3.14 million... well, there’s a pretty low ceiling for what you can create right
-now.
+Nótese que simplemente "creando" un array es gratis, los costos son en rellenarlo.
 
-Note that merely "creating" the array is free, the costs are in filling it.
+Nota2: Optimizando acceso storage puede bajar los costes de gas muchísimo, porque
+32 valores ``uint8`` pueden ser guardados en un slot simple. El problema es que estas
+optimizaciones actualmente no funcionan en bucles y también tienen un problema con revisión
+de límites.
+Aunque, puedes obtener mejores resultados en el futuro.
 
-Note2: Optimizing storage access can pull the gas costs down considerably, because
-32 ``uint8`` values can be stored in a single slot. The problem is that these optimizations
-currently do not work across loops and also have a problem with bounds checking.
-You might get much better results in the future, though.
 
 What does ``p.recipient.call.value(p.amount)(p.data)`` do?
 ==========================================================
