@@ -73,7 +73,7 @@ Nótese que si importas ``import "mortal"`` arriba del contrato y declaras
 ``contract AlgunContrato is mortal { ...`` y compilas con un compilador que ya lo
 tiene (que incluye `Remix <https://remix.ethereum.org/>`), luego
 ``kill()`` es ejecutado por ti. Una vez que un contrato es "mortal", se puede
-``nombrecontrato.kill.sendTransaction({from:eth.coinbase})``, igual que en los
+``contractname.kill.sendTransaction({from:eth.coinbase})``, igual que en los
 ejemplos.
 
 
@@ -115,8 +115,7 @@ Esto no es aún posible.
 Es posible de iniciar un array in-line (ej. ``string[] myarray = ["a", "b"];``)
 ===============================================================================
 
-Si. Sin embargo debiera notarse que esto sólo funciona con arrays de tamaño estático. Puedes incluso crear un array en memoria en línea
-en la declaración de ddevolución. Cool, ¿no?
+Si. Sin embargo debiera notarse que esto sólo funciona con arrays de tamaño estático. Puedes incluso crear un array en memoria en línea en la declaración de devolución. Cool, ¿no?
 
 Example::
 
@@ -134,15 +133,15 @@ Esto depende por lo que te refieres con "de confianza".
 En general, son entregados por los mineros y por lo tanto son vulnerables.
 
 Al menos que haya un problema grave en la blockchain o en tu ordenador,
-puedes hacer las siguientes supuestos:
+puedes hacer las siguientes suposiciones:
 
-Si publicas una transacción en un tiempo X, ésta transacción contitene el
-mismo código que llama ``now`` y es incluída en un bloque de quien la timestamp
+Publicas una transacción en un tiempo X, esta transacción contiene el
+mismo código que llama ``now`` y es incluída en un bloque cuyo timestamp
 es Y y este bloque es incluído en la cadena canónica (publicado) en un tiempo Z.
 
 El valor de ``now`` será idéntico a Y y X <= Y <= Z.
 
-Nunca usa ``now`` o ``block.hash`` como una fuente aleatoria, al menos que
+Nunca usa ``now`` o ``block.hash`` como una fuente aleatoria, a menos que
 sepas lo que estás haciendo.
 
 
@@ -174,7 +173,7 @@ implementar una función callback como
 
 ``function() payable { }``
 
-Otro uso de la función callbak es por ejemplo registrar que tu contrato
+Otro uso de la función callback es por ejemplo registrar que tu contrato
 recibió ether usando un evento.
 
 *Attention*: Si implementas la función fallback, cuida que use lo menos gas
@@ -317,7 +316,7 @@ Si no quieres deolver un error, puedes devolver un par::
         }
     }
 
-¿Los comentarios son incluídos en los contratos publcados y incrementan el gas?
+¿Los comentarios son incluídos en los contratos publicados y incrementan el gas
 ===============================================================================
 
 No. Todo lo que no sea utilizado para la ejecución es eliminado durante la compilación.
