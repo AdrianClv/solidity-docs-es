@@ -536,17 +536,17 @@ El segundo objetivo se cumple introduciendo una fase ***(desaguring) que sólo q
 
 Alcance: Un identificador que está declarado (etiqueta, variable, función, ensamblador) sólo es visible en el bloque donde ha sido declarado (incluyendo bloques anidados dentro del bloque actual). No es legal acceder variables locales cruzando los límites de la función, aunque estas variables estuvieran dentro del alcance. ***Ocultar no está permitido. No se puede acceder variables locales antes de que estén declaradas, ***pero está permitido acceder etiquetas, funciones y ensambladores sin que lo estén. Ensambladores son bloques especiales que se usan para, por ejemplo, devolver el tiempo de ejecución del código o crear contratos. Identificadores externos a un ensamblador no son visibles en un sub ensamblador.
 
-Si el flujo de control va más allá del final de un bloque, se insertan instrucciones ***pop que corresponden al número de variables locales declaradas en este bloque. Cuando se referencia una variables local, el generador de código necesita saber su posición relativa actual en la pila y por lo tanto necesita hacer un seguimiento de la así llamada altura actual de la pila. Como se quitan todas las variables locales al final de un bloque, la altura de la pila antes y después de un bloque debería ser la misma. Si esto no fuera el caso, se emite un aviso.
+Si el flujo de control va más allá del final de un bloque, se insertan instrucciones pop que corresponden al número de variables locales declaradas en este bloque. Cuando se referencia una variables local, el generador de código necesita saber su posición relativa actual en la pila y por lo tanto necesita hacer un seguimiento de la así llamada altura actual de la pila. Como se quitan todas las variables locales al final de un bloque, la altura de la pila antes y después de un bloque debería ser la misma. Si esto no fuera el caso, se emite un aviso.
 
 ¿Por qué usamos constructs de alto nivel como ``switch``, ``for`` y funciones:
 
 Usando ``switch``, ``for`` y funciones, debería ser posible escribir códigos complejos sin usar ``jump`` o ``jumpi`` manualmente. Esto simplifica mucho el análisis del control de flujo, lo que permite hacer mejor la verificación formal y la optimización.
 
-Además, si se permiten los saltos manuales, computar la altura de la pila se hace bastante complicado. Se necesita saber la posición de todas las variables locales de la pila, de lo contrario ni las referencias a las vairables locales ni quitar automáticamente variables locales de la pila al final de un bloque funcionará correctamente. El mecanismo de ***desugaring inserta operaciones correctamente en bloques inalcanzables que ajustan correctamente la altura de la pila en el caso de tener saltos que no tengan un control de flujo en marcha.
+Además, si se permiten los saltos manuales, computar la altura de la pila se hace bastante complicado. Se necesita saber la posición de todas las variables locales de la pila, de lo contrario ni las referencias a las variables locales ni quitar automáticamente variables locales de la pila al final de un bloque funcionará correctamente. El mecanismo de desazucarado inserta operaciones correctamente en bloques inalcanzables que ajustan correctamente la altura de la pila en el caso de tener saltos que no tengan un control de flujo en marcha
 
 Ejemplo:
 
-Vamos a seguir un ejemplo de compilación de Solidity a ensamblador ***desugared.
+Vamos a seguir un ejemplo de compilación de Solidity a ensamblador desazucarado.
 Consideramos el tiempo de ejecución del bytecode del siguiente programa escrito en Solidity::
 
     contract C {
@@ -560,7 +560,7 @@ Consideramos el tiempo de ejecución del bytecode del siguiente programa escrito
 Se va a generar el siguiente ensamblador::
 
     {
-      mstore(0x40, 0x60) // almacenar el "***cursor de memoria disponible"
+      mstore(0x40, 0x60) // almacenar el "puntero de memoria libre"
       // función dispatcher
       switch div(calldataload(0), exp(2, 226))
       case 0xb3de648b {
@@ -584,7 +584,7 @@ Se va a generar el siguiente ensamblador::
       }
     }
 
-Después del la fase de ***desugaring, se parece a lo siguiente::
+Después de la fase de desazucarado, se parece a lo siguiente::
 
     {
       mstore(0x40, 0x60)
@@ -599,13 +599,13 @@ Después del la fase de ***desugaring, se parece a lo siguiente::
           // Esto es código inalcanzable. Se añaden opcodes que reproducen el efecto de la función ***sobre la altura de la pila: se quitan argumentos y se introducen valores devueltos.
           pop pop
           let r := 0
-          $ret1: // el ***cursor de retorno acutal
+          $ret1: // el punto de retorno actual
           $ret2 0x20 jump($allocate)
           pop pop let ret := 0
           $ret2:
           mstore(ret, r)
           return(ret, 0x20)
-          // aunque no sirva de nada, se inserta el salto automáticamente, ya que el proceso de ***desugaring es una operación puramente sintáctica que no analiza el control de flujo.
+          // aunque no sirva de nada, se inserta el salto automáticamente, ya que el proceso de desazucarado es una operación puramente sintáctica que no analiza el control de flujo.
           jump($endswitch)
         }
         $caseDefault:
@@ -650,7 +650,7 @@ Después del la fase de ***desugaring, se parece a lo siguiente::
           { i := add(i, 1) }
           jump($for_begin)
           $for_end:
-        } // Aquí, se inserta una instrucción ***pop para i
+        } // Aquí, se inserta una instrucción pop para i
         swap1 pop swap1 jump
         0 0
       }
@@ -676,11 +676,11 @@ Análisis sintático / Gramática
 
 - Convertir la transmisión de byte en una transmisión de token, desechando comentarios de tipo C++ (existe un comentario especial para las referencias fuente, pero no lo vamos a explicar aquí).
 - Convertir la transmisión de token en un AST según la gramática que figura más abajo.
-- Registrar identificadores con el bloque en el que están definidos (anotación al nodo AST) y una ***nota sobre el punto a partir del cual se puede acceder a las variables.
+- Registrar identificadores con el bloque en el que están definidos (anotación al nodo AST) y anotar sobre el punto a partir del cual se puede acceder a las variables.
 
-El ensamblador ***lexer sigue el ensamblador definido por Solidity.
+El ensamblador lexer sigue el ensamblador definido por Solidity.
 
-El espacio blanco se usa para delimitar tokens y consiste en el carácter ***Espacio, ***Tab y ***Linefeed. Los comentarios aceptados son comentarios típicos de JavaScript/C++ y se interpretan de la misma manera que el ***Espacio.
+El espacio en blanco se usa para delimitar tokens y consiste en los caracteres Espacio, Tabular y Línea de alimentación. Los comentarios aceptados son comentarios típicos de JavaScript/C++ y se interpretan de la misma manera que el Espacio.
 
 Gramática::
 
@@ -728,7 +728,7 @@ Gramática::
 ***Desugaring
 ----------
 
-Una transformación AST quita los for, switch y funciones constructs. El resultados aún es pasible de ser analizado desde el punto de vista sintáctico por el mismo analizador, pero no usará algunos de los constructs. Si se añaden ***jumpdests a los que sólo se salta y desde los que luego no se continúa, se añade información sobre el contenido de la pila, a no ser que no se acceda a ningúna variable local de alcance externo o que la altura de la pila sea la misma que para la instrucción anterior.
+Una transformación AST quita los for, switch y funciones constructs. El resultados aún es pasible de ser analizado desde el punto de vista sintáctico por el mismo analizador, pero no usará algunos de los constructs. Si se añaden saltos a los que sólo se salta y desde los que luego no se continúa, se añade información sobre el contenido de la pila, a no ser que no se acceda a ninguna variable local de alcance externo o que la altura de la pila sea la misma que para la instrucción anterior.
 
 Pseudo código::
 
@@ -748,8 +748,8 @@ Pseudo código::
       }
     AssemblyFor('for' { init } condition post body) ->
       {
-        init // no puede ser su propio bloque porque queremos que el ***alcance de la variable se extienda hasta el cuerpo
-        // encontrar I de tal manera que no haya etiquetas $forI_*
+        init // no puede ser su propio bloque porque queremos que el alcance de la variable se extienda hasta el cuerpo
+        // encuentra I de tal manera que no haya etiquetas $forI_*
         $forI_begin:
         jumpi($forI_end, iszero(condition))
         { body }
@@ -760,7 +760,7 @@ Pseudo código::
       }
     'break' ->
       {
-        // encontrar el alcance que ***encierra más cercano con la etiqueta $forI_end
+        // encuentra el alcance que ***encierra más cercano con la etiqueta $forI_end
         pop all local variables that are defined at the current point
         but not at $forI_end
         jump($forI_end)
@@ -768,7 +768,7 @@ Pseudo código::
       }
     'continue' ->
       {
-        // encontrar el alcance que ***encierra más cercano con la etiqueta $forI_continue
+        // encuentra el alcance envolvente más cercano con la etiqueta $forI_continue
         pop all local variables that are defined at the current point
         but not at $forI_continue
         jump($forI_continue)
@@ -776,7 +776,7 @@ Pseudo código::
       }
     AssemblySwitch(switch condition cases ( default: defaultBlock )? ) ->
       {
-        // ***encontrar I de tal manera que no haya etiqueta o variable $switchI*
+        // // encuentra I de tal manera que no haya etiqueta o variable $switchI*
         let $switchI_value := condition
         for each of cases match {
           case val: -> jumpi($switchI_caseJ, eq($switchI_value, val))
@@ -792,7 +792,7 @@ Pseudo código::
       {
         if identifier is function <name> with n args and m ret values ->
           {
-            // encontrar I de tal manera que no exista $funcallI_*
+            // encuentra I de tal manera que no exista $funcallI_*
             $funcallI_return argn  ... arg2 arg1 jump(<name>)
             pop (n + 1 times)
             if the current context is `let (id1, ..., idm) := f(...)` ->
