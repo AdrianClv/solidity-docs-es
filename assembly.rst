@@ -109,7 +109,7 @@ Los opcodes ``pushi`` y ``jumpdest`` no se pueden usar directamente.
 En la gramática, los opcodes se representan como identificadores predefinidos.
 
 +-------------------------+------+-----------------------------------------------------------------+
-| stop                    + `-`  | parar ejecución, identico a return(0,0)                         |
+| stop                    + `-`  | parar ejecución, idéntico a return(0,0)                         |
 +-------------------------+------+-----------------------------------------------------------------+
 | add(x, y)               |      | x + y                                                           |
 +-------------------------+------+-----------------------------------------------------------------+
@@ -233,18 +233,18 @@ En la gramática, los opcodes se representan como identificadores predefinidos.
 |                         |      | de salida mem[out..(out+outsize)) devolviendo 0 si hay un error |
 |                         |      | (por ejemplo si se queda sin gas) y 1 si es un éxito            |
 +-------------------------+------+-----------------------------------------------------------------+
-| callcode(g, a, v, in,   |      | indentico a `call` pero usando solo el código de a y si no,     |
+| callcode(g, a, v, in,   |      | indéntico a `call` pero usando solo el código de a y si no,     |
 | insize, out, outsize)   |      | quedarse en el contexto del contrato actual                     |
 +-------------------------+------+-----------------------------------------------------------------+
-| delegatecall(g, a, in,  |      | indentico a `callcode` pero mantener también ``caller``         |
+| delegatecall(g, a, in,  |      | indéntico a `callcode` pero mantener también ``caller``         |
 | insize, out, outsize)   |      | y ``callvalue``                                                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| staticcall(g, a, in,    |      | identico a `call(g, a, 0, in, insize, out, outsize)` pero       |
-| insize, out, outsize)   |      | no admite modificaciones de etado                               |
+| staticcall(g, a, in,    |      | idéntico a `call(g, a, 0, in, insize, out, outsize)` pero       |
+| insize, out, outsize)   |      | no admite modificaciones de estado                               |
 +-------------------------+------+-----------------------------------------------------------------+
 | return(p, s)            | `-`  | termina la ejecución, ***devuelve los datos de mem[p..(p+s))    |
 +-------------------------+------+-----------------------------------------------------------------+
-| revert(p, s)            | `-`  | termina la ejecución, revierte los cambios de estado, ***devuelve|
+| revert(p, s)            | `-`  | termina la ejecución, revierte los cambios de estado, devuelve  |
 |                         |      | los datos de mem[p..(p+s))                                      |
 +-------------------------+------+-----------------------------------------------------------------+
 | selfdestruct(a)         | `-`  | termina la ejecución, destruye el contrato actual y manda los   |
@@ -272,7 +272,7 @@ En la gramática, los opcodes se representan como identificadores predefinidos.
 +-------------------------+------+-----------------------------------------------------------------+
 | coinbase                |      | el beneficiario actual del minado                               |
 +-------------------------+------+-----------------------------------------------------------------+
-| timestamp               |      | timestamp en segundos del bloque actual desde la época          |
+| timestamp               |      | timestamp en segundos del bloque actual desde epoch             |
 +-------------------------+------+-----------------------------------------------------------------+
 | number                  |      | número del bloque actual                                        |
 +-------------------------+------+-----------------------------------------------------------------+
