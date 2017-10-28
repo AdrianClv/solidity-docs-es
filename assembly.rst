@@ -240,7 +240,7 @@ En la gramática, los opcodes se representan como identificadores predefinidos.
 | insize, out, outsize)   |      | y ``callvalue``                                                 |
 +-------------------------+------+-----------------------------------------------------------------+
 | staticcall(g, a, in,    |      | idéntico a `call(g, a, 0, in, insize, out, outsize)` pero       |
-| insize, out, outsize)   |      | no admite modificaciones de estado                               |
+| insize, out, outsize)   |      | no admite modificaciones de estado                              |
 +-------------------------+------+-----------------------------------------------------------------+
 | return(p, s)            | `-`  | termina la ejecución, ***devuelve los datos de mem[p..(p+s))    |
 +-------------------------+------+-----------------------------------------------------------------+
