@@ -1,74 +1,77 @@
-.. index:: type
+s.. index:: type
 
 .. _types:
 
 *****
-Types
+Tipos
 *****
 
-Solidity is a statically typed language, which means that the type of each
-variable (state and local) needs to be specified (or at least known -
-see :ref:`type-deduction` below) at
-compile-time. Solidity provides several elementary types which can be combined
-to form complex types.
+Solidity es un lenguaje de tipado estático, que significa que cada tipo de
+variable (estado y local) tiene que ser especificada (o al menos conocida -
+ver :ref:`type-deduction` abajo) en tiempo de compilación.
+Solidity proporciona varios tipos elementales que pueden ser combinados para
+crear tipos más complejos.
 
-In addition, types can interact with each other in expressions containing
-operators. For a quick reference of the various operators, see :ref:`order`.
+
+Además de eso, los tipos pueden interactuar el uno con el otro en expresiones
+conteniendo operadores. Para una lista rápida de referencia de los operadores,
+ver :ref:`order`.
 
 .. index:: ! value type, ! type;value
 
-Value Types
-===========
+Tipos de valor
+==============
 
-The following types are also called value types because variables of these
-types will always be passed by value, i.e. they are always copied when they
-are used as function arguments or in assignments.
+Los siguientes tipos también son llamados tipos de valor porque las variables
+de este tipo serán siempre pasadas como valores, ej. siempre serán copiados cuando
+son usados como argumentos de funciones o en asignaciones.
 
 .. index:: ! bool, ! true, ! false
 
-Booleans
---------
+Booleanos
+---------
 
-``bool``: The possible values are constants ``true`` and ``false``.
+``bool``: Los posibles valores son las constantes ``true`` y ``false``.
 
-Operators:
+Operadores:
 
-*  ``!`` (logical negation)
-*  ``&&`` (logical conjunction, "and")
-*  ``||`` (logical disjunction, "or")
-*  ``==`` (equality)
-*  ``!=`` (inequality)
+*  ``!`` (negación lógica)
+*  ``&&`` (conjunción lógica, "y")
+*  ``||`` (disyunción lógica, "or")
+*  ``==`` (igualdad)
+*  ``!=`` (inigualdad)
 
-The operators ``||`` and ``&&`` apply the common short-circuiting rules. This means that in the expression ``f(x) || g(y)``, if ``f(x)`` evaluates to ``true``, ``g(y)`` will not be evaluated even if it may have side-effects.
+Los operadores ``||`` y ``&&`` aplican las reglas comunes de corto circuitos. Esto significa que en la expresión ``f(x) || g(y)``, si ``f(x)`` evalúa a ``true``, ``g(y)`` no será evaluado incluso si tuviera efectos secundarios.
 
 .. index:: ! uint, ! int, ! integer
 
-Integers
---------
+Enteros
+-------
 
-``int`` / ``uint``: Signed and unsigned integers of various sizes. Keywords ``uint8`` to ``uint256`` in steps of ``8`` (unsigned of 8 up to 256 bits) and ``int8`` to ``int256``. ``uint`` and ``int`` are aliases for ``uint256`` and ``int256``, respectively.
+``int`` / ``uint``: Enteros con y sin signo de varios tamaños. Las palabras clave ``uint8`` a ``uint256`` en pasos de ``8`` (sin signo de 8 hasta 256 bits) y ``int8`` a ``int256``. ``uint`` y ``int`` son alias para ``uint256`` y ``int256``, respectivamente.
 
-Operators:
+Operadores:
 
-* Comparisons: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evaluate to ``bool``)
-* Bit operators: ``&``, ``|``, ``^`` (bitwise exclusive or), ``~`` (bitwise negation)
-* Arithmetic operators: ``+``, ``-``, unary ``-``, unary ``+``, ``*``, ``/``, ``%`` (remainder), ``**`` (exponentiation), ``<<`` (left shift), ``>>`` (right shift)
+* Comparaciones: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evalúa a ``bool``)
+* Operadores bit: ``&``, ``|``, ``^`` (OR exclusivo a nivel de bit), ``~`` (negación a nivel de bit)
+* Operadores aritméticos: ``+``, ``-``, ``-`` unario, ``+`` unario, ``*``, ``/``, ``%`` (restante), ``**`` (exponenciales), ``<<`` (desplazamiento a la izquierda), ``>>`` (desplazamiento a la derecha)
 
-Division always truncates (it just is compiled to the DIV opcode of the EVM), but it does not truncate if both
-operators are :ref:`literals<rational_literals>` (or literal expressions).
+La división siempre trunca (está compilada a la opcode DIV de la EVM), pero no trunca si los dos
+operadores son :ref:`literales<rational_literals>` (o expresiones literales).
 
-Division by zero and modulus with zero throws a runtime exception.
+División por cero y módulos con cero arrojan una excepción en tiempo de ejecución.
 
-The result of a shift operation is the type of the left operand. The
-expression ``x << y`` is equivalent to ``x * 2**y`` and ``x >> y`` is
-equivalent to ``x / 2**y``. This means that shifting negative numbers
-sign extends. Shifting by a negative amount throws a runtime exception.
+El resultado de una operación de desplazamiento es del tipo del operador izquierdo. La
+expresión ``x << y`` es equivalente a ``x * 2**y`` y ``x >> y`` es
+equivalente a ``x / 2**y``. Esto significa que hacer un desplazamiento de números negativos
+extiende en signo. Hacer un desplazamiento por un número negativo arroja una excepción en tiempo de ejecución.
 
 .. warning::
-    The results produced by shift right of negative values of signed integer types is different from those produced
-    by other programming languages. In Solidity, shift right maps to division so the shifted negative values
-    are going to be rounded towards zero (truncated). In other programming languages the shift right of negative values
-    works like division with rounding down (towards negative infinity).
+    Los resultados producidos por desplazamientos a la derecha de valores negativos de tipos enteros con signo
+    son diferentes de los producidos por otros lenguajes de programación. En Solidity, el desplazamiento a la derecha
+    mapea la división para que los valores negativos del desplazamiento a la derecha sean redondeados hacia cero (truncado).
+    En otros lenguajes de programación el desplazamiento a la derecha de valores negativos funciona como una división
+    con redondeo hacia abajo (hacia infinito negativo).
 
 .. index:: address, balance, send, call, callcode, delegatecall, transfer
 
@@ -77,21 +80,21 @@ sign extends. Shifting by a negative amount throws a runtime exception.
 Address
 -------
 
-``address``: Holds a 20 byte value (size of an Ethereum address). Address types also have members and serve as base for all contracts.
+``address``: Contiene un valor de 20 bytes (tamaño de una dirección de Ethereum). Los tipos address también tienen miembros y sirven como base para todos los contratos.
 
-Operators:
+Operadores:
 
-* ``<=``, ``<``, ``==``, ``!=``, ``>=`` and ``>``
+* ``<=``, ``<``, ``==``, ``!=``, ``>=`` y ``>``
 
-Members of Addresses
-^^^^^^^^^^^^^^^^^^^^
+Miembros de Address
+^^^^^^^^^^^^^^^^^^^
 
-* ``balance`` and ``transfer``
+* ``balance`` y ``transfer``
 
-For a quick reference, see :ref:`address_related`.
+Para una referencia rápida, ver :ref:`address_related`.
 
-It is possible to query the balance of an address using the property ``balance``
-and to send Ether (in units of wei) to an address using the ``transfer`` function:
+Es posible consultar el monto de una dirección usando la propiedad ``balance``
+y de enviar Ether (en unidades de wei) a una dirección usando la función ``transfer``:
 
 ::
 
@@ -100,22 +103,22 @@ and to send Ether (in units of wei) to an address using the ``transfer`` functio
     if (x.balance < 10 && myAddress.balance >= 10) x.transfer(10);
 
 .. note::
-    If ``x`` is a contract address, its code (more specifically: its fallback function, if present) will be executed together with the ``transfer`` call (this is a limitation of the EVM and cannot be prevented). If that execution runs out of gas or fails in any way, the Ether transfer will be reverted and the current contract will stop with an exception.
+    Si ``x`` es una dirección de contrato, su código (específicamente: su función de fallback, si es que está presente) será ejecutada con el llamado ``transfer`` (esta es una limitación de la EVM y no puede ser prevenida). Si esa ejecución agota el gas o falla de cualquier forma, el Ether transferido será revertido y el contrato actual se detendrá con una excepción.
 
 * ``send``
 
-Send is the low-level counterpart of ``transfer``. If the execution fails, the current contract will not stop with an exception, but ``send`` will return ``false``.
+Send es la contrapartida de bajo nivel de ``transfer``. Si la ejecución falla, el contrato actual no se detendrá con una excepción, sino que ``send`` devolverá ``false``.
 
 .. warning::
-    There are some dangers in using ``send``: The transfer fails if the call stack depth is at 1024
-    (this can always be forced by the caller) and it also fails if the recipient runs out of gas. So in order
-    to make safe Ether transfers, always check the return value of ``send``, use ``transfer`` or even better:
-    use a pattern where the recipient withdraws the money.
+    Hay algunos peligros en utilizar ``send``: La transferencia falla si la profundidad de la llamada es de 1024
+    (esto puede ser forzado por el llamador) y también falla si al recipiente se le acaba el gas. Entonces para
+    hacer transferencias de Ether seguras, siempre revisar el valor devuelto por ``send``, usar ``transfer`` o incluso mejor:
+    usar un patrón donde el recipiente retira el dinero.
 
-* ``call``, ``callcode`` and ``delegatecall``
+* ``call``, ``callcode`` y ``delegatecall``
 
-Furthermore, to interface with contracts that do not adhere to the ABI,
-the function ``call`` is provided which takes an arbitrary number of arguments of any type. These arguments are padded to 32 bytes and concatenated. One exception is the case where the first argument is encoded to exactly four bytes. In this case, it is not padded to allow the use of function signatures here.
+Además, para interactuar con contratos que no se adhieren al ABI,
+la función ``call`` es prevista que tome un número arbitrario de argumentos de cualquier tipo. Estos argumentos son acolchados a 32 bytes y concatenados. Una excepción es el caso donde el primer argumento es codificado a exactamente 4 bytes. En este caso, no está acolchado para permitir el uso de firmas de función.
 
 ::
 
@@ -123,141 +126,138 @@ the function ``call`` is provided which takes an arbitrary number of arguments o
     nameReg.call("register", "MyName");
     nameReg.call(bytes4(keccak256("fun(uint256)")), a);
 
-``call`` returns a boolean indicating whether the invoked function terminated (``true``) or caused an EVM exception (``false``). It is not possible to access the actual data returned (for this we would need to know the encoding and size in advance).
+``call`` devuelve un booleano indicando si la función llamada terminó (``true``) o causó una excepción de la EVM (``false``). No es posible acceder a los datos reales devueltos (para esto necesitaremos saber de antemano el tamaño de codificación).
 
-In a similar way, the function ``delegatecall`` can be used: The difference is that only the code of the given address is used, all other aspects (storage, balance, ...) are taken from the current contract. The purpose of ``delegatecall`` is to use library code which is stored in another contract. The user has to ensure that the layout of storage in both contracts is suitable for delegatecall to be used. Prior to homestead, only a limited variant called ``callcode`` was available that did not provide access to the original ``msg.sender`` and ``msg.value`` values.
+``delegatecall`` puede ser usado de forma similar: la diferencia es que sólo se usa el código de la dirección dada, todos los demás aspectos (almacenamiento, saldo, ...) salen directamente del contrato actual. El propósito de ``delegatecall`` es usar el código de librería que está almacenado en otro contrato. El usuario tiene que asegurarse de que el layout del almacenamiento en ambos contratos es correcto para usar ``delegatecall``. Antes de homestead, sólo una versión limitada llamada ``callcode`` estaba disponible pero no daba acceso a los valores ``msg.sender`` y ``msg.value`` originales.
 
-All three functions ``call``, ``delegatecall`` and ``callcode`` are very low-level functions and should only be used as a *last resort* as they break the type-safety of Solidity.
+Las tres funciones ``call``, ``delegatecall`` y ``callcode`` son funciones de muy bajo nivel y deben usarse sólo como medida de último recurso ya que rompen la seguridad de tipo de Solidity.
 
-The ``.gas()`` option is available on all three methods, while the ``.value()`` option is not supported for ``delegatecall``.
+La opción ``.gas()`` está disponible en los 3 métodos, mientras que la opción ``.value()`` no se admite para ``delegatecall``.
 
 .. note::
-    All contracts inherit the members of address, so it is possible to query the balance of the
-    current contract using ``this.balance``.
+    Todos los contratos heredan los miembros de address, así que es posible consultar el saldo del contrato actual
+    usando ``this.balance``.
 
 .. warning::
-    All these functions are low-level functions and should be used with care.
-    Specifically, any unknown contract might be malicious and if you call it, you
-    hand over control to that contract which could in turn call back into
-    your contract, so be prepared for changes to your state variables
-    when the call returns.
+    Todas estas funciones son funciones de bajo nivel y deben usarse con cuidado.
+    Específicamente, cualquier contrato desconocido puede ser malicioso y si se le llama,
+    se le da el control a ese contrato, que luego puede llamar de vuelta a tu contrato,
+    así que prepárate para cambios a tus variables de estado cuando la llamada retorna el valor.
 
 .. index:: byte array, bytes32
 
 
-Fixed-size byte arrays
-----------------------
+Arrays de bytes de tamaño fijo
+------------------------------
 
-``bytes1``, ``bytes2``, ``bytes3``, ..., ``bytes32``. ``byte`` is an alias for ``bytes1``.
+``bytes1``, ``bytes2``, ``bytes3``, ..., ``bytes32``. ``byte`` es un alias para ``bytes1``.
 
-Operators:
+Operadores:
 
-* Comparisons: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evaluate to ``bool``)
-* Bit operators: ``&``, ``|``, ``^`` (bitwise exclusive or), ``~`` (bitwise negation), ``<<`` (left shift), ``>>`` (right shift)
-* Index access: If ``x`` is of type ``bytesI``, then ``x[k]`` for ``0 <= k < I`` returns the ``k`` th byte (read-only).
+* Comparaciones: ``<=``, ``<``, ``==``, ``!=``, ``>=``, ``>`` (evalúa a ``bool``)
+* Operadores Bit: ``&``, ``|``, ``^`` (OR exclusivo a nivel de bits), ``~`` (negación a nivel de bits), ``<<`` (desplazamiento a la izquierda), ``>>`` (desplazamiento a la derecha)
+* Acceso por índice: Si ``x`` es de tipo ``bytesI``, entonces ``x[k]`` para ``0 <= k < I`` devuelve el byte ``k`` (sólo lectura).
 
-The shifting operator works with any integer type as right operand (but will
-return the type of the left operand), which denotes the number of bits to shift by.
-Shifting by a negative amount will cause a runtime exception.
+El operador de desplazamiento funciona con cualquier entero como operador derecho (pero
+devuelve el tipo del operador izquierdo, que denota el número de bits a desplazarse.
+Desplazarse por un número negativo arroja una excepción en tiempo de ejecución.
 
-Members:
+Miembros:
 
-* ``.length`` yields the fixed length of the byte array (read-only).
+* ``.length`` devuelve el largo fijo del array byte (sólo lectura).
 
-Dynamically-sized byte array
-----------------------------
+Arrays de bytes de tamaño dinámico
+----------------------------------
 
 ``bytes``:
-    Dynamically-sized byte array, see :ref:`arrays`. Not a value-type!
+    Array bytes de tamaño dinámico, ver :ref:`arrays`. ¡No un tipo de valor!
 ``string``:
-    Dynamically-sized UTF-8-encoded string, see :ref:`arrays`. Not a value-type!
+    Cadena de caracteres UTF-8-codificado de tamaño dinámico, ver :ref:`arrays`. ¡No un tipo de valor!
 
-As a rule of thumb, use ``bytes`` for arbitrary-length raw byte data and ``string``
-for arbitrary-length string (UTF-8) data. If you can limit the length to a certain
-number of bytes, always use one of ``bytes1`` to ``bytes32`` because they are much cheaper.
+Como regla general, usa ``bytes`` para data raw byte de tamaño arbitrario y ``string``
+para una cadena de caracteres (UTF-8) de tamaño arbitrario. Si puedes limitar el tamaño a un cierto
+número de bytes, siempre usa una de ``bytes1`` a ``bytes32`` porque son muchas más baratas.
 
 .. index:: ! ufixed, ! fixed, ! fixed point number
 
-Fixed Point Numbers
--------------------
+Números de punto fijo
+---------------------
 
-**COMING SOON...**
+**PRÓXIMAMENTE...**
 
 .. index:: address, literal;address
 
 .. _address_literals:
 
-Address Literals
-----------------
+Address literales
+-----------------
 
-Hexadecimal literals that pass the address checksum test, for example
-``0xdCad3a6d3569DF655070DEd06cb7A1b2Ccd1D3AF`` are of ``address`` type.
-Hexadecimal literals that are between 39 and 41 digits
-long and do not pass the checksum test produce
-a warning and are treated as regular rational number literals.
+Literales hexadecimales que pasan el test checksum, por ejemplo
+``0xdCad3a6d3569DF655070DEd06cb7A1b2Ccd1D3AF`` es de tipo ``address``.
+Literales hexadecimales que están entre 39 y 41 dígitos de largo y
+no pasan el test de checksum producen una advertencia y son tratados como
+números racionales literales regulares.
 
 .. index:: literal, literal;rational
 
 .. _rational_literals:
 
-Rational and Integer Literals
------------------------------
+Literales racionales y enteros
+------------------------------
 
-Integer literals are formed from a sequence of numbers in the range 0-9.
-They are interpreted as decimals. For example, ``69`` means sixty nine.
-Octal literals do not exist in Solidity and leading zeros are invalid.
+Literales enteros son formados por una secuencia de números en el rango 0-9.
+Son interpretados como decimales. Por ejemplo, ``69`` significa sesenta y nueve.
+Literales octales no existen en Solidity y los ceros a la izquierda son inválidos.
 
-Decimal fraction literals are formed by a ``.`` with at least one number on
-one side.  Examples include ``1.``, ``.1`` and ``1.3``.
+Literales de fracciones decimales son formados por un ``.`` con al menos un número en
+un lado. Ejemplos incluyen ``1.``, ``.1`` y ``1.3``.
 
-Scientific notation is also supported, where the base can have fractions, while the exponent cannot.
-Examples include ``2e10``, ``-2e10``, ``2e-10``, ``2.5e1``.
+La notación científica está también soportada, donde la base puede tener fracciones, mientras que el exponente no puede.
+Ejemplos incluyen ``2e10``, ``-2e10``, ``2e-10``, ``2.5e1``.
 
-Number literal expressions retain arbitrary precision until they are converted to a non-literal type (i.e. by
-using them together with a non-literal expression).
-This means that computations do not overflow and divisions do not truncate
-in number literal expressions.
+Expresiones de números literales retienen precisión arbitraria hasta que son convertidas a un tipo no literal (ej. usándolas
+juntas con una expresión no literal).
+Esto significa que las computaciones no se desbordan y las divisiones no se truncan en expresiones de números literales.
 
-For example, ``(2**800 + 1) - 2**800`` results in the constant ``1`` (of type ``uint8``)
-although intermediate results would not even fit the machine word size. Furthermore, ``.5 * 8`` results
-in the integer ``4`` (although non-integers were used in between).
+Por ejemplo, ``(2**800 + 1) - 2**800`` resulta en la constante ``1`` (de tipo ``uint8``)
+aunque resultados intermedios ni siquiera serían del tamaño de la palabra. Además, ``.5 * 8`` resulta
+en el entero ``4`` (aunque no se hayan usado enteros entremedias).
 
-If the result is not an integer,
-an appropriate ``ufixed`` or ``fixed`` type is used whose number of fractional bits is as large as
-required (approximating the rational number in the worst case).
+Si el resultado no es un entero, un tipo apropiado ``ufixed`` o ``fixed`` es usado del cual el número
+de bits fraccionales es tan grande como se necesite (aproximando el número racional en el peor de los casos).
 
-In ``var x = 1/4;``, ``x`` will receive the type ``ufixed0x8`` while in ``var x = 1/3`` it will receive
-the type ``ufixed0x256`` because ``1/3`` is not finitely representable in binary and will thus be
-approximated.
+En ``var x = 1/4;``, ``x`` recibirá el tipo ``ufixed0x8`` mientras que en ``var x = 1/3`` recibirá
+el tipo ``ufixed0x256`` porque ``1/3`` no es finitamente representable en binario y entonces será
+aproximado.
 
-Any operator that can be applied to integers can also be applied to number literal expressions as
-long as the operands are integers. If any of the two is fractional, bit operations are disallowed
-and exponentiation is disallowed if the exponent is fractional (because that might result in
-a non-rational number).
+Cualquier operador que puede ser aplicado a enteros también puede ser aplicado a una expresión de
+número literal con tal que los operadores sean enteros. Si cualquiera de los dos es fraccional, las
+operaciones de bit no son permitidas y la exponenciación no es permitida si el exponente es fraccional
+(porque eso puede resultar en un número no racional).
 
 .. note::
-    Solidity has a number literal type for each rational number.
-    Integer literals and rational number literals belong to number literal types.
-    Moreover, all number literal expressions (i.e. the expressions that
-    contain only number literals and operators) belong to number literal
-    types.  So the number literal expressions ``1 + 2`` and ``2 + 1`` both
-    belong to the same number literal type for the rational number three.
+    Solidity tiene un tipo literal de número para cada número racional.
+    Literales enteros y números racionales literales pertenecen a los tipos de números
+    literales. Por otra parte, todas las expresiones literales (p.ej. las expresiones que
+    contienen sólo números literales y operadores) pertenecen a tipos de números literales.
+    Entonces las expresiones de números literales ``1 + 2`` y ``2 + 1`` ambas
+    pertenecen al mismo tipo de número literal para el número racional tres.
 
 .. note::
-    Most finite decimal fractions like ``5.3743`` are not finitely representable in binary. The correct type
-    for ``5.3743`` is ``ufixed8x248`` because that allows to best approximate the number. If you want to
-    use the number together with types like ``ufixed`` (i.e. ``ufixed128x128``), you have to explicitly
-    specify the desired precision: ``x + ufixed(5.3743)``.
+    La mayoría de fracciones decimales finitas como ``5.3743`` no son finitamente representables en binario.
+    El tipo correcto para ``5.3743`` es ``ufixed8x248`` porque permite la mejor aproximación del número. Si
+    quieres usar el número junto con tipos como ``ufixed`` (ej. ``ufixed128x128``), tienes que
+    especificar la precisión buscada de forma explícita: ``x + ufixed(5.3743)``.
 
 .. warning::
-    Division on integer literals used to truncate in earlier versions, but it will now convert into a rational number, i.e. ``5 / 2`` is not equal to ``2``, but to ``2.5``.
+    La división de enteros literales se solía truncar en versiones anteriores, pero ahora se convertirá 
+    en un número racional, ej. ``5 / 2`` no es igual a ``1``, más bien a ``2.5``.
 
 .. note::
-    Number literal expressions are converted into a non-literal type as soon as they are used with non-literal
-    expressions. Even though we know that the value of the
-    expression assigned to ``b`` in the following example evaluates to an integer, it still
-    uses fixed point types (and not rational number literals) in between and so the code
-    does not compile
+    Expresiones de números literales son convertidas en tipos no literales tan pronto como sean usadas 
+    con expresiones no literales. Aunque sabemos que el valor de la expresión asignada a ``b`` 
+    en el siguiente ejemplo evalúa a un entero, sigue usando tipos de punto fijo (y no números literales racionales) 
+    entremedio y entonces el código no compila.
 
 ::
 
@@ -266,21 +266,24 @@ a non-rational number).
 
 .. index:: literal, literal;string, string
 
-String Literals
----------------
+String literales
+----------------
 
-String literals are written with either double or single-quotes (``"foo"`` or ``'bar'``).  They do not imply trailing zeroes as in C; ``"foo"`` represents three bytes not four.  As with integer literals, their type can vary, but they are implicitly convertible to ``bytes1``, ..., ``bytes32``, if they fit, to ``bytes`` and to ``string``.
+Los strings literales se escriben con comillas simples o dobles (``"foo"`` or ``'bar'``). No hay ceros implícitos como en C; ``"foo"`` representa tres bytes, no cuatro. Como con literales enteros, su tipo puede variar, pero son implícitamente convertibles a ``bytes1``, ..., ``bytes32``, si caben a ``bytes`` y a ``string``.
 
-String literals support escape characters, such as ``\n``, ``\xNN`` and ``\uNNNN``. ``\xNN`` takes a hex value and inserts the appropriate byte, while ``\uNNNN`` takes a Unicode codepoint and inserts an UTF-8 sequence.
+Los strings literales soportan caracteres de escape, tales como ``\n``, ``\xNN`` y ``\uNNNN``. ``\xNN`` toma un valor e inserta el byte apropiado, mientras que ``\uNNNN`` toma un codepoint Unicode e inserta una secuencia UTF-8.
+
 
 .. index:: literal, bytes
 
-Hexadecimal Literals
---------------------
 
-Hexademical Literals are prefixed with the keyword ``hex`` and are enclosed in double or single-quotes (``hex"001122FF"``). Their content must be a hexadecimal string and their value will be the binary representation of those values.
+Literales hexadecimales
+-----------------------
 
-Hexademical Literals behave like String Literals and have the same convertibility restrictions.
+Los literales hexadecimales son prefijos con la palabra clave ``hex`` y son cerrados por comillas simples o dobles (``hex"001122FF"``). Su contenido debe ser una cadena hexadecimal y su valor será la representación binaria de esos valores.
+
+Los literales hexadecimales se comportan como los string literales y tienen las mismas restricciones de convertibilidad.
+
 
 .. index:: enum
 
@@ -289,9 +292,9 @@ Hexademical Literals behave like String Literals and have the same convertibilit
 Enums
 -----
 
-Enums are one way to create a user-defined type in Solidity. They are explicitly convertible
-to and from all integer types but implicit conversion is not allowed.  The explicit conversions
-check the value ranges at runtime and a failure causes an exception.  Enums needs at least one member.
+Los Enums son una manera para el usuario de crear sus propios tipos en Solidity. Son explícitamente convertibles
+a y desde todos los tipos de enteros, pero la conversión implícita no se permite. Las conversiones explícitas
+revisan los valores de rangos en tiempo de ejecución y un fallo causa una excepción. Los Enums necesitan al menos un miembro.
 
 ::
 
@@ -306,11 +309,11 @@ check the value ranges at runtime and a failure causes an exception.  Enums need
             choice = ActionChoices.GoStraight;
         }
 
-        // Since enum types are not part of the ABI, the signature of "getChoice"
-        // will automatically be changed to "getChoice() returns (uint8)"
-        // for all matters external to Solidity. The integer type used is just
-        // large enough to hold all enum values, i.e. if you have more values,
-        // `uint16` will be used and so on.
+        // Ya que los tipos enum no son parte del ABI, la firma de "getChoice"
+        // será automáticamente cambiada a "getChoice() returns (unit8)"
+        // para todo lo externo a Solidity. El tipo entero usado es apenas
+        // suficientemente grande para guardar todos los valores enum, p.ej. si
+        // tienes más valores, `unit16` será utilizado y así sucesivamente.
         function getChoice() returns (ActionChoices) {
             return choice;
         }
@@ -324,58 +327,59 @@ check the value ranges at runtime and a failure causes an exception.  Enums need
 
 .. _function_types:
 
-Function Types
---------------
+Función
+-------
 
-Function types are the types of functions. Variables of function type
-can be assigned from functions and function parameters of function type
-can be used to pass functions to and return functions from function calls.
-Function types come in two flavours - *internal* and *external* functions:
+Los tipos función son tipos de función. Variables de tipo función
+pueden ser asignados desde funciones y parámetros de funciones de tipo función
+pueden ser usadas para pasar funciones y retornar funciones de llamados de funciones.
+Los tipos de función, los hay de dos tipos: *internas* y *externas*:
 
-Internal functions can only be used inside the current contract (more specifically,
-inside the current code unit, which also includes internal library functions
-and inherited functions) because they cannot be executed outside of the
-context of the current contract. Calling an internal function is realized
-by jumping to its entry label, just like when calling a function of the current
-contract internally.
+Las funciones internas sólo pueden ser usadas dentro del contrato actual (específicamente,
+dentro de la unidad de código actual, que también incluye funciones de librerías internas
+y funciones heredadas) porque no pueden ser ejecutadas fuera del
+contexto del contrato actual. La llamada a una función interna se realiza
+saltando a su label de entrada, tal como cuando se llama a una función interna del
+contrato actual.
 
-External functions consist of an address and a function signature and they can
-be passed via and returned from external function calls.
+Las funciones externas están compuestas de una dirección y una firma de función y pueden
+ser pasadas y devueltas desde una llamada de función externa.
 
-Function types are notated as follows::
+Los tipos de funciones son notadas como sigue::
 
     function (<parameter types>) {internal|external} [constant] [payable] [returns (<return types>)]
 
-In contrast to the parameter types, the return types cannot be empty - if the
-function type should not return anything, the whole ``returns (<return types>)``
-part has to be omitted.
+A diferencia de los tipos de parámetros, los tipos de retorno no pueden estar vacíos - si
+el tipo función no debe retornar nada, la parte ``returns (<return types>)``
+tiene que ser omitida.
 
-By default, function types are internal, so the ``internal`` keyword can be
-omitted.
+Por defecto, las funciones son de tipo interna, así que la palabra clave ``internal``
+puede ser omitida.
 
-There are two ways to access a function in the current contract: Either directly
-by its name, ``f``, or using ``this.f``. The former will result in an internal
-function, the latter in an external function.
+Hay dos formas de acceder una función en el contrato actual: o bien directamente
+con su nombre, ``f``, o usando ``this.f``. Usando el nombre resultará en una función
+interna, y con ``this`` habrá una función externa.
 
-If a function type variable is not initialized, calling it will result
-in an exception. The same happens if you call a function after using ``delete``
-on it.
+Si una variable de tipo función no es inicializada, llamarla resultará 
+en una excepción. Lo mismo ocurre si llamas una función después de usar
+``delete`` en ella.
 
-If external function types are used outside of the context of Solidity,
-they are treated as the ``function`` type, which encodes the address
-followed by the function identifier together in a single ``bytes24`` type.
+Si funciones externas son usadas fuera del contexto de Solidity, son tratadas
+como tipo ``function``, que codifica la dirección seguida por el identificador
+de la función junto con un tipo ``bytes24``.
 
-Note that public functions of the current contract can be used both as an
-internal and as an external function. To use ``f`` as an internal function,
-just use ``f``, if you want to use its external form, use ``this.f``.
+Nótese que las funciones públicas del contrato actual pueden ser usadas tanto
+como una función interna como externa. Para usar ``f`` como función interna, sólo
+se le llama como ``f``, y si se quiere usar como externa, usar ``this.f``.
 
-Example that shows how to use internal function types::
+
+Ejemplo que muestra como usar tipos de función internas::
 
     pragma solidity ^0.4.5;
 
     library ArrayUtils {
-      // internal functions can be used in internal library functions because
-      // they will be part of the same code context
+      // las funciones internas pueden ser usadas en funciones de librerías
+      // internas porque serán parte del mismo contexto de código.
       function map(uint[] memory self, function (uint) returns (uint) f)
         internal
         returns (uint[] memory r)
@@ -404,7 +408,7 @@ Example that shows how to use internal function types::
         }
       }
     }
-    
+
     contract Pyramid {
       using ArrayUtils for *;
       function pyramid(uint l) returns (uint) {
@@ -418,7 +422,7 @@ Example that shows how to use internal function types::
       }
     }
 
-Another example that uses external function types::
+Otro ejemplo que usa tipos de función externa::
 
     pragma solidity ^0.4.11;
 
@@ -434,96 +438,99 @@ Another example that uses external function types::
         NewRequest(requests.length - 1);
       }
       function reply(uint requestID, bytes response) {
-        // Here goes the check that the reply comes from a trusted source
+        // Aquí se revisa que la respuesta viene de una fuente de confianza
         requests[requestID].callback(response);
       }
     }
 
     contract OracleUser {
-      Oracle constant oracle = Oracle(0x1234567); // known contract
+      Oracle constant oracle = Oracle(0x1234567); // contrato conocido
       function buySomething() {
         oracle.query("USD", this.oracleResponse);
       }
       function oracleResponse(bytes response) {
         require(msg.sender == address(oracle));
-        // Use the data
+        // Usar los datos
       }
     }
 
-Note that lambda or inline functions are planned but not yet supported.
+Nótese que las funciones lambda o inline están planeadas pero no están aún implementadas.
 
 .. index:: ! type;reference, ! reference type, storage, memory, location, array, struct
 
-Reference Types
-==================
+Tipos de referencia
+===================
 
-Complex types, i.e. types which do not always fit into 256 bits have to be handled
-more carefully than the value-types we have already seen. Since copying
-them can be quite expensive, we have to think about whether we want them to be
-stored in **memory** (which is not persisting) or **storage** (where the state
-variables are held).
+Tipos complejos, ej. tipos que no siempre caben en 256 bits tienen que ser manejados
+con más cuidado que los tipos de valores que ya hemos visto. Ya que copiarlos puede
+ser muy caro, tenemos que pensar sobre si queremos que se almacenen en **memory**
+(que no es persistente) o en **storage** (donde las variables de estado se guardan).
 
-Data location
--------------
+Ubicación de datos
+------------------
 
-Every complex type, i.e. *arrays* and *structs*, has an additional
-annotation, the "data location", about whether it is stored in memory or in storage. Depending on the
-context, there is always a default, but it can be overridden by appending
-either ``storage`` or ``memory`` to the type. The default for function parameters (including return parameters) is ``memory``, the default for local variables is ``storage`` and the location is forced
-to ``storage`` for state variables (obviously).
+Cada tipo complejo, ej. *arrays* y *structs*, tienen anotaciones
+adicionales, la "data location", con respecto a si es almacenado
+en memoria o en almacenamiento. Dependiendo del contexto, siempre hay un
+valor por defecto, pero puede ser reemplazado añadiendo o bien
+``storage`` o `memory`` al tipo. Por defecto para tipos parámetros de
+función (incluyendo parámetros de retorno) es ``memory``, por defecto para
+variables locales es ``storage`` y la ubicación es forzada a ``storage``
+para variables de estado (obviamente).
 
-There is also a third data location, "calldata", which is a non-modifyable
-non-persistent area where function arguments are stored. Function parameters
-(not return parameters) of external functions are forced to "calldata" and
-it behaves mostly like memory.
+Hay una tercera ubicación de datos, "calldata", un área que no es modificable
+ni persistente donde argumentos de función son almacenados. Parámetros de función
+(no parámetros de retorno) de funciónes externas son forzados a "calldata" y
+se comportan casi como memoria.
 
-Data locations are important because they change how assignments behave:
-Assignments between storage and memory and also to a state variable (even from other state variables)
-always create an independent copy.
-Assignments to local storage variables only assign a reference though, and
-this reference always points to the state variable even if the latter is changed
-in the meantime.
-On the other hand, assignments from a memory stored reference type to another
-memory-stored reference type does not create a copy.
+Las ubicaciones de datos son importantes porque cambian cómo las asignaciones se comportan:
+Las asignaciones entre almacenamiento y memoria y también de variables de estado (incluso desde otras
+variable de estado) siempre crean una copia independiente.
+Asignaciones a almacenamiento variable de almacenamiento local sólo asignan una referencia, y
+esta referencia siempre apunta a la variable de estado aunque la referencia cambie
+entretanto.
+En cambio, asignaciones de la referencia almacenada en memoria a otro tipo de referencia
+no crea una copia.
 
 ::
 
     pragma solidity ^0.4.0;
 
     contract C {
-        uint[] x; // the data location of x is storage
+        uint[] x; // la ubicación de los datos de x es storage
 
-        // the data location of memoryArray is memory
+        // la ubicación de datos de memoryArray es memory
         function f(uint[] memoryArray) {
-            x = memoryArray; // works, copies the whole array to storage
-            var y = x; // works, assigns a pointer, data location of y is storage
-            y[7]; // fine, returns the 8th element
-            y.length = 2; // fine, modifies x through y
-            delete x; // fine, clears the array, also modifies y
-            // The following does not work; it would need to create a new temporary /
-            // unnamed array in storage, but storage is "statically" allocated:
+            x = memoryArray; // funciona, copia el array entero al almacenamiento
+            var y = x; // funciona, asigna una referencia, ubicación de datos de y es almacenamiento
+            y[7]; // bien, devuelve el octavo elemento
+            y.length = 2; // bien, modifica x a través de y
+            delete x; // bien, limpia el array, también modifica y
+            // Lo siguiente no funciona; debería crear un nuevo array temporal/sin nombre
+            // en almacenamiento, pero el almacenamiento es asignado "estáticamente":
             // y = memoryArray;
-            // This does not work either, since it would "reset" the pointer, but there
-            // is no sensible location it could point to.
+            // Esto no funciona tampoco, ya que resetearía el apuntador, pero no hay
+            // ubicación donde podría apuntar
             // delete y;
-            g(x); // calls g, handing over a reference to x
-            h(x); // calls h and creates an independent, temporary copy in memory
+            g(x); // llama g, dando referencia a x
+            h(x); // llama h y crea una copia independiente y temporal en la memoria
         }
 
         function g(uint[] storage storageArray) internal {}
         function h(uint[] memoryArray) {}
     }
 
-Summary
+
+Resumen
 ^^^^^^^
 
-Forced data location:
- - parameters (not return) of external functions: calldata
- - state variables: storage
+Ubicación de datos forzada:
+ - parámetros (no de retorno) de funciones externas: calldata
+ - variables de estado: almacenamiento
 
-Default data location:
- - parameters (also return) of functions: memory
- - all other local variables: storage
+Ubicación de datos por defecto:
+ - parámetros (también de retorno) de funciones: memoria
+ - todas otras variables: almacenamiento
 
 .. index:: ! array
 
@@ -532,42 +539,43 @@ Default data location:
 Arrays
 ------
 
-Arrays can have a compile-time fixed size or they can be dynamic.
-For storage arrays, the element type can be arbitrary (i.e. also other
-arrays, mappings or structs). For memory arrays, it cannot be a mapping and
-has to be an ABI type if it is an argument of a publicly-visible function.
+Los array pueden tener tamaño fijo en compilación o pueden ser dinámicos.
+Para arrays de almacenamiento, el tipo del elemento puede ser arbitrario (ej. también
+otros arrays, mapeos o structs). Para arrays de memoria, no puede ser un mapping y
+tiene que ser un tipo ABI si es que es un argumento de una función públicamente
+visible.
 
-An array of fixed size ``k`` and element type ``T`` is written as ``T[k]``,
-an array of dynamic size as ``T[]``. As an example, an array of 5 dynamic
-arrays of ``uint`` is ``uint[][5]`` (note that the notation is reversed when
-compared to some other languages). To access the second uint in the
-third dynamic array, you use ``x[2][1]`` (indices are zero-based and
-access works in the opposite way of the declaration, i.e. ``x[2]``
-shaves off one level in the type from the right).
+Un array de tamaño fijo ``k`` y elemento tipo ``T`` es escrito como ``T[k]``,
+un array de tamaño dinámico como ``T[]``. Como ejemplo, un array de 5 arrays
+dinámicos de ``uint`` es ``uint[][]`` (nótese que la notación es invertida
+comparada a otros lenguajes). Para acceder al segundo uint en el tercer
+array dinámico, se utiliza ``x[2][1]`` (los índices comienzan en 0 y el acceso
+funciona de forma opuesta a la declaración. i.e. ``x[2]`` reduce un nivel en el
+tipo desde la derecha)
 
-Variables of type ``bytes`` and ``string`` are special arrays. A ``bytes`` is similar to ``byte[]``,
-but it is packed tightly in calldata. ``string`` is equal to ``bytes`` but does not allow
-length or index access (for now).
+Variables de tipo ``bytes`` y ``string`` son arrays especiales. Un ``bytes`` es similar a ``byte[]``,
+pero está junto en el calldata. ``string`` es igual a ``bytes`` pero no permite el acceso
+a la longitud o mediante índice (por ahora).
 
-So ``bytes`` should always be preferred over ``byte[]`` because it is cheaper.
+De modo que ``bytes`` siempre será preferible a ``byte[]`` ya que es más barato.
 
 .. note::
-    If you want to access the byte-representation of a string ``s``, use
-    ``bytes(s).length`` / ``bytes(s)[7] = 'x';``. Keep in mind
-    that you are accessing the low-level bytes of the UTF-8 representation,
-    and not the individual characters!
+    Si quieres acceder a la representación en bytes de un string ``s``, usa
+    ``bytes(s).length`` / ``bytes(s)[7] = 'x';``. ¡Ten en cuenta que
+    estás accediendo a los bytes a bajo nivel de la representación en UTF-8,
+    y no a los caracteres individualmente!
 
-It is possible to mark arrays ``public`` and have Solidity create a getter.
-The numeric index will become a required parameter for the getter.
+Es posible marcar arrays como ``public`` y dejar que Solidity cree un getter.
+El índice numérico se convertirá en un parámetro requerido por el getter.
 
 .. index:: ! array;allocating, new
 
-Allocating Memory Arrays
-^^^^^^^^^^^^^^^^^^^^^^^^
+Asignación de memoria en Arrays
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Creating arrays with variable length in memory can be done using the ``new`` keyword.
-As opposed to storage arrays, it is **not** possible to resize memory arrays by assigning to
-the ``.length`` member.
+Crear arrays con longitud variable en memoria se puede hacer usando la palabra clave ``new``.
+Al contrario que con los arrays en storage, no es posible redimensionar los arrays en memoria
+mediante asignación al miembro ``.length``.
 
 ::
 
@@ -577,18 +585,18 @@ the ``.length`` member.
         function f(uint len) {
             uint[] memory a = new uint[](7);
             bytes memory b = new bytes(len);
-            // Here we have a.length == 7 and b.length == len
+            // Aquí tenemos a.length == 7 y b.length == len
             a[6] = 8;
         }
     }
 
 .. index:: ! array;literals, !inline;arrays
 
-Array Literals / Inline Arrays
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Array Literales / Arrays en linea
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Array literals are arrays that are written as an expression and are not
-assigned to a variable right away.
+Los Array literales son arrays que se escriben como una expresión y no están
+asignados a una variable al momento.
 
 ::
 
@@ -603,13 +611,13 @@ assigned to a variable right away.
         }
     }
 
-The type of an array literal is a memory array of fixed size whose base
-type is the common type of the given elements. The type of ``[1, 2, 3]`` is
-``uint8[3] memory``, because the type of each of these constants is ``uint8``.
-Because of that, it was necessary to convert the first element in the example
-above to ``uint``. Note that currently, fixed size memory arrays cannot
-be assigned to dynamically-sized memory arrays, i.e. the following is not
-possible:
+El tipo de array literal es un array de memoria de tamaño fijo del cual el tipo
+base es el tipo común de los elementos dados. El tipo de ``[1, 2, 3]`` es
+``uint[3] memory``, porque el tipo de cada una de estas constantes es ``uint8``.
+Por eso, fue necesario convertir el primer elemento en el ejemplo arriba
+a ``uint``. Nótese que actualmente, los arrays de memoria de tamaño fijo no pueden
+ser asignados a arrays de memoria de tamaño dinámico, ej. lo siguiente
+no es posible:
 
 ::
 
@@ -617,36 +625,36 @@ possible:
 
     contract C {
         function f() {
-            // The next line creates a type error because uint[3] memory
-            // cannot be converted to uint[] memory.
+            // La próxima línea crea un tipo error porque uint[3] memory
+            // no puede ser convertido a uint[] memory.
             uint[] x = [uint(1), 3, 4];
     }
 
-It is planned to remove this restriction in the future but currently creates
-some complications because of how arrays are passed in the ABI.
+Esta restricción está planeada para ser eliminada en el futuro pero actualmente
+crea complicaciones por cómo los arrays son pasados en el ABI.
 
 .. index:: ! array;length, length, push, !array;push
 
-Members
-^^^^^^^
+Miembros
+^^^^^^^^
 
 **length**:
-    Arrays have a ``length`` member to hold their number of elements.
-    Dynamic arrays can be resized in storage (not in memory) by changing the
-    ``.length`` member. This does not happen automatically when attempting to access elements outside the current length. The size of memory arrays is fixed (but dynamic, i.e. it can depend on runtime parameters) once they are created.
+    Los arrays tienen un miembro ``length`` para guardar su número de elementos.
+    Arrays dinámicos pueden ser modificados en almacenamiento (no en memoria) cambiando
+    el miembro ``.length``. Ésto no ocurre automáticamente cuando se intenta acceder a los elementos fuera de la longitud actual. El tamaño de arrays de memoria es fijo (pero dinámico, ej. puede depender de parámetros en tiempo de ejecución) cuando son creados.
 **push**:
-     Dynamic storage arrays and ``bytes`` (not ``string``) have a member function called ``push`` that can be used to append an element at the end of the array. The function returns the new length.
+    Los arrays de almacenamiento dinámico y ``bytes`` (no ``string``) tienen una función miembro llamada ``push`` que puede ser usada para agregar un elemento al final del array. La función devuelve el nuevo length.
 
 .. warning::
-    It is not yet possible to use arrays of arrays in external functions.
+    Aún no es posible usar arrays en funciónes externas.
 
 .. warning::
-    Due to limitations of the EVM, it is not possible to return
-    dynamic content from external function calls. The function ``f`` in
-    ``contract C { function f() returns (uint[]) { ... } }`` will return
-    something if called from web3.js, but not if called from Solidity.
+    Debido a las limitaciones de la EVM, no es posible retornar
+    contenido dinámico de las funciónes externas . La función ``f`` en
+    ``contract C { function f() returns (uint[]) { ... } }`` devolverá
+    algo si es llamado desde web3.js, pero no si se llama desde Solidity.
 
-    The only workaround for now is to use large statically-sized arrays.
+    La única alternativa por ahora es usar grandes arrays de tamaño estático.
 
 
 ::
@@ -655,40 +663,40 @@ Members
 
     contract ArrayContract {
         uint[2**20] m_aLotOfIntegers;
-        // Note that the following is not a pair of dynamic arrays but a
-        // dynamic array of pairs (i.e. of fixed size arrays of length two).
+        // Nótese que el siguiente no es un par de arrays dinámicos, sino un
+        // array dinámico de pares (ej. de arrays de tamaño fijo de length 2).
         bool[2][] m_pairsOfFlags;
-        // newPairs is stored in memory - the default for function arguments
+        // newPairs es almacenado en memoria - por defecto para argumentos de función
 
         function setAllFlagPairs(bool[2][] newPairs) {
-            // assignment to a storage array replaces the complete array
+            // asignación a un array de almacenamiento reemplaza el array completo
             m_pairsOfFlags = newPairs;
         }
 
         function setFlagPair(uint index, bool flagA, bool flagB) {
-            // access to a non-existing index will throw an exception
+            // acceso a un index que no existe arrojará una excepción
             m_pairsOfFlags[index][0] = flagA;
             m_pairsOfFlags[index][1] = flagB;
         }
 
         function changeFlagArraySize(uint newSize) {
-            // if the new size is smaller, removed array elements will be cleared
+            // si el tamaño nuevo es más pequeño, los elementos eliminados del array serán limpiados
             m_pairsOfFlags.length = newSize;
         }
 
         function clear() {
-            // these clear the arrays completely
+            // éstos limpian los arrays completamente
             delete m_pairsOfFlags;
             delete m_aLotOfIntegers;
-            // identical effect here
+            // efecto idéntico aquí
             m_pairsOfFlags.length = 0;
         }
 
         bytes m_byteData;
 
         function byteArrays(bytes data) {
-            // byte arrays ("bytes") are different as they are stored without padding,
-            // but can be treated identical to "uint8[]"
+            // byte arrays ("bytes") son diferentes ya que no son almacenados sin padding,
+            // pero pueden ser tratados idénticamente a "uint8[]"
             m_byteData = data;
             m_byteData.length += 7;
             m_byteData[3] = 8;
@@ -700,9 +708,9 @@ Members
         }
 
         function createMemoryArray(uint size) returns (bytes) {
-            // Dynamic memory arrays are created using `new`:
+            // Arrays de memoria dinámicos son creados usando `new`:
             uint[2][] memory arrayOfPairs = new uint[2][](size);
-            // Create a dynamic byte array:
+            // Crear un byte array dinámico:
             bytes memory b = new bytes(200);
             for (uint i = 0; i < b.length; i++)
                 b[i] = byte(i);
@@ -718,15 +726,15 @@ Members
 Structs
 -------
 
-Solidity provides a way to define new types in the form of structs, which is
-shown in the following example:
+Solidity provee una manera de definir nuevos tipos con structs, que es
+mostrado en el siguiente ejemplo:
 
 ::
 
     pragma solidity ^0.4.11;
 
     contract CrowdFunding {
-        // Defines a new type with two fields.
+        // Define un nuevo tipo con dos campos.
         struct Funder {
             address addr;
             uint amount;
@@ -744,16 +752,16 @@ shown in the following example:
         mapping (uint => Campaign) campaigns;
 
         function newCampaign(address beneficiary, uint goal) returns (uint campaignID) {
-            campaignID = numCampaigns++; // campaignID is return variable
-            // Creates new struct and saves in storage. We leave out the mapping type.
+            campaignID = numCampaigns++; // campaignID es variable de retorno
+            // Crea un nuevo struct y lo guarda en almacenamiento. Dejamos fuera el tipo mapping.
             campaigns[campaignID] = Campaign(beneficiary, goal, 0, 0);
         }
 
         function contribute(uint campaignID) payable {
             Campaign c = campaigns[campaignID];
-            // Creates a new temporary memory struct, initialised with the given values
-            // and copies it over to storage.
-            // Note that you can also use Funder(msg.sender, msg.value) to initialise.
+            // Crea un nuevo struct de memoria temporal, inicializado con los valores dados
+            // y lo copia al almacenamiento.
+            // Nótese que también se puede usar Funder(msg.sender, msg.value) para inicializarlo
             c.funders[c.numFunders++] = Funder({addr: msg.sender, amount: msg.value});
             c.amount += msg.value;
         }
@@ -769,22 +777,22 @@ shown in the following example:
         }
     }
 
-The contract does not provide the full functionality of a crowdfunding
-contract, but it contains the basic concepts necessary to understand structs.
-Struct types can be used inside mappings and arrays and they can itself
-contain mappings and arrays.
+El contrato no provee la funcionalidad total de un contrato crowdfunding,
+pero contiene los conceptos básicos necesarios para entender structs.
+Los tipos struct pueden ser usados dentro de mappings y arrays, y ellos mismos
+pueden contener mappings y arrays.
 
-It is not possible for a struct to contain a member of its own type,
-although the struct itself can be the value type of a mapping member.
-This restriction is necessary, as the size of the struct has to be finite.
+No es posible para un struct contener un miembro de su propio tipo,
+aunque el struct puede ser el tipo valor de un miembro mapping.
+Esta restricción es necesaria, ya que el tamaño del struct tiene que ser finito.
 
-Note how in all the functions, a struct type is assigned to a local variable
-(of the default storage data location).
-This does not copy the struct but only stores a reference so that assignments to
-members of the local variable actually write to the state.
+Nótese como en todas las funciónes, un tipo struct es asignado a la variable local
+(de la ubicación por defecto del almacenamiento).
+Esto no copia el struct pero guarda una referencia para que las asignaciones
+a miembros de la variable local realmente escriban al estado.
 
-Of course, you can also directly access the members of the struct without
-assigning it to a local variable, as in
+Por supuesto, puedes diréctamente acceder a los miembros del struct sin
+asignarlos a la variable local, como en
 ``campaigns[campaignID].amount = 0``.
 
 .. index:: !mapping
@@ -792,26 +800,25 @@ assigning it to a local variable, as in
 Mappings
 ========
 
-Mapping types are declared as ``mapping(_KeyType => _ValueType)``.
-Here ``_KeyType`` can be almost any type except for a mapping, a dynamically sized array, a contract, an enum and a struct.
-``_ValueType`` can actually be any type, including mappings.
+Tipos mapping son declarados como ``mapping(_KeyType => _ValueType)``.
+Aquí ``_KeyType`` puede ser casi cualquier tipo excepto mapping, un array de tamaño dinámico, un contrato, un enum y un struct.
+``_ValueType`` puede ser cualquier tipo, incluyendo mappings.
 
-Mappings can be seen as `hash tables <https://en.wikipedia.org/wiki/Hash_table>`_ which are virtually initialized such that
-every possible key exists and is mapped to a value whose byte-representation is
-all zeros: a type's :ref:`default value <default-value>`. The similarity ends here, though: The key data is not actually stored
-in a mapping, only its ``keccak256`` hash used to look up the value.
+Mappings pueden verse como 'tablas hash <https://en.wikipedia.org/wiki/Hash_table>'_ que son virtualmente inicializadas ya que
+cada posible clase existe y es mapeada a un valor que su representación byte es
+todo ceros: el valor :ref:`por defecto <default-value>` de un tipo. Aunque la similitud termina aquí: los datos clave no son realmente
+almacenados en el mapping, sólo su hash ``keccak256`` usado para buscar el valor.
 
-Because of this, mappings do not have a length or a concept of a key or value being "set".
+Por esto, los mappings no tienen un length o un concepto de "fijar" clave o valor.
 
-Mappings are only allowed for state variables (or as storage reference types
-in internal functions).
+Los mappings sólo son permitidos para variables de estado (o como tipos de referencia
+en funciones internas).
 
-It is possible to mark mappings ``public`` and have Solidity create a getter.
-The ``_KeyType`` will become a required parameter for the getter and it will
-return ``_ValueType``.
+Es posible marcar los mappings ``public`` y hacer que Solidity cree un getter.
+El ``_KeyType`` será un parámetro requerido para el getter y devolverá ``_ValueType``.
 
-The ``_ValueType`` can be a mapping too. The getter will have one parameter
-for each ``_KeyType``, recursively.
+El ``_ValueType`` puede ser un mapping también. El getter tendrá un parámetro
+para cada ``_KeyType``, recursivamente.
 
 ::
 
@@ -833,26 +840,26 @@ for each ``_KeyType``, recursively.
 
 
 .. note::
-  Mappings are not iterable, but it is possible to implement a data structure on top of them.
-  For an example, see `iterable mapping <https://github.com/ethereum/dapp-bin/blob/master/library/iterable_mapping.sol>`_.
+  Los mappings no son iterables, pero es posible implementar una estructura de datos encima de ellos.
+  Por ejemplo, ver `iterable mapping <https://github.com/ethereum/dapp-bin/blob/master/library/iterable_mapping.sol>`_.
 
 .. index:: assignment, ! delete, lvalue
 
-Operators Involving LValues
-===========================
+Operadores con LValues
+======================
 
-If ``a`` is an LValue (i.e. a variable or something that can be assigned to), the following operators are available as shorthands:
+Si ``a`` es un LValue (ej. una variable o algo que puede ser asignado), los siguientes operadores son abreviaturas posibles:
 
-``a += e`` is equivalent to ``a = a + e``. The operators ``-=``, ``*=``, ``/=``, ``%=``, ``a |=``, ``&=`` and ``^=`` are defined accordingly. ``a++`` and ``a--`` are equivalent to ``a += 1`` / ``a -= 1`` but the expression itself still has the previous value of ``a``. In contrast, ``--a`` and ``++a`` have the same effect on ``a`` but return the value after the change.
+``a += e`` es equivalente a ``a = a + e`` . Los operadores ``-=``, ``*=``, ``/=``, ``%=``, ``a |=``, ``&=`` y ``^=`` son todos definidos de esa manera. ``a++`` y ``a--`` son equivalentes a ``a += 1`` / ``a -= 1`` pero la expresión en sí todavía tiene el valor anterior de ``a``. En contraste, ``--a`` y ``++a`` tienen el mismo efecto en ``a`` pero devuelven el valor después del cambio.
 
 delete
 ------
 
-``delete a`` assigns the initial value for the type to ``a``. I.e. for integers it is equivalent to ``a = 0``, but it can also be used on arrays, where it assigns a dynamic array of length zero or a static array of the same length with all elements reset. For structs, it assigns a struct with all members reset.
+``delete a`` asigna el valor inicial para el tipo a ``a``. Ej. para enteros, el equivalente es ``a = 0``, pero puede ser usado en arrays, donde se asigna un array dinámico de length cero o un array estático del mismo length con todos los elementos reseteados. Para structs, se asigna a struct con todos los miembros reseteados.
 
-``delete`` has no effect on whole mappings (as the keys of mappings may be arbitrary and are generally unknown). So if you delete a struct, it will reset all members that are not mappings and also recurse into the members unless they are mappings. However, individual keys and what they map to can be deleted.
+``delete`` no tiene efecto en mappings enteros (ya que las claves de los mappings pueden ser arbitrarias y generalmente desconocidas). Así que si se hace delete a un struct, reseteará todos los miembros que no son mappings y también recursivamente a los miembros al menos que sean mappings. Sin embargo, las claves individuales y lo que pueden mapear pueden ser eliminados.
 
-It is important to note that ``delete a`` really behaves like an assignment to ``a``, i.e. it stores a new object in ``a``.
+Es importante notar que ``delete a`` en realidad se comporta como una asignación a ``a``, ej. almacena un nuevo objeto en ``a``.
 
 ::
 
@@ -864,78 +871,77 @@ It is important to note that ``delete a`` really behaves like an assignment to `
 
         function f() {
             uint x = data;
-            delete x; // sets x to 0, does not affect data
-            delete data; // sets data to 0, does not affect x which still holds a copy
+            delete x; // setea x to 0, no afecta a los datos
+            delete data; // setea data a 0, no afecta a x que aún tiene una copia
             uint[] y = dataArray;
-            delete dataArray; // this sets dataArray.length to zero, but as uint[] is a complex object, also
-            // y is affected which is an alias to the storage object
-            // On the other hand: "delete y" is not valid, as assignments to local variables
-            // referencing storage objects can only be made from existing storage objects.
+            delete dataArray; // esto setea dataArray.length a cero, pero como uint[] es un objecto complejo,
+            // también y es afectado que es un alias al objeto de almacenamiento
+            // Por otra parte: "delete y" no es válido, ya que asignaciones a variables locales
+            // haciendo referencia a objetos de almacenamiento sólo pueden ser hechas de
+            // objetos de almacenamiento existentes.
         }
     }
 
 .. index:: ! type;conversion, ! cast
 
-Conversions between Elementary Types
-====================================
 
-Implicit Conversions
---------------------
+Conversión entre tipos elementales
+==================================
 
-If an operator is applied to different types, the compiler tries to
-implicitly convert one of the operands to the type of the other (the same is
-true for assignments). In general, an implicit conversion between value-types
-is possible if it
-makes sense semantically and no information is lost: ``uint8`` is convertible to
-``uint16`` and ``int128`` to ``int256``, but ``int8`` is not convertible to ``uint256``
-(because ``uint256`` cannot hold e.g. ``-1``).
-Furthermore, unsigned integers can be converted to bytes of the same or larger
-size, but not vice-versa. Any type that can be converted to ``uint160`` can also
-be converted to ``address``.
+Conversiones implícitas
+-----------------------
 
-Explicit Conversions
---------------------
+Si un operador es aplicado a diferentes tipos, el compilador intenta
+implícitamente convertir uno de los operadores al tipo del otro (lo mismo
+es verdad para asignaciones). En general, una conversión implícita entre tipos de
+valores es posible si tiene sentido semanticamente y no hay información
+perdida: ``uint8`` es convertible a ``uint16`` y ``int128`` a ``int256``, pero
+``int8`` no es convertible a ``uint256`` (porque ``uint256`` no puede contener ``-1``).
+Además, enteros sin signo pueden ser convertidos a bytes del mismo tamaño o más grande
+pero no vice-versa. Cualquier tipo que puede ser convertido a ``uint160`` puede también
+ser convertido a ``address``.
 
-If the compiler does not allow implicit conversion but you know what you are
-doing, an explicit type conversion is sometimes possible. Note that this may
-give you some unexpected behaviour so be sure to test to ensure that the
-result is what you want! Take the following example where you are converting
-a negative ``int8`` to a ``uint``:
+Conversiones explícitas
+-----------------------
+
+Si el compilador no permite conversión implícita pero sabes lo que estás haciendo,
+una conversión explícita de tipo es a veces posible. Nótese que esto puede darte un
+comportamiento inesperado, ¡así que asegúrate de probar que el resultado es el que querías!
+Este ejemplo es para convertir de un negativo ``int8`` a ``uint``:
 
 ::
 
     int8 y = -3;
     uint x = uint(y);
 
-At the end of this code snippet, ``x`` will have the value ``0xfffff..fd`` (64 hex
-characters), which is -3 in the two's complement representation of 256 bits.
+Al final de este snippet de código, ``x`` tendrá el valor ``0xfffff..fd`` (64
+caracteres hex), que es -3 en la representación de 256 bits de los complementos de dos.
 
-If a type is explicitly converted to a smaller type, higher-order bits are
-cut off::
+Si un tipo es explícitamente convertido a un tipo más pequeño, los bits de orden mayor son
+eliminados::
 
     uint32 a = 0x12345678;
-    uint16 b = uint16(a); // b will be 0x5678 now
+    uint16 b = uint16(a); // b será 0x5678 ahora
 
 .. index:: ! type;deduction, ! var
 
 .. _type-deduction:
 
-Type Deduction
-==============
+Deducción de tipo
+=================
 
-For convenience, it is not always necessary to explicitly specify the type of a
-variable, the compiler automatically infers it from the type of the first
-expression that is assigned to the variable::
+Por conveniencia, no es siempre necesario especificar explícitamente el tipo de
+una variable, el compilador infiere automáticamente el tipo del la primera
+expresión a la cual es asignada esa variable::
 
     uint24 x = 0x123;
     var y = x;
 
-Here, the type of ``y`` will be ``uint24``. Using ``var`` is not possible for function
-parameters or return parameters.
+Aquí, el tipo de ``y`` será ``uint24``. No es posible usar ``var`` para parámetros de
+función o parámetros de retorno.
 
 .. warning::
-    The type is only deduced from the first assignment, so
-    the loop in the following snippet is infinite, as ``i`` will have the type
-    ``uint8`` and any value of this type is smaller than ``2000``.
+    El tipo es deducido sólo de la primera asignación, así que
+    el bucle del siguiente snippet es infinito, ya que ``i`` tendrá el tipo
+    ``uint8`` y cualquier valor de este tipo es más pequeño que ``2000``.
     ``for (var i = 0; i < 2000; i++) { ... }``
-
