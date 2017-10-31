@@ -1,18 +1,17 @@
-###############################
-Introduction to Smart Contracts
-###############################
+#########################################
+Introducción a los Contratos Inteligentes
+#########################################
 
 .. _simple-smart-contract:
 
-***********************
-A Simple Smart Contract
-***********************
+******************************
+Un contrato inteligente simple
+******************************
 
-Let us begin with the most basic example. It is fine if you do not understand everything
-right now, we will go into more detail later.
+Vamos a comenzar con el ejemplo más básico. No pasa nada si no entiendes nada ahora, entraremos más en detalle posteriormente.
 
-Storage
-=======
+Almacenamiento
+==============
 
 ::
 
@@ -30,44 +29,20 @@ Storage
         }
     }
 
-The first line simply tells that the source code is written for
-Solidity version 0.4.0 or anything newer that does not break functionality
-(up to, but not including, version 0.5.0). This is to ensure that the
-contract does not suddenly behave differently with a new compiler version. The keyword ``pragma`` is called that way because, in general,
-pragmas are instructions for the compiler about how to treat the
-source code (e.g. `pragma once <https://en.wikipedia.org/wiki/Pragma_once>`_).  .
+La primera línea simplemente dice que el código fuente se ha escrito en la versión 0.4.0 de Solidity o en otra superior totalmente compatible (cualquiera anterior a la 0.5.0). Esto es para garantizar que el contrato no se va a comportar de una forma diferente con una versión más nueva del compilador. La palabra reservada ``pragma`` es llamada de esa manera porque, en general, los "pragmas" son instrucciones para el compilador que indican como este debe operar con el código fuente (p.ej.: `pragma once <https://en.wikipedia.org/wiki/Pragma_once>`_).  .
 
-A contract in the sense of Solidity is a collection of code (its *functions*) and
-data (its *state*) that resides at a specific address on the Ethereum
-blockchain. The line ``uint storedData;`` declares a state variable called ``storedData`` of
-type ``uint`` (unsigned integer of 256 bits). You can think of it as a single slot
-in a database that can be queried and altered by calling functions of the
-code that manages the database. In the case of Ethereum, this is always the owning
-contract. And in this case, the functions ``set`` and ``get`` can be used to modify
-or retrieve the value of the variable.
+Un contrato para Solidity es una colección de código (sus *funciones*) y datos (su *estado*) que residen en una dirección específica en la blockchain de Ethereum. La línea ``uint storedData;`` declara una variable de estado llamada ``storedData`` del tipo ``uint`` (unsigned integer de 256 bits). Esta se puede entender como una parte única en una base de datos que puede ser consultada o modificada llamando a funciones del código que gestiona dicha base de datos. En el caso de Ethereum, este es siempre el contrato propietario. Y en este caso, las funciones ``set`` y ``get`` se pueden usar para modificar o consultar el valor de la variable.
 
-To access a state variable, you do not need the prefix ``this.`` as is common in
-other languages.
+Para acceder a una variable de estado, no es necesario el uso del prefijo ``this.`` como es habitual en otros lenguajes.
 
-This contract does not do much yet (due to the infrastructure
-built by Ethereum) apart from allowing anyone to store a single number that is accessible by
-anyone in the world without a (feasible) way to prevent you from publishing
-this number. Of course, anyone could just call ``set`` again with a different value
-and overwrite your number, but the number will still be stored in the history
-of the blockchain. Later, we will see how you can impose access restrictions
-so that only you can alter the number.
+Este contrato no hace mucho todavía (debido a la infraestructura construída por Ethereum), simplemente permite a cualquiera almacenar un número accesible para todos sin un (factible) modo de prevenir la posibilidad de publicar este número. Por supuesto, cualquiera podría simplemente hacer una llamada ``set`` de nuevo con un valor diferente y sobreescribir el número inicial, pero este número siempre permanecería almacenado en la historía de la blockchain. Más adelante, veremos como imponer restricciones de acceso de tal manera que sólo tú puedas cambiar el número.
 
-.. index:: ! subcurrency
+.. index:: ! submoneda
 
-Subcurrency Example
-===================
+Ejemplo de Submoneda
+====================
 
-The following contract will implement the simplest form of a
-cryptocurrency. It is possible to generate coins out of thin air, but
-only the person that created the contract will be able to do that (it is trivial
-to implement a different issuance scheme).
-Furthermore, anyone can send coins to each other without any need for
-registering with username and password - all you need is an Ethereum keypair.
+El siguiente contrato va a implementar la forma más sencilla de una criptomoneda. Se pueden generar monedas de la nada, pero sólo la persona que creó el contrato estará habilitada para hacerlo (es trivial implementar un esquema diferente de emisión). Es más, cualquiera puede enviar monedas a otros sin necesidad de registrarse con usuario y contraseña - sólo hace falta un par de claves de Ethereum.
 
 
 ::
@@ -75,17 +50,17 @@ registering with username and password - all you need is an Ethereum keypair.
     pragma solidity ^0.4.0;
 
     contract Coin {
-        // The keyword "public" makes those variables
-        // readable from outside.
+        // La palabra clave "public" hace que dichas variables
+        // puedan ser leídas desde fuera.
         address public minter;
         mapping (address => uint) public balances;
-
-        // Events allow light clients to react on
-        // changes efficiently.
+        
+        // Los eventos permiten a los clientes ligeros reaccionar
+        // de forma eficiente a los cambios.
         event Sent(address from, address to, uint amount);
 
-        // This is the constructor whose code is
-        // run only when the contract is created.
+        // Este es el constructor cuyo código
+        // sólo se ejecutará cuando se cree el contrato.
         function Coin() {
             minter = msg.sender;
         }
@@ -103,56 +78,31 @@ registering with username and password - all you need is an Ethereum keypair.
         }
     }
 
-This contract introduces some new concepts, let us go through them one by one.
+Este contrato introduce algunos conceptos nuevos que vamos a detallar uno a uno.
 
-The line ``address public minter;`` declares a state variable of type address
-that is publicly accessible. The ``address`` type is a 160-bit value
-that does not allow any arithmetic operations. It is suitable for
-storing addresses of contracts or keypairs belonging to external
-persons. The keyword ``public`` automatically generates a function that
-allows you to access the current value of the state variable.
-Without this keyword, other contracts have no way to access the variable.
-The function will look something like this::
+La línea ``address public minter;`` declara una variable de estado de tipo address (dirección) que es públicamente accesible. El tipo ``address`` es un valor de 160 bits que no permite operaciones aritméticas. Es apropiado para almacenar direcciones de contratos o pares de claves pertenecientes a personas externas. La palabra reservada ``public`` genera automáticamente una función que permite el acceso al valor actual de la variable de estado. Sin esta palabra reservada, otros contratos no tienen manera de acceder a la variable.
+Esta función sería algo como esto::
 
     function minter() returns (address) { return minter; }
 
-Of course, adding a function exactly like that will not work
-because we would have a
-function and a state variable with the same name, but hopefully, you
-get the idea - the compiler figures that out for you.
+Por supuesto, añadir una función exactamente como esa no funcionará porque deberíamos tener una función y una variable de estado con el mismo nombre, pero afortunadamente, has cogido la idea - el compilador se lo imagina por tí.
 
 .. index:: mapping
 
-The next line, ``mapping (address => uint) public balances;`` also
-creates a public state variable, but it is a more complex datatype.
-The type maps addresses to unsigned integers.
-Mappings can be seen as `hash tables <https://en.wikipedia.org/wiki/Hash_table>`_ which are
-virtually initialized such that every possible key exists and is mapped to a
-value whose byte-representation is all zeros. This analogy does not go
-too far, though, as it is neither possible to obtain a list of all keys of
-a mapping, nor a list of all values. So either keep in mind (or
-better, keep a list or use a more advanced data type) what you
-added to the mapping or use it in a context where this is not needed,
-like this one. The getter function created by the ``public`` keyword
-is a bit more complex in this case. It roughly looks like the
-following::
+La siguiente línea, ``mapping (address => uint) public balances;`` también crea una variable de estado pública, pero se trata de un tipo de datos más complejo. El tipo mapea direcciones a enteros sin signo.
+Los mapeos (Mappings) pueden ser vistos como tablas hash `hash tables <https://en.wikipedia.org/wiki/Hash_table>`_ que son virtualmente inicializadas de tal forma que cada clave candidata existe y es mapeada a un valor cuya representación en bytes es todo ceros. 
+Esta anología no va mucho más allá, ya que no es posible obtener una lista de todas las claves de un mapeo, ni tampoco una lista de todos los valores. Por eso hay que tener en cuenta (o mejor, conservar una lista o usar un tipo de datos más avanzado) lo que se añade al mapping o usarlo en un contexto donde no es necesario, como este caso. La función getter creada mediante la palabra reservada ``public`` es un poco más compleja en este caso. De forma aproximada, es algo parecido a lo siguiente::
 
     function balances(address _account) returns (uint) {
         return balances[_account];
     }
 
-As you see, you can use this function to easily query the balance of a
-single account.
+Como se puede ver, se puede usar esta función para, de forma sencilla, consultar el balance de una única cuenta.
 
 .. index:: event
 
-The line ``event Sent(address from, address to, uint amount);`` declares
-a so-called "event" which is fired in the last line of the function
-``send``. User interfaces (as well as server applications of course) can
-listen for those events being fired on the blockchain without much
-cost. As soon as it is fired, the listener will also receive the
-arguments ``from``, ``to`` and ``amount``, which makes it easy to track
-transactions. In order to listen for this event, you would use ::
+La línea ``event Sent(address from, address to, uint amount);`` declara un evento que es disparado en la última línea de la ejecución de 
+``send``. Las interfaces de ususario (como las de servidor, por supuesto) pueden escuchar esos eventos que están siendo disparados en la blockchain sin mucho coste. Tan pronto son disparados, el listener también recibirá los argumentos ``from``, ``to`` y ``amount``, que hacen más fácil trazar las transacciones. Con el fin de escuchar este evento, se podría usar ::
 
     Coin.Sent().watch({}, '', function(error, result) {
         if (!error) {
@@ -165,310 +115,177 @@ transactions. In order to listen for this event, you would use ::
         }
     })
 
-Note how the automatically generated function ``balances`` is called from
-the user interface.
+Es interesante como la función generada automáticamente ``balances`` es llamada desde la interfaz de usuario.
 
 .. index:: coin
 
-The special function ``Coin`` is the
-constructor which is run during creation of the contract and
-cannot be called afterwards. It permanently stores the address of the person creating the
-contract: ``msg`` (together with ``tx`` and ``block``) is a magic global variable that
-contains some properties which allow access to the blockchain. ``msg.sender`` is
-always the address where the current (external) function call came from.
+La función especial ``Coin`` es el constructor que se ejecuta durante la creación de un contrato y no puede ser llamada con posterioridad. Almacena permanentemente la dirección de la persona que crea el contrato: ``msg`` (junto con ``tx`` y ``block``) es una variable global mágica que contiene propiedades que permiten el acceso a la blockchain. ``msg.sender`` es siempre la dirección desde donde se origina la llamada a la función actual (externa).
 
-Finally, the functions that will actually end up with the contract and can be called
-by users and contracts alike are ``mint`` and ``send``.
-If ``mint`` is called by anyone except the account that created the contract,
-nothing will happen. On the other hand, ``send`` can be used by anyone (who already
-has some of these coins) to send coins to anyone else. Note that if you use
-this contract to send coins to an address, you will not see anything when you
-look at that address on a blockchain explorer, because the fact that you sent
-coins and the changed balances are only stored in the data storage of this
-particular coin contract. By the use of events it is relatively easy to create
-a "blockchain explorer" that tracks transactions and balances of your new coin.
+Finalmente, las funciones que realmente habrá en el contrato y que podrán ser llamadas por usuarios y contratos como son ``mint`` y ``send``. Si se llama a ``mint`` desde una cuenta distinta a la del creador del contrato, no ocurrirá nada. Por otro lado, ``send`` puede ser usado por todos (los que ya tienen algunas de estas monedas) para enviar monedas a cualquier otro. Hay que tener en cuenta que si se usa este contrato para enviar monedas a una dirección, no se verá reflejado cuando se busque la dirección en un explorador de la blockchain por el hecho de enviar monedas, y que los balances sólo serán guardados en el almacenamiento de este contrato de moneda. Con el uso de eventos es relativamente sencillo crear un "explorador de la blockchain" que monitorice las transacciones y los balances de la nueva moneda.
 
 .. _blockchain-basics:
 
-*****************
-Blockchain Basics
-*****************
+*************************
+Fundamentos de Blockchain
+*************************
 
-Blockchains as a concept are not too hard to understand for programmers. The reason is that
-most of the complications (mining, `hashing <https://en.wikipedia.org/wiki/Cryptographic_hash_function>`_, `elliptic-curve cryptography <https://en.wikipedia.org/wiki/Elliptic_curve_cryptography>`_, `peer-to-peer networks <https://en.wikipedia.org/wiki/Peer-to-peer>`_, etc.)
-are just there to provide a certain set of features and promises. Once you accept these
-features as given, you do not have to worry about the underlying technology - or do you have
-to know how Amazon's AWS works internally in order to use it?
+Las blockchains son un concepto no muy difícil de entender para desarrolladores. La razón es que la mayoría de las complicaciones (minería, `hashes <https://en.wikipedia.org/wiki/Cryptographic_hash_function>`_, `criptografa de curva elíptica <https://en.wikipedia.org/wiki/Elliptic_curve_cryptography>`_, `redes P2P <https://en.wikipedia.org/wiki/Peer-to-peer>`_, etc.) están justo ahí para proveer un conjunto de funcionalidades y espectativas. Una vez que aceptas estas funcionalidades tal cual vienen dadas, no tienes que preocuparte por la tecnología que lleva inmersa - o, ¿tienes que saber realmente cómo funciona internamente Amazon AWS para poder usarlo?.
 
 .. index:: transaction
 
-Transactions
-============
+Transacciones
+=============
 
-A blockchain is a globally shared, transactional database.
-This means that everyone can read entries in the database just by participating in the network.
-If you want to change something in the database, you have to create a so-called transaction
-which has to be accepted by all others.
-The word transaction implies that the change you want to make (assume you want to change
-two values at the same time) is either not done at all or completely applied. Furthermore,
-while your transaction is applied to the database, no other transaction can alter it.
+Una blockchain es una base de datos transaccional globalmente compartida. Esto quiere decir que todos pueden leer las entradas en la base de datos simplemente participando en la red. Si quieres cambiar algo en la base de datos, tienes que crear una transacción a tal efecto que tiene que ser aceptada por todos los demás.
+La palabra transacción implica que el cambio que quieres hacer (asumiendo que quieres cambiar dos valores al mismo tiempo) o se aplica por completo, o no se realiza. Es más, mientras tu transacción es aplicada en la base de datos, ninguna otra transacción puede modificarla. 
 
-As an example, imagine a table that lists the balances of all accounts in an
-electronic currency. If a transfer from one account to another is requested,
-the transactional nature of the database ensures that if the amount is
-subtracted from one account, it is always added to the other account. If due
-to whatever reason, adding the amount to the target account is not possible,
-the source account is also not modified.
+Como ejemplo, imagine una tabla que lista los balances de todas las cuentas en una divisa electrónica. Si se solicita una transferencia de una cuenta a otra, la naturaleza transaccional de la base de datos garantiza que la cantidad que es sustraída de una cuenta, es añadida en la otra. Si por la razón que sea, no es posible añadir la cantidad a la cuenta de destino, la cuenta origen tampoco se modifica. 
 
-Furthermore, a transaction is always cryptographically signed by the sender (creator).
-This makes it straightforward to guard access to specific modifications of the
-database. In the example of the electronic currency, a simple check ensures that
-only the person holding the keys to the account can transfer money from it.
+Yendo más allá, una transacción es siempre firmada criptográficamente por el remitente (creador). Esto la hace más robusta para garantizar el acceso a modificaciones específicas de la base de datos. En el ejemplo de divisas electrónicas, un simple chequeo asegura que sólo la persona que posee las claves de la cuenta puede transferir dinero desde ella.
 
 .. index:: ! block
 
-Blocks
-======
+Bloques
+=======
 
-One major obstacle to overcome is what, in Bitcoin terms, is called a "double-spend attack":
-What happens if two transactions exist in the network that both want to empty an account,
-a so-called conflict?
+Un obstáculo mayor que sobrepasar es el que, en términos de Bitcoin, se llama ataque de "doble gasto": ¿qué ocurre si dos transacciones existentes en la red quieren borrar una cuenta?, ¿un conflicto?.
 
-The abstract answer to this is that you do not have to care. An order of the transactions
-will be selected for you, the transactions will be bundled into what is called a "block"
-and then they will be executed and distributed among all participating nodes.
-If two transactions contradict each other, the one that ends up being second will
-be rejected and not become part of the block.
+La respuesta abstracta a esto es que no tienes de qué preocuparte. El orden de las transacciones se seleccionará por ti, las transacciones se aglutinarán en lo que es llamado "bloque" y entonces serán ejecutadas y distribuídas entre todos los nodos participantes. Si dos transacciones se contradicen, la que concluye en segundo lugar será rechazada y no formará parte del bloque.
 
-These blocks form a linear sequence in time and that is where the word "blockchain"
-derives from. Blocks are added to the chain in rather regular intervals - for
-Ethereum this is roughly every 17 seconds.
+Estos bloques forman una secuencia lineal en el tiempo de la que viene la palabra cadena de bloques o "blockchain". Los bloques son añadidos a la cadena en intervalos regulares - para Ethereum esto viene a significar cada 17 segundos.
 
-As part of the "order selection mechanism" (which is called "mining") it may happen that
-blocks are reverted from time to time, but only at the "tip" of the chain. The more
-blocks that are added on top, the less likely it is. So it might be that your transactions
-are reverted and even removed from the blockchain, but the longer you wait, the less
-likely it will be.
+Como parte del "mecanismo de selcción de orden" (que se conoce como minería), tiene que pasar que los bloques sean revertidos de cuando en cuando, pero sólo en el extremo o "tip" de la cadena. Cuantos más bloques se añaden encima, menos probable es. En ese caso, lo que ocurre es que tus transacciones son revertidas e incluso borradas de la blockchain, pero cuanto más esperes, menos probable será.
 
 
 .. _the-ethereum-virtual-machine:
 
 .. index:: !evm, ! ethereum virtual machine
 
-****************************
-The Ethereum Virtual Machine
-****************************
+***************************
+Máquina Virtual de Ethereum
+***************************
 
-Overview
-========
+Introducción
+============
 
-The Ethereum Virtual Machine or EVM is the runtime environment
-for smart contracts in Ethereum. It is not only sandboxed but
-actually completely isolated, which means that code running
-inside the EVM has no access to network, filesystem or other processes.
-Smart contracts even have limited access to other smart contracts.
+La máquina virtual de Ethereum (EVM por sus siglas en inglés) es un entorno de ejecución de contratos inteligentes en Ethereum. Va más allá de una configuración tipo sandbox ya que se encuentra totalmente aislada, lo que significa que el código que se ejecuta en la EVM no tiene acceso a la red, ni al sistema de ficheros, ni a ningún otro proceso. Incluso los contratos inteligentes tienen acceso limitado a otros contratos inteligentes.
 
 .. index:: ! account, address, storage, balance
 
-Accounts
-========
+Cuentas
+=======
 
-There are two kinds of accounts in Ethereum which share the same
-address space: **External accounts** that are controlled by
-public-private key pairs (i.e. humans) and **contract accounts** which are
-controlled by the code stored together with the account.
+Hay dos tipos de cuentas en Ethereum que comparten el mismo espacio de dirección: **Cuentas externas** que están controladas por un par de claves pública-privada (p-ej.: humanos) y **Cuentas contrato** que están controladas por el código almacenado conjuntamente con la cuenta.
 
-The address of an external account is determined from
-the public key while the address of a contract is
-determined at the time the contract is created
-(it is derived from the creator address and the number
-of transactions sent from that address, the so-called "nonce").
+La dirección de una cuenta externa viene determinada por la clave pública mientras que la dirección de la cuenta contrato se define en el momento en que se crea dicho contrato (se deriva de la dirección del creador y del número de transacciones enviadas desde esa dirección, el llamado "nonce").
 
-Regardless of whether or not the account stores code, the two types are
-treated equally by the EVM.
+Independientemente de que la cuenta almacene código, los dos tipos se tratan de forma equitativa por la EVM.
 
-Every account has a persistent key-value store mapping 256-bit words to 256-bit
-words called **storage**.
+Cada cuenta tiene un almacenamiento persistente clave-valor que mapea palabras de 256 bits a palabras de 256 bits llamado **almacenamiento**.
 
-Furthermore, every account has a **balance** in
-Ether (in "Wei" to be exact) which can be modified by sending transactions that
-include Ether.
+Además, cada cuenta tiene un **balance** en Ether (en "Wei" para ser exactos) que puede ser modificado enviando transacciones que incluyen Ether.
 
 .. index:: ! transaction
 
-Transactions
-============
+Transacciones
+=============
 
-A transaction is a message that is sent from one account to another
-account (which might be the same or the special zero-account, see below).
-It can include binary data (its payload) and Ether.
+Una transacción es un mensaje que se envía de una cuenta a otra (que debería ser la misma o la especial cuenta-cero, ver más adelante). Puede incluir datos binarios (payload) y Ether.
 
-If the target account contains code, that code is executed and
-the payload is provided as input data.
+Si la cuenta destino contiene código, este es ejecutado y el payload se provee como dato de entrada.
 
-If the target account is the zero-account (the account with the
-address ``0``), the transaction creates a **new contract**.
-As already mentioned, the address of that contract is not
-the zero address but an address derived from the sender and
-its number of transactions sent (the "nonce"). The payload
-of such a contract creation transaction is taken to be
-EVM bytecode and executed. The output of this execution is
-permanently stored as the code of the contract.
-This means that in order to create a contract, you do not
-send the actual code of the contract, but in fact code that
-returns that code.
+Si la cuenta destino es la cuenta-cero (la cuenta con dirección ``0``), la transacción crea un **nuevo contrato**. Como se ha mencionado, la dirección del contrato no es la dirección cero, sino de una dirección derivada del emisor y su número de transacciones enviadas (el "nonce"). Los datos binarios de la transacción que crea el contrato son obtenidos como bytecode por la EVM y ejecutados. La salida de esta ejecución es permanentemente almacenada como el código del contrato. Esto significa que para crear un contrato, no se envía el código actual del contrato, realmente se envía código que nos devuelve ese código final.
 
 .. index:: ! gas, ! gas price
 
 Gas
 ===
 
-Upon creation, each transaction is charged with a certain amount of **gas**,
-whose purpose is to limit the amount of work that is needed to execute
-the transaction and to pay for this execution. While the EVM executes the
-transaction, the gas is gradually depleted according to specific rules.
+En cuanto se crean, cada transacción se carga con una determinada cantidad de **gas**,
+cuyo propósito es limitar la cantidad de trabajo que se necesita para ejecutar la transacción y pagar por esta ejecución. Mientras la EVM ejecuta la transacción, el gas se gasta gradualmente según unas reglas específicas.
 
-The **gas price** is a value set by the creator of the transaction, who
-has to pay ``gas_price * gas`` up front from the sending account.
-If some gas is left after the execution, it is refunded in the same way.
+El **precio del gas** (gas price) es un valor establecido por el creador de la transacción, quien tiene que pagar el ``gas_price * gas`` desde la cuenta de envío. Si queda algo de gas después de la ejecución, se le reembolsa.
 
-If the gas is used up at any point (i.e. it is negative),
-an out-of-gas exception is triggered, which reverts all modifications
-made to the state in the current call frame.
+Si se ha gastado todo el gas en un punto (p.ej.: es negativo),
+se lanza una excepción de out-of-gas, que revierte todas las modificaciones hechas al estado en el contexto de la ejecución actual.
 
 .. index:: ! storage, ! memory, ! stack
 
-Storage, Memory and the Stack
-=============================
+Almacenamiento, Memoria y la Pila
+=================================
 
-Each account has a persistent memory area which is called **storage**.
-Storage is a key-value store that maps 256-bit words to 256-bit words.
-It is not possible to enumerate storage from within a contract
-and it is comparatively costly to read and even more so, to modify
-storage. A contract can neither read nor write to any storage apart
-from its own.
+Cada cuenta tiene un área de memoria persistente que se llama **almacenamiento**.
+El almacenamiento es un almacén clave-valor que mapea palabras de 256 bits con palabras de 256 bits.
+No es posible enumerar el almacenamiento interno desde un contrato y es comparativamente costoso leer y, más todavía, modificar el almacenamiento. Un contrato no pueder leer ni escribir en otro almacenamiento que no sea el suyo.
 
-The second memory area is called **memory**, of which a contract obtains
-a freshly cleared instance for each message call. Memory is linear and can be
-addressed at byte level, but reads are limited to a width of 256 bits, while writes
-can be either 8 bits or 256 bits wide. Memory is expanded by a word (256-bit), when
-accessing (either reading or writing) a previously untouched memory word (ie. any offset
-within a word). At the time of expansion, the cost in gas must be paid. Memory is more
-costly the larger it grows (it scales quadratically).
+La segunda área de memoria se conoce como **memoria**, de la que un contrato obtiene de forma ágil una instancia clara de cada message call (llamada de mensaje). La memoria es lineal y puede ser tratada a nivel de byte, pero las lecturas están limitadas a un ancho de 256 bits, mientras que las escrituras puden ser tanto de 8 bits como de 256 bits de ancho. La memoria se expande por palabras (256 bits), cuando se accede (tanto para leer o escribir) a una palabra de memoria sin modificar previamente (p.ej.: cualquier offset de una palabra). En el momento de expansión, se debe pagar el coste en gas. La memoria es más costosa cuanto más crece (escala cuadráticamente).
 
-The EVM is not a register machine but a stack machine, so all
-computations are performed on an area called the **stack**. It has a maximum size of
-1024 elements and contains words of 256 bits. Access to the stack is
-limited to the top end in the following way:
-It is possible to copy one of
-the topmost 16 elements to the top of the stack or swap the
-topmost element with one of the 16 elements below it.
-All other operations take the topmost two (or one, or more, depending on
-the operation) elements from the stack and push the result onto the stack.
-Of course it is possible to move stack elements to storage or memory,
-but it is not possible to just access arbitrary elements deeper in the stack
-without first removing the top of the stack.
+La EVM no es una máquina de registro, es una máquina de pila por lo que todas las operaciones se hacen en un área llamada la **pila**. Tiene un espacio máximo de 1024 elementos y contiene palabras de 256 bits. El acceso a la pila está limitado a su cima de la siguiente manera:
+Es posible copiar uno de los 16 elementos superiores a la cima de la pila o intercambiar el elemento superior justo después de uno de los 16 elementos superiores.
+El resto de operaciones cogen los dos elementos más superiores (o uno, o más, dependiendo de la operación) de la pila y ponen el resultado en ella. Por supuesto, es posible mover elementos de la pila al almacenamiento o a la memoria, pero no es posible acceder simplemente a elementos arbitrarios más profundos dentro de la pila sin, primeramente, borrar los que ya están encima.
 
 .. index:: ! instruction
 
-Instruction Set
-===============
+Conjunto de instrucciones
+=========================
 
-The instruction set of the EVM is kept minimal in order to avoid
-incorrect implementations which could cause consensus problems.
-All instructions operate on the basic data type, 256-bit words.
-The usual arithmetic, bit, logical and comparison operations are present.
-Conditional and unconditional jumps are possible. Furthermore,
-contracts can access relevant properties of the current block
-like its number and timestamp.
+El conjunto de instrucciones de la EVM se mantiene mínimo con el objetivo de evitar implementaciones incorrectas que podrían causar problemas de consenso. Todas las instrucciones operan con el tipo de datos básico, palabras de 256 bits.
+Las operaciones de aritmética habitual, bit, lógica y de comparación están presentes.
+Se permiten tanto los saltos condicionales como los no condicionales. Es más, los contratos pueden acceder a propiedades relevantes del bloque actual como su número y timestamp.
 
 .. index:: ! message call, function;call
 
 Message Calls
 =============
 
-Contracts can call other contracts or send Ether to non-contract
-accounts by the means of message calls. Message calls are similar
-to transactions, in that they have a source, a target, data payload,
-Ether, gas and return data. In fact, every transaction consists of
-a top-level message call which in turn can create further message calls.
+Los contratos pueden llamar a otros contratos o enviar Ether a cuentas que no sean de contratos usando message calls. Los Message calls son similares a las transacciones, en el sentido de que tienen un origen, un destino, datos, Ether, gas y datos de retorno. De hecho, cada transacción consiste en un message call de alto nivel que de forma consecutiva puede crear message calls posteriores.
 
-A contract can decide how much of its remaining **gas** should be sent
-with the inner message call and how much it wants to retain.
-If an out-of-gas exception happens in the inner call (or any
-other exception), this will be signalled by an error value put onto the stack.
-In this case, only the gas sent together with the call is used up.
-In Solidity, the calling contract causes a manual exception by default in
-such situations, so that exceptions "bubble up" the call stack.
+Un contrato puede decidir cuánto de su **gas** restante podría ser enviado con el message call interno y cuánto quiere retener. Si ocurre una excepción de out-of-gas durante la llamada interna (o cualquier otra excepción), se mostrará como un valor de error introducido dentro de la pila. En este caso, sólo se gasta el gas enviado junto con la llamada.
+En Solidity, el contrato que hace la llamada causa una excepción manual por defecto en estas situaciones, por lo que esas excepciones ascienden en la pila de llamada. 
 
-As already said, the called contract (which can be the same as the caller)
-will receive a freshly cleared instance of memory and has access to the
-call payload - which will be provided in a separate area called the **calldata**.
-After it has finished execution, it can return data which will be stored at
-a location in the caller's memory preallocated by the caller.
+Como se ha mencionado, el contrato llamado (que podría ser el mismo que el que hace la llamada) recibirá una instancia de memoria vacía y tendrá acceso a los datos de la llamada - que serán provistos en un área separada que se llama **calldata**.
+Después de finalizar su ejecución, puede devolver datos que serán almacenados en una localización en la memoria del que hace la llamada que éste ha reservado previamente.
 
-Calls are **limited** to a depth of 1024, which means that for more complex
-operations, loops should be preferred over recursive calls.
+Las llamadas están **limitadas** a la profundidad de 1024, lo que quiere decir que para operaciones más complejas, se debería preferir bucles sobre llamadas recursivas.
 
 .. index:: delegatecall, callcode, library
 
-Delegatecall / Callcode and Libraries
-=====================================
+Delegatecall / Callcode y librerías
+===================================
 
-There exists a special variant of a message call, named **delegatecall**
-which is identical to a message call apart from the fact that
-the code at the target address is executed in the context of the calling
-contract and ``msg.sender`` and ``msg.value`` do not change their values.
+Existe una variante especial de message call llamada **delegatecall**
+que es idéntica a un message call con la excepción de que el código en la dirección destino se ejecuta en el contexto del que hace la llamada y ``msg.sender`` y ``msg.value`` no cambian sus valores.
 
-This means that a contract can dynamically load code from a different
-address at runtime. Storage, current address and balance still
-refer to the calling contract, only the code is taken from the called address.
+Esto significa que un contrato puede cargar código dinámicamente desde una dirección diferente en tiempo de ejecución. El almacenamiento, la dirección actual y el balance siguen referenciando al contrato que realiza la llamada, sólo se coge el código desde la dirección llamada.
 
-This makes it possible to implement the "library" feature in Solidity:
-Reusable library code that can be applied to a contract's storage, e.g. in
-order to  implement a complex data structure.
+Esto hace posible implementar la funcionalidad de "librería" en Solidity:
+Código de librería reusable que se puede aplicar a un almacenamiento de contrato, por ejemplo, con el fin de implementar una estructura de datos compleja.
 
 .. index:: log
 
 Logs
 ====
 
-It is possible to store data in a specially indexed data structure
-that maps all the way up to the block level. This feature called **logs**
-is used by Solidity in order to implement **events**.
-Contracts cannot access log data after it has been created, but they
-can be efficiently accessed from outside the blockchain.
-Since some part of the log data is stored in `bloom filters <https://en.wikipedia.org/wiki/Bloom_filter>`_, it is
-possible to search for this data in an efficient and cryptographically
-secure way, so network peers that do not download the whole blockchain
-("light clients") can still find these logs.
+Es posible almacenar datos en una estructura de datos indexada que mapea todo el recorrido hasta el nivel de bloque. Esta funcionalidad llamada **logs** se usa en Solidity para implementar **eventos**.
+Los contratos no pueden acceder a los datos del log después de crearse, pero pueden ser accedidos desde fuera de la blockchain de forma eficiente. Como parte de los datos del log se guardan en  `bloom filters <https://en.wikipedia.org/wiki/Bloom_filter>`_, es posible buscar estos datos eficientemente y criptográficamente de manera segura, por lo que los otros miembros de la red que no se han descargado la blockchain entera ("light clients") todavía pueden buscarlos.
 
 .. index:: contract creation
 
-Create
-======
+Creación
+========
 
-Contracts can even create other contracts using a special opcode (i.e.
-they do not simply call the zero address). The only difference between
-these **create calls** and normal message calls is that the payload data is
-executed and the result stored as code and the caller / creator
-receives the address of the new contract on the stack.
+Los contratos pueden incluso crear otros contratos usando un opcode especial (p.ej.: ellos no llaman simplemente a la dirección cero). La única diferencia entre estos **create calls** y los message calls normales es que los datos son ejecutados y el resultado almacenado como código y el llamador / creador recibe la dirección del nuevo contrato en la pila.
 
 .. index:: selfdestruct
 
-Self-destruct
-=============
+Auto-destrucción
+================
 
-The only possibility that code is removed from the blockchain is
-when a contract at that address performs the ``selfdestruct`` operation.
-The remaining Ether stored at that address is sent to a designated
-target and then the storage and code is removed from the state.
+La única posibilidad de borrar el código de la blockchain es cuando un contrato en esa dirección realiza una operación de ``selfdestruct``. Los Ether restantes almacenados en esa dirección son enviados al destinatario designado y, entonces, se borran el almacenamiento y el código del estado.
 
-.. warning:: Even if a contract's code does not contain a call to ``selfdestruct``,
-  it can still perform that operation using ``delegatecall`` or ``callcode``.
+.. warning:: Aunque un contrato no contenga una llamada a ``selfdestruct``,
+  todavía podría hacer esa operación mediante ``delegatecall`` o ``callcode``.
 
-.. note:: The pruning of old contracts may or may not be implemented by Ethereum
-  clients. Additionally, archive nodes could choose to keep the contract storage
-  and code indefinitely.
+.. note:: La eliminación de contratos antiguos puede, o no, ser implementada en clientes de Ethereum. Adicionalmente, los nodos de archivo podrían elegir mantener el almacenamiento del contrato y el código de forma indefinida.
 
-.. note:: Currently **external accounts** cannot be removed from the state.
+.. note:: Actualmente las **cuentas externas** no se pueden borrar del estado.
