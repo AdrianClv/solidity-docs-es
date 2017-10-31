@@ -495,28 +495,27 @@ optimizaciones actualmente no funcionan en bucles y también tienen un problema 
 de límites.
 Aunque, puedes obtener mejores resultados en el futuro.
 
+¿Qué hace ``p.recipient.call.value(p.amount)(p.data)``?
+=======================================================
 
-What does ``p.recipient.call.value(p.amount)(p.data)`` do?
-==========================================================
+Cada llamada de función externa en Solidity se puede modificar de dos maneras:
 
-Every external function call in Solidity can be modified in two ways:
+1. Puedes agregar Ether junto con la llamada
+2. Puede limitar la cantidad de gas disponible para la llamada
 
-1. You can add Ether together with the call
-2. You can limit the amount of gas available to the call
+Esto se hace "llamando a una función de la función":
 
-This is done by "calling a function on the function":
+``f.gas(2).value(20)()`` llama a la función modificada ``f`` y por lo tanto envía 20
+Wei y limitando el gas a 2 (así que esta llamada de función probablemente se quedará sin gas 
+y devolvera tus 20 Wei).
 
-``f.gas(2).value(20)()`` calls the modified function ``f`` and thereby sending 20
-Wei and limiting the gas to 2 (so this function call will most likely go out of
-gas and return your 20 Wei).
+En el ejemplo anterior, la función de nivel bajo ``call`` se utiliza para invocar otro
+contrato con ``p.data`` como carga útil y ``p.amount`` Wei se envía con esa llamada.
 
-In the above example, the low-level function ``call`` is used to invoke another
-contract with ``p.data`` as payload and ``p.amount`` Wei is sent with that call.
+¿Qué pasa con el mapeo de una ``struct`` al copiar sobre una ``struct``?
+========================================================================
 
-What happens to a ``struct``'s mapping when copying over a ``struct``?
-======================================================================
-
-This is a very interesting question. Suppose that we have a contract field set up like such::
+Es una pregunta muy interesante. Supongamos que tenemos un campo en un contrato configurado como tal::
 
     struct user {
         mapping(string => address) usedContracts;
@@ -528,17 +527,17 @@ This is a very interesting question. Suppose that we have a contract field set u
        user user2 = user1;
     }
 
-In this case, the mapping of the struct being copied over into the userList is ignored as there is no "list of mapped keys".
-Therefore it is not possible to find out which values should be copied over.
+En este caso, se ignora el mapeo de la estructura que se está copiando en la userList, ya que no existe una "lista de teclas mapeadas".
+Por lo tanto, no es posible averiguar qué valores deben copiarse.
 
-How do I initialize a contract with only a specific amount of wei?
-==================================================================
+¿Cómo inicializo un contrato con sólo una cantidad específica de wei?
+=====================================================================
 
-Currently the approach is a little ugly, but there is little that can be done to improve it.
-In the case of a ``contract A`` calling a new instance of ``contract B``, parentheses have to be used around
-``new B`` because ``B.value`` would refer to a member of ``B`` called ``value``.
-You will need to make sure that you have both contracts aware of each other's presence and that ``contract B`` has a ``payable`` constructor.
-In this example::
+Actualmente el enfoque es un poco feo, pero hay poco que se pueda hacer para mejorarlo.
+En el caso de un ``contract A`` llamando a una nueva instancia del ``contract B``, los paréntesis tienen que ser usados alrededor de
+``new B`` porque ``B.value`` se referiría a un miembro de ``B`` llamado ``value``.
+Necesitaras asegurarte de que tienes ambos contratos conscientes de la presencia del uno al otro y que el ``contract B`` tenga un constructor ``payable``.
+En este ejemplo::
 
     contract B {
         function B() payable {}
@@ -553,39 +552,38 @@ In this example::
         }
     }
 
-Can a contract function accept a two-dimensional array?
-=======================================================
+¿Puede una función de contrato aceptar un array bidimensional?
+==============================================================
 
-This is not yet implemented for external calls and dynamic arrays -
-you can only use one level of dynamic arrays.
+Esto no se ha implementado todavía para las llamadas externas y los arrays dinámicos -
+sólo se puede utilizar un nivel de arrays dinámicos.
 
-What is the relationship between ``bytes32`` and ``string``? Why is it that ``bytes32 somevar = "stringliteral";`` works and what does the saved 32-byte hex value mean?
-========================================================================================================================================================================
+¿Cuál es la relación entre ``bytes32`` y ``cadena``? ¿Por qué es que ``bytes32 somevar = "stringliteral";`` funciona y qué significa el valor hexadecimal de 32 bytes guardado?
+===============================================================================================================================================================================
 
-The type ``bytes32`` can hold 32 (raw) bytes. In the assignment ``bytes32 samevar = "stringliteral";``,
-the string literal is interpreted in its raw byte form and if you inspect ``somevar`` and
-see a 32-byte hex value, this is just ``"stringliteral"`` in hex.
+El tipo ``bytes32`` puede contener 32 (raw) bytes. En la asignación ``bytes32 samevar = "stringliteral";``,
+la cadena literal se interpreta en su forma de byte crudo y si lo inspeccionas ``somevar`` y
+ves un valor hexadecimal de 32 bytes, esto es sólo ``"stringliteral"`` en hex.
 
-The type ``bytes`` is similar, only that it can change its length.
+El tipo ``bytes`` es similar, sólo que puede cambiar su longitud.
 
-Finally, ``string`` is basically identical to ``bytes`` only that it is assumed
-to hold the UTF-8 encoding of a real string. Since ``string`` stores the
-data in UTF-8 encoding it is quite expensive to compute the number of
-characters in the string (the encoding of some characters takes more
-than a single byte). Because of that, ``string s; s.length`` is not yet
-supported and not even index access ``s[2]``. But if you want to access
-the low-level byte encoding of the string, you can use
-``bytes(s).length`` and ``bytes(s)[2]`` which will result in the number
-of bytes in the UTF-8 encoding of the string (not the number of
-characters) and the second byte (not character) of the UTF-8 encoded
-string, respectively.
+Finalmente, ``string`` es básicamente idéntica a "bytes", sólo que se asume que
+para mantener la codificación UTF-8 de una cadena real. Desde que ``string`` almacena el
+codificación UTF-8 es bastante caro calcular el número de
+caracteres en la cadena (la codificación de algunos caracteres requiere más
+que un solo byte). Debido a eso, ``string s; s.length`` no es todavía
+soportado y ni siquiera indexar el acceso ``s[2]``. Pero si quieres acceder a
+la codificación de bytes de bajo nivel de la cadena, puede utilizar
+``bytes(s).length`` and ``bytes(s)[2]`` lo que resultará en el número
+de bytes en la codificación UTF-8 de la cadena (no el número de
+caracteres) y el segundo byte (no carácter) del UTF-8 codificado
+respectivamente.
 
+¿Puede un contrato pasar un array (tamaño estático) o una cadena o ``bytes`` (tamaño dinámico) a otro contrato?
+===============================================================================================================
 
-Can a contract pass an array (static size) or string or ``bytes`` (dynamic size) to another contract?
-=====================================================================================================
-
-Sure. Take care that if you cross the memory / storage boundary,
-independent copies will be created::
+Seguro. Ten cuidado de que si cruzas la memoria / límite de almacenamiento,
+se crearán copias independientes::
 
     contract C {
         uint[20] x;
@@ -604,22 +602,22 @@ independent copies will be created::
         }
     }
 
-The call to ``g(x)`` will not have an effect on ``x`` because it needs
-to create an independent copy of the storage value in memory
-(the default storage location is memory). On the other hand,
-``h(x)`` successfully modifies ``x`` because only a reference
-and not a copy is passed.
+La llamada a ``g (x)`` no tendrá un efecto en ``x`` porque necesita
+para crear una copia independiente del valor de almacenamiento en memoria
+(la ubicación de almacenamiento predeterminada es la memoria). Por otra parte,
+``h (x)`` modifica con éxito ``x`` porque sólo pasas una referencia
+y no una copia.
 
-Sometimes, when I try to change the length of an array with ex: ``arrayname.length = 7;`` I get a compiler error ``Value must be an lvalue``. Why?
-==================================================================================================================================================
+A veces, cuando intento cambiar la longitud de un array con ej:  ``arrayname.length = 7;`` me sale un error de compilado ``Value must be an lvalue``.  ¿Por qué?
+================================================================================================================================================================
 
-You can resize a dynamic array in storage (i.e. an array declared at the
-contract level) with ``arrayname.length = <some new length>;``. If you get the
-"lvalue" error, you are probably doing one of two things wrong.
+Puedes cambiar el tamaño de un array dinámico en almacenamiento (es decir, un array declarado en el
+nivel de contrato) con ``arrayname.length = <some new length>;``. Si consigues el
+error de "lvalue", probablemente estés haciendo una de dos cosas mal.
 
-1. You might be trying to resize an array in "memory", or
+1. Es posible que estés tratando de redimensionar un array en "memoria", o
 
-2. You might be trying to resize a non-dynamic array.
+2. Podrías estar intentando redimensionar un array no dinámico.
 
 ::
 
@@ -630,59 +628,56 @@ contract level) with ``arrayname.length = <some new length>;``. If you get the
     int8[5] storage storageArr2; // Explicit case 2
     somearray2.length++;         // legal
 
-**Important note:** In Solidity, array dimensions are declared backwards from the way you
-might be used to declaring them in C or Java, but they are access as in
-C or Java.
+**Nota importante:** En Solidity, las dimensiones del array se declaran al revés de la forma 
+en que estés acostumbrado a declararlas en C o Java, pero se acceden como en
+C o Java.
 
-For example, ``int8[][5] somearray;`` are 5 dynamic ``int8`` arrays.
+Por ejemplo, ``int8[][5] somearray;`` son 5 arrays dinámicos ``int8``.
 
-The reason for this is that ``T[5]`` is always an array of 5 ``T``'s,
-no matter whether ``T`` itself is an array or not (this is not the
-case in C or Java).
+La razón de esto es que ``T[5]`` es siempre un array de 5 ``T``,
+no importa si ``T`` en sí mismo es un array o no (esto no es el
+caso en C o Java).
 
-Is it possible to return an array of strings (``string[]``) from a Solidity function?
-=====================================================================================
+¿Es posible devolver un array de cadenas (``string[]``) desde una función de Solidity?
+======================================================================================
 
-Not yet, as this requires two levels of dynamic arrays (``string`` is a dynamic array itself).
+Todavía no, ya que esto requiere dos niveles de arrays dinámicos (``string`` es un array dinámico en sí).
 
-If you issue a call for an array, it is possible to retrieve the whole array? Or must you write a helper function for that?
-===========================================================================================================================
+Si se emite una llamada para un array, es posible recuperar todo el array? ¿O tienes que escribir una función de ayuda para eso?
+================================================================================================================================
 
-The automatic getter function for a public state variable of array type only returns
-individual elements. If you want to return the complete array, you have to
-manually write a function to do that.
+La función getter automática, para una variable de estado público del tipo array sólo devuelve
+elementos individuales. Si quieres devolver el array completo, tienes que
+escribir manualmente una función para hacerlo.
 
+¿Qué podría haber sucedido si una cuenta tiene valor(es) de almacenamiento pero no tiene código?  Ejemplo: http://test.ether.camp/account/5f740b3a43fbb99724ce93a879805f4dc89178b5
+==================================================================================================================================================================================
 
-What could have happened if an account has storage value(s) but no code?  Example: http://test.ether.camp/account/5f740b3a43fbb99724ce93a879805f4dc89178b5
-==========================================================================================================================================================
-
-The last thing a constructor does is returning the code of the contract.
-The gas costs for this depend on the length of the code and it might be
-that the supplied gas is not enough. This situation is the only one
-where an "out of gas" exception does not revert changes to the state,
-i.e. in this case the initialisation of the state variables.
+Lo último que hace un constructor es devolver el código del contrato.
+Los gastos de gas para esto dependen de la longitud del código y puede ser
+que el gas suministrado no es suficiente. Esta situación es la única
+donde una excepción "out of gas" no revierte los cambios al estado,
+es decir, en este caso la inicialización de las variables de estado.
 
 https://github.com/ethereum/wiki/wiki/Subtleties
 
-After a successful CREATE operation's sub-execution, if the operation returns x, 5 * len(x) gas is subtracted from the remaining gas before the contract is created. If the remaining gas is less than 5 * len(x), then no gas is subtracted, the code of the created contract becomes the empty string, but this is not treated as an exceptional condition - no reverts happen.
+Después de la subejecución de una operación CREATE exitosa, si la operación devuelve x, 5 * len(x) gas se resta del gas restante antes de que se crea el contrato. Si el gas restante es menos de 5 * len(x), entonces no se resta ningún gas, el código del contrato creado se convierte en la cadena vacía, pero esto no se trata como una condición excepcional - no se producen reversiones.
 
-
-What does the following strange check do in the Custom Token contract?
-======================================================================
+¿Qué hace la siguiente extraña comprobación en el contrato de Custom Token?
+===========================================================================
 
 ::
 
     require((balanceOf[_to] + _value) >= balanceOf[_to]);
 
-Integers in Solidity (and most other machine-related programming languages) are restricted to a certain range.
-For ``uint256``, this is ``0`` up to ``2**256 - 1``. If the result of some operation on those numbers
-does not fit inside this range, it is truncated. These truncations can have
-`serious consequences <https://en.bitcoin.it/wiki/Value_overflow_incident>`_, so code like the one
-above is necessary to avoid certain attacks.
+Los números enteros en Solidity (y la mayoría de los otros lenguajes de programación relacionados con máquinas) están restringidos a un rango determinado.
+Para ``uint256``, esto es ``0`` hasta ``2**256 - 1``. Si el resultado de alguna operación en esos números
+no cabe dentro de este rango, este es truncado. Estos truncamientos pueden tener
+`serias consecuencias <https://en.bitcoin.it/wiki/Value_overflow_incident>`_, asi que codifica como el de
+arriba es necesario para evitar ciertos ataques.
 
-
-More Questions?
+Más Preguntas?
 ===============
 
-If you have more questions or your question is not answered here, please talk to us on
+Si tienes más preguntas o tu pregunta no se ha contestada aquí, por favor contacta con nosotros en
 `gitter <https://gitter.im/ethereum/solidity>`_ or file an `issue <https://github.com/ethereum/solidity/issues>`_.
