@@ -40,10 +40,10 @@ El siguiente ejemplo proporciona el código de librería que permite acceder al 
             assembly {
                 // recupera el tamaño del código - esto necesita ensamblador
                 let size := extcodesize(_addr)
-                // asigna ***(output byte array) - esto se podría hacer también sin ensamblador
+                // asigna (output byte array) - esto se podría hacer también sin ensamblador
                 // usando o_code = new bytes(size)
                 o_code := mload(0x40)
-                // nuevo "fin de memoria" incluyendo el ***relleno (padding)
+                // nuevo "fin de memoria" incluyendo el relleno (padding)
                 mstore(0x40, add(o_code, and(add(add(size, 0x20), 0x1f), not(0x1f))))
                 // almacenar el tamaño en memoria
                 mstore(o_code, size)
@@ -218,7 +218,7 @@ En la gramática, los opcodes se representan como identificadores predefinidos.
 +-------------------------+------+-----------------------------------------------------------------+
 | returndatasize          |      | tamaño del último returndata                                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| returndatacopy(t, f, s) | `-`  | copiar s bytes de returndata de la posición f a la ***memoria   |
+| returndatacopy(t, f, s) | `-`  | copiar s bytes de returndata de la posición f a la memoria      |
 |                         |      | en la posición t                                                |
 +-------------------------+------+-----------------------------------------------------------------+
 | create(v, p, s)         |      | crear un nuevo contrato con el código mem[p..(p+s))             |
@@ -427,7 +427,7 @@ Puede usar la palabra clave ``let`` para declarar variables que están visibles 
 Asignaciones
 ------------
 
-Las asignaciones son posibles para las variables de ensamblador local y para las variables de función local. ***Tenga cuidado que cuando usted asigna a variables que apuntan a la memoria o al almacenamiento, usted sólo cambiará lo que apunta pero no los datos.
+Las asignaciones son posibles para las variables de ensamblador local y para las variables de función local. Tenga cuidado que cuando usted asigna a variables que apuntan a la memoria o al almacenamiento, usted sólo cambiará lo que apunta pero no los datos.
 
 Existen asignaciones de dos tipos: las de estilo funcional y las de estilo instruccional. Para las asignaciones de estilo funcional, (``variable := value``), se requiere proporcionarun valor dentro de una expresión de estilo funcional que resulta en exactamente un valor de pila. Para las asignaciones de estilo instruccional (``=: variable``), el valor simplemente se toma desde arriba de la pila. Para ambas maneras, la coma apunta al nombre de la variable. La asignación se ejecuta remplazando el valor de la variable en la pila por el valor nuevo.
 
