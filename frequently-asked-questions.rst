@@ -330,7 +330,7 @@ Sólo puedes envíar ether junto con una función que tiene modificador ``payabl
 si no, una excepción es levantada.
 
 ¿Es posible obtener una respuesta tx para una transacción ejecutada contrato-a-contrato?
-===================================================================================
+========================================================================================
 
 No, una llamada de función de un contrato a otro no crea su propia transacción,
 tienes que mirar en la transacción general. Eso también es la razón por la que
