@@ -1,90 +1,92 @@
 .. _security_considerations:
 
-#######################
-Security Considerations
-#######################
+############################
+Consideraciones de seguridad
+############################
 
-While it is usually quite easy to build software that works as expected,
-it is much harder to check that nobody can use it in a way that was **not** anticipated.
+Aunque en general es bastante fácil hacer software que funcione como esperamos,
+es mucho más difícil de chequear que nadie lo pueda usar de alguna forma que **no**
+fue anticipada.
 
-In Solidity, this is even more important because you can use smart contracts
-to handle tokens or, possibly, even more valuable things. Furthermore, every
-execution of a smart contract happens in public and, in addition to that,
-the source code is often available.
+En solidity, esto es aún más importante ya que se pueden usar los contratos
+inteligentes para mover tokens, o posiblemente, cosas aún más valiosas. Además,
+cada ejecución de un contrato inteligente es pública, y a ello se suma
+que el código fuente muchas veces está disponible.
 
-Of course you always have to consider how much is at stake:
-You can compare a smart contract with a web service that is open to the
-public (and thus, also to malicous actors) and perhaps even open source.
-If you only store your grocery list on that web service, you might not have
-to take too much care, but if you manage your bank account using that web service,
-you should be more careful.
+Por supuesto, siempre se tiene que considerar lo que está en juego:
+Puedes comparar un contrato inteligente con un servicio web que está abierto
+al público (y por lo tanto, también a gente malintencionada) y quizá
+de código abierto.
+Si sólo se guarda la lista de compras en ese servicio web, puede que no tengas
+que tener mucho cuidado, pero si accedes a tu cuenta bancaria usando ese servicio,
+deberíás tener más cuidado.
 
-This section will list some pitfalls and general security recommendations but
-can, of course, never be complete. Also, keep in mind that even if your
-smart contract code is bug-free, the compiler or the platform itself might
-have a bug. A list of some publicly known security-relevant bugs of the compiler
-can be found in the
-:ref:`list of known bugs<known_bugs>`, which is also machine-readable. Note
-that there is a bug bounty program that covers the code generator of the
-Solidity compiler.
+Esta sección nombrará algunos errores comunes y recomendaciones de seguridad
+generales pero no puede, por supuesto, ser una lista completa. Además, recordar
+que incluso si tu contrato inteligente está libre de errores, el compilador
+o la plataforma puede que los tenga. Una lista de errores de seguridad públicamente
+conocidos del compilador puede encontrarse en: :ref:`lista de errores conocidos<known_bugs>`,
+la lista también es legible por máquina. Nótese que hay una recompensa
+por encontrar errores (bug-bounty) que cubre el generador de código del compilador de Solidity.
 
-As always, with open source documentation, please help us extend this section
-(especially, some examples would not hurt)!
+Como siempre ocurre con la documentación de código abierto, por favor, ayúdanos a extender
+esta sección, ¡especialmente con algunos ejemplos!
 
-********
-Pitfalls
-********
 
-Private Information and Randomness
+***************
+Errores Comunes
+***************
+
+Información privada y aleatoriedad
 ==================================
 
-Everything you use in a smart contract is publicly visible, even
-local variables and state variables marked ``private``.
+Todo lo que usas en un contrato inteligente es públicamente visible, incluso
+variables locales y variables de estado marcadas como ``private``.
 
-Using random numbers in smart contracts is quite tricky if you do not want
-miners to be able to cheat.
+Es bastante complejo usar números aleatorios en contratos inteligentes si no
+quieres que los mineros puedan hacer trampa.
 
-Re-Entrancy
-===========
+Reentrada
+=========
 
-Any interaction from a contract (A) with another contract (B) and any transfer
-of Ether hands over control to that contract (B). This makes it possible for B
-to call back into A before this interaction is completed. To give an example,
-the following code contains a bug (it is just a snippet and not a
-complete contract):
+Cualquier interacción desde un contrato (A) con otro contrato (B) y cualquier
+transferencia de Ether, le da el control a ese contrato (B). Esto hace posible
+que B vuelva a llamar a A antes de terminar la interacción. Para dar un ejemplo,
+el siguiente código contiene un error (esto es sólo un snippet y no un contrato
+completo):
 
 ::
 
   pragma solidity ^0.4.0;
 
-  // THIS CONTRACT CONTAINS A BUG - DO NOT USE
+  // ESTE CONTRATO CONTIENE UN ERROR - NO USAR
   contract Fund {
-      /// Mapping of ether shares of the contract.
+      /// Mapping de distribución de ether del contrato.
       mapping(address => uint) shares;
-      /// Withdraw your share.
+      /// Retira tu parte.
       function withdraw() {
           if (msg.sender.send(shares[msg.sender]))
               shares[msg.sender] = 0;
       }
   }
 
-The problem is not too serious here because of the limited gas as part
-of ``send``, but it still exposes a weakness: Ether transfer always
-includes code execution, so the recipient could be a contract that calls
-back into ``withdraw``. This would let it get multiple refunds and
-basically retrieve all the Ether in the contract.
+El problema aquí no es tan grave por el límite de gas de la función
+``send``, pero aun así, expone una debilidad: una transferencia de Ether
+siempre incluye ejecución de código, así que el receptor puede ser un
+contrato que vuelve a llamar a ``withdraw``. Esto le permitiría obtener
+múltiples devoluciones, y por lo tanto, vaciar el Ether del contrato.
 
-To avoid re-entrancy, you can use the Checks-Effects-Interactions pattern as
-outlined further below:
+Para evitar reentradas, puedes usar el orden Comprobaciones-Efectos-Interacciones
+como detallamos aquí:
 
 ::
 
   pragma solidity ^0.4.11;
 
   contract Fund {
-      /// Mapping of ether shares of the contract.
+      /// Mapping de distribución de ether del contrato.
       mapping(address => uint) shares;
-      /// Withdraw your share.
+      /// Retira tu parte.
       function withdraw() {
           var share = shares[msg.sender];
           shares[msg.sender] = 0;
@@ -92,80 +94,81 @@ outlined further below:
       }
   }
 
-Note that re-entrancy is not only an effect of Ether transfer but of any
-function call on another contract. Furthermore, you also have to take
-multi-contract situations into account. A called contract could modify the
-state of another contract you depend on.
+Nótese que las reentradas no sólo son un riesgo al transferir Ether, sino
+de cualquier ejecución de una función de otro contrato. Además, también tienes que
+considerar situaciones de multi-contrato. Un contrato ejecutado podría modificar el
+estado de otro contrato del cual dependes.
 
-Gas Limit and Loops
-===================
+Límite de gas y bucles
+======================
 
-Loops that do not have a fixed number of iterations, for example, loops that depend on storage values, have to be used carefully:
-Due to the block gas limit, transactions can only consume a certain amount of gas. Either explicitly or just due to
-normal operation, the number of iterations in a loop can grow beyond the block gas limit which can cause the complete
-contract to be stalled at a certain point. This may not apply to ``constant`` functions that are only executed
-to read data from the blockchain. Still, such functions may be called by other contracts as part of on-chain operations
-and stall those. Please be explicit about such cases in the documentation of your contracts.
+Los bucles que no tienen un número fijo de iteraciones, por ejemplo, bucles que dependen de valores de almacenamiento, tienen que
+usarse con cuidado:
+Dado el límite de gas del bloque, las transacciones sólo pueden consumir una cierta cantidad de gas. Ya sea explícitamente,
+o por una operación normal, el número de iteraciones en un bucle puede crecer más allá del límite de gas, lo que puede causar que el
+contrato se detenga por completo en un cierto punto. Esto no se aplica a funciones ``constant`` que sólo se llaman para
+leer información de la blockchain. Pero aun así, estas funciones pueden ser llamadas por otros contratos como parte de operaciones
+on-chain y detenerlos a ellos. Por favor, sé explícito con estos casos en la documentación de tus contratos.
 
-Sending and Receiving Ether
-===========================
+Envío y recibo de Ether
+=======================
 
-- Neither contracts nor "external accounts" are currently able to prevent that someone sends them Ether.
-  Contracts can react on and reject a regular transfer, but there are ways
-  to move Ether without creating a message call. One way is to simply "mine to"
-  the contract address and the second way is using ``selfdestruct(x)``. 
+- Ni los contratos ni las "cuentas externas", son actualmente capaces de prevenir que alguien
+  les envíe Ether. Los contratos pueden reaccionar y rechazar una transferencia normal, pero hay maneras de mover
+  Ether sin provocar la ejecución de código. Una manera es simplemente "minando" a la
+  cuenta del contrato y la otra es usando ``selfdestruct(x)``.
 
-- If a contract receives Ether (without a function being called), the fallback function is executed.
-  If it does not have a fallback function, the Ether will be rejected (by throwing an exception).
-  During the execution of the fallback function, the contract can only rely
-  on the "gas stipend" (2300 gas) being available to it at that time. This stipend is not enough to access storage in any way.
-  To be sure that your contract can receive Ether in that way, check the gas requirements of the fallback function
-  (for example in the "details" section in Remix).
+- Si un contrato recibe Ether (sin que se llame a ninguna función), se ejecuta la función fallback.
+  Si no tiene una función fallback, el Ether será rechazado (lanzando una excepción).
+  Durante la ejecución de la función fallback, el contrato sólo puede depender del
+  "estipendio de gas" (2300 gas) que tiene disponible en ese momento. Este estipendio no es suficiente para acceder
+  al almacenamiento de ninguna forma. Para asegurarte de que tu contrato pueda recibir Ether de ese modo, verifica los
+  requerimientos de gas de la función fallback (por ejemplo, en la sección de "details" de Remix).
 
-- There is a way to forward more gas to the receiving contract using
-  ``addr.call.value(x)()``. This is essentially the same as ``addr.transfer(x)``,
-  only that it forwards all remaining gas and opens up the ability for the
-  recipient to perform more expensive actions (and it only returns a failure code
-  and does not automatically propagate the error). This might include calling back
-  into the sending contract or other state changes you might not have thought of.
-  So it allows for great flexibility for honest users but also for malicious actors.
+- Hay una manera de enviar más gas al contrato receptor usando ``addr.call.value(x)()``.
+  Esto es esencialmente lo mismo que ``addr.transfer(x)``, solo que envía todo el gas restante
+  y permite la posibilidad al receptor de realizar acciones más caras (y sólo devuelve un código
+  de error y no propaga automáticamente el error). Dentro de estas acciones se incluyen llamar de nuevo al contrato
+  emisor u otros cambios de estado que no fueron previstos. Permite más flexibilidad para
+  usuarios honestos pero también para los usuarios maliciosos.
 
-- If you want to send Ether using ``address.transfer``, there are certain details to be aware of:
+- Si quieres enviar Ether usando ``address.transfer``, hay ciertos detalles que hay que saber:
 
-  1. If the recipient is a contract, it causes its fallback function to be executed which can, in turn, call back the sending contract.
-  2. Sending Ether can fail due to the call depth going above 1024. Since the caller is in total control of the call
-     depth, they can force the transfer to fail; take this possibility into account or use ``send`` and make sure to always check its return value. Better yet,
-     write your contract using a pattern where the recipient can withdraw Ether instead.
-  3. Sending Ether can also fail because the execution of the recipient contract
-     requires more than the allotted amount of gas (explicitly by using ``require``,
-     ``assert``, ``revert``, ``throw`` or
-     because the operation is just too expensive) - it "runs out of gas" (OOG).
-     If you use ``transfer`` or ``send`` with a return value check, this might provide a
-     means for the recipient to block progress in the sending contract. Again, the best practice here is to use
-     a :ref:`"withdraw" pattern instead of a "send" pattern <withdrawal_pattern>`.
+  1. Si el receptor es un contrato, se ejecutará la función fallback, lo cual puede llamar de vuelta al
+  contrato que envía Ether.
+  2. El envío de Ether puede fallar debido a la profundidad de la llamada subiendo por encima 1024. Puesto que el que
+  llama tiene el control total de la profundidad de la llamada, pueden forzar la transferencia para que falle;
+  tened en consideración esta posibilidad o utilizad siempre ``send`` y aseguraos siempre de revisar el valor
+  de retorno. O mejor aún, escribid el contrato siguiendo un patrón de modo que sea el receptor el que tenga que sacar el Ether.
+  3. El envío de Ether también puede fallar porque la ejecución del contrato receptor necesita más gas que
+  la cantidad asignada (OOG, por sus siglas en inglés "Out of Gas"). Esto ocurre porque
+  explícitamente se usó ``require``, ``assert``, ``revert``, ``throw``, o simplemente porque la operación es
+  demasiado cara. Si usas ``transfer`` o ``send`` comprobando el valor de retorno, esto puede hacer que el receptor bloquee
+  el progreso en el contrato emisor.Pero volviendo a insistir, aquí lo mejor es usar un
+  :ref:`patrón de "retirada" en vez de un "orden de envío" <withdrawal_pattern>`.
 
-Callstack Depth
-===============
+Profundidad de la pila de llamadas (Callstack)
+==============================================
 
-External function calls can fail any time because they exceed the maximum
-call stack of 1024. In such situations, Solidity throws an exception.
-Malicious actors might be able to force the call stack to a high value
-before they interact with your contract.
+Las llamadas externas a funciones pueden fallar en cualquier momento al
+exceder la profundidad máxima de la pila de llamadas de 1024. En tales situaciones,
+Solidity lanza una excepción. Los usuarios maliciosos podrían forzar la profundidad de 
+la pila a un valor alto antes de interactuar con el contrato.
 
-Note that ``.send()`` does **not** throw an exception if the call stack is
-depleted but rather returns ``false`` in that case. The low-level functions
-``.call()``, ``.callcode()`` and ``.delegatecall()`` behave in the same way.
+Ten en cuenta que ``.send()`` **no** lanza una excepción si la pila está vacía, sino
+que retorna ``false`` en ese caso. Las funciones de bajo nivel como ``.call()``,
+``.callcode()``  ``.delegatecall()`` se comportan de la misma manera.
 
 tx.origin
 =========
 
-Never use tx.origin for authorization. Let's say you have a wallet contract like this:
+No uses nunca tx.origin para dar autorización. Digamos que tienes un contrato de cartera como este:
 
 ::
 
     pragma solidity ^0.4.11;
 
-    // THIS CONTRACT CONTAINS A BUG - DO NOT USE
+    // ESTE CONTRATO CONTIENE UN ERROR - NO USAR
     contract TxUserWallet {
         address owner;
 
@@ -179,7 +182,7 @@ Never use tx.origin for authorization. Let's say you have a wallet contract like
         }
     }
 
-Now someone tricks you into sending ether to the address of this attack wallet:
+Ahora alguien te engaña para que le envíes Ether a esta cartera maliciosa:
 
 ::
 
@@ -197,91 +200,87 @@ Now someone tricks you into sending ether to the address of this attack wallet:
         }
     }
 
-If your wallet had checked ``msg.sender`` for authorization, it would get the address of the attack wallet, instead of the owner address. But by checking ``tx.origin``, it gets the original address that kicked off the transaction, which is still the owner address. The attack wallet instantly drains all your funds.
+Si tu cartera hubiera comprobado ``msg.sender`` para darle autorización, recibiría la cuenta de la cartera atacante, en vez de la cartera del 'owner'. Pero al chequear ``tx.origin``, recibe la cuenta original que envió la transacción, que es la cuenta owner. La cartera atacante inmediatamente vacía todos tus fondos.
 
+Detalles Menores
+================
 
-Minor Details
-=============
-
-- In ``for (var i = 0; i < arrayName.length; i++) { ... }``, the type of ``i`` will be ``uint8``, because this is the smallest type that is required to hold the value ``0``. If the array has more than 255 elements, the loop will not terminate.
-- The ``constant`` keyword for functions is currently not enforced by the compiler.
-  Furthermore, it is not enforced by the EVM, so a contract function that "claims"
-  to be constant might still cause changes to the state.
-- Types that do not occupy the full 32 bytes might contain "dirty higher order bits".
-  This is especially important if you access ``msg.data`` - it poses a malleability risk:
-  You can craft transactions that call a function ``f(uint8 x)`` with a raw byte argument
-  of ``0xff000001`` and with ``0x00000001``. Both are fed to the contract and both will
-  look like the number ``1`` as far as ``x`` is concerned, but ``msg.data`` will
-  be different, so if you use ``keccak256(msg.data)`` for anything, you will get different results.
+- En ``for (var i = 0; i < arrayName.length; i++) { ... }``, el tipo de ``i`` será ``uint8``, porque este es el tipo más pequeño que es requerido para guardar el valor ``0``. Si el vector (array) tiene más de 255 elementos, el bucle no se terminará.
+- La palabra reservada ``constant`` para funciones no es actualmente forzada por el compilador.
+  Tampoco está forzada por la EVM, de modo que una función de un contrato que "pretenda" ser constante,
+  todava podría hacer cambios al estado.
+- Los tipos que no utilizan totalmente los 32 bytes pueden contener basura en los bits más significativos.
+  Esto es especialmente importante si se accede a ``msg.data`` ya que supone un riesgo de maleabilidad:
+  Puedes crear transacciones que llaman una función ``f(uint8 x)`` con un argumento de tipo byte
+  de ``0xff000001`` y ``0x00000001``. Ambos se pasarán al contrato y ambos se verán como
+  el número ``1``. Pero ``msg.data`` es diferente, así que si se usa ``keccak246(msg.data)`` para
+  algo, tendrás resultados diferentes.
 
 ***************
-Recommendations
+Recomendaciones
 ***************
 
-Restrict the Amount of Ether
-============================
+Restringir la cantidad de Ether
+===============================
 
-Restrict the amount of Ether (or other tokens) that can be stored in a smart
-contract. If your source code, the compiler or the platform has a bug, these
-funds may be lost. If you want to limit your loss, limit the amount of Ether.
+Restringir la cantidad de Ether (u otros tokens) que puedan ser almacenados
+en un contrato inteligente. Si el código fuente, el compilador o la plataforma
+tiene un error, estos fondos podrían perderse. Si quieres limitar la pérdida,
+limita la cantidad de Ether.
 
-Keep it Small and Modular
-=========================
+Pequeño y modular
+=================
 
-Keep your contracts small and easily understandable. Single out unrelated
-functionality in other contracts or into libraries. General recommendations
-about source code quality of course apply: Limit the amount of local variables,
-the length of functions and so on. Document your functions so that others
-can see what your intention was and whether it is different than what the code does.
+Mantén tus contratos pequeños y fáciles de entender. Separa las funcionalidades
+no relacionadas en otros contratos o en librerías. Se pueden aplicar las recomendaciones
+estándar de calidad de código: Limitar la cantidad de variables locales, limitar la longitud
+de las funciones, etc. Documenta tus funciones para que otros puedan ver cuál era la
+intención del código y para ver si hace algo diferente de lo que pretendía.
 
-Use the Checks-Effects-Interactions Pattern
-===========================================
+Usa el orden Comprobaciones-Efectos-Interacciones
+=======================================================
 
-Most functions will first perform some checks (who called the function,
-are the arguments in range, did they send enough Ether, does the person
-have tokens, etc.). These checks should be done first.
+La mayoría de las funciones primero ejecutan algunos chequeos (¿quién ha llamado a
+la función?, ¿los argumentos están en el rango?, ¿mandaron suficiente Ether?
+¿La cuenta tiene tokens?, etc.). Estos chequeos deben de hacerse primero.
 
-As the second step, if all checks passed, effects to the state variables
-of the current contract should be made. Interaction with other contracts
-should be the very last step in any function.
+Como segundo paso, si se pasaron todos los chequeos, se deben ejecutar los efectos a las
+variables de estado del contrato actual. La interacción con otros contratos debe
+hacerse como último paso en cualquier función.
 
-Early contracts delayed some effects and waited for external function
-calls to return in a non-error state. This is often a serious mistake
-because of the re-entrancy problem explained above.
+Al principio, algunos contratos retrasaban la ejecución de los efectos y esperaban a que
+una función externa devolviera un estado sin errores. Esto es un error grave ya que se puede
+hacer un reingreso, como explicamos arriba.
 
-Note that, also, calls to known contracts might in turn cause calls to
-unknown contracts, so it is probably better to just always apply this pattern.
+También hay que tener en cuenta que las llamadas a contratos conocidos pueden a su vez causar llamadas
+a otros contratos no conocidos, así que siempre es mejor aplicar este orden.
 
-Include a Fail-Safe Mode
-========================
+Incluir un modo a prueba de fallos
+==================================
 
-While making your system fully decentralised will remove any intermediary,
-it might be a good idea, especially for new code, to include some kind
-of fail-safe mechanism:
+Aunque hacer que tu sistema sea completamente descentralizado eliminará cualquier intermediario,
+puede que sea una buena idea, especialmente para nuevo código, incluir un sistema
+a prueba de fallos:
 
-You can add a function in your smart contract that performs some
-self-checks like "Has any Ether leaked?",
-"Is the sum of the tokens equal to the balance of the contract?" or similar things.
-Keep in mind that you cannot use too much gas for that, so help through off-chain
-computations might be needed there.
+Puedes agregar una función a tu contrato que realize algunas comprobaciones internas como
+"¿se ha filtrado Ether?", "¿es igual la suma de los tokens al balance de la cuenta?"
+o cosas similares. Recordad que no se puede usar mucho gas para eso, así que ayuda mediante
+computaciones off-chain podrían ser necesarias.
 
-If the self-check fails, the contract automatically switches into some kind
-of "failsafe" mode, which, for example, disables most of the features, hands over
-control to a fixed and trusted third party or just converts the contract into
-a simple "give me back my money" contract.
+Si los chequeos fallan, el contrato automáticamente cambia a modo a prueba de fallos, donde,
+por ejemplo, se desactivan muchas funciones, da el control a una entidad tercera de confianza
+o se convierte en un contrato "devuélveme mi dinero".
 
 
 *******************
-Formal Verification
+Verificación formal
 *******************
 
-Using formal verification, it is possible to perform an automated mathematical
-proof that your source code fulfills a certain formal specification.
-The specification is still formal (just as the source code), but usually much
-simpler. There is a prototype in Solidity that performs formal verification and
-it will be better documented soon.
+Usando verificación formal, es posible realizar pruebas matemáticas automatizadas de que el código
+sigue una cierta especificación formal. La especificación aún es formal (como el código fuente),
+pero normalmente mucho más simple. Hay un prototipo en Solidity que realiza verificación formal y
+pronto se documentará mejor.
 
-Note that formal verification itself can only help you understand the
-difference between what you did (the specification) and how you did it
-(the actual implementation). You still need to check whether the specification
-is what you wanted and that you did not miss any unintended effects of it.
+Ten en cuenta que la verificación formal en sí misma sólo puede ayudarte a entender la diferencia
+entre lo que hiciste (la especificación) y cómo lo hiciste (la implementación real). Aún necesitas
+chequear si la especificación es lo que querías y que no hayas olvidado efectos inesperados de ello.

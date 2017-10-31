@@ -1,56 +1,49 @@
 .. index:: style, coding style
 
-#############
-Style Guide
-#############
+##############
+Guía de estilo
+##############
 
 ************
-Introduction
+Introducción
 ************
 
-This guide is intended to provide coding conventions for writing solidity code.
-This guide should be thought of as an evolving document that will change over
-time as useful conventions are found and old conventions are rendered obsolete.
+Esta guía pretende proporcionar convenciones de codificación para escribir código con Solidity.
+Esta guía debe ser entendida como un documento en evolución que cambiará con el tiempo según aparecen nuevas convenciones útiles y antiguas convenciones se vuelven obsoletas.
 
-Many projects will implement their own style guides.  In the event of
-conflicts, project specific style guides take precedence.
+Muchos proyectos implementarán sus propias guías de estilo. En el caso de conflictos, las guías de estilo específicas del proyecto tendrán prioridad.
 
-The structure and many of the recommendations within this style guide were
-taken from python's
-`pep8 style guide <https://www.python.org/dev/peps/pep-0008/>`_.
+La estructura y muchas de las recomendaciones de esta guía de estilo fueron tomadas de Python: `guía de estilo pep8 <https://www.python.org/dev/peps/pep-0008/>`_.
 
-The goal of this guide is *not* to be the right way or the best way to write
-solidity code.  The goal of this guide is *consistency*.  A quote from python's
-`pep8 <https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds>`_
-captures this concept well.
+El objetivo de esta guía *no* es ser la forma correcta o la mejor manera de escribir código con Solidity. El objetivo de esta guía es la *consistencia*. Una cita de python `pep8 <https://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds>`_ capta bien este concepto.
 
-    A style guide is about consistency. Consistency with this style guide is important. Consistency within a project is more important. Consistency within one module or function is most important.
-    But most importantly: know when to be inconsistent -- sometimes the style guide just doesn't apply. When in doubt, use your best judgment. Look at other examples and decide what looks best. And don't hesitate to ask!
+    Una guía de estilo es sobre consistencia. La consistencia con esta guía de estilo es importante. La consistencia dentro de un proyecto es más importante. La consistencia dentro de un módulo o función es lo más importante.
+    Pero sobre todo: saber cuándo ser inconsistente - a veces la guía de estilo simplemente no se aplica. En caso de duda, use su mejor juicio. Mire otros ejemplos y decida qué parece mejor. ¡Y no dude en preguntar!
 
 
-***********
-Code Layout
-***********
+*****************
+Diseño del código
+*****************
 
 
-Indentation
-===========
+Sangría
+=======
 
-Use 4 spaces per indentation level.
+Utilice 4 espacios por nivel de sangría.
 
-Tabs or Spaces
-==============
+Tabulador o espacios
+====================
 
-Spaces are the preferred indentation method.
+Los espacios son el método de indentación preferido.
 
-Mixing tabs and spaces should be avoided.
+Se deben evitar la mezcla del tabulador y los espacios.
 
-Blank Lines
-===========
+Líneas en blanco
+================
 
-Surround top level declarations in solidity source with two blank lines.
+Envuelva las declaraciones de nivel superior en el código de Solidity con dos líneas en blanco.
 
-Yes::
+Sí::
 
     contract A {
         ...
@@ -79,11 +72,11 @@ No::
         ...
     }
 
-Within a contract surround function declarations with a single blank line.
+Dentro de un contrato, rodee las declaraciones de una función con una sola línea en blanco.
 
-Blank lines may be omitted between groups of related one-liners (such as stub functions for an abstract contract)
+Las líneas en blanco se pueden omitir entre grupos de una frase relacionada (tales como las funciones stub en un contrato abstracto)
 
-Yes::
+Sí::
 
     contract A {
         function spam();
@@ -112,17 +105,17 @@ No::
         }
     }
 
-Source File Encoding
-====================
+Codificación de archivos de origen
+==================================
 
-UTF-8 or ASCII encoding is preferred.
+Se prefiere la codificación del texto en UTF-8 o ASCII.
 
-Imports
-=======
+Importación
+===========
 
-Import statements should always be placed at the top of the file.
+Las declaraciones de importación siempre deben colocarse en la parte superior del archivo.
 
-Yes::
+Sí::
 
     import "owned";
 
@@ -150,82 +143,82 @@ No::
         ...
     }
 
-Order of Functions
+Orden de funciones
 ==================
 
-Ordering helps readers identify which functions they can call and to find the constructor and fallback definitions easier.
+La ordenación ayuda a que los lectores puedan identificar las funciones que pueden invocar y encontrar las definiciones de constructor y de retorno más fácilmente.
 
-Functions should be grouped according to their visibility and ordered:
+Las funciones deben agruparse de acuerdo con su visibilidad y ser ordenadas de acuerdo a:
 
 - constructor
-- fallback function (if exists)
+- función fallback (Si existe)
 - external
 - public
 - internal
 - private
 
-Within a grouping, place the ``constant`` functions last.
+Dentro de un grupo, coloque las funciones ``constant`` al final.
 
-Yes::
+Sí::
 
     contract A {
         function A() {
             ...
         }
-        
+
         function() {
             ...
         }
-        
-        // External functions
+
+        // Funciones external
         // ...
-        
-        // External functions that are constant
+
+        // Funciones external que son constantes
         // ...
-        
-        // Public functions
+
+        // Funciones public
         // ...
-        
-        // Internal functions
+
+        // Funciones internal
         // ...
-        
-        // Private functions
+
+        // Funciones private
         // ...
     }
 
 No::
 
     contract A {
-        
-        // External functions
+
+        // Funciones external
         // ...
 
-        // Private functions
+        // Funciones private
         // ...
 
-        // Public functions
+        // Funciones public
         // ...
 
         function A() {
             ...
         }
-        
+
         function() {
             ...
         }
 
-        // Internal functions
+        // Funciones internal
         // ...       
     }
 
-Whitespace in Expressions
-=========================
+Espacios en blanco en expresiones
+=================================
 
-Avoid extraneous whitespace in the following  situations:
+Evite los espacios en blanco superfluos en las siguientes situaciones:
 
-Immediately inside parenthesis, brackets or braces, with the exception of single-line function declarations.
+Inmediatamente entre paréntesis, llaves o corchetes, con la excepción de declaraciones de una función en una sola línea.
 
-Yes::
+Sí::
 
     spam(ham[1], Coin({name: "ham"}));
 
@@ -233,13 +226,13 @@ No::
 
     spam( ham[ 1 ], Coin( { name: "ham" } ) );
 
-Exception::
+Excepción::
 
     function singleLine() { spam(); }
 
-Immediately before a comma, semicolon:
+Inmediatamente antes de una coma, punto y coma:
 
-Yes::
+Sí::
 
     function spam(uint i, Coin coin);
 
@@ -247,10 +240,9 @@ No::
 
     function spam(uint i , Coin coin) ;
 
-More than one space around an assignment or other operator to align with
-  another:
+Más de un espacio alrededor de una asignación u otro operador para alinearlo con otro:
 
-Yes::
+Sí::
 
     x = 1;
     y = 2;
@@ -262,32 +254,30 @@ No::
     y             = 2;
     long_variable = 3;
 
-Don't include a whitespace in the fallback function:
+No incluya un espacio en blanco en la función fallback:
 
-Yes::
+Sí::
 
     function() {
         ...
     }
 
 No::
-   
+
     function () {
         ...
     }
 
-Control Structures
-==================
+Estructuras de control
+======================
 
-The braces denoting the body of a contract, library, functions and structs
-should:
+Las llaves que denotan el cuerpo de un contrato, biblioteca, funciones y estructuras deberán:
 
-* open on the same line as the declaration
-* close on their own line at the same indentation level as the beginning of the
-  declaration.
-* The opening brace should be proceeded by a single space.
+* Abrir en la misma línea que la declaración
+* Cerrar en su propia línea en el mismo nivel de sangría que la declaración.
+* La llave de apertura debe ser procedida por un solo espacio.
 
-Yes::
+Sí::
 
     contract Coin {
         struct Bank {
@@ -306,15 +296,11 @@ No::
         }
     }
 
-The same recommendations apply to the control structures ``if``, ``else``, ``while``,
-and ``for``.
+Las mismas recomendaciones se aplican a las estructuras de control ``if``, ``else``, ``while`` y ``for``.
 
-Additionally there should be a single space between the control structures
-``if``, ``while``, and ``for`` and the parenthetic block representing the
-conditional, as well as a single space between the conditional parenthetic
-block and the opening brace.
+Además, debería existir un único espacio entre las estructuras de control ``if``, ``while``, y ``for``, y el bloque entre paréntesis que representa el condicional, así como un único espacio entre el bloque del paréntesis condicional y la llave de apertura.
 
-Yes::
+Sí::
 
     if (...) {
         ...
@@ -337,10 +323,9 @@ No::
     for (...) {
         ...;}
 
-For control structures whose body contains a single statement, omitting the
-braces is ok *if* the statement is contained on a single line.
+Para las estructuras de control cuyo cuerpo sólo contiene declaraciones únicas, se pueden omitir los corchetes *si* la declaración cabe en una sola línea.
 
-Yes::
+Sí::
 
     if (x < 10)
         x += 1;
@@ -353,11 +338,9 @@ No::
             value: 42
         }));
 
-For ``if`` blocks which have an ``else`` or ``else if`` clause, the ``else`` should be
-placed on the same line as the ``if``'s closing brace. This is an exception compared
-to the rules of other block-like structures.
+Para los bloques ``if`` que contienen una condición ``else`` o ``else if``, el ``else`` debe estar en la misma línea que el corchete de cierre del ``if``. Esto es una excepción en comparación con las reglas de otras estructuras de tipo bloque.
 
-Yes::
+Sí::
 
     if (x < 3) {
         x += 1;
@@ -382,18 +365,16 @@ No::
         x -= 1;
     }
 
-Function Declaration
-====================
+Declaración de funciones
+========================
 
-For short function declarations, it is recommended for the opening brace of the
-function body to be kept on the same line as the function declaration.
+Para declaraciones de función cortas, se recomienda dejar el corchete de apertura del cuerpo de la función en la misma línea que la declaración de la función.
 
-The closing brace should be at the same indentation level as the function
-declaration.
+El corchete de cierre debe estar al mismo nivel de sangría que la declaración de la función.
 
-The opening brace should be preceeded by a single space.
+El corchete de apertura debe estar precedido por un solo espacio.
 
-Yes::
+Sí::
 
     function increment(uint x) returns (uint) {
         return x + 1;
@@ -421,10 +402,9 @@ No::
     function increment(uint x) returns (uint) {
         return x + 1;}
 
-The visibility modifiers for a function should come before any custom
-modifiers.
+Se debe especificar la visibilidad de los modificadores para una función antes de cualquier modificador personalizado.
 
-Yes::
+Sí::
 
     function kill() public onlyowner {
         selfdestruct(owner);
@@ -436,12 +416,9 @@ No::
         selfdestruct(owner);
     }
 
-For long function declarations, it is recommended to drop each argument onto
-it's own line at the same indentation level as the function body.  The closing
-parenthesis and opening bracket should be placed on their own line as well at
-the same indentation level as the function declaration.
+Para las declaraciones de función largas, se recomienda dejar a cada argumento su propia línea al mismo nivel de sangría que el cuerpo de la función. El paréntesis de cierre y el corchete de apertura deben de estar en su propia línea también y con el mismo nivel de sangría que la declaración de la función.
 
-Yes::
+Sí::
 
     function thisFunctionHasLotsOfArguments(
         address a,
@@ -480,10 +457,9 @@ No::
         doSomething();
     }
 
-If a long function declaration has modifiers, then each modifier should be
-dropped to it's own line.
+Si una declaración de función larga tiene modificadores, cada uno de ellos debe de estar en su propia línea.
 
-Yes::
+Sí::
 
     function thisFunctionNameIsReallyLong(address x, address y, address z)
         public
@@ -531,11 +507,9 @@ No::
         doSomething();
     }
 
-For constructor functions on inherited contracts whose bases require arguments,
-it is recommended to drop the base constructors onto new lines in the same
-manner as modifiers if the function declaration is long or hard to read.
+Para las funciones de tipo constructor en contratos heredados que requieren argumentos, si la declaración de la función es larga o difícil de leer, se recomienda poner cada constructor base en su propia línea de la misma manera que con los modificadores.
 
-Yes::
+Sí::
 
     contract A is B, C, D {
         function A(uint param1, uint param2, uint param3, uint param4, uint param5)
@@ -568,28 +542,25 @@ No::
         }
     }
 
-When declaring short functions with a single statement, it is permissible to do it on a single line.
+Cuando se declara funciones cortas con una sola declaración, está permitido hacerlo en una solo línea.
 
-Permissible::
+Permisible::
 
     function shortFunction() { doSomething(); }
 
-These guidelines for function declarations are intended to improve readability.
-Authors should use their best judgement as this guide does not try to cover all
-possible permutations for function declarations.
+Esta guía sobre la declaración de funciones está pensada para mejorar la legibilidad. Sin embargo, los autores deberían utilizar su mejor juicio, ya que esta guía tampoco intenta cubrir todas las posibles permutaciones para las declaraciones de función.
 
-Mappings
-========
+Mapeo
+=====
 
-TODO
+Pendiente de hacer
 
-Variable Declarations
-=====================
+Declaración de variables
+========================
 
-Declarations of array variables should not have a space between the type and
-the brackets.
+La declaración de variables tipo array no deben incluir un espacio entre el tipo y el corchete.
 
-Yes::
+Sí::
 
     uint[] x;
 
@@ -598,12 +569,12 @@ No::
     uint [] x;
 
 
-Other Recommendations
-=====================
+Otras recommendaciones
+======================
 
-* Strings should be quoted with double-quotes instead of single-quotes.
+* Los strings deben de citarse con comillas dobles en lugar de comillas simples.
 
-Yes::
+Sí::
 
     str = "foo";
     str = "Hamlet says, 'To be or not to be...'";
@@ -613,9 +584,9 @@ No::
     str = 'bar';
     str = '"Be yourself; everyone else is already taken." -Oscar Wilde';
 
-* Surround operators with a single space on either side.
+* Se envuelve los operadores con un solo espacio de cada lado.
 
-Yes::
+Sí::
 
     x = 3;
     x = 100 / 10;
@@ -629,12 +600,9 @@ No::
     x += 3+4;
     x |= y&&z;
 
-* Operators with a higher priority than others can exclude surrounding
-  whitespace in order to denote precedence.  This is meant to allow for
-  improved readability for complex statement. You should always use the same
-  amount of whitespace on either side of an operator:
+* Para los operadores con una prioridad mayor que otros, se pueden omitir los espacios de cada lado del operador para marcar la precedencia. Esto se hace para mejorar la legibilidad de declaraciones complejas. Se debe usar siempre el mismo número de espacios a cada lado de un operador.
 
-Yes::
+Sí::
 
     x = 2**3 + 5;
     x = 2*y + 3*z;
@@ -647,106 +615,96 @@ No::
     x +=1;
 
 
-******************
-Naming Conventions
-******************
+************************
+Convención sobre nombres
+************************
 
-Naming conventions are powerful when adopted and used broadly.  The use of
-different conventions can convey significant *meta* information that would
-otherwise not be immediately available.
+Las convenciones sobre nombres son extremadamente útiles siempre y cuando se usen de forma ámplia. El uso de diferentes convenciones puede transmitir *meta* información significativa a la que de otro modo no tendríamos acceso de manera inmediata.
 
-The naming recommendations given here are intended to improve the readability,
-and thus they are not rules, but rather guidelines to try and help convey the
-most information through the names of things.
+Las recomendaciones de nombres que se dan aquí están pensadas para mejorar la legibilidad, y por lo tanto no se deben considerar como reglas. Son más bien una guía para intentar transmitir la mayor información posible a través del nombre de las cosas.
 
-Lastly, consistency within a codebase should always supercede any conventions
-outlined in this document.
+Finalmente, la consistencia dentro de un bloque de código siempre debe prevalecer sobre cualquier convención destacada en este documento.
 
 
-Naming Styles
-=============
-
-To avoid confusion, the following names will be used to refer to different
-naming styles.
-
-* ``b`` (single lowercase letter)
-* ``B`` (single uppercase letter)
-* ``lowercase``
-* ``lower_case_with_underscores``
-* ``UPPERCASE``
-* ``UPPER_CASE_WITH_UNDERSCORES``
-* ``CapitalizedWords`` (or CapWords)
-* ``mixedCase`` (differs from CapitalizedWords by initial lowercase character!)
-* ``Capitalized_Words_With_Underscores``
-
-.. note:: When using abbreviations in CapWords, capitalize all the letters of the abbreviation. Thus HTTPServerError is better than HttpServerError.
-
-
-Names to Avoid
-==============
-
-* ``l`` - Lowercase letter el
-* ``O`` - Uppercase letter oh
-* ``I`` - Uppercase letter eye
-
-Never use any of these for single letter variable names.  They are often
-indistinguishable from the numerals one and zero.
-
-
-Contract and Library Names
+Estilos para poner nombres
 ==========================
 
-Contracts and libraries should be named using the CapWords style.
+Para evitar confusiones, se usarán los siguiente nombres para referirse a diferentes estilos para poner nombres.
+
+* ``b`` (letra minúscula única)
+* ``B`` (letra mayúscula única)
+* ``minuscula``
+* ``minuscula_con_guiones_bajos``
+* ``MAYUSCULA``
+* ``MAYUSCULA_CON_GUIONES_BAJOS``
+* ``PalabrasConLaInicialEnMayuscula`` (también llamado CapWords)
+* ``mezclaEntreMinusculaYMayuscula`` (¡distinto a PalabrasConLaInicialEnMayuscula por el uso de una minúscula en la letra inicial!)
+* ``Palabras_Con_La_Inicial_En_Mayuscula_Y_Guiones_Bajos``
+
+.. note:: Cuando se usan abreviaciones en CapWords, usar mayúsculas para todas las letras de la abreviación. Es decir que HTTPServerError es mejor que HttpServerError
 
 
-Events
-======
+Nombres a evitar
+================
 
-Events should be named using the CapWords style.
+* ``l`` - Letra minúscula ele
+* ``O`` - Letra mayúscula o
+* ``I`` - Letra mayúscula i
 
-
-Function Names
-==============
-
-Functions should use mixedCase.
+No usar jamás ninguna de estas letras únicas para nombrar una variable. Estas letras generalmente no se diferencian de los dígitos uno y cero.
 
 
-Function Arguments
-==================
+Contratos y librerías de nombres
+================================
 
-When writing library functions that operate on a custom struct, the struct
-should be the first argument and should always be named ``self``.
-
-
-Local and State Variables
-=========================
-
-Use mixedCase.
+Contratos y librerías deben de nombrarse usando el estilo CapWord (PalabrasConLaInicialEnMayuscula).
 
 
-Constants
-=========
+Eventos
+=======
 
-Constants should be named with all capital letters with underscores separating
-words.  (for example:``MAX_BLOCKS``)
-
-
-Modifiers
-=========
-
-Use mixedCase.
+Los eventos deben de nombrarse usando el estilo CapWord (PalabrasConLaInicialEnMayuscula).
 
 
-Avoiding Collisions
-===================
+Nombres para funciones
+======================
 
-* ``single_trailing_underscore_``
-
-This convention is suggested when the desired name collides with that of a
-built-in or otherwise reserved name.
+Las funciones deben de nombrarse usando el estilo mezclaEntreMinusculaYMayuscula.
 
 
-General Recommendations
+Argumentos de funciones
 =======================
 
-TODO
+Cuando se escriben funciones de librerías que operan sobre un struct personalizado, el struct debe ser el primer argumento y debe nombrarse siempre ``self``.
+
+
+Variables locales y de estado
+=============================
+
+Usar el estilo mezclaEntreMinusculaYMayuscula.
+
+
+Constantes
+==========
+
+Las constantes deben de nombrarse con todas las letras mayúsculas y guiones bajos para separar las palabras (p.ej. ``MAX_BLOCKS``).
+
+
+Modificadores
+=============
+
+Usar el estilo mezclaEntreMinusculaYMayuscula.
+
+
+Evitar Colisiones
+=================
+
+* ``guion_bajo_unico_con_cola_``
+
+Se recomienda usar esta convención cuando el nombre deseado colisiona con un nombre inherente al sistema o reservado.
+
+
+Recommendaciones generales
+==========================
+
+Pendiente de hacer

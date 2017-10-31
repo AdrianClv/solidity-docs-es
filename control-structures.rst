@@ -1,38 +1,29 @@
-##################################
-Expressions and Control Structures
-##################################
+####################################
+Expresiones y estructuras de control
+####################################
 
 .. index:: ! parameter, parameter;input, parameter;output
 
-Input Parameters and Output Parameters
-======================================
+Parámetros de entrada y de salida
+=================================
 
-As in Javascript, functions may take parameters as input;
-unlike in Javascript and C, they may also return arbitrary number of
-parameters as output.
+Al igual que en Javascript, las funciones obtienen parámetros como entrada. Por otro lado, al contrario que en Javascript y C, estas también deberían devolver un número aleatorio de parámetros como salida.
 
-Input Parameters
-----------------
+Parámetros de entrada
+---------------------
 
-The input parameters are declared the same way as variables are. As an
-exception, unused parameters can omit the variable name.
-For example, suppose we want our contract to
-accept one kind of external calls with two integers, we would write
-something like::
+Los parámetros de entrada se declaran de la misma forma que las variables. Como una excepción, los parámetros no usados pueden omitir el nombre de la variable. Por ejemplo, si quisiéramos que nuestro contrato acepte un tipo de llamadas externas con dos enteros, el código quedaría similar a este::
 
     contract Simple {
         function taker(uint _a, uint _b) {
-            // do something with _a and _b.
+            // hace algo con _a y _b.
         }
     }
 
-Output Parameters
------------------
+Parámetros de salida
+--------------------
 
-The output parameters can be declared with the same syntax after the
-``returns`` keyword. For example, suppose we wished to return two results:
-the sum and the product of the two given integers, then we would
-write::
+Los parámetros de salida se pueden declarar con la misma sintaxis después de la palabra reservada ``returns``. Por ejemplo, supongamos que deseamos devolver dos resultados: la suma y el producto de dos valores dados. Entonces, escribiríamos un código como este::
 
     contract Simple {
         function arithmetics(uint _a, uint _b) returns (uint o_sum, uint o_product) {
@@ -41,80 +32,61 @@ write::
         }
     }
 
-The names of output parameters can be omitted.
-The output values can also be specified using ``return`` statements.
-The ``return`` statements are also capable of returning multiple
-values, see :ref:`multi-return`.
-Return parameters are initialized to zero; if they are not explicitly
-set, they stay to be zero.
+Los nombres de los parámetros de salida se pueden omitir.
+Los valores de salida se pueden especificar también usando declaraciones ``return``.
+Las declaraciones ``return`` también son capaces de devolver múltiples valores, ver :ref:`multi-return`.
+Los parámetros de retorno se inicializan a cero; si no se especifica explícitamente su valor, permanecen con dicho valor cero.
 
-Input parameters and output parameters can be used as expressions in
-the function body.  There, they are also usable in the left-hand side
-of assignment.
+Los parámetros de entrada y salida se pueden usar como expresiones en el cuerpo de la función. En este caso, también pueden ir en el lado izquierdo de una asignación.
 
 .. index:: if, else, while, do/while, for, break, continue, return, switch, goto
 
-Control Structures
-===================
+Estructuras de control
+======================
 
-Most of the control structures from JavaScript are available in Solidity
-except for ``switch`` and ``goto``. So
-there is: ``if``, ``else``, ``while``, ``do``, ``for``, ``break``, ``continue``, ``return``, ``? :``, with
-the usual semantics known from C or JavaScript.
+La mayoría de las estructuras de control disponibles en JavaScript, también lo están en Solidity exceptuando ``switch`` y ``goto``. Esto significa que tenemos: ``if``, ``else``, ``while``, ``do``, ``for``, ``break``, ``continue``, ``return``, ``? :``, con la semántica habitual conocida de C o JavaScript.
 
-Parentheses can *not* be omitted for conditionals, but curly brances can be omitted
-around single-statement bodies.
+Los paréntesis no se pueden omitir para condicionales, pero sí las llaves alrededor de los cuerpos de las declaraciones sencillas.
 
-Note that there is no type conversion from non-boolean to boolean types as
-there is in C and JavaScript, so ``if (1) { ... }`` is *not* valid
-Solidity.
+Hay que tener en cuenta que no hay conversión de tipos desde non-boolean a boolean como hay en C y JavaScript, por lo que ``if (1) { ... }`` *no* es válido en Solidity.
 
 .. _multi-return:
 
-Returning Multiple Values
--------------------------
+Devolver múltiples valores
+--------------------------
 
-When a function has multiple output parameters, ``return (v0, v1, ...,
-vn)`` can return multiple values.  The number of components must be
-the same as the number of output parameters.
+Cuando una función tiene múltiples parámetros de salida, ``return (v0, v1, ...,
+vn)`` puede devolver múltiples valores. El número de componentes debe ser el mismo que el de parámetros de salida.
 
 .. index:: ! function;call, function;internal, function;external
 
 .. _function-calls:
 
-Function Calls
-==============
+Llamadas a funciones
+====================
 
-Internal Function Calls
------------------------
+Llamadas a funciones internas
+-----------------------------
 
-Functions of the current contract can be called directly ("internally"), also recursively, as seen in
-this nonsensical example::
+Las funciones del contrato actual pueden ser llamadas directamente ("internamente") y, también, recursivamente como se puede ver en este ejemplo sin sentido funcional::
 
     contract C {
         function g(uint a) returns (uint ret) { return f(); }
         function f() returns (uint ret) { return g(7) + f(); }
     }
 
-These function calls are translated into simple jumps inside the EVM. This has
-the effect that the current memory is not cleared, i.e. passing memory references
-to internally-called functions is very efficient. Only functions of the same
-contract can be called internally.
+Estas llamadas a funciones son traducidas en simples saltos dentro de la máquina virtual de Ethereum (EVM). Esto tiene como consecuencia que la memoria actual no se limpia, así que pasar referencias de memoria a las funciones llamadas internamente es muy eficiente. Sólo las funciones del mismo contrato pueden ser llamadas internamente.
 
-External Function Calls
------------------------
+Llamadas a funciones externas
+-----------------------------
 
-The expressions ``this.g(8);`` and ``c.g(2);`` (where ``c`` is a contract
-instance) are also valid function calls, but this time, the function
-will be called "externally", via a message call and not directly via jumps.
-Please note that function calls on ``this`` cannot be used in the constructor, as the
-actual contract has not been created yet.
+Las expresiones ``this.g(8);`` and ``c.g(2);`` (donde ``c`` es la instancia de un contrato) son también llamadas válidas, pero en esta ocasión, la función se llamará "externamente" mediante un message call y no directamente por saltos.
+Por favor, es importante tener en cuenta que las llamadas a funciones en ``this`` no pueden ser usadas en el constructor, ya que el contrato en cuestión no se ha creado todavía.
 
-Functions of other contracts have to be called externally. For an external call,
-all function arguments have to be copied to memory.
+Las funciones de otros contratos se tienen que llamar de forma externa. Para una llamada externa,
+todos los argumentos de la función tienen que ser copiados en memoria.
 
-When calling functions of other contracts, the amount of Wei sent with the call and
-the gas can be specified with special options ``.value()`` and ``.gas()``, respectively::
+Cuando se llama a funciones de otros contratos, la cantidad de Wei enviada con la llamada y el gas pueden especificarse con las opciones especiales ``.value()`` y ``.gas()``, respectivamente::
 
     contract InfoFeed {
         function info() payable returns (uint ret) { return 42; }
@@ -127,46 +99,23 @@ the gas can be specified with special options ``.value()`` and ``.gas()``, respe
         function callFeed() { feed.info.value(10).gas(800)(); }
     }
 
-The modifier ``payable`` has to be used for ``info``, because otherwise, the `.value()`
-option would not be available.
+El modificador ``payable`` se tiene que usar para ``info``, porque de otra manera la opción `.value()` no estaría disponible.
 
-Note that the expression ``InfoFeed(addr)`` performs an explicit type conversion stating
-that "we know that the type of the contract at the given address is ``InfoFeed``" and
-this does not execute a constructor. Explicit type conversions have to be
-handled with extreme caution. Never call a function on a contract where you
-are not sure about its type.
+Destacar que la expresión ``InfoFeed(addr)`` realiza una conversión de tipo explícita afirmando que "sabemos que el tipo de contrato en la dirección dada es ``InfoFeed``", sin ejecutar un constructor. Las conversiones de tipo explícitas tienen que ser gestionadas con extrema precaución. Nunca se debe llamar a una función en un contrato donde no se sabe con seguridad cuál es su tipo.
 
-We could also have used ``function setFeed(InfoFeed _feed) { feed = _feed; }`` directly.
-Be careful about the fact that ``feed.info.value(10).gas(800)``
-only (locally) sets the value and amount of gas sent with the function call and only the
-parentheses at the end perform the actual call.
+También se podría usar ``function setFeed(InfoFeed _feed) { feed = _feed; }`` directamente.
+Hay que tener cuidado con el hecho de que ``feed.info.value(10).gas(800)`` sólo (localmente) establece el valor y la cantidad de gas enviada con la llamada a la función. Sólo tras el último paréntesis se realiza realmente la llamada.
 
-Function calls cause exceptions if the called contract does not exist (in the
-sense that the account does not contain code) or if the called contract itself
-throws an exception or goes out of gas.
+Las llamadas a funciones provocan excepciones si el contrato invocado no existe (en el sentido de que la cuenta no contiene código) o si el contrato invocado por sí mismo dispara una excepción o se queda sin gas.
 
 .. warning::
-    Any interaction with another contract imposes a potential danger, especially
-    if the source code of the contract is not known in advance. The current
-    contract hands over control to the called contract and that may potentially
-    do just about anything. Even if the called contract inherits from a known parent contract,
-    the inheriting contract is only required to have a correct interface. The
-    implementation of the contract, however, can be completely arbitrary and thus,
-    pose a danger. In addition, be prepared in case it calls into other contracts of
-    your system or even back into the calling contract before the first
-    call returns. This means
-    that the called contract can change state variables of the calling contract
-    via its functions. Write your functions in a way that, for example, calls to
-    external functions happen after any changes to state variables in your contract
-    so your contract is not vulnerable to a reentrancy exploit.
+    Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente aleatoria y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama mediante sus funciones. Escribir tus funciones de manera que realicen, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato, hace que este contrato no sea vulnerable a un ataque de reentrada.
+    
 
-Named Calls and Anonymous Function Parameters
----------------------------------------------
+Llamadas con nombre y parámetros de funciones anónimas
+------------------------------------------------------
 
-Function call arguments can also be given by name, in any order,
-if they are enclosed in ``{ }`` as can be seen in the following
-example. The argument list has to coincide by name with the list of
-parameters from the function declaration, but can be in arbitrary order.
+Los argumentos de una llamada a una función pueden venir dados por el nombre, en cualquier orden, si están entre ``{ }`` como se puede ver en el siguiente ejemplo. La lista de argumentos tiene que coincidir por el nombre con la lista de parámetros de la declaración de la función, pero pueden estar en orden aleatorio.
 
 ::
 
@@ -176,39 +125,37 @@ parameters from the function declaration, but can be in arbitrary order.
         function f(uint key, uint value) { ... }
 
         function g() {
-            // named arguments
+            // argumentos con nombre
             f({value: 2, key: 3});
         }
     }
 
-Omitted Function Parameter Names
---------------------------------
+Nombres de parámetros de función omitidos
+-----------------------------------------
 
-The names of unused parameters (especially return parameters) can be omitted.
-Those names will still be present on the stack, but they are inaccessible.
+Los nombres de parámetros no usados (especialmente los de retorno) se pueden omitir.
+Esos nombres estarán presentes en la pila, pero serán inaccesibles.
 
 ::
 
     pragma solidity ^0.4.0;
 
     contract C {
-        // omitted name for parameter
+        // Se omite el nombre para el parámetro
         function func(uint k, uint) returns(uint) {
             return k;
         }
     }
     
 
-.. index:: ! new, contracts;creating
+.. index:: ! new, contracts;creation
 
 .. _creating-contracts:
 
-Creating Contracts via ``new``
-==============================
+Creando contratos mediante ``new``
+==================================
 
-A contract can create a new contract using the ``new`` keyword. The full
-code of the contract being created has to be known in advance, so recursive
-creation-dependencies are not possible.
+Un contrato puede crear un nuevo contrato usando la palabra reservada ``new``. El código completo del contrato que se está creando tiene que ser conocido de antemano, por lo que no son posibles las dependencias de creación recursivas.
 
 ::
 
@@ -223,43 +170,38 @@ creation-dependencies are not possible.
 
 
     contract C {
-        D d = new D(4); // will be executed as part of C's constructor
+        D d = new D(4); // Se ejecutará como parte del constructor de C
 
         function createD(uint arg) {
             D newD = new D(arg);
         }
 
         function createAndEndowD(uint arg, uint amount) {
-            // Send ether along with the creation
+            // Envía Ether junto con la creación
             D newD = (new D).value(amount)(arg);
         }
     }
 
-As seen in the example, it is possible to forward Ether to the creation using the ``.value()`` option,
-but it is not possible to limit the amount of gas. If the creation fails
-(due to out-of-stack, not enough balance or other problems), an exception
-is thrown.
+Como se ve en el ejemplo, es posible traspasar Ether a la creación usando la opción ``.value()``,
+pero no es posible limitar la cantidad de gas. Si la creación falla
+(debido al desbordamiento de la pila, falta de balance o cualquier otro problema), se dispara una excepción.
 
-Order of Evaluation of Expressions
-==================================
+Orden de la evaluación de expresiones
+=====================================
 
-The evaluation order of expressions is not specified (more formally, the order
-in which the children of one node in the expression tree are evaluated is not
-specified, but they are of course evaluated before the node itself). It is only
-guaranteed that statements are executed in order and short-circuiting for
-boolean expressions is done. See :ref:`order` for more information.
+El orden de evaluación de expresiones no se especifica (más formalmente, el orden en el que los hijos de un nodo en el árbol de la expresión son evaluados no es especificado. Eso sí, son evaluados antes que el propio nodo). Sólo se garantiza que las sentencias se ejecutan en orden y que se hace un cortocircuito para las expresiones booleanas. Ver :ref:`order` para más información.
 
 .. index:: ! assignment
 
-Assignment
+Asignación
 ==========
 
 .. index:: ! assignment;destructuring
 
-Destructuring Assignments and Returning Multiple Values
--------------------------------------------------------
+Asignaciones para desestructurar y retornar múltiples valores
+-------------------------------------------------------------
 
-Solidity internally allows tuple types, i.e. a list of objects of potentially different types whose size is a constant at compile-time. Those tuples can be used to return multiple values at the same time and also assign them to multiple variables (or LValues in general) at the same time::
+Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de, potencialmente, diferentes tipos cuyo tamaño es constante en tiempo de compilación. Esas tuplas pueden ser usadas para retornar múltiples valores al mismo tiempo y, también, asignarlos a múltiples variables (o lista de valores en general) también al mismo tiempo::
 
     contract C {
         uint[] data;
@@ -269,49 +211,45 @@ Solidity internally allows tuple types, i.e. a list of objects of potentially di
         }
 
         function g() {
-            // Declares and assigns the variables. Specifying the type explicitly is not possible.
+            // Declara y asigna variables. No es posible especificar el tipo de forma explícita.
             var (x, b, y) = f();
-            // Assigns to a pre-existing variable.
+            // Asigna a una variable pre-existente.
             (x, y) = (2, 7);
-            // Common trick to swap values -- does not work for non-value storage types.
+            // Truco común para intercambiar valores -- no funciona con tipos de almacenamiento sin valor.
             (x, y) = (y, x);
-            // Components can be left out (also for variable declarations).
-            // If the tuple ends in an empty component,
-            // the rest of the values are discarded.
-            (data.length,) = f(); // Sets the length to 7
-            // The same can be done on the left side.
+            // Los componentes se pueden dejar fuera (también en declaraciones de variables).
+            // Si la tupla acaba en un componente vacío,
+            // el resto de los valores se descartan.
+            (data.length,) = f(); // Establece la longitud a 7
+            // Lo mismo se puede hacer en el lado izquierdo.
             (,data[3]) = f(); // Sets data[3] to 2
-            // Components can only be left out at the left-hand-side of assignments, with
-            // one exception:
+            // Los componentes sólo se pueden dejar en el lado izquierdo de las asignaciones, con
+            // una excepción:
             (x,) = (1,);
-            // (1,) is the only way to specify a 1-component tuple, because (1) is
-            // equivalent to 1.
+            // (1,) es la única forma de especificar una tupla de un componente, porque (1) 
+            // equivale a 1.
         }
     }
 
-Complications for Arrays and Structs
-------------------------------------
+Complicaciones en Arrays y Structs
+----------------------------------
 
-The semantics of assignment are a bit more complicated for non-value types like arrays and structs.
-Assigning *to* a state variable always creates an independent copy. On the other hand, assigning to a local variable creates an independent copy only for elementary types, i.e. static types that fit into 32 bytes. If structs or arrays (including ``bytes`` and ``string``) are assigned from a state variable to a local variable, the local variable holds a reference to the original state variable. A second assignment to the local variable does not modify the state but only changes the reference. Assignments to members (or elements) of the local variable *do* change the state.
+La sintaxis de asignación es algo más complicada para tipos sin valor como arrays y structs.
+Las asignaciones *a* variables de estado siempre crean una copia independiente. Por otro lado, asignar una variable local crea una copia independiente sólo para tipos elementales, como tipos estáticos que encajan en 32 bytes. Si los structs o arrays (incluyendo ``bytes`` y ``string``) son asignados desde una variable de estado a una local, la variable local se queda una referencia a la variable de estado original. Una segunda asignación a la variable local no modifica el estado, sólo cambia la referencia. Las asignaciones a miembros (o elementos) de la variable local *hacen* cambiar el estado.
 
 .. index:: ! scoping, declarations, default value
 
 .. _default-value:
 
-Scoping and Declarations
-========================
+Scoping y declaraciones
+=========================
 
-A variable which is declared will have an initial default value whose byte-representation is all zeros.
-The "default values" of variables are the typical "zero-state" of whatever the type is. For example, the default value for a ``bool``
-is ``false``. The default value for the ``uint`` or ``int`` types is ``0``. For statically-sized arrays and ``bytes1`` to ``bytes32``, each individual
-element will be initialized to the default value corresponding to its type. Finally, for dynamically-sized arrays, ``bytes``
-and ``string``, the default value is an empty array or string.
+Una variable cuando se declara tendrá un valor inicial por defecto que, representado en bytes, será todo ceros.
+Los valores por defecto de las variables son los típicos "estado-cero" cualquiera que sea el tipo. Por ejemplo, el valor por defecto para un ``bool`` es ``false``. El valor por defecto para un ``uint`` o ``int`` es ``0``. Para arrays de tamaño estático y ``bytes1`` hasta ``bytes32``, cada elemento individual será inicializado a un valor por defecto según sea su tipo. Finalmente, para arrays de tamaño dinámico, ``bytes``y ``string``, el valor por defecto es un array o string vacío.
 
-A variable declared anywhere within a function will be in scope for the *entire function*, regardless of where it is declared.
-This happens because Solidity inherits its scoping rules from JavaScript.
-This is in contrast to many languages where variables are only scoped where they are declared until the end of the semantic block.
-As a result, the following code is illegal and cause the compiler to throw an error, ``Identifier already declared``::
+Una variable declarada en cualquier punto de una función estará dentro del alcance de *toda la función*, independientemente de donde se haya declarado. Esto ocurre porque Solidity hereda sus reglas de scoping de JavaScript.
+Esto difiere de muchos lenguajes donde las variables sólo están en el alcance de donde se declaran hasta que acaba el bloque semántico.
+Como consecuencia de esto, el código siguiente es ilegal y hace que el compilador devuelva un error porque el identificador se ha declarado previamente, ``Identifier already declared``::
 
     pragma solidity ^0.4.0;
 
@@ -324,7 +262,7 @@ As a result, the following code is illegal and cause the compiler to throw an er
             }
 
             while (i++ < 2) {
-                uint same1 = 0;// Illegal, second declaration of same1
+                uint same1 = 0; // Ilegal, segunda declaración para same1
             }
         }
 
@@ -334,7 +272,7 @@ As a result, the following code is illegal and cause the compiler to throw an er
             }
 
             {
-                uint same2 = 0;// Illegal, second declaration of same2
+                uint same2 = 0; // Ilegal, segunda declaración para same2
             }
         }
 
@@ -342,74 +280,67 @@ As a result, the following code is illegal and cause the compiler to throw an er
             for (uint same3 = 0; same3 < 1; same3++) {
             }
 
-            for (uint same3 = 0; same3 < 1; same3++) {// Illegal, second declaration of same3
+            for (uint same3 = 0; same3 < 1; same3++) { // Ilegal, segunda declaración para same3
             }
         }
     }
 
-In addition to this, if a variable is declared, it will be initialized at the beginning of the function to its default value.
-As a result, the following code is legal, despite being poorly written::
+Como añadido a esto, si la variable se declara, se inicializará al principio de la función con su valor por defecto.
+Esto significa que el siguiente código es legal, aunque se haya escrito de manera un tanto pobre::
 
     function foo() returns (uint) {
-        // baz is implicitly initialized as 0
+        // baz se inicializa implícitamente a 0
         uint bar = 5;
         if (true) {
             bar += baz;
         } else {
-            uint baz = 10;// never executes
+            uint baz = 10;// Nunca se ejecuta
         }
-        return bar;// returns 5
+        return bar;// devuelve 5
     }
 
 .. index:: ! exception, ! throw
 
-Exceptions
-==========
+Excepciones
+===========
 
-There are some cases where exceptions are thrown automatically (see below). You can use the ``throw`` instruction to throw an exception manually. The effect of an exception is that the currently executing call is stopped and reverted (i.e. all changes to the state and balances are undone) and the exception is also "bubbled up" through Solidity function calls (exceptions are ``send`` and the low-level functions ``call``, ``delegatecall`` and ``callcode``, those return ``false`` in case of an exception).
+Hay algunos casos en los que las excepciones se lanzan automáticamente (ver más adelante). Se puede usar la instrucción ``throw`` para lanzarlas manualmente. La consecuencia de una excepción es que la llamada que se está ejecutando en ese momento se para y se revierte (todos los cambios en los estados y balances se deshacen) y la excepción también se genera mediante llamadas de función de Solidity (las excepciones ``send`` y las funciones de bajo nivel ``call``, ``delegatecall`` y ``callcode``, todas ellas devuelven ``false`` en caso de una excepción).
 
-Catching exceptions is not yet possible.
+Todavía no es posible capturar excepciones.
 
-In the following example, we show how ``throw`` can be used to easily revert an Ether transfer and also how to check the return value of ``send``::
+En el siguiente ejemplo, se enseña como ``throw`` se puede usar para revertir fácilmente una transferencia de Ether y, además, se enseña como comprobar el valor de retorno de ``send``::
 
     pragma solidity ^0.4.0;
 
     contract Sharer {
         function sendHalf(address addr) payable returns (uint balance) {
             if (!addr.send(msg.value / 2))
-                throw; // also reverts the transfer to Sharer
+                throw; // También revierte la transferencia de Sharer
             return this.balance;
         }
     }
 
-Currently, Solidity automatically generates a runtime exception in the following situations:
+Actualmente, Solidity genera automáticamente una excepción en tiempo de ejecución en las siguientes situaciones:
 
-#. If you access an array at a too large or negative index (i.e. ``x[i]`` where ``i >= x.length`` or ``i < 0``).
-#. If you access a fixed-length ``bytesN`` at a too large or negative index.
-#. If you call a function via a message call but it does not finish properly (i.e. it runs out of gas, has no matching function, or throws an exception itself), except when a low level operation ``call``, ``send``, ``delegatecall`` or ``callcode`` is used.  The low level operations never throw exceptions but indicate failures by returning ``false``.
-#. If you create a contract using the ``new`` keyword but the contract creation does not finish properly (see above for the definition of "not finish properly").
-#. If you divide or modulo by zero (e.g. ``5 / 0`` or ``23 % 0``).
-#. If you shift by a negative amount.
-#. If you convert a value too big or negative into an enum type.
-#. If you perform an external function call targeting a contract that contains no code.
-#. If your contract receives Ether via a public function without ``payable`` modifier (including the constructor and the fallback function).
-#. If your contract receives Ether via a public getter function.
-#. If you call a zero-initialized variable of internal function type.
-#. If a ``.transfer()`` fails.
-#. If you call ``assert`` with an argument that evaluates to false.
+#. Si se accede a un array en un índice demasiado largo o negativo (ejemplo: ``x[i]`` donde ``i >= x.length`` o ``i < 0``).
+#. Si se accede a un ``bytesN`` de longitud fija en un índice demasiado largo o negativo.
+#. Si se llama a una función con un message call, pero no finaliza adecuadamente (ejemplo: se queda sin gas, no tiene una función de matching, o dispara una excepción por sí mismo), exceptuando el caso en el que se use una operación de bajo nivel ``call``, ``send``, ``delegatecall`` o ``callcode``. Las operaciones de bajo nivel nunca disparan excepciones, pero indican fallos devolviendo ``false``.
+#. Si se crea un contrato usando la palabra reservada ``new``, pero la creación del contrato no finaliza correctamente (ver más arriba la definición de "no finalizar correctamente").
+#. Si se divide o se hace módulo por cero (ejemplos: ``5 / 0`` o ``23 % 0``).
+#. Si se hace un movimiento por una cantidad negativa.
+#. Si se convierte un valor muy grande o negativo en un tipo enum.
+#. Si se realiza una llamada de función externa apuntando a un contrato que no contiene código.
+#. Si un contrato recibe Ether mediante una función sin el modificador ``payable`` (incluyendo el constructor y la función de fallback).
+#. Si un contrato recibe Ether mediante una función getter pública.
+#. Si se llama a una variable inicializada a cero de un tipo de función interna.
+#. Si un ``.transfer()`` falla.
+#. Si se invoca con ``assert`` junto con un argumento que evalúa a falso.
 
-While a user-provided exception is generated in the following situations:
+Un usuario genera una excepción en las siguientes situaciones:
 
-#. Calling ``throw``.
-#. Calling ``require`` with an argument that evaluates to ``false``.
+#. Llamando a ``throw``.
+#. Llamando a ``require`` junto con un argumento que evalúa a ``false``.
 
-Internally, Solidity performs a revert operation (instruction ``0xfd``) when a user-provided exception is thrown or the condition of
-a ``require`` call is not met. In contrast, it performs an invalid operation
-(instruction ``0xfe``) if a runtime exception is encountered or the condition of an ``assert`` call is not met. In both cases, this causes
-the EVM to revert all changes made to the state. The reason for this is that there is no safe way to continue execution, because an expected effect
-did not occur. Because we want to retain the atomicity of transactions, the safest thing to do is to revert all changes and make the whole transaction
-(or at least call) without effect.
+Internamente, Solidity realiza una operación de revertir (revert, instrucción ``0xfd``) cuando una excepción provista por un usuario se lanza o la condición de la llamada ``require`` no se satisface. Por contra, realiza una operación inválida (instrucción ``0xfe``) si una excepción en tiempo de ejecución aparece o la condición de una llamada ``assert`` no se satisface. En ambos casos, esto ocasiona que la EVM revierta todos los cambios de estado acaecidos. El motivo de todo esto es que no existe un modo seguro de continuar con la ejecución debido a que no sucedió el efecto esperado. Como se quiere mantener la atomicidad de las transacciones, lo más seguro es revertir todos los cambios y hacer que la transacción no tenga ningún efecto en su totalidad o, como mínimo, en la llamada.
 
-If contracts are written so that ``assert`` is only used to test internal conditions and ``require``
-is used in case of malformed input, a formal analysis tool that verifies that the invalid
-opcode can never be reached can be used to check for the absence of errors assuming valid inputs.
+En el caso de que los contratos se escriban de tal manera que ``assert`` sólo sea usado para probar condiciones internas y ``require`` se use en caso de que haya una entrada malformada, una herramienta de análisis formal que verifique que el opcode inválido nunca pueda ser alcanzado, se podría usar para chequear la ausencia de errores asumiendo entradas válidas.
