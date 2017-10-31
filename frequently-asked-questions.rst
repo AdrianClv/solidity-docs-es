@@ -1,196 +1,201 @@
-###########################
-Frequently Asked Questions
-###########################
+####################
+Preguntas frequentes
+####################
 
-This list was originally compiled by `fivedogit <mailto:fivedogit@gmail.com>`_.
+Esta lista fue originalmente compilada por `fivedogit  <mailto:fivedogit@gmail.com>`_.
 
 
-***************
-Basic Questions
-***************
+*****************
+Preguntas Básicas
+*****************
 
-Example contracts
-=================
+Ejemplos de contratos
+=====================
 
-There are some `contract examples <https://github.com/fivedogit/solidity-baby-steps/tree/master/contracts/>`_ by fivedogit and
-there should be a `test contract <https://github.com/ethereum/solidity/blob/develop/test/libsolidity/SolidityEndToEndTest.cpp>`_ for every single feature of Solidity.
+Hay algunos `ejemplos de contratos <https://github.com/fivedogit/solidity-baby-steps/tree/master/contracts/>`_ por fivedogit
+y debe haber un `test contract <https://github.com/ethereum/solidity/blob/develop/test/libsolidity/SolidityEndToEndTest.cpp>`_ para cada funcionalidad de Solidity.
 
-Create and publish the most basic contract possible
-===================================================
 
-A quite simple contract is the `greeter <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/05_greeter.sol>`_
+Crear y publicar el contrato mas simple posible
+===============================================
 
-Is it possible to do something on a specific block number? (e.g. publish a contract or execute a transaction)
-=============================================================================================================
+Un contrato bastante simple es el `greeter <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/05_greeter.sol>`_
 
-Transactions are not guaranteed to happen on the next block or any future
-specific block, since it is up to the miners to include transactions and not up
-to the submitter of the transaction. This applies to function calls/transactions and contract
-creation transactions.
+¿Es posible hacer algo en un bloque específico? (ej. publicar un contrato o ejecutar una transaction)
+=====================================================================================================
 
-If you want to schedule future calls of your contract, you can use the
-`alarm clock <http://www.ethereum-alarm-clock.com/>`_.
+Las transacciones no están garantizadas a ejecutarse en el próximo bloque o en cualquier
+bloque futuro, ya que depende de los mineros de incluir transacciones y no del
+remitente de la transacción. Esto se aplica a llamadas de funciones/transacciones y trasacciones
+de creación de contratos.
 
-What is the transaction "payload"?
-==================================
+Si quieres programar llamadas de contrato a futuro, puedes usar el
+`despertador (alarm clock) <http://www.ethereum-alarm-clock.com/>`_.
 
-This is just the bytecode "data" sent along with the request.
 
-Is there a decompiler available?
+¿Qué es la "payload" de la transacción?
+=======================================
+
+Esto es sólamente el data bytecode enviado junto con la solicitud.
+
+¿Hay un decompilador disponible?
 ================================
 
-There is no decompiler to Solidity. This is in principle possible
-to some degree, but for example variable names will be lost and
-great effort will be necessary to make it look similar to
-the original source code.
+No hay un decompilador en Solidity. Esto es en principio posible
+hasta un punto, pero por ejemplo los nombres de variables serán
+perdidas y un gran esfuerzo será necesario para replicar el código
+de fuente original.
 
-Bytecode can be decompiled to opcodes, a service that is provided by
-several blockchain explorers.
+Bytecode puede ser decompilado a opcoses, un servicio que es provisto
+por varios exploradores de blockchain.
 
-Contracts on the blockchain should have their original source
-code published if they are to be used by third parties.
+Los contratos en la blockchain deben tener su código fuente
+original publicado si serán utilizados por terceros.
 
-Create a contract that can be killed and return funds
-=====================================================
+Crear un contrato que puede ser detenido y devolver los fondos
+==============================================================
 
-First, a word of warning: Killing contracts sounds like a good idea, because "cleaning up"
-is always good, but as seen above, it does not really clean up. Furthermore,
-if Ether is sent to removed contracts, the Ether will be forever lost.
+Primero, una advertencia: Detener contratos suena como una buena idea, porque "limpiar"
+siempre es bueno, pero como se ve arriba, no se limpia realmente. Además,
+si algo de Ether es enviado a contratos eliminados, el Ether será perdido para
+siempre.
 
-If you want to deactivate your contracts, it is preferable to **disable** them by changing some
-internal state which causes all functions to throw. This will make it impossible
-to use the contract and ether sent to the contract will be returned automatically.
+Si quieres desactivar tus contratos, es mejor "inhabilitarlos" cambiando algunos estados
+internos que hace que todas las funciones arrojen excepciones. Esto hará que sea imposible
+de usar el contrato y todo ether enviado será devuelto automáticamente.
 
-Now to answering the question: Inside a constructor, ``msg.sender`` is the
-creator. Save it. Then ``selfdestruct(creator);`` to kill and return funds.
+Ahora para responder la pregunta: Dento de un constructor, ``msg.sender`` es el
+creador. Guárdalo. Luego ``selfdestruct(creator);`` para matar y devolver los fondos.
 
-`example <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/05_greeter.sol>`_
+`ejemplo <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/05_greeter.sol>`_
 
-Note that if you ``import "mortal"`` at the top of your contracts and declare
-``contract SomeContract is mortal { ...`` and compile with a compiler that already
-has it (which includes `Remix <https://remix.ethereum.org/>`_), then
-``kill()`` is taken care of for you. Once a contract is "mortal", then you can
-``contractname.kill.sendTransaction({from:eth.coinbase})``, just the same as my
-examples.
+Nótese que si importas ``import "mortal"`` arriba del contrato y declaras
+``contract AlgunContrato is mortal { ...`` y compilas con un compilador que ya lo
+tiene (que incluye `Remix <https://remix.ethereum.org/>`), luego
+``kill()`` es ejecutado por ti. Una vez que un contrato es "mortal", se puede
+``contractname.kill.sendTransaction({from:eth.coinbase})``, igual que en los
+ejemplos.
 
-Store Ether in a contract
-=========================
 
-The trick is to create the contract with ``{from:someaddress, value: web3.toWei(3,"ether")...}``
+Guardar Ether en un contrato
+============================
 
-See `endowment_retriever.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/30_endowment_retriever.sol>`_.
+El truco es de crear un contrato con ``{from:someaddress, value: web3.toWei(3,"ether")...}``
 
-Use a non-constant function (req ``sendTransaction``) to increment a variable in a contract
-===========================================================================================
+Ver `endowment_retriever.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/30_endowment_retriever.sol>`_.
 
-See `value_incrementer.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/20_value_incrementer.sol>`_.
+Usar una función no-constante (req ``sendTransation``) para incrementar una variable en un contrato
+===================================================================================================
 
-Get a contract to return its funds to you (not using ``selfdestruct(...)``).
-============================================================================
+Ver `value_incrementer.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/20_value_incrementer.sol>`_.
 
-This example demonstrates how to send funds from a contract to an address.
+Obtener que un contrato te devuelva los fondos (sin usar ``selfdestruct(...)``).
+================================================================================
 
-See `endowment_retriever <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/30_endowment_retriever.sol>`_.
+Este ejemplo demuestra como envíar fondos de un contrato a una address.
 
-Can you return an array or a ``string`` from a solidity function call?
-======================================================================
+Ver `endowment_retriever <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/30_endowment_retriever.sol>`_.
 
-Yes. See `array_receiver_and_returner.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/60_array_receiver_and_returner.sol>`_.
+¿Puedes devolver un array o un ``string`` desde una llamada de función solidity?
+================================================================================
 
-What is problematic, though, is returning any variably-sized data (e.g. a
-variably-sized array like ``uint[]``) from a fuction **called from within Solidity**.
-This is a limitation of the EVM and will be solved with the next protocol update.
+Si. Ver `array_receiver_and_returner.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/60_array_receiver_and_returner.sol>`_.
 
-Returning variably-sized data as part of an external transaction or call is fine.
+Lo que sí es problemático es devolver cualquier data de tamaño variable (ej. un
+array de tamaño variable como ``uint[]``) desde una función **llamada desde Solidity**.
+Esto es una limitación de la EVM y será resuelto en la próxima versión del protocolo.
 
-How do you represent ``double``/``float`` in Solidity?
-======================================================
+Devolver data de tamaño variable está bien cuando es parte de una transaction o llamada externa.
 
-This is not yet possible.
+¿Cómo representas ``double``/``float``` en Solidity?
+====================================================
 
-Is it possible to in-line initialize an array like so: ``string[] myarray = ["a", "b"];``
-=========================================================================================
+Esto no es aún posible.
 
-Yes. However it should be noted that this currently only works with statically sized memory arrays. You can even create an inline memory
-array in the return statement. Pretty cool, huh?
+Es posible de iniciar un array in-line (ej. ``string[] myarray = ["a", "b"];``)
+===============================================================================
+
+Si. Sin embargo debiera notarse que esto sólo funciona con arrays de tamaño estático. Puedes incluso crear un array en memoria en línea en la declaración de devolución. Cool, ¿no?
 
 Example::
 
     contract C {
         function f() returns (uint8[5]) {
-            string[4] memory adaArr = ["This", "is", "an", "array"];
+            string[4] memory adaArr = ["Esto", "es", "un", "array"];
             return ([1, 2, 3, 4, 5]);
         }
     }
 
-Are timestamps (``now,`` ``block.timestamp``) reliable?
-=======================================================
+Son de confianza los timestamps (``now``, ``block.timestamp``)
+==============================================================
 
-This depends on what you mean by "reliable".
-In general, they are supplied by miners and are therefore vulnerable.
+Esto depende por lo que te refieres con "de confianza".
+En general, son entregados por los mineros y por lo tanto son vulnerables.
 
-Unless someone really messes up the blockchain or the clock on
-your computer, you can make the following assumptions:
+Al menos que haya un problema grave en la blockchain o en tu ordenador,
+puedes hacer las siguientes suposiciones:
 
-You publish a transaction at a time X, this transaction contains same
-code that calls ``now`` and is included in a block whose timestamp is Y
-and this block is included into the canonical chain (published) at a time Z.
+Publicas una transacción en un tiempo X, esta transacción contiene el
+mismo código que llama ``now`` y es incluída en un bloque cuyo timestamp
+es Y y este bloque es incluído en la cadena canónica (publicado) en un tiempo Z.
 
-The value of ``now`` will be identical to Y and X <= Y <= Z.
+El valor de ``now`` será idéntico a Y y X <= Y <= Z.
 
-Never use ``now`` or ``block.hash`` as a source of randomness, unless you know
-what you are doing!
+Nunca usa ``now`` o ``block.hash`` como una fuente aleatoria, a menos que
+sepas lo que estás haciendo.
 
-Can a contract function return a ``struct``?
-============================================
 
-Yes, but only in ``internal`` function calls.
+¿Puede una función de contrato devolver un ``struct``?
+======================================================
 
-If I return an ``enum``, I only get integer values in web3.js. How to get the named values?
-===========================================================================================
+Si, pero sólo en llamadas de funciones ``internal``.
 
-Enums are not supported by the ABI, they are just supported by Solidity.
-You have to do the mapping yourself for now, we might provide some help
-later.
+Si devuelvo un ``enum``, Sólo me dan valores enteros en web3.js. ¿Cómo obtengo los valores nombrados?
+=====================================================================================================
 
-What is the deal with ``function () { ... }`` inside Solidity contracts? How can a function not have a name?
-============================================================================================================
+Enums no son soportados por la ABI, sólo son soportados por Solidity.
+Tienes que hacer el mapping tu mismo por ahora, aunque puede que proporcionemos
+ayuda mas adelante.
 
-This function is called "fallback function" and it
-is called when someone just sent Ether to the contract without
-providing any data or if someone messed up the types so that they tried to
-call a function that does not exist.
 
-The default behaviour (if no fallback function is explicitly given) in
-these situations is to throw an exception.
+¿Cuál es el significado de ``function() { ... }`` dentro de los contratos Solidity? ¿Cómo es posible que una función no tenga nombre?
+======================================================================================================================================
 
-If the contract is meant to receive Ether with simple transfers, you
-should implement the fallback function as
+Esta función es llamada "callback function" y es
+llamada cuando alguien sólo envía Ether al contrato sin proveer data
+o si alguien se equivocó e intentó llamar una función que no existe.
+
+El funcionamiento por defecto (si no hay función fallback explícita) en
+estas situaciones es arrojar una excepción.
+
+Si el contrato debiera recibir Ether con transferencias simples, debes
+implementar una función callback como
 
 ``function() payable { }``
 
-Another use of the fallback function is to e.g. register that your
-contract received ether by using an event.
+Otro uso de la función callback es por ejemplo registrar que tu contrato
+recibió ether usando un evento.
 
-*Attention*: If you implement the fallback function take care that it uses as
-little gas as possible, because ``send()`` will only supply a limited amount.
+*Attention*: Si implementas la función fallback, cuida que use lo menos gas
+posible, porque ``send()`` sólo suministrará una cantidad limitada.
 
-Is it possible to pass arguments to the fallback function?
-==========================================================
 
-The fallback function cannot take parameters.
+¿Es posible pasar argumentos a la función fallback?
+===================================================
 
-Under special circumstances, you can send data. If you take care
-that none of the other functions is invoked, you can access the data
-by ``msg.data``.
+La función fallback no puede tomar parámetros.
 
-Can state variables be initialized in-line?
-===========================================
+Bajo ciertas circunstancias, puedes enviar data. Si cuidad que ninguna
+de las otras funciones es llamada, puedes acceder a la data usando
+``msg.data``.
 
-Yes, this is possible for all types (even for structs). However, for arrays it
-should be noted that you must declare them as static memory arrays.
+¿Pueden las variables de estado ser iniciadas in-line?
+======================================================
 
-Examples::
+Si, esto es posible para todos los tipos (incluso para structs). Sin embargo,
+para arrays debe notarse que se le deben declarar como arrays de memoria estática.
+
+Ejemplos::
 
     contract C {
         struct S {
@@ -200,7 +205,7 @@ Examples::
 
         S public x = S(1, 2);
         string name = "Ada";
-        string[4] memory adaArr = ["This", "is", "an", "array"];
+        string[4] memory adaArr = ["Esto", "es", "un", "array"];
     }
 
 
@@ -208,40 +213,41 @@ Examples::
         C c = new C();
     }
 
-How do structs work?
-====================
+¿Cómo funcionan los structs?
+============================
 
-See `struct_and_for_loop_tester.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/65_struct_and_for_loop_tester.sol>`_.
+Ver `struct_and_for_loop_tester.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/65_struct_and_for_loop_tester.sol>`_.
 
-How do for loops work?
-======================
+¿Cómo funcionan los for loop?
+=============================
 
-Very similar to JavaScript. There is one point to watch out for, though:
+Muy similarmente a Javascript. Aunque esto es un punto al cual debe hacerse atención:
 
-If you use ``for (var i = 0; i < a.length; i ++) { a[i] = i; }``, then
-the type of ``i`` will be inferred only from ``0``, whose type is ``uint8``.
-This means that if ``a`` has more than ``255`` elements, your loop will
-not terminate because ``i`` can only hold values up to ``255``.
+Si usas ``for (var i = 0; i < a.length; i ++) { a[i] = i; }``, entonces
+el tipo de ``i`` será inferido sólo de ``0``, o sea, un tipo ``uint8``.
+Esto significa que si ``a`` tiene más de ``255`` elementos, tu loop no terminará
+ya que ``i`` sólo contendrá valores hasta ``255``.
 
-Better use ``for (uint i = 0; i < a.length...``
+Mejor usar ``for (uint i = 0; i < a.length...``
 
-See `struct_and_for_loop_tester.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/65_struct_and_for_loop_tester.sol>`_.
+Ver `struct_and_for_loop_tester.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/65_struct_and_for_loop_tester.sol>`_.
 
-What character set does Solidity use?
-=====================================
+¿Qué set de caracteres usa Solidity?
+====================================
 
-Solidity is character set agnostic concerning strings in the source code, although
-UTF-8 is recommended. Identifiers (variables, functions, ...) can only use
-ASCII.
+Solidity es agnostico de set de caracteres con respecto a strings en el código fuente,
+aunque UTF-8 es recomendado. Los identificadores (variables, funciones, ...) Solo pueden
+usar ASCII.
 
-What are some examples of basic string manipulation (``substring``, ``indexOf``, ``charAt``, etc)?
-==================================================================================================
+¿Cuáles son algunos ejemplos de manipulación de strings básicos (``substring``, ``indexOf``,, ``charAt``, etc)?
+===============================================================================================================
 
-There are some string utility functions at `stringUtils.sol <https://github.com/ethereum/dapp-bin/blob/master/library/stringUtils.sol>`_
-which will be extended in the future. In addition, Arachnid has written `solidity-stringutils <https://github.com/Arachnid/solidity-stringutils>`_.
+Hay algunas funciones de utilidad de string en `stringUtils.sol <https://github.com/ethereum/dapp-bin/blob/master/library/stringUtils.sol>`_
+que serán extendidas en el futuro. Además, Arachnid ha escrito `solidity-stringutils <https://github.com/Arachnid/solidity-stringutils>`_.
 
-For now, if you want to modify a string (even when you only want to know its length),
-you should always convert it to a ``bytes`` first::
+Por ahora si quieres modificar un string, (incluso cuando sólo quieres saber su largo),
+debes siempre convertirlo en un ``bytes`` primero::
+
 
     contract C {
         string s;
@@ -256,37 +262,38 @@ you should always convert it to a ``bytes`` first::
     }
 
 
-Can I concatenate two strings?
+¿Puedo concatenar dos strings?
 ==============================
 
-You have to do it manually for now.
+Tienes que hacerlo manualmente por ahora.
 
-Why is the low-level function ``.call()`` less favorable than instantiating a contract with a variable (``ContractB b;``) and executing its functions (``b.doSomething();``)?
-=============================================================================================================================================================================
+Por qué la función de bajo nivel ``.call()`` es menos favorable que instanciando un contrato con ua vaiable (``ContractBb;``) y ejecutando sus funcioens (``b.doSomething();``)?
+==========================================================================================================================================================================================
 
-If you use actual functions, the compiler will tell you if the types
-or your arguments do not match, if the function does not exist
-or is not visible and it will do the packing of the
-arguments for you.
+TODO: 
+Si usar reales funciones, el compilador le dirá si los tipos de
+los argumentos no concuerdan, si la función no existe
+o no es visible y hará el empaquetamiento de los argumentos
+por tí.
 
-See `ping.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_ping.sol>`_ and
+
+Ver `ping.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_ping.sol>`_ y
 `pong.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_pong.sol>`_.
 
-Is unused gas automatically refunded?
-=====================================
+¿El gas inutilizado es automaticamente devuelto?
+================================================
 
-Yes and it is immediate, i.e. done as part of the transaction.
+Si y es immediato, ej. hecho como parte de la transacción.
 
-When returning a value of say ``uint`` type, is it possible to return an ``undefined`` or "null"-like value?
-============================================================================================================
+Cuando se devuelve un valor de tipo ``unint``, ¿es posible devolver un `undefined`` o un valor ``null``?
+========================================================================================================
 
-This is not possible, because all types use up the full value range.
+Esto no es posible, porque todos los tipos usan el rango de valores totales.
 
-You have the option to ``throw`` on error, which will also revert the whole
-transaction, which might be a good idea if you ran into an unexpected
-situation.
+Tienes la opción de ``arrojar`` un error, que también revirtirá la transacción
+completa, que puede que sea una buena idea si obtuviste una situación inesperada.
 
-If you do not want to throw, you can return a pair::
+Si no quieres deolver un error, puedes devolver un par::
 
     contract C {
         uint[] counters;
@@ -309,57 +316,57 @@ If you do not want to throw, you can return a pair::
         }
     }
 
+¿Los comentarios son incluídos en los contratos publicados y incrementan el gas
+===============================================================================
 
-Are comments included with deployed contracts and do they increase deployment gas?
-==================================================================================
+No. Todo lo que no sea utilizado para la ejecución es eliminado durante la compilación.
+Esto incluye, entre otras cosas, comentarios, nombres de variable y nombres de tipos.
 
-No, everything that is not needed for execution is removed during compilation.
-This includes, among others, comments, variable names and type names.
+¿Qué pasa si envías ether junto con una llamada de función a un contrato?
+=========================================================================
 
-What happens if you send ether along with a function call to a contract?
-========================================================================
+Se agrega al balance total del contrato, igual que cuando mandas ether creando un contrato.
+Sólo puedes envíar ether junto con una función que tiene modificador ``payable``,
+si no, una excepción es levantada.
 
-It gets added to the total balance of the contract, just like when you send ether when creating a contract.
-You can only send ether along to a function that has the ``payable`` modifier,
-otherwise an exception is thrown.
+¿Es posible obtener una respuesta tx para una transacción ejecutada contrato-a-contrato?
+========================================================================================
 
-Is it possible to get a tx receipt for a transaction executed contract-to-contract?
-===================================================================================
+No, una llamada de función de un contrato a otro no crea su propia transacción,
+tienes que mirar en la transacción general. Eso también es la razón por la que
+varios exploradores de bloques no muestran Ether envíado entre contratos correctamente.
 
-No, a function call from one contract to another does not create its own transaction,
-you have to look in the overall transaction. This is also the reason why several
-block explorer do not show Ether sent between contracts correctly.
 
-What is the ``memory`` keyword? What does it do?
+¿Cuál es la palabra clave ``memory`` y qué hace?
 ================================================
 
-The Ethereum Virtual Machine has three areas where it can store items.
+La Máquina Virtual Ethereum tiene tres áreas donde puede guardar cosas.
 
-The first is "storage", where all the contract state variables reside.
-Every contract has its own storage and it is persistent between function calls
-and quite expensive to use.
+La primera es "storage", donde todas las variables de estado del contrato existen.
+Cada contrato tiene su propio storage y es persistente entre llamdas de función
+y bastate caro usarlo.
 
-The second is "memory", this is used to hold temporary values. It
-is erased between (external) function calls and is cheaper to use.
+La segunda es "memory", esto es usado para guardar valores temporales. Es
+borrado entre llamdas de función (externas) y es más barato usar.
 
-The third one is the stack, which is used to hold small local variables.
-It is almost free to use, but can only hold a limited amount of values.
+La tercera es en el stack, que es usado para guardar pequeñas variables locales.
+Es casi gratis para usar, pero sólo puede guardar una cantidad limitada de valores.
 
-For almost all types, you cannot specify where they should be stored, because
-they are copied everytime they are used.
+Para casi todos los tipos, no puedes especificar donde deben ser gurdadas, porque
+son copiadas cada vez que se usan.
 
-The types where the so-called storage location is important are structs
-and arrays. If you e.g. pass such variables in function calls, their
-data is not copied if it can stay in memory or stay in storage.
-This means that you can modify their content in the called function
-and these modifications will still be visible in the caller.
+Los tipos donde la storage-location es importante son structs
+y arrays. Si, por ejemplo, pasaras estas variables en llamadas de función, su
+data no es copiada si puede quedar en memoria o quedar en storage.
+Esto significa que puedes modificar su contenido en la función llamada
+y estas modificaciones aún serán visibles al llamador.
 
-There are defaults for the storage location depending on which type
-of variable it concerns:
+Hay valores por defecto para el storage location dependiendo de que tipo
+de variable le concierne:
 
-* state variables are always in storage
-* function arguments are always in memory
-* local variables always reference storage
+* variables de estado siempre están en storage
+* argumentos de función siempre están en memoria
+* variable locales siempre referencian storage
 
 Example::
 
@@ -380,19 +387,18 @@ Example::
         }
     }
 
-The function ``append`` can work both on ``data1`` and ``data2`` and its modifications will be
-stored permanently. If you remove the ``storage`` keyword, the default
-is to use ``memory`` for function arguments. This has the effect that
-at the point where ``append(data1)`` or ``append(data2)`` is called, an
-independent copy of the state variable is created in memory and
-``append`` operates on this copy (which does not support ``.push`` - but that
-is another issue). The modifications to this independent copy do not
-carry back to ``data1`` or ``data2``.
+La función ``append`` puede funcionar en ambos ``data1`` y ``data2`` y sus
+modificaciones serán guardadas permenentemente. Si quitas la palabra clave
+``storage``, por defecto se usa ``memory`` para argumentos de función. Esto tiene
+como efecto que en el punto donde ``append(data1)`` o ``append(data2)`` son llamadas,
+una copia independiente de la variable de estado es creada en memoria y ``append``
+opera en esta copia (que no soporta ``.push`` - pero eso es otro tema). Las
+modificaciones a esta copia independiente no se llevan a ``data1`` o ``data2``.
 
-A common mistake is to declare a local variable and assume that it will
-be created in memory, although it will be created in storage::
+Un error típico es declarar una variable local y presumir que será creada en
+memoria, aunque será creada en storage::
 
-    /// THIS CONTRACT CONTAINS AN ERROR
+    /// ESTE CONTRATO CONTIENE UN ERROR
     contract C {
         uint someVariable;
         uint[] data;
@@ -404,18 +410,18 @@ be created in memory, although it will be created in storage::
         }
     }
 
-The type of the local variable ``x`` is ``uint[] storage``, but since
-storage is not dynamically allocated, it has to be assigned from
-a state variable before it can be used. So no space in storage will be
-allocated for ``x``, but instead it functions only as an alias for
-a pre-existing variable in storage.
+El tipo de la variable local ``x`` es ``unint[] storage``, pero ya que
+storage no es asignada dinámicamente, tiene que ser asignada desde
+una variable de estado antes de que pueda ser usada. Entonces nada de
+espacio en storage será asignado para ``x``, pero en cambio funciona
+sólo como un alias para variables pre existentes en storage.
 
-What will happen is that the compiler interprets ``x`` as a storage
-pointer and will make it point to the storage slot ``0`` by default.
-This has the effect that ``someVariable`` (which resides at storage
-slot ``0``) is modified by ``x.push(2)``.
+Lo que pasará es que el compilador interpreta ``x`` como un pointer
+storage y lo apuntará al slot de storage ``0`` por defecto.
+Esto significa que ``unaVariable`` (que reside en slot ``0``
+de storage) es modificada por ``x.push(2)``.
 
-The correct way to do this is the following::
+La manera correcta de hacerlo es la siguiente::
 
     contract C {
         uint someVariable;
@@ -427,89 +433,89 @@ The correct way to do this is the following::
         }
     }
 
-What is the difference between ``bytes`` and ``byte[]``?
-========================================================
+¿Cuál es la diferencia entre ``bytes`` y ``byte[]``?
+====================================================
 
-``bytes`` is usually more efficient: When used as arguments to functions (i.e. in
-CALLDATA) or in memory, every single element of a ``byte[]`` is padded to 32
-bytes which wastes 31 bytes per element.
+``bytes`` es en general mas eficiente: Cuando se usa como argumentos a funciones (ej
+en CALLDATA) o en memoria, cada elemento de un ``byte[]`` es acolchado a 32 bytes
+que derrocha 31 bytes por elemento.
 
-Is it possible to send a value while calling an overloaded function?
-====================================================================
+¿Es posible envíar un valor mientras se llama una función que está overloaded?
+==============================================================================
 
-It's a known missing feature. https://www.pivotaltracker.com/story/show/92020468
-as part of https://www.pivotaltracker.com/n/projects/1189488
+Es una funcionalidad que falta conocida. https://www.pivotaltracker.com/story/show/92020468
+como parte de https://www.pivotaltracker.com/n/projects/1189488
 
-Best solution currently see is to introduce a special case for gas and value and
-just re-check whether they are present at the point of overload resolution.
+La mejor solución actualmente es introducir un caso de uso especial para gas y valor
+y simplemente re-checkear si están presentes en el punto de resolución de overload.
+
+*******************
+Preguntas Avanzadas
+*******************
+
+¿Cómo se obtiene un número al azar en un contrato? (Emplementar un contrato de apuestas autónomo)
+=================================================================================================
+
+Obtener números al azar es a menudo una parte crucial de un proyecto crypto
+y la mayoría de los errores vienen de malos generadores de números random.
+
+Si no quieres que sea seguro, puedes contruir algo similar a la `moneda flipper <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/35_coin_flipper.sol>`_
+si no, mejor usar otro contrato que entrega azar, como el `RANDAO <https://github.com/randao/randao>`_`
+
+Obtener un valor devuelto de una función no constante desde otro contrato
+=========================================================================
+
+El punto clave es que el contrato que llama necesita saber sobre la función que intenta llamar.
+
+Ver `ping.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_ping.sol>`_
+y `pong.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_pong.sol>`_.
 
 
-******************
-Advanced Questions
-******************
+Hacer que un contrato haga algo apenas es minado por primera vez
+================================================================
 
-How do you get a random number in a contract? (Implement a self-returning gambling contract.)
-=============================================================================================
+Usar el contructor. Cualquier cosa dentro de él será ejecutado cuando el contrato sea minado.
 
-Getting randomness right is often the crucial part in a crypto project and
-most failures result from bad random number generators.
+Ver `replicator.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/50_replicator.sol>`_.
 
-If you do not want it to be safe, you build something similar to the `coin flipper <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/35_coin_flipper.sol>`_
-but otherwise, rather use a contract that supplies randomness, like the `RANDAO <https://github.com/randao/randao>`_.
+¿Cómo se crea un array de dos dimenciones?
+==========================================
 
-Get return value from non-constant function from another contract
-=================================================================
+Ver `2D_array.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/55_2D_array.sol>`_.
 
-The key point is that the calling contract needs to know about the function it intends to call.
+Nótese que llenando un cuadrado de 10x10 de ``uint8`` + creación de contrato tomó mas de ``800,000``
+gas en el momento de escribir este contrato. 17x17 tomó ``2,000,000`` gas. Con un límite a
+3.14 millones, bueno, hay poco espacio para esto.
 
-See `ping.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_ping.sol>`_
-and `pong.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/45_pong.sol>`_.
+Nótese que simplemente "creando" un array es gratis, los costos son en rellenarlo.
 
-Get contract to do something when it is first mined
-===================================================
+Nota2: Optimizando acceso storage puede bajar los costes de gas muchísimo, porque
+32 valores ``uint8`` pueden ser guardados en un slot simple. El problema es que estas
+optimizaciones actualmente no funcionan en bucles y también tienen un problema con revisión
+de límites.
+Aunque, puedes obtener mejores resultados en el futuro.
 
-Use the constructor. Anything inside it will be executed when the contract is first mined.
+¿Qué hace ``p.recipient.call.value(p.amount)(p.data)``?
+=======================================================
 
-See `replicator.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/50_replicator.sol>`_.
+Cada llamada de función externa en Solidity se puede modificar de dos maneras:
 
-How do you create 2-dimensional arrays?
-=======================================
+1. Puedes agregar Ether junto con la llamada
+2. Puede limitar la cantidad de gas disponible para la llamada
 
-See `2D_array.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/55_2D_array.sol>`_.
+Esto se hace "llamando a una función de la función":
 
-Note that filling a 10x10 square of ``uint8`` + contract creation took more than ``800,000``
-gas at the time of this writing. 17x17 took ``2,000,000`` gas. With the limit at
-3.14 million... well, there’s a pretty low ceiling for what you can create right
-now.
+``f.gas(2).value(20)()`` llama a la función modificada ``f`` y por lo tanto envía 20
+Wei y limitando el gas a 2 (así que esta llamada de función probablemente se quedará sin gas 
+y devolvera tus 20 Wei).
 
-Note that merely "creating" the array is free, the costs are in filling it.
+En el ejemplo anterior, la función de nivel bajo ``call`` se utiliza para invocar otro
+contrato con ``p.data`` como carga útil y ``p.amount`` Wei se envía con esa llamada.
 
-Note2: Optimizing storage access can pull the gas costs down considerably, because
-32 ``uint8`` values can be stored in a single slot. The problem is that these optimizations
-currently do not work across loops and also have a problem with bounds checking.
-You might get much better results in the future, though.
+¿Qué pasa con el mapeo de una ``struct`` al copiar sobre una ``struct``?
+========================================================================
 
-What does ``p.recipient.call.value(p.amount)(p.data)`` do?
-==========================================================
-
-Every external function call in Solidity can be modified in two ways:
-
-1. You can add Ether together with the call
-2. You can limit the amount of gas available to the call
-
-This is done by "calling a function on the function":
-
-``f.gas(2).value(20)()`` calls the modified function ``f`` and thereby sending 20
-Wei and limiting the gas to 2 (so this function call will most likely go out of
-gas and return your 20 Wei).
-
-In the above example, the low-level function ``call`` is used to invoke another
-contract with ``p.data`` as payload and ``p.amount`` Wei is sent with that call.
-
-What happens to a ``struct``'s mapping when copying over a ``struct``?
-======================================================================
-
-This is a very interesting question. Suppose that we have a contract field set up like such::
+Es una pregunta muy interesante. Supongamos que tenemos un campo en un contrato configurado como tal::
 
     struct user {
         mapping(string => address) usedContracts;
@@ -521,17 +527,17 @@ This is a very interesting question. Suppose that we have a contract field set u
        user user2 = user1;
     }
 
-In this case, the mapping of the struct being copied over into the userList is ignored as there is no "list of mapped keys".
-Therefore it is not possible to find out which values should be copied over.
+En este caso, se ignora el mapeo de la estructura que se está copiando en la userList, ya que no existe una "lista de teclas mapeadas".
+Por lo tanto, no es posible averiguar qué valores deben copiarse.
 
-How do I initialize a contract with only a specific amount of wei?
-==================================================================
+¿Cómo inicializo un contrato con sólo una cantidad específica de wei?
+=====================================================================
 
-Currently the approach is a little ugly, but there is little that can be done to improve it.
-In the case of a ``contract A`` calling a new instance of ``contract B``, parentheses have to be used around
-``new B`` because ``B.value`` would refer to a member of ``B`` called ``value``.
-You will need to make sure that you have both contracts aware of each other's presence and that ``contract B`` has a ``payable`` constructor.
-In this example::
+Actualmente el enfoque es un poco feo, pero hay poco que se pueda hacer para mejorarlo.
+En el caso de un ``contract A`` llamando a una nueva instancia del ``contract B``, los paréntesis tienen que ser usados alrededor de
+``new B`` porque ``B.value`` se referiría a un miembro de ``B`` llamado ``value``.
+Necesitaras asegurarte de que tienes ambos contratos conscientes de la presencia del uno al otro y que el ``contract B`` tenga un constructor ``payable``.
+En este ejemplo::
 
     contract B {
         function B() payable {}
@@ -546,39 +552,38 @@ In this example::
         }
     }
 
-Can a contract function accept a two-dimensional array?
-=======================================================
+¿Puede una función de contrato aceptar un array bidimensional?
+==============================================================
 
-This is not yet implemented for external calls and dynamic arrays -
-you can only use one level of dynamic arrays.
+Esto no se ha implementado todavía para las llamadas externas y los arrays dinámicos -
+sólo se puede utilizar un nivel de arrays dinámicos.
 
-What is the relationship between ``bytes32`` and ``string``? Why is it that ``bytes32 somevar = "stringliteral";`` works and what does the saved 32-byte hex value mean?
-========================================================================================================================================================================
+¿Cuál es la relación entre ``bytes32`` y ``cadena``? ¿Por qué es que ``bytes32 somevar = "stringliteral";`` funciona y qué significa el valor hexadecimal de 32 bytes guardado?
+===============================================================================================================================================================================
 
-The type ``bytes32`` can hold 32 (raw) bytes. In the assignment ``bytes32 samevar = "stringliteral";``,
-the string literal is interpreted in its raw byte form and if you inspect ``somevar`` and
-see a 32-byte hex value, this is just ``"stringliteral"`` in hex.
+El tipo ``bytes32`` puede contener 32 (raw) bytes. En la asignación ``bytes32 samevar = "stringliteral";``,
+la cadena literal se interpreta en su forma de byte crudo y si lo inspeccionas ``somevar`` y
+ves un valor hexadecimal de 32 bytes, esto es sólo ``"stringliteral"`` en hex.
 
-The type ``bytes`` is similar, only that it can change its length.
+El tipo ``bytes`` es similar, sólo que puede cambiar su longitud.
 
-Finally, ``string`` is basically identical to ``bytes`` only that it is assumed
-to hold the UTF-8 encoding of a real string. Since ``string`` stores the
-data in UTF-8 encoding it is quite expensive to compute the number of
-characters in the string (the encoding of some characters takes more
-than a single byte). Because of that, ``string s; s.length`` is not yet
-supported and not even index access ``s[2]``. But if you want to access
-the low-level byte encoding of the string, you can use
-``bytes(s).length`` and ``bytes(s)[2]`` which will result in the number
-of bytes in the UTF-8 encoding of the string (not the number of
-characters) and the second byte (not character) of the UTF-8 encoded
-string, respectively.
+Finalmente, ``string`` es básicamente idéntica a "bytes", sólo que se asume que
+para mantener la codificación UTF-8 de una cadena real. Desde que ``string`` almacena el
+codificación UTF-8 es bastante caro calcular el número de
+caracteres en la cadena (la codificación de algunos caracteres requiere más
+que un solo byte). Debido a eso, ``string s; s.length`` no es todavía
+soportado y ni siquiera indexar el acceso ``s[2]``. Pero si quieres acceder a
+la codificación de bytes de bajo nivel de la cadena, puede utilizar
+``bytes(s).length`` and ``bytes(s)[2]`` lo que resultará en el número
+de bytes en la codificación UTF-8 de la cadena (no el número de
+caracteres) y el segundo byte (no carácter) del UTF-8 codificado
+respectivamente.
 
+¿Puede un contrato pasar un array (tamaño estático) o una cadena o ``bytes`` (tamaño dinámico) a otro contrato?
+===============================================================================================================
 
-Can a contract pass an array (static size) or string or ``bytes`` (dynamic size) to another contract?
-=====================================================================================================
-
-Sure. Take care that if you cross the memory / storage boundary,
-independent copies will be created::
+Seguro. Ten cuidado de que si cruzas la memoria / límite de almacenamiento,
+se crearán copias independientes::
 
     contract C {
         uint[20] x;
@@ -597,22 +602,22 @@ independent copies will be created::
         }
     }
 
-The call to ``g(x)`` will not have an effect on ``x`` because it needs
-to create an independent copy of the storage value in memory
-(the default storage location is memory). On the other hand,
-``h(x)`` successfully modifies ``x`` because only a reference
-and not a copy is passed.
+La llamada a ``g (x)`` no tendrá un efecto en ``x`` porque necesita
+para crear una copia independiente del valor de almacenamiento en memoria
+(la ubicación de almacenamiento predeterminada es la memoria). Por otra parte,
+``h (x)`` modifica con éxito ``x`` porque sólo pasas una referencia
+y no una copia.
 
-Sometimes, when I try to change the length of an array with ex: ``arrayname.length = 7;`` I get a compiler error ``Value must be an lvalue``. Why?
-==================================================================================================================================================
+A veces, cuando intento cambiar la longitud de un array con ej:  ``arrayname.length = 7;`` me sale un error de compilado ``Value must be an lvalue``.  ¿Por qué?
+================================================================================================================================================================
 
-You can resize a dynamic array in storage (i.e. an array declared at the
-contract level) with ``arrayname.length = <some new length>;``. If you get the
-"lvalue" error, you are probably doing one of two things wrong.
+Puedes cambiar el tamaño de un array dinámico en almacenamiento (es decir, un array declarado en el
+nivel de contrato) con ``arrayname.length = <some new length>;``. Si consigues el
+error de "lvalue", probablemente estés haciendo una de dos cosas mal.
 
-1. You might be trying to resize an array in "memory", or
+1. Es posible que estés tratando de redimensionar un array en "memoria", o
 
-2. You might be trying to resize a non-dynamic array.
+2. Podrías estar intentando redimensionar un array no dinámico.
 
 ::
 
@@ -623,59 +628,56 @@ contract level) with ``arrayname.length = <some new length>;``. If you get the
     int8[5] storage storageArr2; // Explicit case 2
     somearray2.length++;         // legal
 
-**Important note:** In Solidity, array dimensions are declared backwards from the way you
-might be used to declaring them in C or Java, but they are access as in
-C or Java.
+**Nota importante:** En Solidity, las dimensiones del array se declaran al revés de la forma 
+en que estés acostumbrado a declararlas en C o Java, pero se acceden como en
+C o Java.
 
-For example, ``int8[][5] somearray;`` are 5 dynamic ``int8`` arrays.
+Por ejemplo, ``int8[][5] somearray;`` son 5 arrays dinámicos ``int8``.
 
-The reason for this is that ``T[5]`` is always an array of 5 ``T``'s,
-no matter whether ``T`` itself is an array or not (this is not the
-case in C or Java).
+La razón de esto es que ``T[5]`` es siempre un array de 5 ``T``,
+no importa si ``T`` en sí mismo es un array o no (esto no es el
+caso en C o Java).
 
-Is it possible to return an array of strings (``string[]``) from a Solidity function?
-=====================================================================================
+¿Es posible devolver un array de cadenas (``string[]``) desde una función de Solidity?
+======================================================================================
 
-Not yet, as this requires two levels of dynamic arrays (``string`` is a dynamic array itself).
+Todavía no, ya que esto requiere dos niveles de arrays dinámicos (``string`` es un array dinámico en sí).
 
-If you issue a call for an array, it is possible to retrieve the whole array? Or must you write a helper function for that?
-===========================================================================================================================
+Si se emite una llamada para un array, es posible recuperar todo el array? ¿O tienes que escribir una función de ayuda para eso?
+================================================================================================================================
 
-The automatic getter function for a public state variable of array type only returns
-individual elements. If you want to return the complete array, you have to
-manually write a function to do that.
+La función getter automática, para una variable de estado público del tipo array sólo devuelve
+elementos individuales. Si quieres devolver el array completo, tienes que
+escribir manualmente una función para hacerlo.
 
+¿Qué podría haber sucedido si una cuenta tiene valor(es) de almacenamiento pero no tiene código?  Ejemplo: http://test.ether.camp/account/5f740b3a43fbb99724ce93a879805f4dc89178b5
+==================================================================================================================================================================================
 
-What could have happened if an account has storage value(s) but no code?  Example: http://test.ether.camp/account/5f740b3a43fbb99724ce93a879805f4dc89178b5
-==========================================================================================================================================================
-
-The last thing a constructor does is returning the code of the contract.
-The gas costs for this depend on the length of the code and it might be
-that the supplied gas is not enough. This situation is the only one
-where an "out of gas" exception does not revert changes to the state,
-i.e. in this case the initialisation of the state variables.
+Lo último que hace un constructor es devolver el código del contrato.
+Los gastos de gas para esto dependen de la longitud del código y puede ser
+que el gas suministrado no es suficiente. Esta situación es la única
+donde una excepción "out of gas" no revierte los cambios al estado,
+es decir, en este caso la inicialización de las variables de estado.
 
 https://github.com/ethereum/wiki/wiki/Subtleties
 
-After a successful CREATE operation's sub-execution, if the operation returns x, 5 * len(x) gas is subtracted from the remaining gas before the contract is created. If the remaining gas is less than 5 * len(x), then no gas is subtracted, the code of the created contract becomes the empty string, but this is not treated as an exceptional condition - no reverts happen.
+Después de la subejecución de una operación CREATE exitosa, si la operación devuelve x, 5 * len(x) gas se resta del gas restante antes de que se crea el contrato. Si el gas restante es menos de 5 * len(x), entonces no se resta ningún gas, el código del contrato creado se convierte en la cadena vacía, pero esto no se trata como una condición excepcional - no se producen reversiones.
 
-
-What does the following strange check do in the Custom Token contract?
-======================================================================
+¿Qué hace la siguiente extraña comprobación en el contrato de Custom Token?
+===========================================================================
 
 ::
 
     require((balanceOf[_to] + _value) >= balanceOf[_to]);
 
-Integers in Solidity (and most other machine-related programming languages) are restricted to a certain range.
-For ``uint256``, this is ``0`` up to ``2**256 - 1``. If the result of some operation on those numbers
-does not fit inside this range, it is truncated. These truncations can have
-`serious consequences <https://en.bitcoin.it/wiki/Value_overflow_incident>`_, so code like the one
-above is necessary to avoid certain attacks.
+Los números enteros en Solidity (y la mayoría de los otros lenguajes de programación relacionados con máquinas) están restringidos a un rango determinado.
+Para ``uint256``, esto es ``0`` hasta ``2**256 - 1``. Si el resultado de alguna operación en esos números
+no cabe dentro de este rango, este es truncado. Estos truncamientos pueden tener
+`serias consecuencias <https://en.bitcoin.it/wiki/Value_overflow_incident>`_, asi que codifica como el de
+arriba es necesario para evitar ciertos ataques.
 
-
-More Questions?
+Más Preguntas?
 ===============
 
-If you have more questions or your question is not answered here, please talk to us on
+Si tienes más preguntas o tu pregunta no se ha contestada aquí, por favor contacta con nosotros en
 `gitter <https://gitter.im/ethereum/solidity>`_ or file an `issue <https://github.com/ethereum/solidity/issues>`_.
