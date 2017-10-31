@@ -1,49 +1,35 @@
-#################
-Solidity Assembly
-#################
+#######################
+Ensamblador de Solidity
+#######################
 
 .. index:: ! assembly, ! asm, ! evmasm
 
-Solidity defines an assembly language that can also be used without Solidity.
-This assembly language can also be used as "inline assembly" inside Solidity
-source code. We start with describing how to use inline assembly and how it
-differs from standalone assembly and then specify assembly itself.
+Solidity define un lenguaje ensamblador que también puede ser usado sin Solidity. Este lenguaje ensamblador también se puede usar como "ensamblador inline" dentro del código fuente de Solidity. Vamos a comenzar explicando cómo usar el ensamblador inline y sus diferencias con el ensamblador independiente, y luego especificaremos el ensamblador propiamente dicho.
 
-TODO: Write about how scoping rules of inline assembly are a bit different
-and the complications that arise when for example using internal functions
-of libraries. Furthermore, write about the symbols defined by the compiler.
+PENDIENTE DE HACER: Escribir sobre de qué manera el ámbito del ensamblador inline es un poco diferente y las complicaciones que aparecen cuando, por ejemplo, se usan funciones internas o librerías. Además, escribir sobre los símbolos definidos por el compilador.
 
-Inline Assembly
-===============
+Ensamblador inline
+==================
 
-For more fine-grained control especially in order to enhance the language by writing libraries,
-it is possible to interleave Solidity statements with inline assembly in a language close
-to the one of the virtual machine. Due to the fact that the EVM is a stack machine, it is
-often hard to address the correct stack slot and provide arguments to opcodes at the correct
-point on the stack. Solidity's inline assembly tries to facilitate that and other issues
-arising when writing manual assembly by the following features:
+Para tener un control más fino, especialmente para mejorar el lenguaje excribiendo librerías, es posible intercalar las declaraciones hechas en Solidity con el ensamblador inline en un lenguaje cercano al lenguaje de la máquina virtual. Debido a que el EVM (la máquina virtual de Ethereum) es un máquina de tipo pila (stack machine), suele ser difícil dirigirse a la posición correcta de la pila y proporcinar los argumentos a los opcodes en el punto correcto en la pila. El ensamblador inline de Solidity intenta facilitar esto, y otras complicaciones que ocurren cuando se escribe el ensamblador de forma manual, con las siguientes funcinalidades:
 
-* functional-style opcodes: ``mul(1, add(2, 3))`` instead of ``push1 3 push1 2 add push1 1 mul``
-* assembly-local variables: ``let x := add(2, 3)  let y := mload(0x40)  x := add(x, y)``
-* access to external variables: ``function f(uint x) { assembly { x := sub(x, 1) } }``
-* labels: ``let x := 10  repeat: x := sub(x, 1) jumpi(repeat, eq(x, 0))``
-* loops: ``for { let i := 0 } lt(i, x) { i := add(i, 1) } { y := mul(2, y) }``
-* switch statements: ``switch x case 0 { y := mul(x, 2) } default { y := 0 }``
-* function calls: ``function f(x) -> y { switch x case 0 { y := 1 } default { y := mul(x, f(sub(x, 1))) }   }``
+* opcodes de estilo funcional: ``mul(1, add(2, 3))`` en lugar de ``push1 3 push1 2 add push1 1 mul``
+* variables de ensamblador local: ``let x := add(2, 3)  let y := mload(0x40)  x := add(x, y)``
+* acceso a variables externas: ``function f(uint x) { assembly { x := sub(x, 1) } }``
+* etiquetas: ``let x := 10  repeat: x := sub(x, 1) jumpi(repeat, eq(x, 0))``
+* bucles: ``for { let i := 0 } lt(i, x) { i := add(i, 1) } { y := mul(2, y) }``
+* declaraciones de intercambio: ``switch x case 0 { y := mul(x, 2) } default { y := 0 }``
+* llamadas a funciones: ``function f(x) -> y { switch x case 0 { y := 1 } default { y := mul(x, f(sub(x, 1))) }   }``
 
-We now want to describe the inline assembly language in detail.
+Ahora queremos decribir el lenguaje del ensamblador inline en detalles.
 
 .. warning::
-    Inline assembly is a way to access the Ethereum Virtual Machine
-    at a low level. This discards several important safety
-    features of Solidity.
+    El ensamblador inline es una forma de acceder a bajo nivel a la Máquina Virtual de Ethereum. Esto ignora varios elementos de seguridad de Solidity.
 
-Example
+Ejemplo
 -------
 
-The following example provides library code to access the code of another contract and
-load it into a ``bytes`` variable. This is not possible at all with "plain Solidity" and the
-idea is that assembly libraries will be used to enhance the language in such ways.
+El siguiente ejemplo proporciona el código de librería que permite acceder al código de otro contrato y cargarlo en una variable ``bytes``. Esto no es para nada factible con "Solidity puro". La idea es que se usen librerías de ensamblador para aumentar las capacidades del lenguaje en ese sentido.
 
 .. code::
 
@@ -52,41 +38,36 @@ idea is that assembly libraries will be used to enhance the language in such way
     library GetCode {
         function at(address _addr) returns (bytes o_code) {
             assembly {
-                // retrieve the size of the code, this needs assembly
+                // recupera el tamaño del código - esto necesita ensamblador
                 let size := extcodesize(_addr)
-                // allocate output byte array - this could also be done without assembly
-                // by using o_code = new bytes(size)
+                // asigna (output byte array) - esto se podría hacer también sin ensamblador
+                // usando o_code = new bytes(size)
                 o_code := mload(0x40)
-                // new "memory end" including padding
+                // nuevo "fin de memoria" incluyendo el relleno (padding)
                 mstore(0x40, add(o_code, and(add(add(size, 0x20), 0x1f), not(0x1f))))
-                // store length in memory
+                // almacenar el tamaño en memoria
                 mstore(o_code, size)
-                // actually retrieve the code, this needs assembly
+                // recuperar de verdad el código - esto necesita ensamblador
                 extcodecopy(_addr, add(o_code, 0x20), 0, size)
             }
         }
     }
 
-Inline assembly could also be beneficial in cases where the optimizer fails to produce
-efficient code. Please be aware that assembly is much more difficult to write because
-the compiler does not perform checks, so you should use it for complex things only if
-you really know what you are doing.
+El ensamblador inline también es útil es los casos en los que el optimizador falla en producir un código eficiente. Tenga en cuenta que es mucho más difíciil escribir el ensamblador porque el compilador no realiza controles, por lo tanto use ensamblador solamente para cosas complejas y solo si sabe lo que está haciendo.
 
 .. code::
 
     pragma solidity ^0.4.0;
 
     library VectorSum {
-        // This function is less efficient because the optimizer currently fails to
-        // remove the bounds checks in array access.
+        // Esta función es menos eficiente porque el optimizador falla en quitar los controles de límite en el acceso al array.
         function sumSolidity(uint[] _data) returns (uint o_sum) {
             for (uint i = 0; i < _data.length; ++i)
                 o_sum += _data[i];
         }
 
-        // We know that we only access the array in bounds, so we can avoid the check.
-        // 0x20 needs to be added to an array because the first slot contains the
-        // array length.
+        // Sabemos que solamente accedemos al array dentro de los límites, así que podemos evitar los controles.
+        // Se tiene que añadir 0x20 a un array porque la primera posición contiene el tamaño del array.
         function sumAsm(uint[] _data) returns (uint o_sum) {
             for (uint i = 0; i < _data.length; ++i) {
                 assembly {
@@ -97,43 +78,38 @@ you really know what you are doing.
     }
 
 
-Syntax
-------
+Síntaxis
+--------
 
-Assembly parses comments, literals and identifiers exactly as Solidity, so you can use the
-usual ``//`` and ``/* */`` comments. Inline assembly is marked by ``assembly { ... }`` and inside
-these curly braces, the following can be used (see the later sections for more details)
+El ensamblador analiza comentarios, literales e identificadores de igual manera que en Solidity, así que se puede usar los comentarios habituales: ``//`` y ``/* */``. El ensamblador inline está señalado por ``assembly { ... }`` y dentro de estos corchetes se pueden usar los siguentes elementos (véase las secciones más abajo para más detalles):
 
- - literals, i.e. ``0x123``, ``42`` or ``"abc"`` (strings up to 32 characters)
- - opcodes (in "instruction style"), e.g. ``mload sload dup1 sstore``, for a list see below
- - opcodes in functional style, e.g. ``add(1, mlod(0))``
- - labels, e.g. ``name:``
- - variable declarations, e.g. ``let x := 7`` or ``let x := add(y, 3)``
- - identifiers (labels or assembly-local variables and externals if used as inline assembly), e.g. ``jump(name)``, ``3 x add``
- - assignments (in "instruction style"), e.g. ``3 =: x``
- - assignments in functional style, e.g. ``x := add(y, 3)``
- - blocks where local variables are scoped inside, e.g. ``{ let x := 3 { let y := add(x, 1) } }``
+ - literales, es decir ``0x123``, ``42`` o ``"abc"`` (strings de hasta 32 carácteres)
+ - opcodes (en "estilo instruccional"), p.ej. ``mload sload dup1 sstore``, véase más abajo para tener una lista
+ - opcodes en estilo fucional, e.g. ``add(1, mlod(0))``
+ - etiquetas, p.ej. ``name:``
+ - declaraciones de variable, p.ej. ``let x := 7`` o ``let x := add(y, 3)``
+ - identificadores (etiquetas o variables de ensamblador local y externos si se usa como ensamblador inline), p.ej. ``jump(name)``, ``3 x add``
+ - tareas (en "estilo instruccional"), e.g. ``3 =: x``
+ - tareas en estilo fucional, p.ej. ``x := add(y, 3)``
+ - bloques donde las variables locales están incluidas dentro, p.ej. ``{ let x := 3 { let y := add(x, 1) } }``
 
 Opcodes
 -------
 
-This document does not want to be a full description of the Ethereum virtual machine, but the
-following list can be used as a reference of its opcodes.
+Este documento no preten de ser una descripción exhaustiva de la máquina virtual de Ethereum, pero la lista siguiente puede servir de referencia para sus opcodes.
 
-If an opcode takes arguments (always from the top of the stack), they are given in parentheses.
-Note that the order of arguments can be seen to be reversed in non-functional style (explained below).
-Opcodes marked with ``-`` do not push an item onto the stack, those marked with ``*`` are
-special and all others push exactly one item onte the stack.
+Si un opcode recibe un argumento (siempre desde lo más alto de la pila), se ponen entre paréntesis.
+Note que el orden de los argumentos puede verse invertido en estilo no funcional (se explica más abajo).
+Opcodes marcados con un ``-`` no empuja un elemento encima de la pila, los marcados con ``*`` son especiales, y todos los demás empujan exactamente un elemento encima de la pila.
 
-In the following, ``mem[a...b)`` signifies the bytes of memory starting at position ``a`` up to
-(excluding) position ``b`` and ``storage[p]`` signifies the storage contents at position ``p``.
+En el ejemplo ``mem[a...b)``, se indica los bytes de memoria empezando en la posición ``a`` hasta la posición (excluida) ``b`` y en el ejemplo ``storage[p]``, se indica los índices de almacenamiento en la posicón ``p``.
 
-The opcodes ``pushi`` and ``jumpdest`` cannot be used directly.
+Los opcodes ``pushi`` y ``jumpdest`` no se pueden usar directamente.
 
-In the grammar, opcodes are represented as pre-defined identifiers.
+En la gramática, los opcodes se representan como identificadores predefinidos.
 
 +-------------------------+------+-----------------------------------------------------------------+
-| stop                    + `-`  | stop execution, identical to return(0,0)                        |
+| stop                    + `-`  | parar ejecución, idéntico a return(0,0)                         |
 +-------------------------+------+-----------------------------------------------------------------+
 | add(x, y)               |      | x + y                                                           |
 +-------------------------+------+-----------------------------------------------------------------+
@@ -143,215 +119,210 @@ In the grammar, opcodes are represented as pre-defined identifiers.
 +-------------------------+------+-----------------------------------------------------------------+
 | div(x, y)               |      | x / y                                                           |
 +-------------------------+------+-----------------------------------------------------------------+
-| sdiv(x, y)              |      | x / y, for signed numbers in two's complement                   |
+| sdiv(x, y)              |      | x / y, para números con signo en complemento de dos             |
 +-------------------------+------+-----------------------------------------------------------------+
 | mod(x, y)               |      | x % y                                                           |
 +-------------------------+------+-----------------------------------------------------------------+
-| smod(x, y)              |      | x % y, for signed numbers in two's complement                   |
+| smod(x, y)              |      | x % y, para números con signo en complemento de dos             |
 +-------------------------+------+-----------------------------------------------------------------+
-| exp(x, y)               |      | x to the power of y                                             |
+| exp(x, y)               |      | x elevado a y                                                   |
 +-------------------------+------+-----------------------------------------------------------------+
-| not(x)                  |      | ~x, every bit of x is negated                                   |
+| not(x)                  |      | ~x, cada bit de x está negado                                   |
 +-------------------------+------+-----------------------------------------------------------------+
-| lt(x, y)                |      | 1 if x < y, 0 otherwise                                         |
+| lt(x, y)                |      | 1 si x < y, 0 de lo contrario                                   |
 +-------------------------+------+-----------------------------------------------------------------+
-| gt(x, y)                |      | 1 if x > y, 0 otherwise                                         |
+| gt(x, y)                |      | 1 si x > y, 0 de lo contrario                                   |
 +-------------------------+------+-----------------------------------------------------------------+
-| slt(x, y)               |      | 1 if x < y, 0 otherwise, for signed numbers in two's complement |
+| slt(x, y)               |      | 1 si x < y, 0 de lo contrario, para números con signo en        |
+|                         |      | complemento de dos                                              |
 +-------------------------+------+-----------------------------------------------------------------+
-| sgt(x, y)               |      | 1 if x > y, 0 otherwise, for signed numbers in two's complement |
+| sgt(x, y)               |      | 1 si x > y, 0 de lo contrario, para números con signo en        |
+|                         |      | complemento de dos                                              |
 +-------------------------+------+-----------------------------------------------------------------+
-| eq(x, y)                |      | 1 if x == y, 0 otherwise                                        |
+| eq(x, y)                |      | 1 si x == y, 0 de lo contrario                                  |
 +-------------------------+------+-----------------------------------------------------------------+
-| iszero(x)               |      | 1 if x == 0, 0 otherwise                                        |
+| iszero(x)               |      | 1 si x == 0, 0 de lo contrario                                  |
 +-------------------------+------+-----------------------------------------------------------------+
-| and(x, y)               |      | bitwise and of x and y                                          |
+| and(x, y)               |      | bitwise and de x e y                                            |
 +-------------------------+------+-----------------------------------------------------------------+
 | or(x, y)                |      | bitwise or of x and y                                           |
 +-------------------------+------+-----------------------------------------------------------------+
 | xor(x, y)               |      | bitwise xor of x and y                                          |
 +-------------------------+------+-----------------------------------------------------------------+
-| byte(n, x)              |      | nth byte of x, where the most significant byte is the 0th byte  |
+| byte(n, x)              |      | n byte de x, donde el más significante byte es el byte 0        |
 +-------------------------+------+-----------------------------------------------------------------+
-| addmod(x, y, m)         |      | (x + y) % m with arbitrary precision arithmetics                |
+| addmod(x, y, m)         |      | (x + y) % m con una precisión aritmética arbitraria             |
 +-------------------------+------+-----------------------------------------------------------------+
-| mulmod(x, y, m)         |      | (x * y) % m with arbitrary precision arithmetics                |
+| mulmod(x, y, m)         |      | (x * y) % m con una precisión aritmética arbitraria             |
 +-------------------------+------+-----------------------------------------------------------------+
-| signextend(i, x)        |      | sign extend from (i*8+7)th bit counting from least significant  |
+| signextend(i, x)        |      | el signo se extiende desde el bit (i*8+7) contando desde el     |
+|                         |      | menos significante                                              |
 +-------------------------+------+-----------------------------------------------------------------+
 | keccak256(p, n)         |      | keccak(mem[p...(p+n)))                                          |
 +-------------------------+------+-----------------------------------------------------------------+
 | sha3(p, n)              |      | keccak(mem[p...(p+n)))                                          |
 +-------------------------+------+-----------------------------------------------------------------+
-| jump(label)             | `-`  | jump to label / code position                                   |
+| jump(label)             | `-`  | saltar a la posición de label / código                          |
 +-------------------------+------+-----------------------------------------------------------------+
-| jumpi(label, cond)      | `-`  | jump to label if cond is nonzero                                |
+| jumpi(label, cond)      | `-`  | saltar a label si cond no es cero                               |
 +-------------------------+------+-----------------------------------------------------------------+
-| pc                      |      | current position in code                                        |
+| pc                      |      | posición actual en el código                                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| pop(x)                  | `-`  | remove the element pushed by x                                  |
+| pop(x)                  | `-`  | quitar el elemento empujado por x                               |
 +-------------------------+------+-----------------------------------------------------------------+
-| dup1 ... dup16          |      | copy ith stack slot to the top (counting from top)              |
+| dup1 ... dup16          |      | copiar posición i de la pila en la posición de arriba           |
+|                         |      | (contando desde arriba)                                         |
 +-------------------------+------+-----------------------------------------------------------------+
-| swap1 ... swap16        | `*`  | swap topmost and ith stack slot below it                        |
+| swap1 ... swap16        | `*`  | intercambiar la posición la más arriba con la posición i de     |
+|                         |      | la pila justo debajo                                            |
 +-------------------------+------+-----------------------------------------------------------------+
 | mload(p)                |      | mem[p..(p+32))                                                  |
 +-------------------------+------+-----------------------------------------------------------------+
 | mstore(p, v)            | `-`  | mem[p..(p+32)) := v                                             |
 +-------------------------+------+-----------------------------------------------------------------+
-| mstore8(p, v)           | `-`  | mem[p] := v & 0xff    - only modifies a single byte             |
+| mstore8(p, v)           | `-`  | mem[p] := v & 0xff    - sólo modifica un único byte             |
 +-------------------------+------+-----------------------------------------------------------------+
 | sload(p)                |      | storage[p]                                                      |
 +-------------------------+------+-----------------------------------------------------------------+
 | sstore(p, v)            | `-`  | storage[p] := v                                                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| msize                   |      | size of memory, i.e. largest accessed memory index              |
+| msize                   |      | tamaño de la memoria , es decir el índice más grande de         |
+|                         |      | la memoria que ha sido accedida                                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| gas                     |      | gas still available to execution                                |
+| gas                     |      | el gas todavía disponible para ejecución                        |
 +-------------------------+------+-----------------------------------------------------------------+
-| address                 |      | address of the current contract / execution context             |
+| address                 |      | dirección del contrato actual / contexto de ejecución           |
 +-------------------------+------+-----------------------------------------------------------------+
-| balance(a)              |      | wei balance at address a                                        |
+| balance(a)              |      | balance en wei de la dirección a                                |
 +-------------------------+------+-----------------------------------------------------------------+
-| caller                  |      | call sender (excluding delegatecall)                            |
+| caller                  |      | llamar el remitente (excluyendo delegatecall)                   |
 +-------------------------+------+-----------------------------------------------------------------+
-| callvalue               |      | wei sent together with the current call                         |
+| callvalue               |      | wei que se enviaron junto con la llamada actual                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| calldataload(p)         |      | call data starting from position p (32 bytes)                   |
+| calldataload(p)         |      | llamar datos empezando por la posición p (32 bytes)             |
 +-------------------------+------+-----------------------------------------------------------------+
-| calldatasize            |      | size of call data in bytes                                      |
+| calldatasize            |      | tamaño de la llamada a datos en bytes                           |
 +-------------------------+------+-----------------------------------------------------------------+
-| calldatacopy(t, f, s)   | `-`  | copy s bytes from calldata at position f to mem at position t   |
+| calldatacopy(t, f, s)   | `-`  | copiar s bytes de la llamada a datos en la posición f a         |
+|                         |      | la memoria en la posición t                                     |
 +-------------------------+------+-----------------------------------------------------------------+
-| codesize                |      | size of the code of the current contract / execution context    |
+| codesize                |      | tamaño del código de contrato actual / contexto de ejecución    |
 +-------------------------+------+-----------------------------------------------------------------+
-| codecopy(t, f, s)       | `-`  | copy s bytes from code at position f to mem at position t       |
+| codecopy(t, f, s)       | `-`  | copiar s bytes del código en la posición f a la memoria         |
+|                         |      | en la posición t                                                |
 +-------------------------+------+-----------------------------------------------------------------+
-| extcodesize(a)          |      | size of the code at address a                                   |
+| extcodesize(a)          |      | tamaño del código en la dirección a                             |
 +-------------------------+------+-----------------------------------------------------------------+
-| extcodecopy(a, t, f, s) | `-`  | like codecopy(t, f, s) but take code at address a               |
+| extcodecopy(a, t, f, s) | `-`  | igual que codecopy(t, f, s) pero tomando el código de           |
+|                         |      | la dirección a                                                  |
 +-------------------------+------+-----------------------------------------------------------------+
-| returndatasize          |      | size of the last returndata                                     |
+| returndatasize          |      | tamaño del último returndata                                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| returndatacopy(t, f, s) | `-`  | copy s bytes from returndata at position f to mem at position t |
+| returndatacopy(t, f, s) | `-`  | copiar s bytes de returndata de la posición f a la memoria      |
+|                         |      | en la posición t                                                |
 +-------------------------+------+-----------------------------------------------------------------+
-| create(v, p, s)         |      | create new contract with code mem[p..(p+s)) and send v wei      |
-|                         |      | and return the new address                                      |
+| create(v, p, s)         |      | crear un nuevo contrato con el código mem[p..(p+s))             |
+|                         |      | y mandar v wei y devolver la nueva dirección                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| create2(v, n, p, s)     |      | create new contract with code mem[p..(p+s)) at address          |
-|                         |      | keccak256(<address> . n . keccak256(mem[p..(p+s))) and send v   |
-|                         |      | wei and return the new address                                  |
+| create2(v, n, p, s)     |      | crear un nuevo contrato con el código mem[p..(p+s)) en la       |
+|                         |      | dirección keccak256(<address> . n . keccak256(mem[p..(p+s)))    |
+|                         |      | y mandar v wei y devolver la nueva dirección                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| call(g, a, v, in,       |      | call contract at address a with input mem[in..(in+insize))      |
-| insize, out, outsize)   |      | providing g gas and v wei and output area                       |
-|                         |      | mem[out..(out+outsize)) returning 0 on error (eg. out of gas)   |
-|                         |      | and 1 on success                                                |
+| call(g, a, v, in,       |      | llamar el contrato a la dirección a con la entrada              |
+| insize, out, outsize)   |      | mem[in..(in+insize)) proporcionando g gas y v wei y el campo    |
+|                         |      | de salida mem[out..(out+outsize)) devolviendo 0 si hay un error |
+|                         |      | (por ejemplo si se queda sin gas) y 1 si es un éxito            |
 +-------------------------+------+-----------------------------------------------------------------+
-| callcode(g, a, v, in,   |      | identical to `call` but only use the code from a and stay       |
-| insize, out, outsize)   |      | in the context of the current contract otherwise                |
+| callcode(g, a, v, in,   |      | indéntico a `call` pero usando solo el código de a y si no,     |
+| insize, out, outsize)   |      | quedarse en el contexto del contrato actual                     |
 +-------------------------+------+-----------------------------------------------------------------+
-| delegatecall(g, a, in,  |      | identical to `callcode` but also keep ``caller``                |
-| insize, out, outsize)   |      | and ``callvalue``                                               |
+| delegatecall(g, a, in,  |      | indéntico a `callcode` pero mantener también ``caller``         |
+| insize, out, outsize)   |      | y ``callvalue``                                                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| staticcall(g, a, in,    |      | identical to `call(g, a, 0, in, insize, out, outsize)` but do   |
-| insize, out, outsize)   |      | not allow state modifications                                   |
+| staticcall(g, a, in,    |      | idéntico a `call(g, a, 0, in, insize, out, outsize)` pero       |
+| insize, out, outsize)   |      | no admite modificaciones de estado                              |
 +-------------------------+------+-----------------------------------------------------------------+
-| return(p, s)            | `-`  | end execution, return data mem[p..(p+s))                        |
+| return(p, s)            | `-`  | termina la ejecución, devuelve los datos de mem[p..(p+s))       |
 +-------------------------+------+-----------------------------------------------------------------+
-| revert(p, s)            | `-`  | end execution, revert state changes, return data mem[p..(p+s))  |
+| revert(p, s)            | `-`  | termina la ejecución, revierte los cambios de estado, devuelve  |
+|                         |      | los datos de mem[p..(p+s))                                      |
 +-------------------------+------+-----------------------------------------------------------------+
-| selfdestruct(a)         | `-`  | end execution, destroy current contract and send funds to a     |
+| selfdestruct(a)         | `-`  | termina la ejecución, destruye el contrato actual y manda los   |
+|                         |      | fondos a a                                                      |
 +-------------------------+------+-----------------------------------------------------------------+
-| invalid                 | `-`  | end execution with invalid instruction                          |
+| invalid                 | `-`  | termina la ejecución con una instrucción no válida              |
 +-------------------------+------+-----------------------------------------------------------------+
-| log0(p, s)              | `-`  | log without topics and data mem[p..(p+s))                       |
+| log0(p, s)              | `-`  | log sin tópicos y datos mem[p..(p+s))                           |
 +-------------------------+------+-----------------------------------------------------------------+
-| log1(p, s, t1)          | `-`  | log with topic t1 and data mem[p..(p+s))                        |
+| log1(p, s, t1)          | `-`  | log sin tópicos t1 y datos mem[p..(p+s))                        |
 +-------------------------+------+-----------------------------------------------------------------+
-| log2(p, s, t1, t2)      | `-`  | log with topics t1, t2 and data mem[p..(p+s))                   |
+| log2(p, s, t1, t2)      | `-`  | log sin tópicos t1, t2 y datos mem[p..(p+s))                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| log3(p, s, t1, t2, t3)  | `-`  | log with topics t1, t2, t3 and data mem[p..(p+s))               |
+| log3(p, s, t1, t2, t3)  | `-`  | log sin tópicos t1, t2, t3 y datos mem[p..(p+s))                |
 +-------------------------+------+-----------------------------------------------------------------+
-| log4(p, s, t1, t2, t3,  | `-`  | log with topics t1, t2, t3, t4 and data mem[p..(p+s))           |
+| log4(p, s, t1, t2, t3,  | `-`  | log sin tópicos t1, t2, t3, t4 y datos mem[p..(p+s))            |
 | t4)                     |      |                                                                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| origin                  |      | transaction sender                                              |
+| origin                  |      | remitente de la transacción                                     |
 +-------------------------+------+-----------------------------------------------------------------+
-| gasprice                |      | gas price of the transaction                                    |
+| gasprice                |      | precio del gas price de la transacción                          |
 +-------------------------+------+-----------------------------------------------------------------+
-| blockhash(b)            |      | hash of block nr b - only for last 256 blocks excluding current |
+| blockhash(b)            |      | hash del bloque número b - solamente para los últimos           |
+|                         |      | 256 bloques, exluyendo al bloque actual                         |
 +-------------------------+------+-----------------------------------------------------------------+
-| coinbase                |      | current mining beneficiary                                      |
+| coinbase                |      | el beneficiario actual del minado                               |
 +-------------------------+------+-----------------------------------------------------------------+
-| timestamp               |      | timestamp of the current block in seconds since the epoch       |
+| timestamp               |      | timestamp en segundos del bloque actual desde epoch             |
 +-------------------------+------+-----------------------------------------------------------------+
-| number                  |      | current block number                                            |
+| number                  |      | número del bloque actual                                        |
 +-------------------------+------+-----------------------------------------------------------------+
-| difficulty              |      | difficulty of the current block                                 |
+| difficulty              |      | dificultad del bloque actual                                    |
 +-------------------------+------+-----------------------------------------------------------------+
-| gaslimit                |      | block gas limit of the current block                            |
+| gaslimit                |      | límite de gas del bloque para el bloque actual                  |
 +-------------------------+------+-----------------------------------------------------------------+
 
-Literals
---------
+Literales
+---------
 
-You can use integer constants by typing them in decimal or hexadecimal notation and an
-appropriate ``PUSHi`` instruction will automatically be generated. The following creates code
-to add 2 and 3 resulting in 5 and then computes the bitwise and with the string "abc".
-Strings are stored left-aligned and cannot be longer than 32 bytes.
+Se pueden usar constantes íntegras usando la notación decimal o hexadecimal y con eso, una instrucción apropiada ``PUSHi`` sereá automáticamente generada. El siguiente código suma 2 con 3, lo que resulta en 5 y luego computa el bitwise con el string "abc". Los strings están almacenados alineados a la izquierda y no pueden ser más largos que 32 bytes.
 
 .. code::
 
     assembly { 2 3 add "abc" and }
 
-Functional Style
------------------
+Estilo funcional
+----------------
 
-You can type opcode after opcode in the same way they will end up in bytecode. For example
-adding ``3`` to the contents in memory at position ``0x80`` would be
+Se puede entrar opcodes uno trás el otro de la misma manera que van aparecer en el bytecode. Por ejemplo sumar ''3'' al contenido de la memoria en la posición ``0x80`` sería:
 
 .. code::
 
     3 0x80 mload add 0x80 mstore
 
-As it is often hard to see what the actual arguments for certain opcodes are,
-Solidity inline assembly also provides a "functional style" notation where the same code
-would be written as follows
+Como suele ser complicado ver cuales son los argumentos actuales para algunos de los opcodes, el ensamblador inline de Solidity proporciona también una notación de "estilo fucinonal" donde el mismo código se escribiría de la siguiente manera:
 
 .. code::
 
     mstore(0x80, add(mload(0x80), 3))
 
-Functional style expressions cannot use instructional style internally, i.e.
-``1 2 mstore(0x80, add)`` is not valid assembly, it has to be written as
-``mstore(0x80, add(2, 1))``. For opcodes that do not take arguments, the
-parentheses can be omitted.
+Expresiones en estilo funcional no pueden hacer uso internamente del estilo instruccional, es decir que ``1 2 mstore(0x80, add)`` no es ensamblador válido, debería escribirse como ``mstore(0x80, add(2, 1))``. Para los opcodes que no toman argumentos, las parentésis pueden obviarse.
 
-Note that the order of arguments is reversed in functional-style as opposed to the instruction-style
-way. If you use functional-style, the first argument will end up on the stack top.
+Nótese que el orden de los argumentos está invertido en estilo funcional con respecto al estilo instruccional. Si hace uso del estilo funcional, el primer argumento aparecerá arriba de la pila.
 
 
-Access to External Variables and Functions
-------------------------------------------
+Acceso a variables y funciones internas
+---------------------------------------
 
-Solidity variables and other identifiers can be accessed by simply using their name.
-For memory variables, this will push the address and not the value onto the
-stack. Storage variables are different: Values in storage might not occupy a
-full storage slot, so their "address" is composed of a slot and a byte-offset
-inside that slot. To retrieve the slot pointed to by the variable ``x``, you
-used ``x_slot`` and to retrieve the byte-offset you used ``x_offset``.
+Se accede a las variables y otros identificadores de Solidity simplemente por su nombre. Para las variables de memoria, esto tiene como consecuencia que es la dirección y no el nombre que se empuja en la pila. Con las variables de almacenamiento es diferente: los valores en almacenamiento podrían no ocupar una posición completa en la pila, de tal manera que su dirección estaría compuesta por una posición y un decalage en bytes dentro de esta posición. Para recuperar la posición a la que apunta la variable ``x``, se usa ``x_slot`` y para recuperar el decalage en bytes se usa ``x_offset``.
 
-In assignments (see below), we can even use local Solidity variables to assign to.
+En las asignaciones (ver abajo), hasta se pueden usar las variables locales de Solidity y asignarlas.
 
-Functions external to inline assembly can also be accessed: The assembly will
-push their entry label (with virtual function resolution applied). The calling semantics
-in solidity are:
+También se puede acceder a las funciones externas al ensamblador inline: el ensamblador empujará su etiqueta de entrada (aplicando la resolución de funciones virtuales). Las semánticas de llamada en Solidity son las siguientes:
 
- - the caller pushes return label, arg1, arg2, ..., argn
- - the call returns with ret1, ret2, ..., retm
+ - el que llama empuja return etiqueta, arg1, arg2, ..., argn
+ - la llamada devuelve ret1, ret2, ..., retm
 
-This feature is still a bit cumbersome to use, because the stack offset essentially
-changes during the call, and thus references to local variables will be wrong.
+Esta funcionalidad está todavía un poco dificultosa de usar, esensialmente porque el decalage de pila cambia durante la llamada, y por lo tanto las referencias a las variables locales estarán mal.
 
 .. code::
 
@@ -361,19 +332,15 @@ changes during the call, and thus references to local variables will be wrong.
         uint b;
         function f(uint x) returns (uint r) {
             assembly {
-                r := mul(x, sload(b_slot)) // ignore the offset, we know it is zero
+                r := mul(x, sload(b_slot)) // ignorar el decalage, sabemos que es cero
             }
         }
     }
 
-Labels
-------
+Etiquetas
+---------
 
-Another problem in EVM assembly is that ``jump`` and ``jumpi`` use absolute addresses
-which can change easily. Solidity inline assembly provides labels to make the use of
-jumps easier. Note that labels are a low-level feature and it is possible to write
-efficient assembly without labels, just using assembly functions, loops and switch instructions
-(see below). The following code computes an element in the Fibonacci series.
+Otro de los problemas en el ensamblador del EVM es que ``jump`` y ``jumpi`` hacen uso de direcciones absolutas que pueden facilmente cambiar. El ensamblador inline de Solidity proporciona etiquetas para hacer el uso de saltos más cómodo. Nótese que las etiquetas son una funcionalidad de bajo nivel y que es perfectamente posible escribir un ensamblador eficicente sin etiquetas, usando solo funciones de ensamblador, bucles e instrucciones de intercambio (ver abajo). El siguiente código computa un elemento en una serie de Fibonacci.
 
 .. code::
 
@@ -391,14 +358,9 @@ efficient assembly without labels, just using assembly functions, loops and swit
         return(0, 0x20)
     }
 
-Please note that automatically accessing stack variables can only work if the
-assembler knows the current stack height. This fails to work if the jump source
-and target have different stack heights. It is still fine to use such jumps, but
-you should just not access any stack variables (even assembly variables) in that case.
+Tenga en cuenta que acceder automáticamente a variables de pila sólo funciona si el ensamblador conoce la altura de la pila actual. Esto falla si el inicio y el destino del salto tienen alturas de pila distintas. Aún así se pueden usar estos saltos, pero no debería entonces acceder a ninguna variables de pila (incluso variables de ensamblador)
 
-Furthermore, the stack height analyser goes through the code opcode by opcode
-(and not according to control flow), so in the following case, the assembler
-will have a wrong impression about the stack height at label ``two``:
+Además, el analizador de la altura de la pila lee el código opcode por opcode (y no acorde al control de flujo), por lo tanto y según indica al ejemplo que figura abajo, el ensamblador tendría una falsa idea de la altura de la pila al llegar a la etiqueta ``two``:
 
 .. code::
 
@@ -406,52 +368,42 @@ will have a wrong impression about the stack height at label ``two``:
         let x := 8
         jump(two)
         one:
-            // Here the stack height is 2 (because we pushed x and 7),
-            // but the assembler thinks it is 1 because it reads
-            // from top to bottom.
-            // Accessing the stack variable x here will lead to errors.
+            // Aquí la altura de la pila es de 2 (porque empujamos x y 7), pero el ensamblador cree que la altura es de 1 porque lee desde arriba abajo.
+            // Acceder a la variable de pila x aquí nos llevaría a un error.
             x := 9
             jump(three)
         two:
-            7 // push something onto the stack
+            7 // empujar algo arriba de la pila
             jump(one)
         three:
     }
 
-This problem can be fixed by manually adjusting the stack height for the
-assembler - you can provide a stack height delta that is added
-to the stack height just prior to the label.
-Note that you will not have to care about these things if you just use
-loops and assembly-level functions.
+Este problema puede resolverse manualmente ajustando la altura de la pila en lugar de que lo haga el ensamblador - puede proporcionar un delta de altura de pila que se suma a la altura de la pila justo antes de la etiqueta.
+Nótese que no va a tener que preocuparse por estas cosas si sólo usa bucles y funciones de nivel ensamblador.
 
-As an example how this can be done in extreme cases, please see the following.
+Para ilustrar cómo esto se puede hacer en casos extremos, véase el ejemplo siguiente:
 
 .. code::
 
     {
         let x := 8
         jump(two)
-        0 // This code is unreachable but will adjust the stack height correctly
+        0 // Este código no se puede acceder pero se ajustará correctamente la altura de la pila
         one:
-            x := 9 // Now x can be accessed properly.
+            x := 9 // Ahora se puede acceder correctamente a x
             jump(three)
-            pop // Similar negative correction.
+            pop // Corrección negativa similar
         two:
-            7 // push something onto the stack
+            7 // Empujar algo arriba de la pila
             jump(one)
         three:
-        pop // We have to pop the manually pushed value here again.
+        pop // Tenemos que hacer pop con el valor empujado manualmente aqui otra vez
     }
 
-Declaring Assembly-Local Variables
-----------------------------------
+Declarando variables de ensamblador local
+-----------------------------------------
 
-You can use the ``let`` keyword to declare variables that are only visible in
-inline assembly and actually only in the current ``{...}``-block. What happens
-is that the ``let`` instruction will create a new stack slot that is reserved
-for the variable and automatically removed again when the end of the block
-is reached. You need to provide an initial value for the variable which can
-be just ``0``, but it can also be a complex functional-style expression.
+Puede usar la palabra clave ``let`` para declarar variables que están visibles solamente en ensamblador inline y en realidad solamente en el bloque actual ``{...}``. Lo que pasa es que la instrucción ``let`` crea una nueva posición en la pila que está reservada para la variable. Esta posición se quitará automaticamente cuando se llegue al final del bloque. Es necesario proporcionar un valor inicial para la variable, que puede ser simplemente ``0``, pero también puede ser una expresión compleja en el estilo funcional.
 
 .. code::
 
@@ -465,45 +417,33 @@ be just ``0``, but it can also be a complex functional-style expression.
                 {
                     let y := add(sload(v), 1)
                     b := y
-                } // y is "deallocated" here
+                } // aquí se "desasigna" y
                 b := add(b, v)
-            } // v is "deallocated" here
+            } // aquí se "desasigna" v
         }
     }
 
 
-Assignments
------------
+Asignaciones
+------------
 
-Assignments are possible to assembly-local variables and to function-local
-variables. Take care that when you assign to variables that point to
-memory or storage, you will only change the pointer and not the data.
+Las asignaciones son posibles para las variables de ensamblador local y para las variables de función local. Tenga cuidado que cuando usted asigna a variables que apuntan a la memoria o al almacenamiento, usted sólo cambiará lo que apunta pero no los datos.
 
-There are two kinds of assignments: functional-style and instruction-style.
-For functional-style assignments (``variable := value``), you need to provide a value in a
-functional-style expression that results in exactly one stack value
-and for instruction-style (``=: variable``), the value is just taken from the stack top.
-For both ways, the colon points to the name of the variable. The assignment
-is performed by replacing the variable's value on the stack by the new value.
+Existen asignaciones de dos tipos: las de estilo funcional y las de estilo instruccional. Para las asignaciones de estilo funcional, (``variable := value``), se requiere proporcionarun valor dentro de una expresión de estilo funcional que resulta en exactamente un valor de pila. Para las asignaciones de estilo instruccional (``=: variable``), el valor simplemente se toma desde arriba de la pila. Para ambas maneras, la coma apunta al nombre de la variable. La asignación se ejecuta remplazando el valor de la variable en la pila por el valor nuevo.
 
 .. code::
 
     assembly {
-        let v := 0 // functional-style assignment as part of variable declaration
+        let v := 0 // asignación de estilo funcional como parte de la declaración de variable
         let g := add(v, 2)
         sload(10)
-        =: v // instruction style assignment, puts the result of sload(10) into v
+        =: v // asignación de estilo instruccional, pone el resultado de sload(10) en v
     }
 
-Switch
-------
+Intercambio
+-----------
 
-You can use a switch statement as a very basic version of "if/else".
-It takes the value of an expression and compares it to several constants.
-The branch corresponding to the matching constant is taken. Contrary to the
-error-prone behaviour of some programming languages, control flow does
-not continue from one case to the next. There can be a fallback or default
-case called ``default``.
+Se puede usar una declaración de intercambio como una versión muy básica de un "if/else". Toma el valor de una expresión y lo compara con distintas constantes. Se elige la rama correspondiente a la constante que combina. A contrario de algunos de los lenguages de programación que son propenses a errores de comportamiento, el flujo de control, después de un caso, no pasa al siguiente. Puede haber un fallback o un caso por defecto llamado ``default``.
 
 .. code::
 
@@ -519,20 +459,14 @@ case called ``default``.
         sstore(0, div(x, 2))
     }
 
-The list of cases does not require curly braces, but the body of a
-case does require them.
+Una lista de casos no necesita llaves, pero el cuerpo de un caso si.
 
-Loops
------
+Bucles
+------
 
-Assembly supports a simple for-style loop. For-style loops have
-a header containing an initializing part, a condition and a post-iteration
-part. The condition has to be a functional-style expression, while
-the other two are blocks. If the initializing part
-declares any variables, the scope of these variables is extended into the
-body (including the condition and the post-iteration part).
+El ensamblador soporta un bucle simple de tipo for. Los bucles de tipo for contienen un encabezado con la inicialización, una condición y una parte post interación. La condición debe ser una expresión de estilo funcional, mientras que las otras dos partes son bloques. Si se declaran variables en la parte de inicialización, el alcance de estas variables se extenderá hasta el cuerpo (incluyendo la condición y la parte post iteración).
 
-The following example computes the sum of an area in memory.
+El ejemplo siguiente computa la suma de un área en la memoria.
 
 .. code::
 
@@ -543,23 +477,16 @@ The following example computes the sum of an area in memory.
         }
     }
 
-Functions
+Funciones
 ---------
 
-Assembly allows the definition of low-level functions. These take their
-arguments (and a return PC) from the stack and also put the results onto the
-stack. Calling a function looks the same way as executing a functional-style
-opcode.
+El ensamblador permite la definición de funciones de bajo nivel. Éstas toman sus argumentos (y un return PC) desde la pila y también ponen los resultados arriba de la pila. Llamar una función se parece a la ejecución de un opcode de estilo funcional.
 
-Functions can be defined anywhere and are visible in the block they are
-declared in. Inside a function, you cannot access local variables
-defined outside of that function. There is no explicit ``return``
-statement.
+Las funciones pueden definirse en cualquier lugar y son visibles en el bloque en el que se han declarado. Dentro de una función, no se permite acceder a variables locales definidas fuera de esta función. No existe una declaración ``return`` explícita.
 
-If you call a function that returns multiple values, you have to assign
-them to a tuple using ``a, b := f(x)`` or ``let a, b := f(x)``.
+Si se llama una función que devuelve múltiples valores, es obligatorio asignarlos a un tuple usando ``a, b := f(x)`` o ``let a, b := f(x)``.
 
-The following example implements the power function by square-and-multiply.
+El siguiente ejemplo implementa la función de potencia con cuadrados y multiplicaciones.
 
 .. code::
 
@@ -576,106 +503,51 @@ The following example implements the power function by square-and-multiply.
         }
     }
 
-Things to Avoid
----------------
+Cosas a evitar
+--------------
 
-Inline assembly might have a quite high-level look, but it actually is extremely
-low-level. Function calls, loops and switches are converted by simple
-rewriting rules and after that, the only thing the assembler does for you is re-arranging
-functional-style opcodes, managing jump labels, counting stack height for
-variable access and removing stack slots for assembly-local variables when the end
-of their block is reached. Especially for those two last cases, it is important
-to know that the assembler only counts stack height from top to bottom, not
-necessarily following control flow. Furthermore, operations like swap will only
-swap the contents of the stack but not the location of variables.
+Aunque el ensamblador inline puede dar la sensación de tener un aspecto de alto nivel, es en realidad de nivel extremadamente bajo. Se convierten las llamadas a funciones, los bucles y los interruptores con simples reglas de reescritura y luego, lo único que el ensamblador hace para el usuario es reorganizar los opcodes en estilo funcional, manejando etiquetas de salto, contando la altura de la pila para el acceso a variables y quitando posiciones en la pila para variables locales del ensamblador cuando se alcanza el final de su bloque. Especialmente en estos dos últimos casos, es importante saber que el ensamblador solo cuenta la altura de la pila desde arriba abajo, y no necesariamente siguiendo el flujo de control. Además, las operaciones como los intercambios solo van a intercambiar los contenidos de la pila pero no la ubicación de las variables.
 
-Conventions in Solidity
------------------------
+Convenciones en Solidity
+------------------------
 
-In contrast to EVM assembly, Solidity knows types which are narrower than 256 bits,
-e.g. ``uint24``. In order to make them more efficient, most arithmetic operations just
-treat them as 256-bit numbers and the higher-order bits are only cleaned at the
-point where it is necessary, i.e. just shortly before they are written to memory
-or before comparisons are performed. This means that if you access such a variable
-from within inline assembly, you might have to manually clean the higher order bits
-first.
+A cambio del ensamblador EVM, Solidity conoce tipos que son más estrechos que 256 bits, por ejemplo ``uint24``. Para hacerlos más eficientes, la mayoría de las operaciones aritméticas los tratan como números de 256 bits y los bits de mayor orden sólo se limpian cuando es necesario, es decir sólo un poco antes de almacenarse en memoria o antes de realizar comparaciones. Lo que significa que si se accede dicha variable desde dentro del ensamblador inline, puede que se tenga primero que limpiar los bits de mayor orden.
 
-Solidity manages memory in a very simple way: There is a "free memory pointer"
-at position ``0x40`` in memory. If you want to allocate memory, just use the memory
-from that point on and update the pointer accordingly.
+Solidity maneja la memoria de una manera muy simple: hay un "cursor de memoria disponible" en la posición ``0x40`` de la memoria. Si se desea asignar memoria, tan solo se tiene que usar la memoria a partir de este punto y actualizar el cursor en consecuencia.
 
-Elements in memory arrays in Solidity always occupy multiples of 32 bytes (yes, this is
-even true for ``byte[]``, but not for ``bytes`` and ``string``). Multi-dimensional memory
-arrays are pointers to memory arrays. The length of a dynamic array is stored at the
-first slot of the array and then only the array elements follow.
+En Solidity, los elementos en arrays de memoria siempre ocupan múltiples de 32 bytes (y si, esto también es cierto para ``byte[]``, pero no para ``bytes`` y ``string``). Arrays multidimensionales son cursores de arrays de memoria. La longitud de un array dinámico se almacena en la primera posición del array y luego sólo le siguen elementos del array.
 
 .. warning::
-    Statically-sized memory arrays do not have a length field, but it will be added soon
-    to allow better convertibility between statically- and dynamically-sized arrays, so
-    please do not rely on that.
+    Arrays de memoria estáticos en tamaño no tienen un campo para la longitud, pero se añadirá pronto para permitir una mejor convertibilidad entre arrays de tamaño estático y dinñamico, pero es importante no contar con esto por ahora.
 
 
-Standalone Assembly
-===================
+Ensamblador independiente
+=========================
 
-The assembly language described as inline assembly above can also be used
-standalone and in fact, the plan is to use it as an intermediate language
-for the Solidity compiler. In this form, it tries to achieve several goals:
+El lenguage ensamblador que hemos descrito más arriba como ensamblador inline también puede usarse de forma independiente. De hecho, el plan es de usarlo como un lenguage intermedio para el compilador de Solidity. De esta forma, intenta cumplir con varios objetivos:
 
-1. Programs written in it should be readable, even if the code is generated by a compiler from Solidity.
-2. The translation from assembly to bytecode should contain as few "surprises" as possible.
-3. Control flow should be easy to detect to help in formal verification and optimization.
+1. Los programas escritos en el lenguage ensamblador deben de ser legibles, aunque el código sea generado por un compilador de Solidity.
+2. La traducción del lenguage ensamblador al bytecode deben de contener el número de sorpresas el más reducido posible.
+3. El control de flujo debe de ser fácil de detectar para ayudar a la verificación formal y a la optimización.
 
-In order to achieve the first and last goal, assembly provides high-level constructs
-like ``for`` loops, ``switch`` statements and function calls. It should be possible
-to write assembly programs that do not make use of explicit ``SWAP``, ``DUP``,
-``JUMP`` and ``JUMPI`` statements, because the first two obfuscate the data flow
-and the last two obfuscate control flow. Furthermore, functional statements of
-the form ``mul(add(x, y), 7)`` are preferred over pure opcode statements like
-``7 y x add mul`` because in the first form, it is much easier to see which
-operand is used for which opcode.
+Para cumplir con el primero y el útlimo de los objetivos, el ensamblador proporciona constructs de alto nivel como bucles ``for``, declaraciones ``switch`` y llamadas a funciones. Debería de ser posible de escribir programas de ensamblador que no hacen uso de declaraciones explícitas de tipo ``SWAP``, ``DUP``, ``JUMP`` y ``JUMPI``, porque las dos primeras declaraciones ofuscan el flujo de datos y las dos últimas ofuscan el control de flujo. Además, hay que privilegiar declaraciones funcionales del tipo ``mul(add(x, y), 7)`` a las declaraciones de opcodes puras como ``7 y x add mul`` porque en la primera, es mucho más fácil ver qué operando se usa para qué opcode.
 
-The second goal is achieved by introducing a desugaring phase that only removes
-the higher level constructs in a very regular way and still allows inspecting
-the generated low-level assembly code. The only non-local operation performed
-by the assembler is name lookup of user-defined identifiers (functions, variables, ...),
-which follow very simple and regular scoping rules and cleanup of local variables from the stack.
+El segundo objetivo se cumple introduciendo una fase de desazucarización que sólo quita los constructs de más alto nivel de una forma muy regular pero permitiendo todavía la inspección el código ensamblador de bajo nivel generado. La única operación no local realizada por el ensamblador es la búsqueda de nombre de identificadores (funciones, variables, ...) definidos por el usuario, lo que se hace siguiendo reglas con un alcance muy simple y regular y con un proceso de limpieza de variables locales desde la pila.
 
-Scoping: An identifier that is declared (label, variable, function, assembly)
-is only visible in the block where it was declared (including nested blocks
-inside the current block). It is not legal to access local variables across
-function borders, even if they would be in scope. Shadowing is not allowed.
-Local variables cannot be accessed before they were declared, but labels,
-functions and assemblies can. Assemblies are special blocks that are used
-for e.g. returning runtime code or creating contracts. No identifier from an
-outer assembly is visible in a sub-assembly.
+Alcance: Un identificador que está declarado (etiqueta, variable, función, ensamblador) sólo es visible en el bloque donde ha sido declarado (incluyendo bloques anidados dentro del bloque actual). No es legal acceder variables locales cruzando los límites de la función, aunque estas variables estuvieran dentro del alcance. Ocultar no está permitido. No se puede acceder variables locales antes de que estén declaradas, pero está permitido acceder etiquetas, funciones y ensambladores sin que lo estén. Ensambladores son bloques especiales que se usan para, por ejemplo, devolver el tiempo de ejecución del código o crear contratos. Identificadores externos a un ensamblador no son visibles en un sub ensamblador.
 
-If control flow passes over the end of a block, pop instructions are inserted
-that match the number of local variables declared in that block.
-Whenever a local variable is referenced, the code generator needs
-to know its current relative position in the stack and thus it needs to
-keep track of the current so-called stack height. Since all local variables
-are removed at the end of a block, the stack height before and after the block
-should be the same. If this is not the case, a warning is issued.
+Si el flujo de control va más allá del final de un bloque, se insertan instrucciones pop que corresponden al número de variables locales declaradas en este bloque. Cuando se referencia una variables local, el generador de código necesita saber su posición relativa actual en la pila y por lo tanto necesita hacer un seguimiento de la así llamada altura actual de la pila. Como se quitan todas las variables locales al final de un bloque, la altura de la pila antes y después de un bloque debería ser la misma. Si esto no fuera el caso, se emite un aviso.
 
-Why do we use higher-level constructs like ``switch``, ``for`` and functions:
+¿Por qué usamos constructs de alto nivel como ``switch``, ``for`` y funciones:
 
-Using ``switch``, ``for`` and functions, it should be possible to write
-complex code without using ``jump`` or ``jumpi`` manually. This makes it much
-easier to analyze the control flow, which allows for improved formal
-verification and optimization.
+Usando ``switch``, ``for`` y funciones, debería ser posible escribir códigos complejos sin usar ``jump`` o ``jumpi`` manualmente. Esto simplifica mucho el análisis del control de flujo, lo que permite hacer mejor la verificación formal y la optimización.
 
-Furthermore, if manual jumps are allowed, computing the stack height is rather complicated.
-The position of all local variables on the stack needs to be known, otherwise
-neither references to local variables nor removing local variables automatically
-from the stack at the end of a block will work properly. The desugaring
-mechanism correctly inserts operations at unreachable blocks that adjust the
-stack height properly in case of jumps that do not have a continuing control flow.
+Además, si se permiten los saltos manuales, computar la altura de la pila se hace bastante complicado. Se necesita saber la posición de todas las variables locales de la pila, de lo contrario ni las referencias a las variables locales ni quitar automáticamente variables locales de la pila al final de un bloque funcionará correctamente. El mecanismo de desazucarado inserta operaciones correctamente en bloques inalcanzables que ajustan correctamente la altura de la pila en el caso de tener saltos que no tengan un control de flujo en marcha
 
-Example:
+Ejemplo:
 
-We will follow an example compilation from Solidity to desugared assembly.
-We consider the runtime bytecode of the following Solidity program::
+Vamos a seguir un ejemplo de compilación de Solidity a ensamblador desazucarado.
+Consideramos el tiempo de ejecución del bytecode del siguiente programa escrito en Solidity::
 
     contract C {
       function f(uint x) returns (uint y) {
@@ -685,11 +557,11 @@ We consider the runtime bytecode of the following Solidity program::
       }
     }
 
-The following assembly will be generated::
+Se va a generar el siguiente ensamblador::
 
     {
-      mstore(0x40, 0x60) // store the "free memory pointer"
-      // function dispatcher
+      mstore(0x40, 0x60) // almacenar el "puntero de memoria libre"
+      // función dispatcher
       switch div(calldataload(0), exp(2, 226))
       case 0xb3de648b {
         let (r) = f(calldataload(4))
@@ -698,12 +570,12 @@ The following assembly will be generated::
         return(ret, 0x20)
       }
       default { revert(0, 0) }
-      // memory allocator
+      // repartidor de memoria
       function $allocate(size) -> pos {
         pos := mload(0x40)
         mstore(0x40, add(pos, size))
       }
-      // the contract function
+      // la función del contrato
       function f(x) -> y {
         y := 1
         for { let i := 0 } lt(i, x) { i := add(i, 1) } {
@@ -712,7 +584,7 @@ The following assembly will be generated::
       }
     }
 
-After the desugaring phase it looks as follows::
+Después de la fase de desazucarado, se parece a lo siguiente::
 
     {
       mstore(0x40, 0x60)
@@ -722,22 +594,18 @@ After the desugaring phase it looks as follows::
         jump($caseDefault)
         $case1:
         {
-          // the function call - we put return label and arguments on the stack
+          // la llamada de función – ponemos la etiqueta return y los argumentos encima de la pila
           $ret1 calldataload(4) jump(f)
-          // This is unreachable code. Opcodes are added that mirror the
-          // effect of the function on the stack height: Arguments are
-          // removed and return values are introduced.
+          // Esto es código inalcanzable. Se añaden opcodes que reproducen el efecto de la función sobre la altura de la pila: se quitan argumentos y se introducen valores devueltos.
           pop pop
           let r := 0
-          $ret1: // the actual return point
+          $ret1: // el punto de retorno actual
           $ret2 0x20 jump($allocate)
           pop pop let ret := 0
           $ret2:
           mstore(ret, r)
           return(ret, 0x20)
-          // although it is useless, the jump is automatically inserted,
-          // since the desugaring process is a purely syntactic operation that
-          // does not analyze control-flow
+          // aunque no sirva de nada, se inserta el salto automáticamente, ya que el proceso de desazucarado es una operación puramente sintáctica que no analiza el control de flujo.
           jump($endswitch)
         }
         $caseDefault:
@@ -750,20 +618,19 @@ After the desugaring phase it looks as follows::
       jump($afterFunction)
       allocate:
       {
-        // we jump over the unreachable code that introduces the function arguments
+        // nos saltamos el código inalcanzable que introduce los argumentos de la función
         jump($start)
         let $retpos := 0 let size := 0
         $start:
-        // output variables live in the same scope as the arguments and is
-        // actually allocated.
+        // las variables de salida están dentro del mismo alcance que los argumentos y ahora se reparten
         let pos := 0
         {
           pos := mload(0x40)
           mstore(0x40, add(pos, size))
         }
-        // This code replaces the arguments by the return values and jumps back.
+        // Este código remplaza los argumentos por los valores de retorno y los saltos hacía atrás.
         swap1 pop swap1 jump
-        // Again unreachable code that corrects stack height.
+        // Esto es, de nuevo, código inalcanzable que corrige la altura de la pila.
         0 0
       }
       f:
@@ -783,7 +650,7 @@ After the desugaring phase it looks as follows::
           { i := add(i, 1) }
           jump($for_begin)
           $for_end:
-        } // Here, a pop instruction will be inserted for i
+        } // Aquí, se inserta una instrucción pop para i
         swap1 pop swap1 jump
         0 0
       }
@@ -792,35 +659,30 @@ After the desugaring phase it looks as follows::
     }
 
 
-Assembly happens in four stages:
+El ensamblador sucede en cuatro etapas:
 
-1. Parsing
-2. Desugaring (removes switch, for and functions)
-3. Opcode stream generation
-4. Bytecode generation
+1. Análisis sintático (o parsing en inglés)
+2. Desazucarización (quita switch, for y funciones)
+3. Generación de la transmisión de opcodes
+4. Generación del bytecode
 
-We will specify steps one to three in a pseudo-formal way. More formal
-specifications will follow.
+Vamos a especificar las etapas uno a tres de una forma pseudo formal. Especificaciones más formales se darán luego.
 
 
-Parsing / Grammar
------------------
+Análisis sintático / Gramática
+------------------------------
 
-The tasks of the parser are the following:
+Éstas son las tareas del módulo de análisis (o del parser en inglés):
 
-- Turn the byte stream into a token stream, discarding C++-style comments
-  (a special comment exists for source references, but we will not explain it here).
-- Turn the token stream into an AST according to the grammar below
-- Register identifiers with the block they are defined in (annotation to the
-  AST node) and note from which point on, variables can be accessed.
+- Convertir la transmisión de byte en una transmisión de token, desechando comentarios de tipo C++ (existe un comentario especial para las referencias fuente, pero no lo vamos a explicar aquí).
+- Convertir la transmisión de token en un AST según la gramática que figura más abajo.
+- Registrar identificadores con el bloque en el que están definidos (anotación al nodo AST) y anotar sobre el punto a partir del cual se puede acceder a las variables.
 
-The assembly lexer follows the one defined by Solidity itself.
+El ensamblador lexer sigue el ensamblador definido por Solidity.
 
-Whitespace is used to delimit tokens and it consists of the characters
-Space, Tab and Linefeed. Comments are regular JavaScript/C++ comments and
-are interpreted in the same way as Whitespace.
+El espacio en blanco se usa para delimitar tokens y consiste en los caracteres Espacio, Tabular y Línea de alimentación. Los comentarios aceptados son comentarios típicos de JavaScript/C++ y se interpretan de la misma manera que el Espacio.
 
-Grammar::
+Gramática::
 
     AssemblyBlock = '{' AssemblyItem* '}'
     AssemblyItem =
@@ -863,16 +725,12 @@ Grammar::
     DecimalNumber = [0-9]+
 
 
-Desugaring
-----------
+Desazucarización
+----------------
 
-An AST transformation removes for, switch and function constructs. The result
-is still parseable by the same parser, but it will not use certain constructs.
-If jumpdests are added that are only jumped to and not continued at, information
-about the stack content is added, unless no local variables of outer scopes are
-accessed or the stack height is the same as for the previous instruction.
+Una transformación AST quita los for, switch y funciones constructs. El resultados aún es pasible de ser analizado desde el punto de vista sintáctico por el mismo analizador, pero no usará algunos de los constructs. Si se añaden saltos a los que sólo se salta y desde los que luego no se continúa, se añade información sobre el contenido de la pila, a no ser que no se acceda a ninguna variable local de alcance externo o que la altura de la pila sea la misma que para la instrucción anterior.
 
-Pseudocode::
+Pseudo código::
 
     desugar item: AST -> AST =
     match item {
@@ -890,8 +748,8 @@ Pseudocode::
       }
     AssemblyFor('for' { init } condition post body) ->
       {
-        init // cannot be its own block because we want variable scope to extend into the body
-        // find I such that there are no labels $forI_*
+        init // no puede ser su propio bloque porque queremos que el alcance de la variable se extienda hasta el cuerpo
+        // encuentra I de tal manera que no haya etiquetas $forI_*
         $forI_begin:
         jumpi($forI_end, iszero(condition))
         { body }
@@ -902,7 +760,7 @@ Pseudocode::
       }
     'break' ->
       {
-        // find nearest enclosing scope with label $forI_end
+        // encuentra el alcance que encierra más cercano con la etiqueta $forI_end
         pop all local variables that are defined at the current point
         but not at $forI_end
         jump($forI_end)
@@ -910,7 +768,7 @@ Pseudocode::
       }
     'continue' ->
       {
-        // find nearest enclosing scope with label $forI_continue
+        // encuentra el alcance envolvente más cercano con la etiqueta $forI_continue
         pop all local variables that are defined at the current point
         but not at $forI_continue
         jump($forI_continue)
@@ -918,7 +776,7 @@ Pseudocode::
       }
     AssemblySwitch(switch condition cases ( default: defaultBlock )? ) ->
       {
-        // find I such that there is no $switchI* label or variable
+        // // encuentra I de tal manera que no haya etiqueta o variable $switchI*
         let $switchI_value := condition
         for each of cases match {
           case val: -> jumpi($switchI_caseJ, eq($switchI_value, val))
@@ -934,7 +792,7 @@ Pseudocode::
       {
         if identifier is function <name> with n args and m ret values ->
           {
-            // find I such that $funcallI_* does not exist
+            // encuentra I de tal manera que no exista $funcallI_*
             $funcallI_return argn  ... arg2 arg1 jump(<name>)
             pop (n + 1 times)
             if the current context is `let (id1, ..., idm) := f(...)` ->
@@ -952,21 +810,12 @@ Pseudocode::
       desugar(children of node)
     }
 
-Opcode Stream Generation
-------------------------
+Generación de la transmisión de opcodes
+---------------------------------------
 
-During opcode stream generation, we keep track of the current stack height
-in a counter,
-so that accessing stack variables by name is possible. The stack height is modified with every opcode
-that modifies the stack and with every label that is annotated with a stack
-adjustment. Every time a new
-local variable is introduced, it is registered together with the current
-stack height. If a variable is accessed (either for copying its value or for
-assignment), the appropriate DUP or SWAP instruction is selected depending
-on the difference bitween the current stack height and the
-stack height at the point the variable was introduced.
+Durante la generación de la transmisión de opcodes, hacemos un seguimiento de la altura de la pila en un contador, de tal manera que se pueda acceder a la variables de la pila por su nombre. Se modifica la altura de la pila con cada opcode que modifica la pila y con cada etiqueta que se anota con un ajuste de la pila. Cada vez que se introduce una nueva variable local, se registra junto con la altua actual de la pila. Si se accede a una variable (bien para copiar su valor, bien para asignar algo), se selecciona la instrucción DUP o SWAP, dependiendo de la diferencia entre la altura actual de la pila y la altura de la pila en el momento en que se introdujo esta variable.
 
-Pseudocode::
+Pseudo código::
 
     codegen item: AST -> opcode_stream =
     match item {
@@ -982,7 +831,7 @@ Pseudocode::
         Local Variable ->
           DUPi where i = 1 + stack_height - stack_height_of_identifier(id)
         Label ->
-          // reference to be resolved during bytecode generation
+          // se tendrá que resolver esta referencia durante la generación del bytecode
           PUSH<bytecode position of label>
         SubAssembly ->
           PUSH<bytecode position of subassembly data>
