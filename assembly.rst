@@ -186,7 +186,7 @@ En la gramática, los opcodes se representan como identificadores predefinidos.
 +-------------------------+------+-----------------------------------------------------------------+
 | sstore(p, v)            | `-`  | storage[p] := v                                                 |
 +-------------------------+------+-----------------------------------------------------------------+
-| msize                   |      | ***tamaño de la memoria , es decir el índice más grande de      |
+| msize                   |      | tamaño de la memoria , es decir el índice más grande de         |
 |                         |      | la memoria que ha sido accedida                                 |
 +-------------------------+------+-----------------------------------------------------------------+
 | gas                     |      | el gas todavía disponible para ejecución                        |
@@ -204,11 +204,11 @@ En la gramática, los opcodes se representan como identificadores predefinidos.
 | calldatasize            |      | tamaño de la llamada a datos en bytes                           |
 +-------------------------+------+-----------------------------------------------------------------+
 | calldatacopy(t, f, s)   | `-`  | copiar s bytes de la llamada a datos en la posición f a         |
-|                         |      | la ***memoria en la posición t                                  |
+|                         |      | la memoria en la posición t                                     |
 +-------------------------+------+-----------------------------------------------------------------+
 | codesize                |      | tamaño del código de contrato actual / contexto de ejecución    |
 +-------------------------+------+-----------------------------------------------------------------+
-| codecopy(t, f, s)       | `-`  | copiar s bytes del código en la posición f a la ***memoria      |
+| codecopy(t, f, s)       | `-`  | copiar s bytes del código en la posición f a la memoria         |
 |                         |      | en la posición t                                                |
 +-------------------------+------+-----------------------------------------------------------------+
 | extcodesize(a)          |      | tamaño del código en la dirección a                             |
@@ -242,7 +242,7 @@ En la gramática, los opcodes se representan como identificadores predefinidos.
 | staticcall(g, a, in,    |      | idéntico a `call(g, a, 0, in, insize, out, outsize)` pero       |
 | insize, out, outsize)   |      | no admite modificaciones de estado                              |
 +-------------------------+------+-----------------------------------------------------------------+
-| return(p, s)            | `-`  | termina la ejecución, ***devuelve los datos de mem[p..(p+s))    |
+| return(p, s)            | `-`  | termina la ejecución, devuelve los datos de mem[p..(p+s))       |
 +-------------------------+------+-----------------------------------------------------------------+
 | revert(p, s)            | `-`  | termina la ejecución, revierte los cambios de estado, devuelve  |
 |                         |      | los datos de mem[p..(p+s))                                      |
@@ -284,7 +284,7 @@ En la gramática, los opcodes se representan como identificadores predefinidos.
 Literales
 ---------
 
-Se pueden usar constantes ***íntegras usando la notación decimal o hexadecimal y con eso, una instrucción apropiada ``PUSHi`` sereá automáticamente generada. El siguiente código suma 2 con 3, lo que resulta en 5 y luego computa el ***bitwise con el string "abc". Los strings están almacenados alineados a la izquierda y no pueden ser más largos que 32 bytes.
+Se pueden usar constantes íntegras usando la notación decimal o hexadecimal y con eso, una instrucción apropiada ``PUSHi`` sereá automáticamente generada. El siguiente código suma 2 con 3, lo que resulta en 5 y luego computa el bitwise con el string "abc". Los strings están almacenados alineados a la izquierda y no pueden ser más largos que 32 bytes.
 
 .. code::
 
@@ -315,7 +315,7 @@ Acceso a variables y funciones internas
 
 Se accede a las variables y otros identificadores de Solidity simplemente por su nombre. Para las variables de memoria, esto tiene como consecuencia que es la dirección y no el nombre que se empuja en la pila. Con las variables de almacenamiento es diferente: los valores en almacenamiento podrían no ocupar una posición completa en la pila, de tal manera que su dirección estaría compuesta por una posición y un decalage en bytes dentro de esta posición. Para recuperar la posición a la que apunta la variable ``x``, se usa ``x_slot`` y para recuperar el decalage en bytes se usa ``x_offset``.
 
-En las asignaciones (ver abajo), hasta se pueden usar las variables locales de Solidity y ***asignarlas.
+En las asignaciones (ver abajo), hasta se pueden usar las variables locales de Solidity y asignarlas.
 
 También se puede acceder a las funciones externas al ensamblador inline: el ensamblador empujará su etiqueta de entrada (aplicando la resolución de funciones virtuales). Las semánticas de llamada en Solidity son las siguientes:
 
@@ -480,13 +480,13 @@ El ejemplo siguiente computa la suma de un área en la memoria.
 Funciones
 ---------
 
-El ensamblador permite la definición de funciones de bajo nivel. Éstas toman sus argumentos (y un ***return PC) desde la pila y también ponen los resultados arriba de la pila. Llamar una función se parece a la ejecución de un opcode de estilo funcional.
+El ensamblador permite la definición de funciones de bajo nivel. Éstas toman sus argumentos (y un return PC) desde la pila y también ponen los resultados arriba de la pila. Llamar una función se parece a la ejecución de un opcode de estilo funcional.
 
 Las funciones pueden definirse en cualquier lugar y son visibles en el bloque en el que se han declarado. Dentro de una función, no se permite acceder a variables locales definidas fuera de esta función. No existe una declaración ``return`` explícita.
 
-Si se llama una función que devuelve múltiples valores, es obligatorio asignarlos a un ***tuple usando ``a, b := f(x)`` o ``let a, b := f(x)``.
+Si se llama una función que devuelve múltiples valores, es obligatorio asignarlos a un tuple usando ``a, b := f(x)`` o ``let a, b := f(x)``.
 
-El siguiente ejemplo implementa la función de potencia con ***cuadrados y multiplicaciones.
+El siguiente ejemplo implementa la función de potencia con cuadrados y multiplicaciones.
 
 .. code::
 
@@ -506,14 +506,14 @@ El siguiente ejemplo implementa la función de potencia con ***cuadrados y multi
 Cosas a evitar
 --------------
 
-Aunque el ensamblador inline puede dar la sensación de tener un aspecto de alto nivel, es en realidad de nivel extremadamente bajo. Se convierten las llamadas a funciones, los bucles y los ***interruptores con simples reglas de reescritura y luego, lo único que el ensamblador hace para el usuario es reorganizar los opcodes en estilo funcional, manejando etiquetas de salto, contando la altura de la pila para el acceso a variables y quitando posiciones en la pila para variables ***locales del ensamblador cuando se alcanza el final de su bloque. Especialmente en estos dos últimos casos, es importante saber que el ensamblador solo cuenta la altura de la pila desde arriba abajo, y no necesariamente siguiendo el flujo de control. Además, las operaciones como los intercambios solo van a intercambiar los contenidos de la pila pero no la ubicación de las variables.
+Aunque el ensamblador inline puede dar la sensación de tener un aspecto de alto nivel, es en realidad de nivel extremadamente bajo. Se convierten las llamadas a funciones, los bucles y los interruptores con simples reglas de reescritura y luego, lo único que el ensamblador hace para el usuario es reorganizar los opcodes en estilo funcional, manejando etiquetas de salto, contando la altura de la pila para el acceso a variables y quitando posiciones en la pila para variables locales del ensamblador cuando se alcanza el final de su bloque. Especialmente en estos dos últimos casos, es importante saber que el ensamblador solo cuenta la altura de la pila desde arriba abajo, y no necesariamente siguiendo el flujo de control. Además, las operaciones como los intercambios solo van a intercambiar los contenidos de la pila pero no la ubicación de las variables.
 
 Convenciones en Solidity
 ------------------------
 
 A cambio del ensamblador EVM, Solidity conoce tipos que son más estrechos que 256 bits, por ejemplo ``uint24``. Para hacerlos más eficientes, la mayoría de las operaciones aritméticas los tratan como números de 256 bits y los bits de mayor orden sólo se limpian cuando es necesario, es decir sólo un poco antes de almacenarse en memoria o antes de realizar comparaciones. Lo que significa que si se accede dicha variable desde dentro del ensamblador inline, puede que se tenga primero que limpiar los bits de mayor orden.
 
-Solidity maneja la memoria de una manera muy simple: hay un "***cursor de memoria disponible" en la posición ``0x40`` de la memoria. Si se desea asignar memoria, tan solo se tiene que usar la memoria a partir de este punto y actualizar el cursor en consecuencia.
+Solidity maneja la memoria de una manera muy simple: hay un "cursor de memoria disponible" en la posición ``0x40`` de la memoria. Si se desea asignar memoria, tan solo se tiene que usar la memoria a partir de este punto y actualizar el cursor en consecuencia.
 
 En Solidity, los elementos en arrays de memoria siempre ocupan múltiples de 32 bytes (y si, esto también es cierto para ``byte[]``, pero no para ``bytes`` y ``string``). Arrays multidimensionales son cursores de arrays de memoria. La longitud de un array dinámico se almacena en la primera posición del array y luego sólo le siguen elementos del array.
 
@@ -532,9 +532,9 @@ El lenguage ensamblador que hemos descrito más arriba como ensamblador inline t
 
 Para cumplir con el primero y el útlimo de los objetivos, el ensamblador proporciona constructs de alto nivel como bucles ``for``, declaraciones ``switch`` y llamadas a funciones. Debería de ser posible de escribir programas de ensamblador que no hacen uso de declaraciones explícitas de tipo ``SWAP``, ``DUP``, ``JUMP`` y ``JUMPI``, porque las dos primeras declaraciones ofuscan el flujo de datos y las dos últimas ofuscan el control de flujo. Además, hay que privilegiar declaraciones funcionales del tipo ``mul(add(x, y), 7)`` a las declaraciones de opcodes puras como ``7 y x add mul`` porque en la primera, es mucho más fácil ver qué operando se usa para qué opcode.
 
-El segundo objetivo se cumple introduciendo una fase ***(desaguring) que sólo quita los constructs de más alto nivel de una forma muy regular pero permitiendo todavía la inspección el código ensamblador de bajo nivel generado. La única operación no local realizada por el ensamblador es la búsqueda de nombre de identificadores (funciones, variables, ...) definidos por el usuario, (***) lo que se hace siguiendo reglas con un alcance muy simple y regular y con un proceso de limpieza de variables locales desde la pila.
+El segundo objetivo se cumple introduciendo una fase de desazucarización que sólo quita los constructs de más alto nivel de una forma muy regular pero permitiendo todavía la inspección el código ensamblador de bajo nivel generado. La única operación no local realizada por el ensamblador es la búsqueda de nombre de identificadores (funciones, variables, ...) definidos por el usuario, lo que se hace siguiendo reglas con un alcance muy simple y regular y con un proceso de limpieza de variables locales desde la pila.
 
-Alcance: Un identificador que está declarado (etiqueta, variable, función, ensamblador) sólo es visible en el bloque donde ha sido declarado (incluyendo bloques anidados dentro del bloque actual). No es legal acceder variables locales cruzando los límites de la función, aunque estas variables estuvieran dentro del alcance. ***Ocultar no está permitido. No se puede acceder variables locales antes de que estén declaradas, ***pero está permitido acceder etiquetas, funciones y ensambladores sin que lo estén. Ensambladores son bloques especiales que se usan para, por ejemplo, devolver el tiempo de ejecución del código o crear contratos. Identificadores externos a un ensamblador no son visibles en un sub ensamblador.
+Alcance: Un identificador que está declarado (etiqueta, variable, función, ensamblador) sólo es visible en el bloque donde ha sido declarado (incluyendo bloques anidados dentro del bloque actual). No es legal acceder variables locales cruzando los límites de la función, aunque estas variables estuvieran dentro del alcance. Ocultar no está permitido. No se puede acceder variables locales antes de que estén declaradas, pero está permitido acceder etiquetas, funciones y ensambladores sin que lo estén. Ensambladores son bloques especiales que se usan para, por ejemplo, devolver el tiempo de ejecución del código o crear contratos. Identificadores externos a un ensamblador no son visibles en un sub ensamblador.
 
 Si el flujo de control va más allá del final de un bloque, se insertan instrucciones pop que corresponden al número de variables locales declaradas en este bloque. Cuando se referencia una variables local, el generador de código necesita saber su posición relativa actual en la pila y por lo tanto necesita hacer un seguimiento de la así llamada altura actual de la pila. Como se quitan todas las variables locales al final de un bloque, la altura de la pila antes y después de un bloque debería ser la misma. Si esto no fuera el caso, se emite un aviso.
 
@@ -596,7 +596,7 @@ Después de la fase de desazucarado, se parece a lo siguiente::
         {
           // la llamada de función – ponemos la etiqueta return y los argumentos encima de la pila
           $ret1 calldataload(4) jump(f)
-          // Esto es código inalcanzable. Se añaden opcodes que reproducen el efecto de la función ***sobre la altura de la pila: se quitan argumentos y se introducen valores devueltos.
+          // Esto es código inalcanzable. Se añaden opcodes que reproducen el efecto de la función sobre la altura de la pila: se quitan argumentos y se introducen valores devueltos.
           pop pop
           let r := 0
           $ret1: // el punto de retorno actual
@@ -622,7 +622,7 @@ Después de la fase de desazucarado, se parece a lo siguiente::
         jump($start)
         let $retpos := 0 let size := 0
         $start:
-        // las variables de salida están dentro del mismo alcance que los argumentos y ***ahora se reparten (***incoherencia con el singular/plural de la frase).
+        // las variables de salida están dentro del mismo alcance que los argumentos y ahora se reparten
         let pos := 0
         {
           pos := mload(0x40)
@@ -662,7 +662,7 @@ Después de la fase de desazucarado, se parece a lo siguiente::
 El ensamblador sucede en cuatro etapas:
 
 1. Análisis sintático (o parsing en inglés)
-2. Desugaring (quita switch, for y funciones)
+2. Desazucarización (quita switch, for y funciones)
 3. Generación de la transmisión de opcodes
 4. Generación del bytecode
 
@@ -725,8 +725,8 @@ Gramática::
     DecimalNumber = [0-9]+
 
 
-***Desugaring
-----------
+Desazucarización
+----------------
 
 Una transformación AST quita los for, switch y funciones constructs. El resultados aún es pasible de ser analizado desde el punto de vista sintáctico por el mismo analizador, pero no usará algunos de los constructs. Si se añaden saltos a los que sólo se salta y desde los que luego no se continúa, se añade información sobre el contenido de la pila, a no ser que no se acceda a ninguna variable local de alcance externo o que la altura de la pila sea la misma que para la instrucción anterior.
 
@@ -760,7 +760,7 @@ Pseudo código::
       }
     'break' ->
       {
-        // encuentra el alcance que ***encierra más cercano con la etiqueta $forI_end
+        // encuentra el alcance que encierra más cercano con la etiqueta $forI_end
         pop all local variables that are defined at the current point
         but not at $forI_end
         jump($forI_end)
