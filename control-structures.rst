@@ -14,6 +14,10 @@ Parámetros de entrada
 
 Los parámetros de entrada se declaran de la misma forma que las variables. Como una excepción, los parámetros no usados pueden omitir el nombre de la variable. Por ejemplo, si quisiéramos que nuestro contrato acepte un tipo de llamadas externas con dos enteros, el código quedaría similar a este::
 
+::
+
+    pragma solidity ^0.4.16;
+    
     contract Simple {
         function taker(uint _a, uint _b) {
             // hace algo con _a y _b.
@@ -25,6 +29,10 @@ Parámetros de salida
 
 Los parámetros de salida se pueden declarar con la misma sintaxis después de la palabra reservada ``returns``. Por ejemplo, supongamos que deseamos devolver dos resultados: la suma y el producto de dos valores dados. Entonces, escribiríamos un código como este::
 
+::
+
+    pragma solidity ^0.4.16;
+    
     contract Simple {
         function arithmetics(uint _a, uint _b) returns (uint o_sum, uint o_product) {
             o_sum = _a + _b;
@@ -70,9 +78,11 @@ Llamadas a funciones internas
 
 Las funciones del contrato actual pueden ser llamadas directamente ("internamente") y, también, recursivamente como se puede ver en este ejemplo sin sentido funcional::
 
+    pragma solidity ^0.4.16;
+    
     contract C {
-        function g(uint a) returns (uint ret) { return f(); }
-        function f() returns (uint ret) { return g(7) + f(); }
+        function g(uint a) public returns (uint ret) { return f(); }
+        function f() internal pure returns (uint ret) { return g(7) + f(); }
     }
 
 Estas llamadas a funciones son traducidas en simples saltos dentro de la máquina virtual de Ethereum (EVM). Esto tiene como consecuencia que la memoria actual no se limpia, así que pasar referencias de memoria a las funciones llamadas internamente es muy eficiente. Sólo las funciones del mismo contrato pueden ser llamadas internamente.
@@ -88,15 +98,16 @@ todos los argumentos de la función tienen que ser copiados en memoria.
 
 Cuando se llama a funciones de otros contratos, la cantidad de Wei enviada con la llamada y el gas pueden especificarse con las opciones especiales ``.value()`` y ``.gas()``, respectivamente::
 
+    pragma solidity ^0.4.0;
+    
     contract InfoFeed {
-        function info() payable returns (uint ret) { return 42; }
+        function info() public payable returns (uint ret) { return 42; }
     }
-
 
     contract Consumer {
         InfoFeed feed;
-        function setFeed(address addr) { feed = InfoFeed(addr); }
-        function callFeed() { feed.info.value(10).gas(800)(); }
+        function setFeed(address addr) public { feed = InfoFeed(addr); }
+        function callFeed() public { feed.info.value(10).gas(800)(); }
     }
 
 El modificador ``payable`` se tiene que usar para ``info``, porque de otra manera la opción `.value()` no estaría disponible.
@@ -109,22 +120,24 @@ Hay que tener cuidado con el hecho de que ``feed.info.value(10).gas(800)`` sólo
 Las llamadas a funciones provocan excepciones si el contrato invocado no existe (en el sentido de que la cuenta no contiene código) o si el contrato invocado por sí mismo dispara una excepción o se queda sin gas.
 
 .. warning::
-    Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente aleatoria y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama mediante sus funciones. Escribir tus funciones de manera que realicen, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato, hace que este contrato no sea vulnerable a un ataque de reentrada.
+
+Cualquier interacción con otro contrato supone un daño potencial, especialmente si el código fuente del contrato no se conoce de antemano. El contrato actual pasa el control al contrato invocado y eso potencialmente podría suponer que haga cualquier cosa. Incluso si el contrato invocado hereda de un contrato padre conocido, el contrato del que hereda sólo requiere tener una interfaz correcta. La implementación del contrato, sin embargo, puede ser totalmente aleatoria y, por ello, crear un perjuicio. Además, hay que estar preparado en caso de que llame dentro de otros contratos del sistema o, incluso, volver al contrato que lo llama antes de que la primera llamada retorne. Esto significa que el contrato invocado puede cambiar variables de estado del contrato que le llama mediante sus funciones. Escribir tus funciones de manera que realicen, por ejemplo, llamadas a funciones externas ocurridas después de cualquier cambio en variables de estado en tu contrato, hace que este contrato no sea vulnerable a un ataque de reentrada.
     
 
 Llamadas con nombre y parámetros de funciones anónimas
 ------------------------------------------------------
 
 Los argumentos de una llamada a una función pueden venir dados por el nombre, en cualquier orden, si están entre ``{ }`` como se puede ver en el siguiente ejemplo. La lista de argumentos tiene que coincidir por el nombre con la lista de parámetros de la declaración de la función, pero pueden estar en orden aleatorio.
-
 ::
 
     pragma solidity ^0.4.0;
 
     contract C {
-        function f(uint key, uint value) { ... }
+        function f(uint key, uint value) public {
+            // ... 
+        }
 
-        function g() {
+        function g() public {
             // argumentos con nombre
             f({value: 2, key: 3});
         }
@@ -138,11 +151,11 @@ Esos nombres estarán presentes en la pila, pero serán inaccesibles.
 
 ::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     contract C {
         // Se omite el nombre para el parámetro
-        function func(uint k, uint) returns(uint) {
+        function func(uint k, uint) public pure returns(uint) {
             return k;
         }
     }
@@ -156,14 +169,13 @@ Creando contratos mediante ``new``
 ==================================
 
 Un contrato puede crear un nuevo contrato usando la palabra reservada ``new``. El código completo del contrato que se está creando tiene que ser conocido de antemano, por lo que no son posibles las dependencias de creación recursivas.
-
 ::
 
     pragma solidity ^0.4.0;
 
     contract D {
         uint x;
-        function D(uint a) payable {
+        function D(uint a) public payable {
             x = a;
         }
     }
@@ -172,11 +184,11 @@ Un contrato puede crear un nuevo contrato usando la palabra reservada ``new``. E
     contract C {
         D d = new D(4); // Se ejecutará como parte del constructor de C
 
-        function createD(uint arg) {
+        function createD(uint arg) public {
             D newD = new D(arg);
         }
 
-        function createAndEndowD(uint arg, uint amount) {
+        function createAndEndowD(uint arg, uint amount) public payable {
             // Envía Ether junto con la creación
             D newD = (new D).value(amount)(arg);
         }
@@ -203,14 +215,16 @@ Asignaciones para desestructurar y retornar múltiples valores
 
 Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de, potencialmente, diferentes tipos cuyo tamaño es constante en tiempo de compilación. Esas tuplas pueden ser usadas para retornar múltiples valores al mismo tiempo y, también, asignarlos a múltiples variables (o lista de valores en general) también al mismo tiempo::
 
+    pragma solidity ^0.4.16;
+
     contract C {
         uint[] data;
 
-        function f() returns (uint, bool, uint) {
+        function f() public pure returns (uint, bool, uint) {
             return (7, true, 2);
         }
 
-        function g() {
+        function g() public {
             // Declara y asigna variables. No es posible especificar el tipo de forma explícita.
             var (x, b, y) = f();
             // Asigna a una variable pre-existente.
@@ -251,10 +265,12 @@ Una variable declarada en cualquier punto de una función estará dentro del alc
 Esto difiere de muchos lenguajes donde las variables sólo están en el alcance de donde se declaran hasta que acaba el bloque semántico.
 Como consecuencia de esto, el código siguiente es ilegal y hace que el compilador devuelva un error porque el identificador se ha declarado previamente, ``Identifier already declared``::
 
-    pragma solidity ^0.4.0;
+    // This will not compile
+
+    pragma solidity ^0.4.16;
 
     contract ScopingErrors {
-        function scoping() {
+        function scoping() public {
             uint i = 0;
 
             while (i++ < 1) {
@@ -266,7 +282,7 @@ Como consecuencia de esto, el código siguiente es ilegal y hace que el compilad
             }
         }
 
-        function minimalScoping() {
+        function minimalScoping() public {
             {
                 uint same2 = 0;
             }
@@ -276,7 +292,7 @@ Como consecuencia de esto, el código siguiente es ilegal y hace que el compilad
             }
         }
 
-        function forLoopScoping() {
+        function forLoopScoping() public {
             for (uint same3 = 0; same3 < 1; same3++) {
             }
 
@@ -288,15 +304,19 @@ Como consecuencia de esto, el código siguiente es ilegal y hace que el compilad
 Como añadido a esto, si la variable se declara, se inicializará al principio de la función con su valor por defecto.
 Esto significa que el siguiente código es legal, aunque se haya escrito de manera un tanto pobre::
 
-    function foo() returns (uint) {
-        // baz se inicializa implícitamente a 0
-        uint bar = 5;
-        if (true) {
-            bar += baz;
-        } else {
-            uint baz = 10;// Nunca se ejecuta
+    pragma solidity ^0.4.0;
+
+    contract C {
+        function foo() public pure returns (uint) {
+            // baz se inicializa implícitamente a 0
+            uint bar = 5;
+            if (true) {
+                bar += baz;
+            } else {
+                uint baz = 10;// Nunca se ejecuta
+            }
+            return bar;// devuelve 5
         }
-        return bar;// devuelve 5
     }
 
 .. index:: ! exception, ! throw
