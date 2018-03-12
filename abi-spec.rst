@@ -167,10 +167,12 @@ Para el siguiente contrato:
 
 ::
 
+    pragma solidity ^0.4.0;
+
     contract Foo {
-      function bar(bytes3[2] xy) {}
-      function baz(uint32 x, bool y) returns (bool r) { r = x > 32 || y; }
-      function sam(bytes name, bool z, uint[] data) {}
+      function bar(bytes3[2] xy) public {}
+      function baz(uint32 x, bool y) public returns (bool r) { r = x > 32 || y; }
+      function sam(bytes name, bool z, uint[] data) public {}
     }
 
 
@@ -299,11 +301,13 @@ Por ejemplo,
 
 ::
 
+  pragma solidity ^0.4.0;
+
   contract Test {
-    function Test(){ b = 0x12345678901234567890123456789012; }
+    function Test() public { b = 0x12345678901234567890123456789012; }
     event Event(uint indexed a, bytes32 b)
     event Event2(uint indexed a, bytes32 b)
-    function foo(uint a) { Event(a, b); }
+    function foo(uint a) public { Event(a, b); }
     bytes32 b;
   }
 
@@ -329,3 +333,130 @@ resultaría en el JSON:
   "name":"foo",
   "outputs": []
   }]
+
+
+Manejo de tipos tuples
+--------------------
+
+Despite that names are intentionally not part of the ABI encoding they do make a lot of sense to be included
+in the JSON to enable displaying it to the end user. The structure is nested in the following way:
+
+A pesar de que los nombres no son intencionalmente parte de la codificación ABI, tienen mucho sentido para ser incluidos en el JSON y permitir mostrarlo al usuario final. La estructura se anida de la siguiente manera:
+
+
+An object with members ``name``, ``type`` and potentially ``components`` describes a typed variable.
+The canonical type is determined until a tuple type is reached and the string description up
+to that point is stored in ``type`` prefix with the word ``tuple``, i.e. it will be ``tuple`` followed by
+a sequence of ``[]`` and ``[k]`` with
+integers ``k``. The components of the tuple are then stored in the member ``components``,
+which is of array type and has the same structure as the top-level object except that
+``indexed`` is not allowed there.
+
+Un objeto con miembros ``name``, ``type`` y potencialmente ``components`` describe una variable mecanografiada.
+El tipo canónico se determina hasta que se alcanza un tipo de tuple y la descripción de la cadena es ascendente.
+a ese punto se almacena en ``type`` prefijo con la palabra ``tuple``, es decir, será ``tuple`` seguido de
+una secuencia de ``[]`` y ``[k]`` con enteros "k". Los componentes de la tuple se almacenan en el miembro "components",
+que es de tipo array y tiene la misma estructura que el objeto de nivel superior excepto que ``indexed`` no está permitido ahí.
+
+
+Por ejemplo, el código
+::
+
+    pragma solidity ^0.4.19;
+    pragma experimental ABIEncoderV2;
+
+    contract Test {
+      struct S { uint a; uint[] b; T[] c; }
+      struct T { uint x; uint y; }
+      function f(S s, T t, uint a) public { }
+      function g() public returns (S s, T t, uint a) {}
+    }
+
+resultaría en el JSON:
+
+.. code:: json
+
+  [
+    {
+      "name": "f",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "s",
+          "type": "tuple",
+          "components": [
+            {
+              "name": "a",
+              "type": "uint256"
+            },
+            {
+              "name": "b",
+              "type": "uint256[]"
+            },
+            {
+              "name": "c",
+              "type": "tuple[]",
+              "components": [
+                {
+                  "name": "x",
+                  "type": "uint256"
+                },
+                {
+                  "name": "y",
+                  "type": "uint256"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "t",
+          "type": "tuple",
+          "components": [
+            {
+              "name": "x",
+              "type": "uint256"
+            },
+            {
+              "name": "y",
+              "type": "uint256"
+            }
+          ]
+        },
+        {
+          "name": "a",
+          "type": "uint256"
+        }
+      ],
+      "outputs": []
+    }
+  ]
+
+.. _abi_packed_mode:
+
+Modo compacto no estándar
+========================
+
+Solidity soporta un modo compacto no estándar donde:
+
+- no :ref:`function selector <abi_function_selector>` está codificado,
+- los tipos de tamaño inferior a 32 bytes no están acolchados por ceros ni tienen signos extendidos y
+- los tipos dinámicos están codificados in situ y sin longitud.
+
+Un ejemplo de codificación ``int1, bytes1, uint16, string`` con valores ``-1, 0x42, 0x2424, "Hello, world!"`` da lugar a ::
+
+    0xff42242448656c6c6f2c20776f726c6421
+      ^^                                 int1(-1)
+        ^^                               bytes1(0x42)
+          ^^^^                           uint16(0x2424)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^ string("Hello, world!") without a length field
+
+More specifically, each statically-sized type takes as many bytes as its range has
+and dynamically-sized types like ``string``, ``bytes`` or ``uint[]`` are encoded without
+their length field. This means that the encoding is ambiguous as soon as there are two
+dynamically-sized elements.
+
+Específicamente, cada tipo de tamaño estático toma tantos bytes como su gama tenga
+y tipos de tamaño dinámico como ``string``, ``bytes`` o ``uint[]`` están codificados sin 
+su campo de longitud. Esto significa que la codificación es ambigua en cuanto hay dos tipos de 
+elementos dinámicamente dimensionados.
