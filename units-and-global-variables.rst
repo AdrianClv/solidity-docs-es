@@ -27,7 +27,7 @@ Ojo si utilizan estas unidades para realizar cálculos de calendario, porque no 
 
 Estos sufijos no pueden aplicarse a variables. Si desea interpretar algunas variables de entrada, como por ejemplo días, puede hacerlo de siguiente forma::
 
-    function f(uint start, uint daysAfter) {
+    function f(uint start, uint daysAfter) public {
         if (now >= start + daysAfter * 1 days) { ... }
     }
 
