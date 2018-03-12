@@ -15,7 +15,7 @@ Para tener un control más fino, especialmente para mejorar el lenguaje excribie
 
 * opcodes de estilo funcional: ``mul(1, add(2, 3))`` en lugar de ``push1 3 push1 2 add push1 1 mul``
 * variables de ensamblador local: ``let x := add(2, 3)  let y := mload(0x40)  x := add(x, y)``
-* acceso a variables externas: ``function f(uint x) { assembly { x := sub(x, 1) } }``
+* acceso a variables externos: ``function f(uint x) public { assembly { x := sub(x, 1) } }``
 * etiquetas: ``let x := 10  repeat: x := sub(x, 1) jumpi(repeat, eq(x, 0))``
 * bucles: ``for { let i := 0 } lt(i, x) { i := add(i, 1) } { y := mul(2, y) }``
 * declaraciones de intercambio: ``switch x case 0 { y := mul(x, 2) } default { y := 0 }``
@@ -36,7 +36,7 @@ El siguiente ejemplo proporciona el código de librería que permite acceder al 
     pragma solidity ^0.4.0;
 
     library GetCode {
-        function at(address _addr) returns (bytes o_code) {
+        function at(address _addr) public returns (bytes o_code) {
             assembly {
                 // recupera el tamaño del código - esto necesita ensamblador
                 let size := extcodesize(_addr)
@@ -61,21 +61,47 @@ El ensamblador inline también es útil es los casos en los que el optimizador f
 
     library VectorSum {
         // Esta función es menos eficiente porque el optimizador falla en quitar los controles de límite en el acceso al array.
-        function sumSolidity(uint[] _data) returns (uint o_sum) {
+        function sumSolidity(uint[] _data) public returns (uint o_sum) {
             for (uint i = 0; i < _data.length; ++i)
                 o_sum += _data[i];
         }
 
         // Sabemos que solamente accedemos al array dentro de los límites, así que podemos evitar los controles.
         // Se tiene que añadir 0x20 a un array porque la primera posición contiene el tamaño del array.
-        function sumAsm(uint[] _data) returns (uint o_sum) {
+        function sumAsm(uint[] _data) public returns (uint o_sum) {
             for (uint i = 0; i < _data.length; ++i) {
                 assembly {
                     o_sum := mload(add(add(_data, 0x20), mul(i, 0x20)))
                 }
             }
         }
+
+        // Same as above, but accomplish the entire code within inline assembly.
+        function sumPureAsm(uint[] _data) public view returns (uint o_sum) {
+            assembly {
+               // Load the length (first 32 bytes)
+               let len := mload(_data)
+
+               // Skip over the length field.
+               //
+               // Keep temporary variable so it can be incremented in place.
+               //
+               // NOTE: incrementing _data would result in an unusable
+               //       _data variable after this assembly block
+               let data := add(_data, 0x20)
+
+               // Iterate until the bound is not met.
+               for
+                   { let end := add(data, len) }
+                   lt(data, end)
+                   { data := add(data, 0x20) }
+               {
+                   o_sum := add(o_sum, mload(data))
+               }
+            }
+        }
     }
+
 
 
 Síntaxis
@@ -330,7 +356,7 @@ Esta funcionalidad está todavía un poco dificultosa de usar, esensialmente por
 
     contract C {
         uint b;
-        function f(uint x) returns (uint r) {
+        function f(uint x) public returns (uint r) {
             assembly {
                 r := mul(x, sload(b_slot)) // ignorar el decalage, sabemos que es cero
             }
@@ -410,7 +436,7 @@ Puede usar la palabra clave ``let`` para declarar variables que están visibles 
     pragma solidity ^0.4.0;
 
     contract C {
-        function f(uint x) returns (uint b) {
+        function f(uint x) public returns (uint b) {
             assembly {
                 let v := add(x, 1)
                 mstore(0x80, v)
@@ -549,8 +575,10 @@ Ejemplo:
 Vamos a seguir un ejemplo de compilación de Solidity a ensamblador desazucarado.
 Consideramos el tiempo de ejecución del bytecode del siguiente programa escrito en Solidity::
 
+    pragma solidity ^0.4.0;
+    
     contract C {
-      function f(uint x) returns (uint y) {
+      function f(uint x) public returns (uint y) {
         y = 1;
         for (uint i = 0; i < x; i++)
           y = 2 * y;
