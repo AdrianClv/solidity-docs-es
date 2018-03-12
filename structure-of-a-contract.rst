@@ -40,7 +40,7 @@ Las funciones son las unidades ejecutables del código dentro de un contrato.
   pragma solidity ^0.4.0;
 
   contract SimpleAuction {
-      function bid() payable { // Función
+      function bid() public payable { // Función
           // ...
       }
   }
@@ -66,7 +66,7 @@ Los modificadores de función se usan para enmendar de un modo declarativo la se
           _;
       }
 
-      function abort() onlySeller { // Uso de modificador
+      function abort() public onlySeller { // Uso de modificador
           // ...
       }
   }
@@ -85,7 +85,7 @@ Los eventos son interfaces de conveniencia con los servicios de registro de la E
   contract SimpleAuction {
       event HighestBidIncreased(address bidder, uint amount); // Evento
 
-      function bid() payable {
+      function bid() public payable {
           // ...
           HighestBidIncreased(msg.sender, msg.value); // Lanzamiento del evento
       }
