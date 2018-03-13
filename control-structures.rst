@@ -19,8 +19,8 @@ Los parámetros de entrada se declaran de la misma forma que las variables. Como
     pragma solidity ^0.4.16;
     
     contract Simple {
-        function taker(uint _a, uint _b) {
-            // hace algo con _a y _b.
+        function taker(uint _a, uint _b) public pure {
+            // hace algo con _a y _b. 
         }
     }
 
@@ -34,7 +34,11 @@ Los parámetros de salida se pueden declarar con la misma sintaxis después de l
     pragma solidity ^0.4.16;
     
     contract Simple {
-        function arithmetics(uint _a, uint _b) returns (uint o_sum, uint o_product) {
+        function arithmetics(uint _a, uint _b)
+            public
+            pure
+            returns (uint o_sum, uint o_product)
+        {
             o_sum = _a + _b;
             o_product = _a * _b;
         }
@@ -81,7 +85,7 @@ Las funciones del contrato actual pueden ser llamadas directamente ("internament
     pragma solidity ^0.4.16;
     
     contract C {
-        function g(uint a) public returns (uint ret) { return f(); }
+        function g(uint a) public pure returns (uint ret) { return f(); }
         function f() internal pure returns (uint ret) { return g(7) + f(); }
     }
 
@@ -147,7 +151,7 @@ Nombres de parámetros de función omitidos
 -----------------------------------------
 
 Los nombres de parámetros no usados (especialmente los de retorno) se pueden omitir.
-Esos nombres estarán presentes en la pila, pero serán inaccesibles.
+Esos parámetros estarán presentes en la pila, pero serán inaccesibles.
 
 ::
 
@@ -194,9 +198,11 @@ Un contrato puede crear un nuevo contrato usando la palabra reservada ``new``. E
         }
     }
 
-Como se ve en el ejemplo, es posible traspasar Ether a la creación usando la opción ``.value()``,
+Como se ve en el ejemplo, es posible traspasar Ether mientras se crea
+una instancia de ``D`` usando la opción ``.value()``,
 pero no es posible limitar la cantidad de gas. Si la creación falla
-(debido al desbordamiento de la pila, falta de balance o cualquier otro problema), se dispara una excepción.
+(debido al desbordamiento de la pila, falta de balance o cualquier otro problema),
+se lanza una excepción.
 
 Orden de la evaluación de expresiones
 =====================================
@@ -236,7 +242,8 @@ Solidity internamente permite tipos tupla, p.ej.: una lista de objetos de, poten
             // el resto de los valores se descartan.
             (data.length,) = f(); // Establece la longitud a 7
             // Lo mismo se puede hacer en el lado izquierdo.
-            (,data[3]) = f(); // Sets data[3] to 2
+            // Si la tupla comienza con un componente vacío, el comienzo de los valores será descartado.
+            (,data[3]) = f(); // Sets data[3] to 2
             // Los componentes sólo se pueden dejar en el lado izquierdo de las asignaciones, con
             // una excepción:
             (x,) = (1,);
@@ -319,7 +326,7 @@ Esto significa que el siguiente código es legal, aunque se haya escrito de mane
         }
     }
 
-.. index:: ! exception, ! throw
+.. index:: ! exception, ! throw, ! assert, ! require, ! revert
 
 Excepciones
 ===========
