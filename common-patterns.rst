@@ -35,12 +35,12 @@ recibes los fondos de la persona que te destronó.
 
         mapping (address => uint) pendingWithdrawals;
 
-        function WithdrawalContract() payable {
+        function WithdrawalContract() public payable {
             richest = msg.sender;
             mostSent = msg.value;
         }
 
-        function becomeRichest() payable returns (bool) {
+        function becomeRichest() public payable returns (bool) {
             if (msg.value > mostSent) {
                 pendingWithdrawals[richest] += msg.value;
                 richest = msg.sender;
@@ -51,7 +51,7 @@ recibes los fondos de la persona que te destronó.
             }
         }
 
-        function withdraw() {
+        function withdraw() public {
             uint amount = pendingWithdrawals[msg.sender];
             // Acuérdate de poner a cero la cantidad a reembolsar antes
             // de enviarlo para evitar re-entrancy attacks
@@ -70,12 +70,12 @@ Esto en lugar del patrón más intuitivo de envío:
         address public richest;
         uint public mostSent;
 
-        function SendContract() payable {
+        function SendContract() public payable {
             richest = msg.sender;
             mostSent = msg.value;
         }
 
-        function becomeRichest() payable returns (bool) {
+        function becomeRichest() public payable returns (bool) {
             if (msg.value > mostSent) {
                 // Esta línea puede causar problemas (explicado abajo).
                 richest.transfer(msg.value);
@@ -157,6 +157,7 @@ hace estas restricciones altamente visibles.
         /// Hacer que `_newOwner` sea el nuevo owner de
         /// este contrato.
         function changeOwner(address _newOwner)
+            public
             onlyBy(owner)
         {
             owner = _newOwner;
@@ -172,6 +173,7 @@ hace estas restricciones altamente visibles.
         /// después de que el contrato haya sido
         /// creado.
         function disown()
+            public
             onlyBy(owner)
             onlyAfter(creationTime + 6 weeks)
         {
@@ -195,6 +197,7 @@ hace estas restricciones altamente visibles.
         }
 
         function forceOwnerChange(address _newOwner)
+            public
             costs(200 ether)
         {
             owner = _newOwner;
@@ -315,6 +318,7 @@ cuando la función termine.
 
         // ¡El orden de los modificadores importa aquí!
         function bid()
+            public 
             payable
             timedTransitions
             atStage(Stages.AcceptingBlindedBids)
@@ -323,6 +327,7 @@ cuando la función termine.
         }
 
         function reveal()
+            public
             timedTransitions
             atStage(Stages.RevealBids)
         {
@@ -337,6 +342,7 @@ cuando la función termine.
         }
 
         function g()
+            public
             timedTransitions
             atStage(Stages.AnotherStage)
             transitionNext
@@ -344,6 +350,7 @@ cuando la función termine.
         }
 
         function h()
+            public
             timedTransitions
             atStage(Stages.AreWeDoneYet)
             transitionNext
@@ -351,6 +358,7 @@ cuando la función termine.
         }
 
         function i()
+            public
             timedTransitions
             atStage(Stages.Finished)
         {
