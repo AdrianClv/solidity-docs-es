@@ -7,7 +7,7 @@ Estructura de un contrato
 *************************
 
 Los Contratos en Solidity son similares a las clases de los lenguajes orientados a objetos.
-Cualquier contrato puede contener declaraciones del tipo :ref:`variables de estado <structure-state-variables>`, :ref:`funciones <structure-functions>`, :ref:`modificadores de función <structure-function-modifiers>`, :ref:`eventos <structure-events>`, :ref:`structs <structure-structs-types>` y :ref:`enums <structure-enum-types>`.
+Cualquier contrato puede contener declaraciones del tipo :ref:`variables de estado <structure-state-variables>`, :ref:`funciones <structure-functions>`, :ref:`modificadores de función <structure-function-modifiers>`, :ref:`eventos <structure-events>`, :ref:`structs <structure-struct-types>` y :ref:`enums <structure-enum-types>`.
 Además, los contratos pueden heredar de otros contratos.
 
 .. _structure-state-variables:
@@ -40,7 +40,7 @@ Las funciones son las unidades ejecutables del código dentro de un contrato.
   pragma solidity ^0.4.0;
 
   contract SimpleAuction {
-      function bid() payable { // Función
+      function bid() public payable { // Función
           // ...
       }
   }
@@ -66,7 +66,7 @@ Los modificadores de función se usan para enmendar de un modo declarativo la se
           _;
       }
 
-      function abort() onlySeller { // Uso de modificador
+      function abort() public onlySeller { // Uso de modificador
           // ...
       }
   }
@@ -85,7 +85,7 @@ Los eventos son interfaces de conveniencia con los servicios de registro de la E
   contract SimpleAuction {
       event HighestBidIncreased(address bidder, uint amount); // Evento
 
-      function bid() payable {
+      function bid() public payable {
           // ...
           HighestBidIncreased(msg.sender, msg.value); // Lanzamiento del evento
       }
@@ -93,7 +93,7 @@ Los eventos son interfaces de conveniencia con los servicios de registro de la E
 
 Véase :ref:`eventos <events>` en la sección sobre contratos para tener más información sobre cómo se declaran los eventos y cómo se pueden usar dentro de una dapp.
 
-.. _structure-structs-types:
+.. _structure-struct-types:
 
 Tipos de structs
 ================
