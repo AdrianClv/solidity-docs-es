@@ -14,13 +14,11 @@ Parámetros de entrada
 
 Los parámetros de entrada se declaran de la misma forma que las variables. Como una excepción, los parámetros no usados pueden omitir el nombre de la variable. Por ejemplo, si quisiéramos que nuestro contrato acepte un tipo de llamadas externas con dos enteros, el código quedaría similar a este::
 
-::
-
     pragma solidity ^0.4.16;
-    
+
     contract Simple {
         function taker(uint _a, uint _b) public pure {
-            // hace algo con _a y _b. 
+            // hace algo con _a y _b.
         }
     }
 
@@ -28,8 +26,6 @@ Parámetros de salida
 --------------------
 
 Los parámetros de salida se pueden declarar con la misma sintaxis después de la palabra reservada ``returns``. Por ejemplo, supongamos que deseamos devolver dos resultados: la suma y el producto de dos valores dados. Entonces, escribiríamos un código como este::
-
-::
 
     pragma solidity ^0.4.16;
     
@@ -132,6 +128,7 @@ Llamadas con nombre y parámetros de funciones anónimas
 ------------------------------------------------------
 
 Los argumentos de una llamada a una función pueden venir dados por el nombre, en cualquier orden, si están entre ``{ }`` como se puede ver en el siguiente ejemplo. La lista de argumentos tiene que coincidir por el nombre con la lista de parámetros de la declaración de la función, pero pueden estar en orden aleatorio.
+
 ::
 
     pragma solidity ^0.4.0;
@@ -173,6 +170,7 @@ Creando contratos mediante ``new``
 ==================================
 
 Un contrato puede crear un nuevo contrato usando la palabra reservada ``new``. El código completo del contrato que se está creando tiene que ser conocido de antemano, por lo que no son posibles las dependencias de creación recursivas.
+
 ::
 
     pragma solidity ^0.4.0;
@@ -263,7 +261,7 @@ Las asignaciones *a* variables de estado siempre crean una copia independiente. 
 .. _default-value:
 
 Scoping y declaraciones
-=========================
+=======================
 
 Una variable cuando se declara tendrá un valor inicial por defecto que, representado en bytes, será todo ceros.
 Los valores por defecto de las variables son los típicos "estado-cero" cualquiera que sea el tipo. Por ejemplo, el valor por defecto para un ``bool`` es ``false``. El valor por defecto para un ``uint`` o ``int`` es ``0``. Para arrays de tamaño estático y ``bytes1`` hasta ``bytes32``, cada elemento individual será inicializado a un valor por defecto según sea su tipo. Finalmente, para arrays de tamaño dinámico, ``bytes``y ``string``, el valor por defecto es un array o string vacío.
@@ -309,7 +307,9 @@ Como consecuencia de esto, el código siguiente es ilegal y hace que el compilad
     }
 
 Como añadido a esto, si la variable se declara, se inicializará al principio de la función con su valor por defecto.
-Esto significa que el siguiente código es legal, aunque se haya escrito de manera un tanto pobre::
+Esto significa que el siguiente código es legal, aunque se haya escrito de manera un tanto pobre:
+
+::
 
     pragma solidity ^0.4.0;
 
