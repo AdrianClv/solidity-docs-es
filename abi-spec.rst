@@ -288,7 +288,7 @@ Una descripción de función es un objeto JSON con los siguientes campos:
   * ``components``: usado para tipos tupla (ver abajo).
 - ``outputs``: un array de objetos similar a ``inputs``, puede omitirse si la función no devuelve nada;
 - ``payable``: ``true`` si la función acepta ether, por defecto a ``false``.
-- ``stateMutability``: un string con uno de los siguientes valores: ``pure`` (:ref:`especificada para no leer el estado de la blockchain <pure-functions>`), ``view`` (:ref:`especificada para no modificar el estado de la blockchain <view-functions>`), ``nonpayable`` y ``payable`` (igual ``payable`` arriba).
+- ``stateMutability``: un string con uno de los siguientes valores: ``pure`` (:ref:`especificada para no leer el estado de la blockchain <pure-functions>`), ``view`` (:ref:`especificada para no modificar el estado de la blockchain <view-functions>`), ``nonpayable`` y ``payable`` (igual que ``payable`` arriba).
 - ``constant``: ``true`` si la función es ``pure`` o ``view``.
 
 
