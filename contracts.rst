@@ -12,52 +12,26 @@ Los contratos en Solidity son similares a las clases en los lenguajes orientados
 Crear contratos
 ***************
 
-Los contratos pueden crearse "desde fuera" o desde contratos en Solidity. Cuando se crea un contrato, su constructor (una función con el mismo nombre que el contrato) se ejecuta una sola vez.
+Los contratos pueden crearse "desde fuera" mediante transacciones en Ethereum o desde contratos en Solidity.
+
+IDEs, como `Remix <https://remix.ethereum.org/>`_, facilitan el proceso de creación empleando elementos de UI.
+
+La mejor forma de crear contratos en Ethereum de forma programática es usando el API de JavaScript `web3.js <https://github.com/ethereum/web3.js>`_.
+A día de hoy, tiene un método llamado `web3.eth.Contract <https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#new-contract>`_ para facilitar la creación de contratos.
+
+Cuando se crea un contrato, su constructor (una función con el mismo nombre que el contrato) se ejecuta una sola vez.
 
 El constructor es opcional. Se admite un solo constructor, lo que significa que la sobrecarga no está soportada.
 
-Desde ``web3.js``, es decir la API de JavaScript, esto se hace de la siguiente manera::
-
-    // Es necesario especificar alguna fuente, incluido el nombre del contrato para los parametros de abajo
-    var source = "contract CONTRACT_NAME { function CONTRACT_NAME(uint a, uint b) {} }";
-
-    // El array json del ABI generado por el compilador
-    var abiArray = [
-        {
-            "inputs":[
-                {"name":"x","type":"uint256"},
-                {"name":"y","type":"uint256"}
-            ],
-            "type":"constructor"
-        },
-        {
-            "constant":true,
-            "inputs":[],
-            "name":"x",
-            "outputs":[{"name":"","type":"bytes32"}],
-            "type":"function"
-        }
-    ];
-
-    var MyContract_ = web3.eth.contract(source);
-    MyContract = web3.eth.contract(MyContract_.CONTRACT_NAME.info.abiDefinition);
-    
-    // Desplegar el nuevo contrato
-    var contractInstance = MyContract.new(
-        10,
-        11,
-        {from: myAccount, gas: 1000000}
-    );
-
 .. index:: constructor;arguments
 
-Internamente, los argumentos del constructor son transmitidos después del propio código del contrato, pero no se tiene que preocupar de eso si utiliza ``web3.js``.
+Internamente, los argumentos del constructor son transmitidos :ref:`ABI encoded <ABI>` después del propio código del contrato, pero no se tiene que preocupar de eso si utiliza ``web3.js``.
 
 Si un contrato quiere crear otros contratos, el creador tiene que conocer el código fuente (y el binario) del contrato a crear. Eso significa que la creación de dependencias cíclicas es imposible.
 
 ::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     contract OwnedToken {
         // TokenCreator es un contrato que está definido más abajo. 
@@ -69,7 +43,7 @@ Si un contrato quiere crear otros contratos, el creador tiene que conocer el có
 
         // Esto es el constructor que registra el creador y el nombre 
         // que se le ha asignado
-        function OwnedToken(bytes32 _name) {
+        function OwnedToken(bytes32 _name) public {
             // Se accede a las variables de estado por su nombre
             // y no, por ejemplo, por this.owner. Eso también se aplica 
             // a las funciones y, especialmente en los constructores, 
@@ -84,7 +58,7 @@ Si un contrato quiere crear otros contratos, el creador tiene que conocer el có
             name = _name;
         }
 
-        function changeName(bytes32 newName) {
+        function changeName(bytes32 newName) public {
             // Solo el creador puede modificar el nombre --
             // la comparación es posible ya que los contratos 
             // se pueden convertir a direcciones de forma implícita.
@@ -92,7 +66,7 @@ Si un contrato quiere crear otros contratos, el creador tiene que conocer el có
                 name = newName;
         }
 
-        function transfer(address newOwner) {
+        function transfer(address newOwner) public {
             // Solo el creador puede transferir el token.
             if (msg.sender != owner) return;
             // También vamos a querer preguntar al creador 
@@ -107,25 +81,27 @@ Si un contrato quiere crear otros contratos, el creador tiene que conocer el có
 
     contract TokenCreator {
         function createToken(bytes32 name)
+	   public
            returns (OwnedToken tokenAddress)
         {
             // Crea un contrato para crear un nuevo Token.
             // Del lado de JavaScript, el tipo que se nos devuelve
-            // simplemente es la dirección ("address"), ya que ese
+            // simplemente es la dirección (`address`), ya que ese
             // es el tipo más cercano disponible en el ABI.
             return new OwnedToken(name);
         }
 
-        function changeName(OwnedToken tokenAddress, bytes32 name) {
+        function changeName(OwnedToken tokenAddress, bytes32 name) public {
             // De nuevo, el tipo externo de "tokenAddress" 
             // simplemente es "address".
             tokenAddress.changeName(name);
         }
 
-        function isTokenTransferOK(
-            address currentOwner,
-            address newOwner
-        ) returns (bool ok) {
+        function isTokenTransferOK(address currentOwner, address newOwner)
+	    public
+	    view
+	    returns (bool ok)
+	{
             // Verifica una condición arbitraria
             address tokenAddress = msg.sender;
             return (keccak256(newOwner) & 0xff) == (bytes20(tokenAddress) & 0xff);
@@ -158,10 +134,10 @@ El especificador de visibilidad se pone después del tipo para las variables de 
 
 ::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     contract C {
-        function f(uint a) private returns (uint b) { return a + 1; }
+        function f(uint a) private pure returns (uint b) { return a + 1; }
         function setData(uint a) internal { data = a; }
         uint public data;
     }
@@ -169,6 +145,7 @@ El especificador de visibilidad se pone después del tipo para las variables de 
 En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el valor de ``data`` en el almacén de estados, pero no puede llamar a ``f``. El contrato ``E`` deriva de ``C`` y, por lo tanto, puede llamar a ``compute``.
 
 ::
+    // Esto no va a compilar
 
     pragma solidity ^0.4.0;
 
@@ -176,31 +153,32 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
         uint private data;
 
         function f(uint a) private returns(uint b) { return a + 1; }
-        function setData(uint a) { data = a; }
+        function setData(uint a) public { data = a; }
         function getData() public returns(uint) { return data; }
         function compute(uint a, uint b) internal returns (uint) { return a+b; }
     }
 
 
     contract D {
-        function readData() {
+        function readData() public {
             C c = new C();
-            uint local = c.f(7); // error: el miembro "f" no es visible
+            uint local = c.f(7); // error: el miembro `f` no es visible
             c.setData(3);
             local = c.getData();
-            local = c.compute(3, 5); // error: el miembro "compute" no es visible
+            local = c.compute(3, 5); // error: el miembro `compute` no es visible
         }
     }
 
 
     contract E is C {
-        function g() {
+        function g() public {
             C c = new C();
             uint val = compute(3, 5);  // acceso a un miembro interno (desde un contrato derivado a su contrato padre)
         }
     }
 
 .. index:: ! getter;function, ! function;getter
+.. _getter-functions:
 
 Funciones getter
 ================
@@ -218,7 +196,7 @@ El compilador crea automáticamente funciones getter para todas las variables de
 
     contract Caller {
         C c = new C();
-        function f() {
+        function f() public {
             uint local = c.data();
         }
     }
@@ -231,7 +209,7 @@ Las funciones getter tienen visibilidad externa. Si se accede al símbolo intern
 
     contract C {
         uint public data;
-        function x() {
+        function x() public {
             data = 3; // acceso interno
             uint val = this.data(); // acceso externo
         }
@@ -256,7 +234,7 @@ Nos va a generar una función de la siguiente forma:
 
 ::
 
-    function data(uint arg1, bool arg2, uint arg3) returns (uint a, bytes3 b) {
+    function data(uint arg1, bool arg2, uint arg3) public returns (uint a, bytes3 b) {
         a = data[arg1][arg2][arg3].a;
         b = data[arg1][arg2][arg3].b;
     }
@@ -278,11 +256,11 @@ Se pueden usar los modificadores para cambiar el comportamiento de las funciones
     pragma solidity ^0.4.11;
 
     contract owned {
-        function owned() { owner = msg.sender; }
+        function owned() public { owner = msg.sender; }
         address owner;
         
         // Este contrato sólo define un modificador pero no lo usa, se va a utilizar en un contrato derivado.
-        // El cuerpo de la función se inserta donde aparece el símbolo especial "_;" en la definición del modificador.
+        // El cuerpo de la función se inserta donde aparece el símbolo especial `_;` en la definición del modificador.
         // Esto significa que si el propietario llama a esta función, la función se ejecuta, pero en otros casos devolverá una excepción.
         modifier onlyOwner {
             require(msg.sender == owner);
@@ -293,7 +271,7 @@ Se pueden usar los modificadores para cambiar el comportamiento de las funciones
 
     contract mortal is owned {
         // Este contrato hereda del modificador "onlyOwner" desde "owned" y lo aplica a la función "close", lo que tiene como efecto que las llamadas a "close" solamente tienen efecto si las hace el propietario registrado.
-        function close() onlyOwner {
+        function close() public onlyOwner {
             selfdestruct(owner);
         }
     }
@@ -313,14 +291,14 @@ Se pueden usar los modificadores para cambiar el comportamiento de las funciones
         mapping (address => bool) registeredAddresses;
         uint price;
 
-        function Register(uint initialPrice) { price = initialPrice; }
+        function Register(uint initialPrice) public { price = initialPrice; }
 
         // Aquí es importante facilitar también la palabra clave "payable", de lo contrario la función rechazaría automáticamente todos los ethers que le mandemos. 
-        function register() payable costs(price) {
+        function register() public payable costs(price) {
             registeredAddresses[msg.sender] = true;
         }
 
-        function changePrice(uint _price) onlyOwner {
+        function changePrice(uint _price) public onlyOwner {
             price = _price;
         }
     }
@@ -334,7 +312,7 @@ Se pueden usar los modificadores para cambiar el comportamiento de las funciones
             locked = false;
         }
 
-        /// Esta función está protegida por un mutex, lo que significa que llamadas reentrantes desde dentro del msg.sender.call no pueden llamar a f de nuevo.
+        /// Esta función está protegida por un mutex, lo que significa que llamadas reentrantes desde dentro del `msg.sender.call` no pueden llamar a `f` de nuevo.
         /// La declaración `return 7` asigna 7 al valor devuelto, pero aún así ejecuta la declaración `locked = false` en el modificador.
         function f() noReentrancy returns (uint) {
             require(msg.sender.call());
@@ -375,42 +353,91 @@ En este momento, no todos los tipos para las constantes están implementados. Lo
         bytes32 constant myHash = keccak256("abc");
     }
 
+.. index:: ! functions
+.. _functions:
 
-.. _constant-functions:
+*********
+Funciones
+*********
+.. index:: ! view function, function;view
 
-********************
-Funciones constantes
-********************
+Funciones view
+==============
 
-En el caso en que una función se declare como constante, promete no modificar el estado.
+Las funciones pueden declararse como ``view``, en cuyo caso se comprometen a no modificar el estado.
+
+Los siguientes casos se considera que modifican el estado:
+
+#. Escribir en variables de estado
+#. :ref:`Emitir eventos <events>`.
+#. :ref:`Crear otros contratos <creating-contracts>`.
+#. Usar ``selfdestruct``.
+#. Enviar Ether mediante llamadas.
+#. Llamar a cualquier función que no esté marcada como ``view`` o ``pure``.
+#. Usar llamadas a bajo nivel.
+#. Usar ensamblador inline que contiene ciertos opcodes.
 
 ::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     contract C {
-        function f(uint a, uint b) constant returns (uint) {
-            return a * (b + 42);
+        function f(uint a, uint b) public view returns (uint) {
+            return a * (b + 42) + now;
         }
     }
 
 .. note::
-  Los métodos getter están marcados como constantes. 
+  ``constant`` es un alias para ``view``.
+  
+.. note::
+  Los métodos getter están marcados como ``view``. 
 
 .. warning::
-  El compilador todavía no impone que un método constante no modifique el estado.
+  El compilador todavía no impone que un método ``view`` no modifique el estado.
+
+.. index:: ! pure function, function;pure
+
+.. _pure-functions:
+
+Funciones pure
+==============
+
+Las funciones pueden declararse como ``pure``, en cuyo caso se comprometen a no leer o modificar el estado.
+
+Además de la lista de modificaciones de estado explicada arriba, los siguientes casos se consideran leer del estado:
+
+#. Leer de variables de estado.
+#. Acceder a ``this.balance`` o ``<address>.balance``.
+#. Acceder a cualquiera de los miembros de ``block``, ``tx``, ``msg`` (con la excepción de ``msg.sig`` y ``msg.data``).
+#. Llamar a cualquier función no marcada como ``pure``.
+#. Usar ensamblador inline que contenga ciertos opcodes.
+
+::
+
+    pragma solidity ^0.4.16;
+
+    contract C {
+        function f(uint a, uint b) public pure returns (uint) {
+            return a * (b + 42);
+        }
+    }
+
+.. warning::
+  El compilador todavía no impone que un método ``pure`` no lea el estado.
 
 .. index:: ! fallback function, function;fallback
 
 .. _fallback-function:
 
-****************
 Función fallback
-****************
+================
 
 Un contrato puede tener exactamente una sola función sin nombre. Esta función no puede tener argumentos ni puede devolver nada. Se ejecuta si, al llamar al contrato, ninguna de las otras funciones del contrato se corresponde al identificador de función proporcionado (o si no se hubiera proporcionado ningún dato).
 
-Además, esta función se ejecutará siempre y cuando el contrato sólo reciba Ether (sin datos). En este caso en general hay muy poco gas disponible para una llamada a una función (para ser preciso, 2300 gas), por eso es importante hacer las funciones fallback lo más baratas posible.
+Además, esta función se ejecutará siempre y cuando el contrato sólo reciba Ether (sin datos). Además, para recibir Ether, la función fallback debe ser marcada como ``payable``. Si la función no existe, el contrato no puede recibir Ether mediante transacciones normales.
+
+En este caso en general hay muy poco gas disponible para una llamada a una función (para ser preciso, 2300 gas), por eso es importante hacer las funciones fallback lo más baratas posible. Ten en cuenta que el gas requerido por una transacción (al contrario que por una llamada interna) que llama a la función fallback es mucho mayor, porque cada transacción carga una cantidad adicional de 21000 gas o más por cosas como comprobar la firma.
 
 En particular, las siguientes operaciones consumirán más gas de lo que se da como estipendio para una función fallback.
 
@@ -421,35 +448,55 @@ En particular, las siguientes operaciones consumirán más gas de lo que se da c
 
 Asegúrese por favor de testear su función fallback meticulosamente antes de desplegar el contrato para asegurarse de que su coste de ejecución es menor de 2300 gas.
 
+.. note::
+    Aunque la funcin fallback no puede tener argumentos, se puede usar ``msg.data`` para recibir cualquier payload proporcionado en la llamada.
+
 .. warning::
     Los contratos que reciben Ether directamente (sin una llamada a una función, p.ej usando ``send`` o ``transfer``) pero que no tienen definida una función fallback, van a lanzar una excepción, devolviendo el Ether (nótese que esto era diferente antes de la versión v0.4.0 de Solidity). Por lo tanto, si desea que su contrato reciba Ether, tiene que implementar una función fallback.
+    
+.. warning::
+    Un contrato sin payable en la función fallback puede recibir Ether como receptor de una `transacción coinbase` (aka `recompensa de bloque del minero`) o como destino en ``selfdestruct``.
+
+    Un contrato no puede reaccionar c dichas transferencias de Ether, por lo que no puede rechazarlas. Esto es una elección de diseño de la EVM y Solidity no puede hacer nada.
+
+    También significa que ``this.balance`` puede ser mayor que la suma de algún tipo de contabilidad manual implementado en un contrato (i.e. tener un contador actualizado en la función fallback).
 
 ::
 
     pragma solidity ^0.4.0;
 
     contract Test {
-        // Se llama a esta función para todos los mensajes enviados a este contrato (no hay otra función). Enviar Ether a este contrato lanza una excepción, porque la función fallback no tiene el modificador "payable".
-        function() { x = 1; }
+        // Se llama a esta función para todos los mensajes enviados a este contrato (no hay otra función). Enviar Ether a este contrato lanza una excepción, porque la función fallback no tiene el modificador `payable`.
+        function() public{ x = 1; }
         uint x;
     }
 
 
     // Este contrato guarda todo el Ether que se le envía sin posibilidad de recuperarlo.
     contract Sink {
-        function() payable { }
+        function() public payable { }
     }
 
 
     contract Caller {
-        function callTest(Test test) {
+        function callTest(Test test) public {
             test.call(0xabcdef01); // el hash no existe
             // resulta en que test.x se vuelve == 1.
 
-            // La siguiente llamada falla, devuelve el Ether y devuelve un error:
-            test.send(2 ether);
+            // Lo siguiente no compila, pero incluso
+            // si alguien envía Ether al contrato,
+            // la transacción fallará y rechazará el
+            // Ether.
+            // test.send(2 ether);
         }
     }
+    
+.. index:: ! overload
+.. _overload-function:
+
+Sobrecarga de funciones
+=======================
+
 
 .. index:: ! event
 
