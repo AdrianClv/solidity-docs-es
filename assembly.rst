@@ -18,6 +18,7 @@ Para tener un control más fino, especialmente para mejorar el lenguaje excribie
 * acceso a variables externos: ``function f(uint x) public { assembly { x := sub(x, 1) } }``
 * etiquetas: ``let x := 10  repeat: x := sub(x, 1) jumpi(repeat, eq(x, 0))``
 * bucles: ``for { let i := 0 } lt(i, x) { i := add(i, 1) } { y := mul(2, y) }``
+* bloques if: ``if slt(x, 0) { x := sub(0, x) }``
 * declaraciones de intercambio: ``switch x case 0 { y := mul(x, 2) } default { y := 0 }``
 * llamadas a funciones: ``function f(x) -> y { switch x case 0 { y := 1 } default { y := mul(x, f(sub(x, 1))) }   }``
 
@@ -25,6 +26,11 @@ Ahora queremos decribir el lenguaje del ensamblador inline en detalles.
 
 .. warning::
     El ensamblador inline es una forma de acceder a bajo nivel a la Máquina Virtual de Ethereum. Esto ignora varios elementos de seguridad de Solidity.
+
+.. note::
+    TODO: Escribir cómo las reglas del ámbito del ensamblador inline son un poco diferentes,
+    y las complicaciones que surgen cuando, por ejemplo, se usan funciones internas o librerías.
+    Escribir también sobre los símbolos definidos por el compilador.
 
 Ejemplo
 -------
@@ -36,7 +42,7 @@ El siguiente ejemplo proporciona el código de librería que permite acceder al 
     pragma solidity ^0.4.0;
 
     library GetCode {
-        function at(address _addr) public returns (bytes o_code) {
+        function at(address _addr) public view returns (bytes o_code) {
             assembly {
                 // recupera el tamaño del código - esto necesita ensamblador
                 let size := extcodesize(_addr)
@@ -57,40 +63,40 @@ El ensamblador inline también es útil es los casos en los que el optimizador f
 
 .. code::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     library VectorSum {
         // Esta función es menos eficiente porque el optimizador falla en quitar los controles de límite en el acceso al array.
-        function sumSolidity(uint[] _data) public returns (uint o_sum) {
+        function sumSolidity(uint[] _data) public view returns (uint o_sum) {
             for (uint i = 0; i < _data.length; ++i)
                 o_sum += _data[i];
         }
 
         // Sabemos que solamente accedemos al array dentro de los límites, así que podemos evitar los controles.
         // Se tiene que añadir 0x20 a un array porque la primera posición contiene el tamaño del array.
-        function sumAsm(uint[] _data) public returns (uint o_sum) {
+        function sumAsm(uint[] _data) public view returns (uint o_sum) {
             for (uint i = 0; i < _data.length; ++i) {
                 assembly {
-                    o_sum := mload(add(add(_data, 0x20), mul(i, 0x20)))
+                    o_sum := add(o_sum, mload(add(add(_data, 0x20), mul(i, 0x20))))
                 }
             }
         }
 
-        // Same as above, but accomplish the entire code within inline assembly.
+        // Igual que arriba, pero todo mediante ensamblador inline.
         function sumPureAsm(uint[] _data) public view returns (uint o_sum) {
             assembly {
-               // Load the length (first 32 bytes)
+               // Carga la longitud (primeros 32 bytes)
                let len := mload(_data)
 
-               // Skip over the length field.
+               // Saltar el campo de longitud
                //
-               // Keep temporary variable so it can be incremented in place.
+               // Mantener la variable temporal para poder ser incrementada.
                //
-               // NOTE: incrementing _data would result in an unusable
-               //       _data variable after this assembly block
+               // NOTE: imcrementar _data resultaría en una variable 
+               //       _data inusable tras este bloque de ensamblador
                let data := add(_data, 0x20)
 
-               // Iterate until the bound is not met.
+               // Iterar hasta que se alcance el límite.
                for
                    { let end := add(data, len) }
                    lt(data, end)
@@ -113,7 +119,7 @@ El ensamblador analiza comentarios, literales e identificadores de igual manera 
  - opcodes (en "estilo instruccional"), p.ej. ``mload sload dup1 sstore``, véase más abajo para tener una lista
  - opcodes en estilo fucional, e.g. ``add(1, mlod(0))``
  - etiquetas, p.ej. ``name:``
- - declaraciones de variable, p.ej. ``let x := 7`` o ``let x := add(y, 3)``
+ - declaraciones de variable, p.ej. ``let x := 7``, ``let x := add(y, 3)`` o ``let x`` (se asigna el valor inicial de vacío (0))
  - identificadores (etiquetas o variables de ensamblador local y externos si se usa como ensamblador inline), p.ej. ``jump(name)``, ``3 x add``
  - tareas (en "estilo instruccional"), e.g. ``3 =: x``
  - tareas en estilo fucional, p.ej. ``x := add(y, 3)``
@@ -404,28 +410,6 @@ Además, el analizador de la altura de la pila lee el código opcode por opcode 
         three:
     }
 
-Este problema puede resolverse manualmente ajustando la altura de la pila en lugar de que lo haga el ensamblador - puede proporcionar un delta de altura de pila que se suma a la altura de la pila justo antes de la etiqueta.
-Nótese que no va a tener que preocuparse por estas cosas si sólo usa bucles y funciones de nivel ensamblador.
-
-Para ilustrar cómo esto se puede hacer en casos extremos, véase el ejemplo siguiente:
-
-.. code::
-
-    {
-        let x := 8
-        jump(two)
-        0 // Este código no se puede acceder pero se ajustará correctamente la altura de la pila
-        one:
-            x := 9 // Ahora se puede acceder correctamente a x
-            jump(three)
-            pop // Corrección negativa similar
-        two:
-            7 // Empujar algo arriba de la pila
-            jump(one)
-        three:
-        pop // Tenemos que hacer pop con el valor empujado manualmente aqui otra vez
-    }
-
 Declarando variables de ensamblador local
 -----------------------------------------
 
@@ -433,10 +417,10 @@ Puede usar la palabra clave ``let`` para declarar variables que están visibles 
 
 .. code::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     contract C {
-        function f(uint x) public returns (uint b) {
+        function f(uint x) public view returns (uint b) {
             assembly {
                 let v := add(x, 1)
                 mstore(0x80, v)
@@ -459,21 +443,37 @@ Existen asignaciones de dos tipos: las de estilo funcional y las de estilo instr
 
 .. code::
 
-    assembly {
+    {
         let v := 0 // asignación de estilo funcional como parte de la declaración de variable
         let g := add(v, 2)
         sload(10)
         =: v // asignación de estilo instruccional, pone el resultado de sload(10) en v
     }
 
-Intercambio
------------
+If
+--
 
-Se puede usar una declaración de intercambio como una versión muy básica de un "if/else". Toma el valor de una expresión y lo compara con distintas constantes. Se elige la rama correspondiente a la constante que combina. A contrario de algunos de los lenguages de programación que son propenses a errores de comportamiento, el flujo de control, después de un caso, no pasa al siguiente. Puede haber un fallback o un caso por defecto llamado ``default``.
+La declaración if se puede usar para ejecutar código de forma condicionada.
+No hay parte "else", considera usar "switch" (ver abajo) si
+necesitas múltiples alternativas.
 
 .. code::
 
-    assembly {
+    {
+        if eq(value, 0) { revert(0, 0) }
+    }
+
+The curly braces for the body are required.
+
+
+Switch
+------
+
+Se puede usar una declaración de switch como una versión muy básica de un "if/else". Toma el valor de una expresión y lo compara con distintas constantes. Se elige la rama correspondiente a la constante que combina. A contrario de algunos de los lenguages de programación que son propensos a errores de comportamiento, el flujo de control, después de un caso, no pasa al siguiente. Puede haber un fallback o un caso por defecto llamado ``default``.
+
+.. code::
+
+    {
         let x := 0
         switch calldataload(4)
         case 0 {
@@ -496,12 +496,27 @@ El ejemplo siguiente computa la suma de un área en la memoria.
 
 .. code::
 
-    assembly {
+    {
         let x := 0
         for { let i := 0 } lt(i, 0x100) { i := add(i, 0x20) } {
             x := add(x, mload(i))
         }
     }
+
+Los bucles for también se pueden escribir de modo que se comporten como bucles while:
+Simplemente deja vacías las partes de inicialización y post-iteración.
+
+.. code::
+
+    {
+        let x := 0
+        let i := 0
+        for { } lt(i, 0x100) { } {     // while(i < 0x100)
+            x := add(x, mload(i))
+            i := add(i, 0x20)
+        }
+    }
+
 
 Funciones
 ---------
@@ -516,7 +531,7 @@ El siguiente ejemplo implementa la función de potencia con cuadrados y multipli
 
 .. code::
 
-    assembly {
+    {
         function power(base, exponent) -> result {
             switch exponent
             case 0 { result := 1 }
@@ -532,7 +547,7 @@ El siguiente ejemplo implementa la función de potencia con cuadrados y multipli
 Cosas a evitar
 --------------
 
-Aunque el ensamblador inline puede dar la sensación de tener un aspecto de alto nivel, es en realidad de nivel extremadamente bajo. Se convierten las llamadas a funciones, los bucles y los interruptores con simples reglas de reescritura y luego, lo único que el ensamblador hace para el usuario es reorganizar los opcodes en estilo funcional, manejando etiquetas de salto, contando la altura de la pila para el acceso a variables y quitando posiciones en la pila para variables locales del ensamblador cuando se alcanza el final de su bloque. Especialmente en estos dos últimos casos, es importante saber que el ensamblador solo cuenta la altura de la pila desde arriba abajo, y no necesariamente siguiendo el flujo de control. Además, las operaciones como los intercambios solo van a intercambiar los contenidos de la pila pero no la ubicación de las variables.
+Aunque el ensamblador inline puede dar la sensación de tener un aspecto de alto nivel, es en realidad de nivel extremadamente bajo. Se convierten las llamadas a funciones, los bucles, los ifs y los switches con simples reglas de reescritura y luego, lo único que el ensamblador hace para el usuario es reorganizar los opcodes en estilo funcional, manejando etiquetas de salto, contando la altura de la pila para el acceso a variables y quitando posiciones en la pila para variables locales del ensamblador cuando se alcanza el final de su bloque. Especialmente en estos dos últimos casos, es importante saber que el ensamblador solo cuenta la altura de la pila desde arriba abajo, y no necesariamente siguiendo el flujo de control. Además, las operaciones como los intercambios solo van a intercambiar los contenidos de la pila pero no la ubicación de las variables.
 
 Convenciones en Solidity
 ------------------------
@@ -556,7 +571,7 @@ El lenguage ensamblador que hemos descrito más arriba como ensamblador inline t
 2. La traducción del lenguage ensamblador al bytecode deben de contener el número de sorpresas el más reducido posible.
 3. El control de flujo debe de ser fácil de detectar para ayudar a la verificación formal y a la optimización.
 
-Para cumplir con el primero y el útlimo de los objetivos, el ensamblador proporciona constructs de alto nivel como bucles ``for``, declaraciones ``switch`` y llamadas a funciones. Debería de ser posible de escribir programas de ensamblador que no hacen uso de declaraciones explícitas de tipo ``SWAP``, ``DUP``, ``JUMP`` y ``JUMPI``, porque las dos primeras declaraciones ofuscan el flujo de datos y las dos últimas ofuscan el control de flujo. Además, hay que privilegiar declaraciones funcionales del tipo ``mul(add(x, y), 7)`` a las declaraciones de opcodes puras como ``7 y x add mul`` porque en la primera, es mucho más fácil ver qué operando se usa para qué opcode.
+Para cumplir con el primero y el útlimo de los objetivos, el ensamblador proporciona constructs de alto nivel como bucles ``for``, ``if``, declaraciones ``switch`` y llamadas a funciones. Debería de ser posible de escribir programas de ensamblador que no hacen uso de declaraciones explícitas de tipo ``SWAP``, ``DUP``, ``JUMP`` y ``JUMPI``, porque las dos primeras declaraciones ofuscan el flujo de datos y las dos últimas ofuscan el control de flujo. Además, hay que privilegiar declaraciones funcionales del tipo ``mul(add(x, y), 7)`` a las declaraciones de opcodes puras como ``7 y x add mul`` porque en la primera, es mucho más fácil ver qué operando se usa para qué opcode.
 
 El segundo objetivo se cumple introduciendo una fase de desazucarización que sólo quita los constructs de más alto nivel de una forma muy regular pero permitiendo todavía la inspección el código ensamblador de bajo nivel generado. La única operación no local realizada por el ensamblador es la búsqueda de nombre de identificadores (funciones, variables, ...) definidos por el usuario, lo que se hace siguiendo reglas con un alcance muy simple y regular y con un proceso de limpieza de variables locales desde la pila.
 
@@ -575,10 +590,10 @@ Ejemplo:
 Vamos a seguir un ejemplo de compilación de Solidity a ensamblador desazucarado.
 Consideramos el tiempo de ejecución del bytecode del siguiente programa escrito en Solidity::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
     
     contract C {
-      function f(uint x) public returns (uint y) {
+      function f(uint x) public pure returns (uint y) {
         y = 1;
         for (uint i = 0; i < x; i++)
           y = 2 * y;
@@ -716,36 +731,37 @@ Gramática::
     AssemblyItem =
         Identifier |
         AssemblyBlock |
-        FunctionalAssemblyExpression |
+        AssemblyExpression |
         AssemblyLocalDefinition |
-        FunctionalAssemblyAssignment |
         AssemblyAssignment |
+        AssemblyStackAssignment |
         LabelDefinition |
+        AssemblyIf |
         AssemblySwitch |
         AssemblyFunctionDefinition |
         AssemblyFor |
-        'break' | 'continue' |
-        SubAssembly | 'dataSize' '(' Identifier ')' |
-        LinkerSymbol |
-        'errorLabel' | 'bytecodeSize' |
-        NumberLiteral | StringLiteral | HexLiteral
+        'break' |
+        'continue' |
+        SubAssembly
+    AssemblyExpression = AssemblyCall | Identifier | AssemblyLiteral
+    AssemblyLiteral = NumberLiteral | StringLiteral | HexLiteral
     Identifier = [a-zA-Z_$] [a-zA-Z_0-9]*
-    FunctionalAssemblyExpression = Identifier '(' ( AssemblyItem ( ',' AssemblyItem )* )? ')'
-    AssemblyLocalDefinition = 'let' IdentifierOrList ':=' FunctionalAssemblyExpression
-    FunctionalAssemblyAssignment = IdentifierOrList ':=' FunctionalAssemblyExpression
+    AssemblyCall = Identifier '(' ( AssemblyExpression ( ',' AssemblyExpression )* )? ')'
+    AssemblyLocalDefinition = 'let' IdentifierOrList ( ':=' AssemblyExpression )?
+    AssemblyAssignment = IdentifierOrList ':=' AssemblyExpression
     IdentifierOrList = Identifier | '(' IdentifierList ')'
     IdentifierList = Identifier ( ',' Identifier)*
-    AssemblyAssignment = '=:' Identifier
+    AssemblyStackAssignment = '=:' Identifier
     LabelDefinition = Identifier ':'
-    AssemblySwitch = 'switch' FunctionalAssemblyExpression AssemblyCase*
+    AssemblyIf = 'if' AssemblyExpression AssemblyBlock
+    AssemblySwitch = 'switch' AssemblyExpression AssemblyCase*
         ( 'default' AssemblyBlock )?
-    AssemblyCase = 'case' FunctionalAssemblyExpression AssemblyBlock
+    AssemblyCase = 'case' AssemblyExpression AssemblyBlock
     AssemblyFunctionDefinition = 'function' Identifier '(' IdentifierList? ')'
         ( '->' '(' IdentifierList ')' )? AssemblyBlock
-    AssemblyFor = 'for' ( AssemblyBlock | FunctionalAssemblyExpression)
-        FunctionalAssemblyExpression ( AssemblyBlock | FunctionalAssemblyExpression) AssemblyBlock
+    AssemblyFor = 'for' ( AssemblyBlock | AssemblyExpression )
+        AssemblyExpression ( AssemblyBlock | AssemblyExpression ) AssemblyBlock
     SubAssembly = 'assembly' Identifier AssemblyBlock
-    LinkerSymbol = 'linkerSymbol' '(' StringLiteral ')'
     NumberLiteral = HexNumber | DecimalNumber
     HexLiteral = 'hex' ('"' ([0-9a-fA-F]{2})* '"' | '\'' ([0-9a-fA-F]{2})* '\'')
     StringLiteral = '"' ([^"\r\n\\] | '\\' .)* '"'
@@ -841,7 +857,7 @@ Pseudo código::
 Generación de la transmisión de opcodes
 ---------------------------------------
 
-Durante la generación de la transmisión de opcodes, hacemos un seguimiento de la altura de la pila en un contador, de tal manera que se pueda acceder a la variables de la pila por su nombre. Se modifica la altura de la pila con cada opcode que modifica la pila y con cada etiqueta que se anota con un ajuste de la pila. Cada vez que se introduce una nueva variable local, se registra junto con la altua actual de la pila. Si se accede a una variable (bien para copiar su valor, bien para asignar algo), se selecciona la instrucción DUP o SWAP, dependiendo de la diferencia entre la altura actual de la pila y la altura de la pila en el momento en que se introdujo esta variable.
+Durante la generación de la transmisión de opcodes, hacemos un seguimiento de la altura de la pila en un contador, de tal manera que se pueda acceder a la variables de la pila por su nombre. Se modifica la altura de la pila con cada opcode que modifica la pila y con cada etiqueta que se anota con un ajuste de la pila. Cada vez que se introduce una nueva variable local, se registra junto con la altua actual de la pila. Si se accede a una variable (bien para copiar su valor, bien para asignar algo), se selecciona la instrucción ``DUP`` o ``SWAP``, dependiendo de la diferencia entre la altura actual de la pila y la altura de la pila en el momento en que se introdujo esta variable.
 
 Pseudo código::
 
