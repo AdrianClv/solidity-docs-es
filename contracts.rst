@@ -155,10 +155,9 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
         function f(uint a) private returns(uint b) { return a + 1; }
         function setData(uint a) public { data = a; }
         function getData() public returns(uint) { return data; }
-        function compute(uint a, uint b) internal returns (uint) { return a+b; }
+	function compute(uint a, uint b) internal returns (uint) { return a+b; }
     }
-
-
+    
     contract D {
         function readData() public {
             C c = new C();
@@ -496,7 +495,75 @@ Asegúrese por favor de testear su función fallback meticulosamente antes de de
 
 Sobrecarga de funciones
 =======================
+Un contrato puede tener múltiples funciones con el mismo nombre pero diferentes argumentos.
+Esto también aplica a funciones heredadas. El siguiente ejemplo muestra la sobrecarga de la 
+función ``f`` en el ámbito del contrato ``A``.
 
+::
+
+    pragma solidity ^0.4.16;
+
+    contract A {
+        function f(uint _in) public pure returns (uint out) {
+            out = 1;
+        }
+
+        function f(uint _in, bytes32 _key) public pure returns (uint out) {
+            out = 2;
+        }
+    }
+
+Las funciones sobrecargadas tambin están presentes en la interfaz externa.
+Si dos funciones visibles de forma externa difieren por sus tipos de Solidity
+pero no por sus tipos externos, en un error.
+
+::
+
+    // Esto no compila
+    pragma solidity ^0.4.16;
+
+    contract A {
+        function f(B _in) public pure returns (B out) {
+            out = _in;
+        }
+
+        function f(address _in) public pure returns (address out) {
+            out = _in;
+        }
+    }
+
+    contract B {
+    }
+
+Ambas funciones ``f`` sobrecargadas de arriba acaban aceptando un tipo address para el ABI,
+aunque son consideradas distintas dentro de Solidity.
+
+Resolución de sobrecarga y comparación de argumentos
+----------------------------------------------------
+
+Las funciones sobrecargadas se seleccionan comparando la declaración de las funciones en el ámbito actual
+con los argumentos proporcionados en la llamada a la función. Las funciones se seleccionan como candidatas
+a sobrecargarse si todos los argumentos se pueden convertir de forma implícita a los tipos esperados.
+Si no hay exactamente un candidato, la resolución falla.
+
+.. note::
+    Los parámetros devueltos no se tienen en cuenta para la resolución de la sobrecarga.
+
+::
+
+    pragma solidity ^0.4.16;
+
+    contract A {
+        function f(uint8 _in) public pure returns (uint8 out) {
+            out = _in;
+        }
+
+        function f(uint256 _in) public pure returns (uint256 out) {
+            out = _in;
+        }
+    }
+
+Llamar a ``f(50)`` crearía un error, ya que ``50`` se puede convertir de forma implícita tanto a ``uint8`` como a ``uint256``. Por otro lado, ``f(256)`` se resolvería como ``f(uint256)`` ya que ``256`` no se puede convertir de forma implícita a ``uint8``.
 
 .. index:: ! event
 
@@ -534,7 +601,7 @@ Todos los argumentos no indexados se guardarán en la parte de datos del registr
             uint _value
         );
 
-        function deposit(bytes32 _id) payable {
+        function deposit(bytes32 _id) public payable {
             // Cualquier llamada a esta función (por muy anidada que sea) puede ser detectada desde la API de JavaScript con un filtro para que se llame a `Deposit`.
             Deposit(msg.sender, _id, msg.value);
         }
@@ -546,13 +613,13 @@ Su uso en la API de JavaScript sería como sigue:
 
     var abi = /* abi generado por el compilador */;
     var ClientReceipt = web3.eth.contract(abi);
-    var clientReceipt = ClientReceipt.at(0x123 /* dirección */);
+    var clientReceipt = ClientReceipt.at("0x1234...ab67" /* dirección */);
 
     var event = clientReceipt.Deposit();
 
     // mirar si hay cambios
     event.watch(function(error, result){
-        // el resultado contendrá varias informaciones incluyendo los argumentos proporcionados en el momento de la llamada a Deposit.
+        // el resultado contendrá varias informaciones incluyendo los argumentos proporcionados en el momento de la llamada a `Deposit`.
         if (!error)
             console.log(result);
     });
@@ -572,12 +639,19 @@ También es posible acceder al mecanismo de logging a través de la interfaz de 
 
 ::
 
-    log3(
-        msg.value,
-        0x50cb9fe53daa9737b786ab3646f04d0150dc50ef4e75f59509d83667ad5adb20,
-        msg.sender,
-        _id
-    );
+    pragma solidity ^0.4.10;
+
+    contract C {
+        function f() public payable {
+            bytes32 _id = 0x420042;
+            log3(
+                bytes32(msg.value),
+                bytes32(0x50cb9fe53daa9737b786ab3646f04d0150dc50ef4e75f59509d83667ad5adb20),
+                bytes32(msg.sender),
+                _id
+            );
+        }
+    }
 
 donde el numero hexadecimal largo es igual a ``keccak256("Deposit(address,hash256,uint256)")``, la firma del evento.
 
@@ -608,7 +682,7 @@ En el siguiente ejemplo se dan más detalles.
 
 ::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     contract owned {
         function owned() { owner = msg.sender; }
@@ -616,7 +690,7 @@ En el siguiente ejemplo se dan más detalles.
     }
 
 
-    // Usar "is" para derivar de otro contrato. Los contratos derivados
+    // Usar `is` para derivar de otro contrato. Los contratos derivados
     // pueden acceder a todos los miembros no privados, incluidas las
     // funciones internas y variables de estado. A éstas sin embargo
     // no se puede acceder externamente mediante `this`.
@@ -631,21 +705,21 @@ En el siguiente ejemplo se dan más detalles.
     // sepa de la interfaz. Nótese que la función no tiene cuerpo. Si un contrato
     // no implementa todas las funciones, sólo puede usarse como interfaz.
     contract Config {
-        function lookup(uint id) returns (address adr);
+        function lookup(uint id) public returns (address adr);
     }
 
 
     contract NameReg {
-        function register(bytes32 name);
-        function unregister();
+        function register(bytes32 name) public;
+        function unregister() public;
      }
 
 
-    // Las herencias multiples son posibles. Nótese que "owned" también es una clase base
-    // de "mortal", aun así hay una sóla instancia de "owned" (igual que para las herencias virtuales en C++).
+    // Las herencias multiples son posibles. Nótese que `owned` también es una clase base
+    // de `mortal`, aun así hay una sóla instancia de `owned` (igual que para las herencias virtuales en C++).
     contract named is owned, mortal {
-        function named(bytes32 name) {
-            Config config = Config(0xd5f9d8d94886e70b06e474c3fb14fd43e2f23970);
+        function named(bytes32 name) public {
+            Config config = Config(0xD5f9D8D94886E70b06E474c3fB14Fd43E2f23970);
             NameReg(config.lookup(1)).register(name);
         }
 
@@ -654,9 +728,9 @@ En el siguiente ejemplo se dan más detalles.
 	// tipos de parámetros de salida, esto provocará un error. 
         // Tanto las llamadas a funciones locales como las que están basadas en mensajes
 	// tienen en cuenta estas sobreescrituras.
-        function kill() {
+        function kill() public {
             if (msg.sender == owner) {
-                Config config = Config(0xd5f9d8d94886e70b06e474c3fb14fd43e2f23970);
+                Config config = Config(0xD5f9D8D94886E70b06E474c3fB14Fd43E2f23970);
                 NameReg(config.lookup(1)).unregister();
                 // Sigue siendo posible llamar a una función específica que ha sido sobreescrita.
                 mortal.kill();
@@ -669,11 +743,11 @@ En el siguiente ejemplo se dan más detalles.
     // (o de forma similar a como se hace con los modificadores, en el constructor
     // del contrato derivado (ver más abajo)).
     contract PriceFeed is owned, mortal, named("GoldFeed") {
-       function updateInfo(uint newInfo) {
+       function updateInfo(uint newInfo) public {
           if (msg.sender == owner) info = newInfo;
        }
 
-       function get() constant returns(uint r) { return info; }
+       function get() public view returns(uint r) { return info; }
 
        uint info;
     }
@@ -683,21 +757,25 @@ Nótese que arriba llamamos a ``mortal.kill()`` para "reenviar" la orden de dest
 ::
 
     pragma solidity ^0.4.0;
+    
+    contract owned {
+        function owned() public { owner = msg.sender; }
+        address owner;
+    }
 
     contract mortal is owned {
-        function kill() {
+        function kill() public {
             if (msg.sender == owner) selfdestruct(owner);
         }
     }
 
-
     contract Base1 is mortal {
-        function kill() { /* hacer limpieza 1 */ mortal.kill(); }
+        function kill() public { /* hacer limpieza 1 */ mortal.kill(); }
     }
 
 
     contract Base2 is mortal {
-        function kill() { /* hacer limpieza 2 */ mortal.kill(); }
+        function kill() public { /* hacer limpieza 2 */ mortal.kill(); }
     }
 
 
@@ -710,32 +788,37 @@ Una llamada a ``Final.kill()`` llamará a ``Base2.kill`` al ser la última sobre
 
     pragma solidity ^0.4.0;
 
+    contract owned {
+        function owned() public { owner = msg.sender; }
+        address owner;
+    }
+    
     contract mortal is owned {
-        function kill() {
+        function kill() public {
             if (msg.sender == owner) selfdestruct(owner);
         }
     }
 
 
     contract Base1 is mortal {
-        function kill() { /* hacer limpieza 1 */ super.kill(); }
+        function kill() public { /* hacer limpieza 1 */ super.kill(); }
     }
 
 
     contract Base2 is mortal {
-        function kill() { /* hacer limpieza 2 */ super.kill(); }
+        function kill() public { /* hacer limpieza 2 */ super.kill(); }
     }
 
 
     contract Final is Base2, Base1 {
     }
 
-If ``Base1`` calls a function of ``super``, it does not simply
+If ``Base2`` calls a function of ``super``, it does not simply
 call this function on one of its base contracts.  Rather, it 
 calls this function on the next base contract in the final
-inheritance graph, so it will call ``Base2.kill()`` (note that
+inheritance graph, so it will call ``Base1.kill()`` (note that
 the final inheritance sequence is -- starting with the most
-derived contract: Final, Base1, Base2, mortal, owned).
+derived contract: Final, Base2, Base1, mortal, owned).
 The actual function that is called when using super is
 not known in the context of the class where it is used,
 although its type is known. This is similar for ordinary
@@ -758,12 +841,12 @@ Se requiere que los contratos derivados proporcionen todos los argumentos necesa
 
     contract Base {
         uint x;
-        function Base(uint _x) { x = _x; }
+        function Base(uint _x) public { x = _x; }
     }
 
 
     contract Derived is Base(7) {
-        function Derived(uint _y) Base(_y * _y) {
+        function Derived(uint _y) Base(_y * _y) public {
         }
     }
 
@@ -778,7 +861,8 @@ Los lenguajes que permiten herencias múltiples tienen que lidiar con varios pro
 Solidity le sigue la pista a Python y utiliza la "`Linearización C3 <https://en.wikipedia.org/wiki/C3_linearization>`_" para forzar un orden específico en el DAG de las clases base. Esto hace que se consigua la propiedad deseada de monotonicidad pero impide algunos grafos de herencia. El orden en el que las clases base se van dando con la instrucción ``is`` es especialmente importante. En el siguiente código, Solidity dará el error "Linearization of inheritance graph impossible".
 
 ::
-
+    // Esto no compila
+    
     pragma solidity ^0.4.0;
 
     contract X {}
@@ -809,17 +893,19 @@ Las funciones de un contrato pueden carecer de una implementación como pasa en 
     pragma solidity ^0.4.0;
 
     contract Feline {
-        function utterance() returns (bytes32);
+        function utterance() public returns (bytes32);
     }
 
-Estos contratos no pueden compilarse (aunque contengan funciones implementadas junto con funciones no implementadas), pero pueden usarse como contratos base.
+Estos contratos no pueden compilarse (aunque contengan
+funciones implementadas junto con funciones no implementadas),
+pero pueden usarse como contratos base.
 
 ::
 
     pragma solidity ^0.4.0;
 
     contract Cat is Feline {
-        function utterance() returns (bytes32) { return "miaow"; }
+        function utterance() public returns (bytes32) { return "miaow"; }
     }
 
 Si un contrato hereda de un contrato abstracto y éste no implementa todas las funciones no implementadas con sobrescritura, él mismo será un contrato abstracto.
@@ -845,9 +931,10 @@ Las interfaces son limitadas a lo que básicamente el contrato ABI puede represe
 Las interfaces se indican por su propia palabra clave:
 
 ::
-
+    pragma solidity ^0.4.11;
+    
     interface Token {
-        function transfer(address recipient, uint amount);
+        function transfer(address recipient, uint amount) public;
     }
 
 Los contratos pueden heredar interfaces como lo heredarían otros contratos.
@@ -860,7 +947,7 @@ Los contratos pueden heredar interfaces como lo heredarían otros contratos.
 Librerías
 *********
 
-Las librerías son similares a los contratos, pero su propósito es que se desplieguen una sola vez a una dirección especifica y su código se pueda reutilizar utilizando la característica ``DELEGATECALL`` (``CALLCODE`` hasta Homestead) de la EVM. Lo que significa que si se llama a las funciones de una librería, su código es ejecutado en el contexto del contrato que llama, es decir, ``this`` apunta al contrato que llama y en especial, se puede acceder al almacenamiento del contrato que llama. Como una librería es un trozo de código fuente aislado, una librería sólo puede acceder a las variables de estado de un contrato emisor si estas variables están específicamente proporcionadas (de lo contrario, no tendría la posibilidad de nombrarlas).
+Las librerías son similares a los contratos, pero su propósito es que se desplieguen una sola vez a una dirección especifica y su código se pueda reutilizar utilizando la característica ``DELEGATECALL`` (``CALLCODE`` hasta Homestead) de la EVM. Lo que significa que si se llama a las funciones de una librería, su código es ejecutado en el contexto del contrato que llama, es decir, ``this`` apunta al contrato que llama y en especial, se puede acceder al almacenamiento del contrato que llama. Como una librería es un trozo de código fuente aislado, una librería sólo puede acceder a las variables de estado de un contrato emisor si estas variables están específicamente proporcionadas (de lo contrario, no tendría la posibilidad de nombrarlas). Las funciones de una librería sólo se pueden llamar directamente (i.e. sin usar ``DELEGATECALL``) si no modifican el estado (i.e. si son funciones ``view`` o ``pure``), porque se asume que las librerías no tienen estado. En particular, no es posible destruir una librería salvo que se evite el sistema de tipos de Solidity.
 
 Las librería pueden considerarse como contratos base implícitos del contrato que las usa.
 Las librerías no son explícitamente visibles en la jerarquía de herencia, pero las llamadas a las funciones de una librería se parecen completamente a las llamadas a funciones de contratos base explícitos (``L.f()`` si ``L`` es el nombre de la librería). Además, las funciones ``internal`` de las librerías son visibles en todos los contratos, como si la librería fuera un contrato base. Por supuesto las llamadas a funciones internas utilizan las normas de llamadas internas, lo que significa que todos los tipos internos pueden ser enviados y que los tipos de memoria serán enviados mediante referencia y no copiados.
@@ -872,7 +959,7 @@ El siguiente ejemplo ilustra cómo usar las librerías (pero asegúrese de leer 
 
 ::
 
-    pragma solidity ^0.4.11;
+    pragma solidity ^0.4.16;
 
     library Set {
       // Definimos un nuevo tipo de datos para un struct que se va a utilizar para
@@ -882,9 +969,10 @@ El siguiente ejemplo ilustra cómo usar las librerías (pero asegúrese de leer 
       // Nótese que el primer parametro es del tipo "referencia de almacenamiento",
       // por lo tanto solamente su dirección de almacenamiento y no su contenido se
       // envía como parte de la llamada. Esto es una característica especial de las
-      // funciones de librerías. Es idiomático llamar al primer parámetro 'self', si
+      // funciones de librerías. Es idiomático llamar al primer parámetro `self`, si
       // la función puede verse como un método de este objeto.
       function insert(Data storage self, uint value)
+          public
           returns (bool)
       {
           if (self.flags[value])
@@ -894,6 +982,7 @@ El siguiente ejemplo ilustra cómo usar las librerías (pero asegúrese de leer 
       }
 
       function contains(Data storage self, uint value)
+          public
           returns (bool)
       {
           return self.flags[value];
@@ -904,7 +993,7 @@ El siguiente ejemplo ilustra cómo usar las librerías (pero asegúrese de leer 
     contract C {
         Set.Data knownValues;
 
-        function register(uint value) {
+        function register(uint value) public {
             // Las funciones de librerías pueden llamarse sin una instancia
 	    // específica de la librería, ya que la "instancia" es el contrato actual.
             require(Set.insert(knownValues, value));
@@ -928,12 +1017,12 @@ En el siguiente ejemplo se muestra cómo usar tipos de memoria y funciones inter
             uint[] limbs;
         }
 
-        function fromUint(uint x) internal returns (bigint r) {
+        function fromUint(uint x) internal pure returns (bigint r) {
             r.limbs = new uint[](1);
             r.limbs[0] = x;
         }
 
-        function add(bigint _a, bigint _b) internal returns (bigint r) {
+        function add(bigint _a, bigint _b) internal pure returns (bigint r) {
             r.limbs = new uint[](max(_a.limbs.length, _b.limbs.length));
             uint carry = 0;
             for (uint i = 0; i < r.limbs.length; ++i) {
@@ -955,11 +1044,11 @@ En el siguiente ejemplo se muestra cómo usar tipos de memoria y funciones inter
             }
         }
 
-        function limb(bigint _a, uint _limb) internal returns (uint) {
+        function limb(bigint _a, uint _limb) internal pure returns (uint) {
             return _limb < _a.limbs.length ? _a.limbs[_limb] : 0;
         }
 
-        function max(uint a, uint b) private returns (uint) {
+        function max(uint a, uint b) private pure returns (uint) {
             return a > b ? a : b;
         }
     }
@@ -968,7 +1057,7 @@ En el siguiente ejemplo se muestra cómo usar tipos de memoria y funciones inter
     contract C {
         using BigInt for BigInt.bigint;
 
-        function f() {
+        function f() public pure {
             var x = BigInt.fromUint(7);
             var y = BigInt.fromUint(uint(-1));
             var z = x.add(y);
@@ -984,6 +1073,29 @@ Las restricciones para las librerías con respecto a las restricciones para los 
 - No pueden recibir Ether
 
 (Puede que estas restricciones se levanten en un futuro.)
+
+Protección de llamadas para las librerías
+=========================================
+
+Como se ha mencionado en la introduccin, si el cdigo de una librería se
+ejecuta usando ``CALL`` en lugar de ``DELEGATECALL`` o ``CALLCODE``,
+se revertirá la ejecución a menos que se haya llamada a una función
+``view`` o ``pure``.
+
+La EVM no provee una forma directa para que un contrato sepa si
+está siendo llamado mediante ``CALL`` o no, pero un contrato puede
+usa el opcode ``ADDRESS`` para saber "dónde" está siendo ejecutado
+en ese momento. El código generado compara esta dirección con la dirección
+generada en el momento se su creación para saber el modo de llamada.
+
+Más concretamente, el código en tiempo de ejecución de una librería
+siempre comienza con una instrucción push, que es un cero de 20 bytes en 
+tiempo de compilación. Cuando el código desplegado se ejecuta, esta constante
+es reemplazada en memoria por la dirección actual. Este código modificado
+se almacena en el contrato. En tiempo de ejecución, esto causa que la dirección en
+el momento de la creación sea la primera constante en ser puesta en la pila.
+El código del dispacher compara la dirección actual con esta constante en
+cualquier función que no sea view o pure.
 
 .. index:: ! using for, library
 
@@ -1005,13 +1117,14 @@ Volvamos a escribir el ejemplo de Set del apartado :ref:`librerías <libraries>`
 
 ::
 
-    pragma solidity ^0.4.11;
+    pragma solidity ^0.4.16;
 
     // Es el mismo código que antes pero sin los comentarios
     library Set {
       struct Data { mapping(uint => bool) flags; }
 
       function insert(Data storage self, uint value)
+          public
           returns (bool)
       {
           if (self.flags[value])
@@ -1021,6 +1134,7 @@ Volvamos a escribir el ejemplo de Set del apartado :ref:`librerías <libraries>`
       }
 
       function remove(Data storage self, uint value)
+          public
           returns (bool)
       {
           if (!self.flags[value])
@@ -1030,6 +1144,8 @@ Volvamos a escribir el ejemplo de Set del apartado :ref:`librerías <libraries>`
       }
 
       function contains(Data storage self, uint value)
+          public
+	  view
           returns (bool)
       {
           return self.flags[value];
@@ -1041,9 +1157,9 @@ Volvamos a escribir el ejemplo de Set del apartado :ref:`librerías <libraries>`
         using Set for Set.Data; // este es el cambio importante
         Set.Data knownValues;
 
-        function register(uint value) {
+        function register(uint value) public {
             // Aquí, cada una de las variables con el tipo Set.Data tiene una función miembro correspondiente.
-            // La siguiente llamada es idéntica a Set.insert(knownValues, value)
+            // La siguiente llamada es idéntica a `Set.insert(knownValues, value)`
             require(knownValues.insert(value));
         }
     }
@@ -1052,10 +1168,14 @@ También es posible extender los tipos elementales de la siguiente manera:
 
 ::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     library Search {
-        function indexOf(uint[] storage self, uint value) returns (uint) {
+        function indexOf(uint[] storage self, uint value)
+	    public
+	    view
+	    returns (uint)
+	{
             for (uint i = 0; i < self.length; i++)
                 if (self[i] == value) return i;
             return uint(-1);
@@ -1067,11 +1187,11 @@ También es posible extender los tipos elementales de la siguiente manera:
         using Search for uint[];
         uint[] data;
 
-        function append(uint value) {
+        function append(uint value) public {
             data.push(value);
         }
 
-        function replace(uint _old, uint _new) {
+        function replace(uint _old, uint _new) public {
             // Esto es lo que realiza la llamada a la función de la librería
             uint index = data.indexOf(_old);
             if (index == uint(-1))
