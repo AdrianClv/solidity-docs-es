@@ -145,17 +145,18 @@ El especificador de visibilidad se pone después del tipo para las variables de 
 En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el valor de ``data`` en el almacén de estados, pero no puede llamar a ``f``. El contrato ``E`` deriva de ``C`` y, por lo tanto, puede llamar a ``compute``.
 
 ::
+
     // Esto no va a compilar
-
+    
     pragma solidity ^0.4.0;
-
+    
     contract C {
         uint private data;
-
+        
         function f(uint a) private returns(uint b) { return a + 1; }
         function setData(uint a) public { data = a; }
         function getData() public returns(uint) { return data; }
-	function compute(uint a, uint b) internal returns (uint) { return a+b; }
+        function compute(uint a, uint b) internal returns (uint) { return a+b; }
     }
     
     contract D {
@@ -167,8 +168,8 @@ En el siguiente ejemplo, ``D``, puede llamar a ``c.getData()`` para recuperar el
             local = c.compute(3, 5); // error: el miembro `compute` no es visible
         }
     }
-
-
+    
+    
     contract E is C {
         function g() public {
             C c = new C();
