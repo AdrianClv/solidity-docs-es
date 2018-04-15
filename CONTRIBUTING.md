@@ -8,6 +8,8 @@ Este documento pretende ser una versión en español de la documentación origin
 
 Los documentos que se deben traducir son los **documentos .rst**. Dentro de estos, se debe traducir **el texto y los comentarios del código**. Los nombres de los contratos, variables y demás no deben ser traducidos.
 
+Ahora mismo se encuentra en periodo de actualización, puedes ver los cambios a realizar en el siguiente gist: https://gist.github.com/chriseth/5e06fb08433a03d1e4c05224f4287264
+
 ### Estilo
 Algunas cosas a tener en cuenta cuando se traduzca un documento:
 * El código, nombres de funciones y variables no se traducen (los comentarios sí).
