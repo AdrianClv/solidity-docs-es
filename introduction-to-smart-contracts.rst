@@ -154,7 +154,7 @@ La respuesta abstracta a esto es que no tienes de qué preocuparte. El orden de 
 
 Estos bloques forman una secuencia lineal en el tiempo de la que viene la palabra cadena de bloques o "blockchain". Los bloques son añadidos a la cadena en intervalos regulares - para Ethereum esto viene a significar cada 17 segundos.
 
-Como parte del "mecanismo de selcción de orden" (que se conoce como minería), tiene que pasar que los bloques sean revertidos de cuando en cuando, pero sólo en el extremo o "tip" de la cadena. Cuantos más bloques se añaden encima, menos probable es. En ese caso, lo que ocurre es que tus transacciones son revertidas e incluso borradas de la blockchain, pero cuanto más esperes, menos probable será.
+Como parte del "mecanismo de selección de orden" (que se conoce como minería), tiene que pasar que los bloques sean revertidos de cuando en cuando, pero sólo en el extremo o "tip" de la cadena. Cuantos más bloques se añaden encima, menos probable es. En ese caso, lo que ocurre es que tus transacciones son revertidas e incluso borradas de la blockchain, pero cuanto más esperes, menos probable será.
 
 
 .. _the-ethereum-virtual-machine:
