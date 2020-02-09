@@ -6,11 +6,13 @@ Solidity
     :alt: Solidity logo
     :align: center
 
-Solidity es un lenguaje de alto nivel orientado a contratos. Su sintaxis es similar a la de JavaScript y está enfocado específicamente a la Máquina Virtual de Etehreum (EVM).
+Solidity es un lenguaje orientado a objetos, de alto nivel para la implementación de contratos inteligentes. Los contratos inteligentes son programas que gobiernan el comportamiento de las cuentas dentro de Ethereum.
 
-Solidity está tipado de manera estática y acepta, entre otras cosas, herencias, librerías y tipos complejos definidos por el usuario.
+Solidity fue influenciado por C++, Python y JavaScript y diseñado para ser utilizado por la Máquina Virtual de Ethereum (EVM).
 
-Como verá, es posible crear contratos para votar, para el crowdfunding, para subastas a ciegas, para monederos muti firmas, y mucho más.
+Solidity está tipado de manera estática y acepta, entre otras cosas, herencia, librerías y tipos complejos definidos por el usuario.
+
+Con Solidity es posible crear contratos para votar, para el crowdfunding, para subastas a ciegas, para monederos multi firmas, y mucho más.
 
 .. note::
     La mejor manera de probar Solidity ahora mismo es usando `Remix <https://remix.ethereum.org/>`_ (puede tardar un rato en cargarse, por favor sea paciente).
