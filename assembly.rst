@@ -11,7 +11,7 @@ PENDIENTE DE HACER: Escribir sobre de qué manera el ámbito del ensamblador inl
 Ensamblador inline
 ==================
 
-Para tener un control más fino, especialmente para mejorar el lenguaje excribiendo librerías, es posible intercalar las declaraciones hechas en Solidity con el ensamblador inline en un lenguaje cercano al lenguaje de la máquina virtual. Debido a que el EVM (la máquina virtual de Ethereum) es un máquina de tipo pila (stack machine), suele ser difícil dirigirse a la posición correcta de la pila y proporcinar los argumentos a los opcodes en el punto correcto en la pila. El ensamblador inline de Solidity intenta facilitar esto, y otras complicaciones que ocurren cuando se escribe el ensamblador de forma manual, con las siguientes funcinalidades:
+Para tener un control más fino, especialmente para mejorar el lenguaje escribiendo librerías, es posible intercalar las declaraciones hechas en Solidity con el ensamblador inline en un lenguaje cercano al lenguaje de la máquina virtual. Debido a que el EVM (la máquina virtual de Ethereum) es un máquina de tipo pila (stack machine), suele ser difícil dirigirse a la posición correcta de la pila y proporcinar los argumentos a los opcodes en el punto correcto en la pila. El ensamblador inline de Solidity intenta facilitar esto, y otras complicaciones que ocurren cuando se escribe el ensamblador de forma manual, con las siguientes funcinalidades:
 
 * opcodes de estilo funcional: ``mul(1, add(2, 3))`` en lugar de ``push1 3 push1 2 add push1 1 mul``
 * variables de ensamblador local: ``let x := add(2, 3)  let y := mload(0x40)  x := add(x, y)``
@@ -128,7 +128,7 @@ El ensamblador analiza comentarios, literales e identificadores de igual manera 
 Opcodes
 -------
 
-Este documento no preten de ser una descripción exhaustiva de la máquina virtual de Ethereum, pero la lista siguiente puede servir de referencia para sus opcodes.
+Este documento no pretende ser una descripción exhaustiva de la máquina virtual de Ethereum, pero la lista siguiente puede servir de referencia para sus opcodes.
 
 Si un opcode recibe un argumento (siempre desde lo más alto de la pila), se ponen entre paréntesis.
 Note que el orden de los argumentos puede verse invertido en estilo no funcional (se explica más abajo).
