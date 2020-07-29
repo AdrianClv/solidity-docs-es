@@ -102,7 +102,7 @@ Como se puede ver, se puede usar esta función para, de forma sencilla, consulta
 .. index:: event
 
 La línea ``event Sent(address from, address to, uint amount);`` declara un evento que es disparado en la última línea de la ejecución de 
-``send``. Las interfaces de ususario (como las de servidor, por supuesto) pueden escuchar esos eventos que están siendo disparados en la blockchain sin mucho coste. Tan pronto son disparados, el listener también recibirá los argumentos ``from``, ``to`` y ``amount``, que hacen más fácil trazar las transacciones. Con el fin de escuchar este evento, se podría usar ::
+``send``. Las interfaces de usuario (como las de servidor, por supuesto) pueden escuchar esos eventos que están siendo disparados en la blockchain sin mucho coste. Tan pronto son disparados, el listener también recibirá los argumentos ``from``, ``to`` y ``amount``, que hacen más fácil trazar las transacciones. Con el fin de escuchar este evento, se podría usar ::
 
     Coin.Sent().watch({}, '', function(error, result) {
         if (!error) {
