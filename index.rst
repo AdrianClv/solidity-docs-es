@@ -111,7 +111,7 @@ Analizadores de sintaxis y de gramática alternativos para Solidity
 Documentación del lenguaje
 --------------------------
 
-A continuación, primero veremos un :ref:`contrato inteligente sencilo <simple-smart-contract>` escrito en Solidity, seguido de una introducción sobre :ref:`blockchains <blockchain-basics>` y sobre la :ref:`Máquina Virtual de Ethereum <the-ethereum-virtual-machine>`.
+A continuación, primero veremos un :ref:`contrato inteligente sencillo <simple-smart-contract>` escrito en Solidity, seguido de una introducción sobre :ref:`blockchains <blockchain-basics>` y sobre la :ref:`Máquina Virtual de Ethereum <the-ethereum-virtual-machine>`.
 
 En la siguiente sección se explicarán distintas *características* de Solidity con varios :ref:`ejemplos de contratos <voting>`. Recuerde que siempre puede probar estos contratos `en su navegador <https://remix.ethereum.org>`_!.
 
