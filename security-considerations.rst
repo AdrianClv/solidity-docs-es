@@ -64,8 +64,8 @@ completo):
       /// Mapping de distribución de ether del contrato.
       mapping(address => uint) shares;
       /// Retira tu parte.
-      function withdraw() {
-          if (msg.sender.send(shares[msg.sender]))
+      function withdraw() public {
+          if (msg.sender.call.value(shares[msg.sender])())
               shares[msg.sender] = 0;
       }
   }
@@ -87,7 +87,7 @@ como detallamos aquí:
       /// Mapping de distribución de ether del contrato.
       mapping(address => uint) shares;
       /// Retira tu parte.
-      function withdraw() {
+      function withdraw() public {
           var share = shares[msg.sender];
           shares[msg.sender] = 0;
           msg.sender.transfer(share);
@@ -172,11 +172,11 @@ No uses nunca tx.origin para dar autorización. Digamos que tienes un contrato d
     contract TxUserWallet {
         address owner;
 
-        function TxUserWallet() {
+        function TxUserWallet() public {
             owner = msg.sender;
         }
 
-        function transferTo(address dest, uint amount) {
+        function transferTo(address dest, uint amount) public {
             require(tx.origin == owner);
             dest.transfer(amount);
         }
@@ -188,14 +188,18 @@ Ahora alguien te engaña para que le envíes Ether a esta cartera maliciosa:
 
     pragma solidity ^0.4.0;
 
+    interface TxUserWallet {
+        function transferTo(address dest, uint amount) public;
+    }
+
     contract TxAttackWallet {
         address owner;
 
-        function TxAttackWallet() {
+        function TxAttackWallet() public {
             owner = msg.sender;
         }
 
-        function() {
+        function() public {
             TxUserWallet(msg.sender).transferTo(owner, msg.sender.balance);
         }
     }
