@@ -117,11 +117,13 @@ Es posible de iniciar un array in-line (ej. ``string[] myarray = ["a", "b"];``)
 
 Si. Sin embargo debiera notarse que esto sólo funciona con arrays de tamaño estático. Puedes incluso crear un array en memoria en línea en la declaración de devolución. Cool, ¿no?
 
-Example::
+Ejemplo::
+
+    pragma solidity ^0.4.16;
 
     contract C {
-        function f() returns (uint8[5]) {
-            string[4] memory adaArr = ["Esto", "es", "un", "array"];
+        function f() public pure returns (uint8[5]) {
+            string[4] memory adaArr = ["This", "is", "an", "array"];
             return ([1, 2, 3, 4, 5]);
         }
     }
@@ -248,15 +250,16 @@ que serán extendidas en el futuro. Además, Arachnid ha escrito `solidity-strin
 Por ahora si quieres modificar un string, (incluso cuando sólo quieres saber su largo),
 debes siempre convertirlo en un ``bytes`` primero::
 
+    pragma solidity ^0.4.0;
 
     contract C {
         string s;
 
-        function append(byte c) {
+        function append(byte c) public {
             bytes(s).push(c);
         }
 
-        function set(uint i, byte c) {
+        function set(uint i, byte c) public {
             bytes(s)[i] = c;
         }
     }
@@ -295,10 +298,14 @@ completa, que puede que sea una buena idea si obtuviste una situación inesperad
 
 Si no quieres deolver un error, puedes devolver un par::
 
+    pragma solidity ^0.4.16;
+
     contract C {
         uint[] counters;
 
         function getCounter(uint index)
+            public
+            view
             returns (uint counter, bool error) {
                 if (index >= counters.length)
                     return (0, true);
@@ -306,16 +313,15 @@ Si no quieres deolver un error, puedes devolver un par::
                     return (counters[index], false);
         }
 
-        function checkCounter(uint index) {
+        function checkCounter(uint index) public view {
             var (counter, error) = getCounter(index);
             if (error) {
-                ...
+                // ...
             } else {
-                ...
+                // ...
             }
         }
     }
-
 ¿Los comentarios son incluídos en los contratos publicados y incrementan el gas
 ===============================================================================
 
@@ -368,21 +374,23 @@ de variable le concierne:
 * argumentos de función siempre están en memoria
 * variable locales siempre referencian storage
 
-Example::
+Ejemplo::
+
+    pragma solidity ^0.4.0;
 
     contract C {
         uint[] data1;
         uint[] data2;
 
-        function appendOne() {
+        function appendOne() public {
             append(data1);
         }
 
-        function appendTwo() {
+        function appendTwo() public {
             append(data2);
         }
 
-        function append(uint[] storage d) {
+        function append(uint[] storage d) internal {
             d.push(1);
         }
     }
@@ -399,11 +407,14 @@ Un error típico es declarar una variable local y presumir que será creada en
 memoria, aunque será creada en storage::
 
     /// ESTE CONTRATO CONTIENE UN ERROR
+
+    pragma solidity ^0.4.0;
+
     contract C {
         uint someVariable;
         uint[] data;
 
-        function f() {
+        function f() public {
             uint[] x;
             x.push(2);
             data = x;
@@ -423,11 +434,13 @@ de storage) es modificada por ``x.push(2)``.
 
 La manera correcta de hacerlo es la siguiente::
 
+    pragma solidity ^0.4.0;
+
     contract C {
         uint someVariable;
         uint[] data;
 
-        function f() {
+        function f() public {
             uint[] x = data;
             x.push(2);
         }
@@ -495,36 +508,19 @@ optimizaciones actualmente no funcionan en bucles y también tienen un problema 
 de límites.
 Aunque, puedes obtener mejores resultados en el futuro.
 
-¿Qué hace ``p.recipient.call.value(p.amount)(p.data)``?
-=======================================================
-
-Cada llamada de función externa en Solidity se puede modificar de dos maneras:
-
-1. Puedes agregar Ether junto con la llamada
-2. Puede limitar la cantidad de gas disponible para la llamada
-
-Esto se hace "llamando a una función de la función":
-
-``f.gas(2).value(20)()`` llama a la función modificada ``f`` y por lo tanto envía 20
-Wei y limitando el gas a 2 (así que esta llamada de función probablemente se quedará sin gas 
-y devolvera tus 20 Wei).
-
-En el ejemplo anterior, la función de nivel bajo ``call`` se utiliza para invocar otro
-contrato con ``p.data`` como carga útil y ``p.amount`` Wei se envía con esa llamada.
-
 ¿Qué pasa con el mapeo de una ``struct`` al copiar sobre una ``struct``?
 ========================================================================
 
 Es una pregunta muy interesante. Supongamos que tenemos un campo en un contrato configurado como tal::
 
-    struct user {
-        mapping(string => address) usedContracts;
+    struct User {
+        mapping(string => string) comments;
     }
 
-    function somefunction {
-       user user1;
-       user1.usedContracts["Hello"] = "World";
-       user user2 = user1;
+    function somefunction public {
+       User user1;
+       user1.comments["Hello"] = "World";
+       User user2 = user1;
     }
 
 En este caso, se ignora el mapeo de la estructura que se está copiando en la userList, ya que no existe una "lista de teclas mapeadas".
@@ -539,15 +535,16 @@ En el caso de un ``contract A`` llamando a una nueva instancia del ``contract B`
 Necesitaras asegurarte de que tienes ambos contratos conscientes de la presencia del uno al otro y que el ``contract B`` tenga un constructor ``payable``.
 En este ejemplo::
 
-    contract B {
-        function B() payable {}
-    }
+    pragma solidity ^0.4.0;
 
+    contract B {
+        function B() public payable {}
+    }
 
     contract A {
         address child;
 
-        function test() {
+        function test() public {
             child = (new B).value(10)(); //construct a new B with 10 wei
         }
     }
@@ -585,19 +582,21 @@ respectivamente.
 Seguro. Ten cuidado de que si cruzas la memoria / límite de almacenamiento,
 se crearán copias independientes::
 
+    pragma solidity ^0.4.16;
+
     contract C {
         uint[20] x;
 
-        function f() {
+        function f() public {
             g(x);
             h(x);
         }
 
-        function g(uint[20] y) {
+        function g(uint[20] y) internal pure {
             y[2] = 3;
         }
 
-        function h(uint[20] storage y) {
+        function h(uint[20] storage y) internal {
             y[3] = 4;
         }
     }
@@ -621,12 +620,27 @@ error de "lvalue", probablemente estés haciendo una de dos cosas mal.
 
 ::
 
-    int8[] memory memArr;        // Case 1
-    memArr.length++;             // illegal
-    int8[5] storageArr;          // Case 2
-    somearray.length++;          // legal
-    int8[5] storage storageArr2; // Explicit case 2
-    somearray2.length++;         // legal
+    // This will not compile
+
+    pragma solidity ^0.4.18;
+
+    contract C {
+        int8[] dynamicStorageArray;
+        int8[5] fixedStorageArray;
+
+        function f() {
+            int8[] memory memArr;        // Case 1
+            memArr.length++;             // illegal
+
+            int8[5] storage storageArr = fixedStorageArray;   // Case 2
+            storageArr.length++;                             // illegal
+
+            int8[] storage storageArr2 = dynamicStorageArray;
+            storageArr2.length++;                     // legal
+
+
+        }
+    }
 
 **Nota importante:** En Solidity, las dimensiones del array se declaran al revés de la forma 
 en que estés acostumbrado a declararlas en C o Java, pero se acceden como en
