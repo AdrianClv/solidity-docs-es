@@ -35,7 +35,7 @@ Un contrato para Solidity es una colección de código (sus *funciones*) y datos
 
 Para acceder a una variable de estado, no es necesario el uso del prefijo ``this.`` como es habitual en otros lenguajes.
 
-Este contrato no hace mucho todavía (debido a la infraestructura construída por Ethereum), simplemente permite a cualquiera almacenar un número accesible para todos sin un (factible) modo de prevenir la posibilidad de publicar este número. Por supuesto, cualquiera podría simplemente hacer una llamada ``set`` de nuevo con un valor diferente y sobreescribir el número inicial, pero este número siempre permanecería almacenado en la historía de la blockchain. Más adelante, veremos como imponer restricciones de acceso de tal manera que sólo tú puedas cambiar el número.
+Este contrato no hace mucho todavía (debido a la infraestructura construída por Ethereum), simplemente permite a cualquiera almacenar un número accesible para todos sin un (factible) modo de prevenir la posibilidad de publicar este número. Por supuesto, cualquiera podría simplemente hacer una llamada ``set`` de nuevo con un valor diferente y sobrescribir el número inicial, pero este número siempre permanecería almacenado en la historía de la blockchain. Más adelante, veremos como imponer restricciones de acceso de tal manera que sólo tú puedas cambiar el número.
 
 .. index:: ! submoneda
 
@@ -129,7 +129,7 @@ Finalmente, las funciones que realmente habrá en el contrato y que podrán ser 
 Fundamentos de Blockchain
 *************************
 
-Las blockchains son un concepto no muy difícil de entender para desarrolladores. La razón es que la mayoría de las complicaciones (minería, `hashes <https://en.wikipedia.org/wiki/Cryptographic_hash_function>`_, `criptografa de curva elíptica <https://en.wikipedia.org/wiki/Elliptic_curve_cryptography>`_, `redes P2P <https://en.wikipedia.org/wiki/Peer-to-peer>`_, etc.) están justo ahí para proveer un conjunto de funcionalidades y espectativas. Una vez que aceptas estas funcionalidades tal cual vienen dadas, no tienes que preocuparte por la tecnología que lleva inmersa - o, ¿tienes que saber realmente cómo funciona internamente Amazon AWS para poder usarlo?.
+Las blockchains son un concepto no muy difícil de entender para desarrolladores. La razón es que la mayoría de las complicaciones (minería, `hashes <https://es.wikipedia.org/wiki/Funci%C3%B3n_hash_criptogr%C3%A1fica>`_, `criptografa de curva elíptica <https://es.wikipedia.org/wiki/Criptograf%C3%ADa_de_curva_el%C3%ADptica>`_, `redes P2P <https://es.wikipedia.org/wiki/Peer-to-peer>`_, etc.) están justo ahí para proveer un conjunto de funcionalidades y espectativas. Una vez que aceptas estas funcionalidades tal cual vienen dadas, no tienes que preocuparte por la tecnología que lleva inmersa - o, ¿Tienes que saber realmente cómo funciona internamente Amazon AWS para poder usarlo?.
 
 .. index:: transaction
 
@@ -148,7 +148,7 @@ Yendo más allá, una transacción es siempre firmada criptográficamente por el
 Bloques
 =======
 
-Un obstáculo mayor que sobrepasar es el que, en términos de Bitcoin, se llama ataque de "doble gasto": ¿qué ocurre si dos transacciones existentes en la red quieren borrar una cuenta?, ¿un conflicto?.
+Un obstáculo mayor que sobrepasar es el que, en términos de Bitcoin, se llama ataque de "doble gasto": ¿Qué ocurre si dos transacciones existentes en la red quieren borrar una cuenta?, ¿Un conflicto?.
 
 La respuesta abstracta a esto es que no tienes de qué preocuparte. El orden de las transacciones se seleccionará por ti, las transacciones se aglutinarán en lo que es llamado "bloque" y entonces serán ejecutadas y distribuídas entre todos los nodos participantes. Si dos transacciones se contradicen, la que concluye en segundo lugar será rechazada y no formará parte del bloque.
 
@@ -218,7 +218,7 @@ Cada cuenta tiene un área de memoria persistente que se llama **almacenamiento*
 El almacenamiento es un almacén clave-valor que mapea palabras de 256 bits con palabras de 256 bits.
 No es posible enumerar el almacenamiento interno desde un contrato y es comparativamente costoso leer y, más todavía, modificar el almacenamiento. Un contrato no pueder leer ni escribir en otro almacenamiento que no sea el suyo.
 
-La segunda área de memoria se conoce como **memoria**, de la que un contrato obtiene de forma ágil una instancia clara de cada message call (llamada de mensaje). La memoria es lineal y puede ser tratada a nivel de byte, pero las lecturas están limitadas a un ancho de 256 bits, mientras que las escrituras puden ser tanto de 8 bits como de 256 bits de ancho. La memoria se expande por palabras (256 bits), cuando se accede (tanto para leer o escribir) a una palabra de memoria sin modificar previamente (p.ej.: cualquier offset de una palabra). En el momento de expansión, se debe pagar el coste en gas. La memoria es más costosa cuanto más crece (escala cuadráticamente).
+La segunda área de memoria se conoce como **memoria**, de la que un contrato obtiene de forma ágil una instancia clara de cada message call (llamada de mensaje). La memoria es lineal y puede ser tratada a nivel de byte, pero las lecturas están limitadas a un ancho de 256 bits, mientras que las escrituras pueden ser tanto de 8 bits como de 256 bits de ancho. La memoria se expande por palabras (256 bits), cuando se accede (tanto para leer o escribir) a una palabra de memoria sin modificar previamente (p.ej.: cualquier offset de una palabra). En el momento de expansión, se debe pagar el coste en gas. La memoria es más costosa cuanto más crece (escala cuadráticamente).
 
 La EVM no es una máquina de registro, es una máquina de pila por lo que todas las operaciones se hacen en un área llamada la **pila**. Tiene un espacio máximo de 1024 elementos y contiene palabras de 256 bits. El acceso a la pila está limitado a su cima de la siguiente manera:
 Es posible copiar uno de los 16 elementos superiores a la cima de la pila o intercambiar el elemento superior justo después de uno de los 16 elementos superiores.
@@ -267,14 +267,14 @@ Logs
 ====
 
 Es posible almacenar datos en una estructura de datos indexada que mapea todo el recorrido hasta el nivel de bloque. Esta funcionalidad llamada **logs** se usa en Solidity para implementar **eventos**.
-Los contratos no pueden acceder a los datos del log después de crearse, pero pueden ser accedidos desde fuera de la blockchain de forma eficiente. Como parte de los datos del log se guardan en  `bloom filters <https://en.wikipedia.org/wiki/Bloom_filter>`_, es posible buscar estos datos eficientemente y criptográficamente de manera segura, por lo que los otros miembros de la red que no se han descargado la blockchain entera ("light clients") todavía pueden buscarlos.
+Los contratos no pueden acceder a los datos del log después de crearse, pero pueden ser accedidos desde fuera de la blockchain de forma eficiente. Como parte de los datos del log se guardan en  `bloom filters <https://es.wikipedia.org/wiki/Filtro_de_Bloom>`_ (Filtro de Bloom), es posible buscar estos datos eficientemente y criptográficamente de manera segura, por lo que los otros miembros de la red que no se han descargado la blockchain entera ("light clients") todavía pueden buscarlos.
 
 .. index:: contract creation
 
 Creación
 ========
 
-Los contratos pueden incluso crear otros contratos usando un opcode especial (p.ej.: ellos no llaman simplemente a la dirección cero). La única diferencia entre estos **create calls** y los message calls normales es que los datos son ejecutados y el resultado almacenado como código y el llamador / creador recibe la dirección del nuevo contrato en la pila.
+Los contratos pueden incluso crear otros contratos usando un opcode especial (p.ej.: ellos no llaman simplemente a la dirección cero). La única diferencia entre estos **create calls** y los message calls normales es que los datos son ejecutados y el resultado almacenado como código y el caller / creador recibe la dirección del nuevo contrato en la pila.
 
 .. index:: selfdestruct
 
