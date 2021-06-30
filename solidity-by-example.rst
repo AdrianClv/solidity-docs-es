@@ -226,7 +226,7 @@ su dinero - los contratos no pueden activarse por sí mismos.
         mapping(address => uint) pendingReturns;
 
         // Fijado como true al final, no permite ningún cambio.
-        bool ended; 
+        bool ended;
 
         // Eventos que serán emitidos al realizar algún cambio
         event HighestBidIncreased(address bidder, uint amount);
