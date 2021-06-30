@@ -129,7 +129,7 @@ Se aceptan los comentarios de línea simple (``//``) y los comentarios de múlti
   */
 
 
-Adicionalmente, existe otro tipo de comentario llamado natspec, pero la documentación todavía no está escrita. Estos comentarios se escriben con tres barras ***oblícuas (``///``) o como un bloque de comentarios con doble asterísco (``/** ... */``) y se deben usar justo arriba de las declaraciones de función o instrucciones. Para documentar funciones, anotar condiciones para la verificación formal y para proporcionar un **texto de confirmación** al usuario cuando intenta invocar una función, se puede usar etiquetas del tipo `Doxygen <https://en.wikipedia.org/wiki/Doxygen>`_ dentro de estos comentarios.
+Adicionalmente, existe otro tipo de comentario llamado natspec, pero la documentación todavía no está escrita. Estos comentarios se escriben con tres barras ***oblícuas (``///``) o como un bloque de comentarios con doble asterísco (``/** ... */``) y se deben usar justo arriba de las declaraciones de función o instrucciones. Para documentar funciones, anotar condiciones para la verificación formal y para proporcionar un **texto de confirmación** al usuario cuando intenta invocar una función, se puede usar etiquetas del tipo `Doxygen <https://es.wikipedia.org/wiki/Doxygen>`_ dentro de estos comentarios.
 
 En el siguiente ejemplo, documentamos el título del contrato, la explicación para los dos parametros de entrada y para los dos valores de retorno.
 
@@ -139,11 +139,11 @@ En el siguiente ejemplo, documentamos el título del contrato, la explicación p
 
  /** @title Shape calculator.*/
  contract shapeCalculator{
-     /**@dev Calculates a rectangle's surface and perimeter.
-      * @param w Width of the rectangle.
-      * @param h Height of the rectangle.
-      * @return s The calculated surface.
-      * @return p The calculated perimeter.
+     /**@dev Calcular la superficie y el perímetro de un rectángulo.
+      * @parámetro w como el ancho del rectángulo.
+      * @parámetro h como la altura del rectángulo.
+      * @regresa s como el cálculo de la superficie.
+      * @regresa p como el perímetro calculado.
       */
      function rectangle(uint w, uint h) returns (uint s, uint p) {
          s = w * h;
