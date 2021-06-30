@@ -226,7 +226,7 @@ su dinero - los contratos no pueden activarse por sí mismos.
         mapping(address => uint) pendingReturns;
 
         // Fijado como true al final, no permite ningún cambio.
-        bool ended;
+        bool ended; 
 
         // Eventos que serán emitidos al realizar algún cambio
         event HighestBidIncreased(address bidder, uint amount);
@@ -303,7 +303,7 @@ su dinero - los contratos no pueden activarse por sí mismos.
         /// Finaliza la subasta y envía la puja más alta al beneficiario.
         function auctionEnd() {
             // Es una buena práctica estructurar las funciones que interactúan
-            // con otros contratos (i.e. llaman a funciones o envían ether)
+            // con otros contratos (p.ej.: llaman a funciones o envían ether)
             // en tres fases:
             // 1. comprobación de las condiciones
             // 2. ejecución de las acciones (pudiendo cambiar las condiciones)
@@ -375,7 +375,7 @@ inválidas con valores altos o bajos.
     }
 
     address payable public beneficiary;
-    uint public biddingEnd;å
+    uint public biddingEnd;
     uint public revealEnd;
     bool public ended;
 
@@ -389,12 +389,19 @@ inválidas con valores altos o bajos.
 
     event AuctionEnded(address winner, uint highestBid);
 
-    // Modifiers are a convenient way to validate inputs to
-    // functions. `onlyBefore` is applied to `bid` below:
-    // The new function body is the modifier's body where
-    // `_` is replaced by the old function body.
-    modifier onlyBefore(uint _time) { require(now < _time); _; }
-    modifier onlyAfter(uint _time) { require(now > _time); _; }
+    // Los modificadores son una forma cómoda de validar los
+    // inputs de las funciones. Abajo se puede ver cómo
+    // `onlyBefore` se aplica a `bid`.
+    // El nuevo cuerpo de la función pasa a ser el del modificador,
+    // sustituyendo `_` por el anterior cuerpo de la función.
+    modifier onlyBefore(uint _time) {
+        require(now < _time); 
+        _;
+    }
+    modifier onlyAfter(uint _time) {
+        require(now > _time);
+        _;
+    }
 
     constructor(
         uint _biddingTime,
@@ -407,11 +414,11 @@ inválidas con valores altos o bajos.
     }
 
     // Efectúa la puja de manera oculta con `_blindedBid`=
-    // keccak256(value, fake, secret).
-    // El ether enviado sólo se recuperará si la puja se revela de
-    // forma correcta durante la fase de revelacin. La puja es
-    // válida si el ether junto al que se envía es al menos "value"
-    // y "fake" no es cierto. Poner "fake" como verdadero y no enviar
+    // keccak256(abi.encodePacked(value, fake, secret)).
+    // El ether enviado sólo se reintegrará si la puja se revela de
+    // forma correcta durante la fase de revelación. La puja es
+    // válida si el ether envíado junto a la misma puja es al menos "value"
+    // y "fake" como no verdadero (!=). Poner "fake" como verdadero y no enviar
     // la cantidad exacta, son formas de ocultar la verdadera puja
     // y aún así realizar el depósito necesario. La misma dirección
     // puede realizar múltiples pujas.
@@ -428,7 +435,7 @@ inválidas con valores altos o bajos.
 
     // Revela tus pujas ocultas. Recuperarás los fondos de todas
     // las pujas inválidas ocultadas de forma correcta y de
-    // todas las pujas salvo en aquellos casos en que sea la más alta.
+    // todas las pujas salvo en aquellos casos en que la puja sea la más alta.
     function reveal(
         uint[] memory _values,
         bool[] memory _fake,
@@ -462,7 +469,7 @@ inválidas con valores altos o bajos.
             // el mismo depósito.
             bidToCheck.blindedBid = bytes32(0);
         }
-        msg.sender.transfer(refund);
+        require(msg.sender).transfer(refund);
     }
 
      /// Retira una puja que ha sido superada.
@@ -608,4 +615,74 @@ Compra a distancia segura
 Canal de micropagos
 *******************
 
-Por escribir.
+En esta sección aprenderemos a desarrollar una implementación de ejemplo de un canal de pagos. Se usarán firmas criptográficas para realizar repetidas transferencias de Ether entre las mismas partes seguras, instantáneamente y sin comisiones de transacción. Para el ejemplo, necesitaremos entender cómo firmar y verificar las firmas, y configurar el canal.
+
+Crear y verificar firmas
+========================
+
+Imagina que Alice quiere mandar una cantidad de Ether a Bob, p.ej.: Alice es el emisor y Bob es el receptor.
+
+Alice solo necesita enviar un mensaje firmado cripográficamente off-chain (p.ej.: via email) a Bob y sería algo similar a llenar un cheque.
+
+Alice y Bob usan firmas para autorizar transacciones, las cuales son posibles en los contratos inteligentes de la red Ethereum. Alice puede crear un contrato inteligente sencillo que le permita transferir Ether, pero en vez de llamar una función ella misma para iniciar un pago, ella puede dejar que Bob lo realice y a la vez pagar la comisión de transacción.
+
+El contrato funciona de la siguiente forma:
+    - Alice despliega el contrato, agregando el suficiente Ethere para cubrir el pago que ella realizó.
+    - Alice autoriza un pago al firmar un mensaje con su llave privada.
+    - Alice envía el mensaje firmado criptográficamente a Bob. El mensaje no necesita mantenerse en secreto (lo explicaremos luego), y el mecanismo para enviarlo no es necesario.
+    - Bob solicita su pago al presentar el mensaje firmado para el contrato inteligente, al verificar la autenticidad del mensaje, se liberan los fondos.
+    
+
+Creating the signature
+======================
+
+Alice no necesita interactuar con la red de Ethereum para firmar la transacción, el proceso es completamente offline. En este tutorial, firmaremos mensajes en el navegador usando web3.js y Metamask, usando el método descrito en EIP-762, ya que proporciona una serie de otros beneficios de seguridad.
+
+::
+
+    // El Hashing de primero hace las cosas más sencillas
+    var hash = web3.utils.sha3("message to sign");
+    web3.eth.personal.sign(hash, web3.eth.defaultAccount, function () {
+        console.log("Signed");
+    });
+    
+    La web3.the.personal.sign antepone el tamaño del mensaje a los datos firmados. Desde que realizamos el hash primero, el mensaje siempre tendrá un tamaño de 32 Bytes. y por lo tanto este prefijo de longitud es siempre el mismo.
+    
+
+Qué Firmar
+==========
+
+Para un contrato que cumple con los pagos, el mensaje firmado debe de incuir:
+    - La dirección del destinatario.
+    - El monto a transferir.
+    - La proteccción contra un `Ataque de Replay <https://es.wikipedia.org/wiki/Ataque_de_REPLAY>`_.
+
+Un Ataque de Replay es cuando un mensaje firmado es reusado para reclamar autorización para una segunda acción. Para evitar una repetición de ataques usamos la misma técnica como en las mismas transacciones de Ethereum, un llamado nonce, el cual es un número de transacciones enviados por un cuenta. El contrato inteligente verifica si el nonce es usando varias veces.
+
+Otro tipo de Ataque de Replay puede suceder cuando el propietario despliega un contrato inteligente donde paga el receptor, realizando algún otro pago y luego destruye el contrato. Luego, él decide desplegar el contrato inteligente donde el paga el receptor otra vez, pero el nuevo contrato no sabe cual nonce se utilizó en el despliege anterior, así el atacante puede utilizar el viejo mensaje de nuevo.
+
+Alice puede protegerse contra estos ataques al incuir la dirección del contrato en el mensaje, y solamente los mensajes que estén en la dirección del contrato por sí mismo serán aceptados. Puedes encontrar un ejemplo en las primeras dos líneas de la función claimPayment() del contrato de ejemplo al final de esta sección
+
+Empaquetar Argumentos
+=====================
+
+Ahora que hemos identificado qué información incluir en el mensaje firmado, estamos preparados para poner el mensaje junto, hashearlo y firmarlo. Por simplicidad, concatenamos los datos. La librería ethereumjs-abi proporciona una función llamada soloditySHA3 que imita el comportamiento de la función keccak256 que se utiliza en los argumentos codificados usando abo.encodePacked. Aquí es una función de JavaScript que crear una firma adecuada para el ejemplo del ReceiverPays:
+
+
+::
+
+    // recipient es la dirección que debería recibir el pago.
+    // amount, en unidades wei, especifica cuanto ether debe ser enviado.
+    // nonce puede ser un único número para así evitar Ataques de Replay.
+    // contractAddress se usa para eveitar Ataque de Replay en contratos cruzados
+    function signPayment(recipient, amount, nonce, contractAddress, callback) {
+        var hash = "0x" + abi.soliditySHA3(
+            ["address", "uint256", "uint256", "address"],
+            [recipient, amount, nonce, contractAddress]
+        ).toString("hex");
+
+        web3.eth.personal.sign(hash, web3.eth.defaultAccount, callback);
+    }
+    
+    
+    FALTA COMPLETAR
