@@ -8,11 +8,11 @@ Solidity
 
 Solidity es un lenguaje orientado a objetos, de alto nivel para la implementación de contratos inteligentes. Los contratos inteligentes son programas que gobiernan el comportamiento de las cuentas dentro de Ethereum.
 
-Solidity fue influenciado por C++, Python y JavaScript y diseñado para ser utilizado por la Máquina Virtual de Ethereum (EVM).
+Solidity fue influenciado por C++, Python, JavaScript y diseñado para ser utilizado por la Máquina Virtual de Ethereum (EVM).
 
 Solidity está tipado de manera estática y acepta, entre otras cosas, herencia, librerías y tipos complejos definidos por el usuario.
 
-Con Solidity es posible crear contratos para votar, para el crowdfunding, para subastas a ciegas, para monederos multi firmas, y mucho más.
+Con Solidity es posible crear contratos para votar, para el crowdfunding, para subastas a ciegas, para monederos multi firmas y mucho más.
 
 .. note::
     La mejor manera de probar Solidity ahora mismo es usando `Remix <https://remix.ethereum.org/>`_ (puede tardar un rato en cargarse, por favor sea paciente).
@@ -51,7 +51,7 @@ Integraciones de Solidity disponibles
     Paquete para resaltar la sintáxis de Solidity en el editor SublimeText.
 
 * `Etheratom <https://github.com/0mkara/etheratom>`_
-    Plugin para el editor Atom que ofrece: resaltar la sintáxis, un entorno de compilación y un entorno en tiempo de ejecución (compatible con un nodo en segundo plano y con una máquina virtual).
+    Plugin para el editor Atom que ofrece: resaltar la sintaxis, un entorno de compilación y un entorno en tiempo de ejecución (compatible con un nodo en segundo plano y con una máquina virtual).
 
 * `Linter de Solidity para Atom <https://atom.io/packages/linter-solidity>`_
     Plugin para el editor Atom que ofrece linting para Solidity.
@@ -63,13 +63,13 @@ Integraciones de Solidity disponibles
     Programa de linting de Solidity para la interfaz de línea de comandos que sigue estrictamente las reglas prescritas por la `Guía de Estilo de Solidity <http://solidity.readthedocs.io/en/latest/style-guide.html>`_.
 
 * `Extensión para Visual Studio Code <http://juan.blanco.ws/solidity-contracts-in-visual-studio-code/>`_
-    Plugin de Solidity para Microsoft Visual Studio que incluye resaltar la sintáxis y el compilador de Solidity.
+    Plugin de Solidity para Microsoft Visual Studio que incluye resaltar la sintaxis y el compilador de Solidity.
 
 * `Emacs Solidity <https://github.com/ethereum/emacs-solidity/>`_
-    Plugin para el editor Emacs que incluye resaltar la sintáxis y el reporte de los errores de compilación.
+    Plugin para el editor Emacs que incluye resaltar la sintaxis y el reporte de los errores de compilación.
 
 * `Vim Solidity <https://github.com/tomlion/vim-solidity/>`_
-    Plugin para el editor Vim que incluye resaltar la sintáxis.
+    Plugin para el editor Vim que incluye resaltar la sintaxis.
     Plugin for the Vim editor providing syntax highlighting.
 
 * `Vim Syntastic <https://github.com/scrooloose/syntastic>`_
@@ -94,24 +94,24 @@ Herramientas para Solidity
     Visualiza el flujo de control de Solidity y resalta potenciales vulnerabilidades de seguridad.
 
 * `evmdis <https://github.com/Arachnid/evmdis>`_
-    Desensamblador de la Máquina Virtual de Ethereum (EVM) que realiza análisis estáticos sobre el bytecode y así proporcionar un mayor nivel de abstracción que las operaciones brutas del EVM.
+    Desensamblador de la Máquina Virtual de Ethereum (EVM) que realiza análisis estáticos sobre el bytecode y así proporciona un mayor nivel de abstracción que las operaciones brutas del EVM.
 
 * `Doxity <https://github.com/DigixGlobal/doxity>`_
     Generador de documentación para Solidity.
 
-Analizadores de sintáxis y de gramática alternativos para Solidity
+Analizadores de sintaxis y de gramática alternativos para Solidity
 ------------------------------------------------------------------
 
 * `solidity-parser <https://github.com/ConsenSys/solidity-parser>`_
-    Analizador de sintáxis para JavaScript.
+    Analizador de sintaxis para JavaScript.
 
 * `Solidity Grammar para ANTLR 4 <https://github.com/federicobond/solidity-antlr4>`_
-    Analizador de gramática de Solidity para el generador de sintáxis ANTLR 4.
+    Analizador de gramática de Solidity para el generador de sintaxis ANTLR 4.
 
 Documentación del lenguaje
 --------------------------
 
-A continuación, primero veremos un :ref:`contrato inteligente sencilo <simple-smart-contract>` escrito en Solidity, seguido de una introducción sobre :ref:`blockchains <blockchain-basics>` y sobre la :ref:`Máquina Virtual de Ethereum <the-ethereum-virtual-machine>`.
+A continuación, primero veremos un :ref:`contrato inteligente sencillo <simple-smart-contract>` escrito en Solidity, seguido de una introducción sobre :ref:`blockchains <blockchain-basics>` y sobre la :ref:`Máquina Virtual de Ethereum <the-ethereum-virtual-machine>`.
 
 En la siguiente sección se explicarán distintas *características* de Solidity con varios :ref:`ejemplos de contratos <voting>`. Recuerde que siempre puede probar estos contratos `en su navegador <https://remix.ethereum.org>`_!.
 
