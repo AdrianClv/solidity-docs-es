@@ -473,7 +473,7 @@ Cada tipo complejo, ej. *arrays* y *structs*, tienen anotaciones
 adicionales, la "data location", con respecto a si es almacenado
 en memoria o en almacenamiento. Dependiendo del contexto, siempre hay un
 valor por defecto, pero puede ser reemplazado añadiendo o bien
-``storage`` o `memory`` al tipo. Por defecto para tipos parámetros de
+``storage`` o ``memory`` al tipo. Por defecto para tipos parámetros de
 función (incluyendo parámetros de retorno) es ``memory``, por defecto para
 variables locales es ``storage`` y la ubicación es forzada a ``storage``
 para variables de estado (obviamente).
@@ -804,7 +804,7 @@ Tipos mapping son declarados como ``mapping(_KeyType => _ValueType)``.
 Aquí ``_KeyType`` puede ser casi cualquier tipo excepto mapping, un array de tamaño dinámico, un contrato, un enum y un struct.
 ``_ValueType`` puede ser cualquier tipo, incluyendo mappings.
 
-Mappings pueden verse como 'tablas hash <https://en.wikipedia.org/wiki/Hash_table>'_ que son virtualmente inicializadas ya que
+Mappings pueden verse como 'tablas hash <https://es.wikipedia.org/wiki/Tabla_hash>'_ que son virtualmente inicializadas ya que
 cada posible clase existe y es mapeada a un valor que su representación byte es
 todo ceros: el valor :ref:`por defecto <default-value>` de un tipo. Aunque la similitud termina aquí: los datos clave no son realmente
 almacenados en el mapping, sólo su hash ``keccak256`` usado para buscar el valor.
@@ -931,7 +931,7 @@ Deducción de tipo
 =================
 
 Por conveniencia, no es siempre necesario especificar explícitamente el tipo de
-una variable, el compilador infiere automáticamente el tipo del la primera
+una variable; el compilador infiere automáticamente el tipo de la primera
 expresión a la cual es asignada esa variable::
 
     uint24 x = 0x123;
