@@ -230,7 +230,7 @@ Excepción::
 
     function singleLine() { spam(); }
 
-Inmediatamente antes de una coma, punto y coma:
+Inmediatamente después de una coma, punto y coma:
 
 Sí::
 
