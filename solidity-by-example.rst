@@ -303,7 +303,7 @@ su dinero - los contratos no pueden activarse por sí mismos.
         /// Finaliza la subasta y envía la puja más alta al beneficiario.
         function auctionEnd() {
             // Es una buena práctica estructurar las funciones que interactúan
-            // con otros contratos (i.e. llaman a funciones o envían ether)
+            // con otros contratos (p.ej.: llaman a funciones o envían ether)
             // en tres fases:
             // 1. comprobación de las condiciones
             // 2. ejecución de las acciones (pudiendo cambiar las condiciones)
@@ -375,7 +375,7 @@ inválidas con valores altos o bajos.
     }
 
     address payable public beneficiary;
-    uint public biddingEnd;å
+    uint public biddingEnd;
     uint public revealEnd;
     bool public ended;
 
@@ -389,12 +389,19 @@ inválidas con valores altos o bajos.
 
     event AuctionEnded(address winner, uint highestBid);
 
-    // Modifiers are a convenient way to validate inputs to
-    // functions. `onlyBefore` is applied to `bid` below:
-    // The new function body is the modifier's body where
-    // `_` is replaced by the old function body.
-    modifier onlyBefore(uint _time) { require(now < _time); _; }
-    modifier onlyAfter(uint _time) { require(now > _time); _; }
+    // Los modificadores son una forma cómoda de validar los
+    // inputs de las funciones. Abajo se puede ver cómo
+    // `onlyBefore` se aplica a `bid`.
+    // El nuevo cuerpo de la función pasa a ser el del modificador,
+    // sustituyendo `_` por el anterior cuerpo de la función.
+    modifier onlyBefore(uint _time) {
+        require(now < _time); 
+        _;
+    }
+    modifier onlyAfter(uint _time) {
+        require(now > _time);
+        _;
+    }
 
     constructor(
         uint _biddingTime,
@@ -407,11 +414,11 @@ inválidas con valores altos o bajos.
     }
 
     // Efectúa la puja de manera oculta con `_blindedBid`=
-    // keccak256(value, fake, secret).
-    // El ether enviado sólo se recuperará si la puja se revela de
-    // forma correcta durante la fase de revelacin. La puja es
-    // válida si el ether junto al que se envía es al menos "value"
-    // y "fake" no es cierto. Poner "fake" como verdadero y no enviar
+    // keccak256(abi.encodePacked(value, fake, secret)).
+    // El ether enviado sólo se reintegrará si la puja se revela de
+    // forma correcta durante la fase de revelación. La puja es
+    // válida si el ether envíado junto a la misma puja es al menos "value"
+    // y "fake" como no verdadero (!=). Poner "fake" como verdadero y no enviar
     // la cantidad exacta, son formas de ocultar la verdadera puja
     // y aún así realizar el depósito necesario. La misma dirección
     // puede realizar múltiples pujas.
@@ -428,7 +435,7 @@ inválidas con valores altos o bajos.
 
     // Revela tus pujas ocultas. Recuperarás los fondos de todas
     // las pujas inválidas ocultadas de forma correcta y de
-    // todas las pujas salvo en aquellos casos en que sea la más alta.
+    // todas las pujas salvo en aquellos casos en que la puja sea la más alta.
     function reveal(
         uint[] memory _values,
         bool[] memory _fake,
@@ -462,7 +469,7 @@ inválidas con valores altos o bajos.
             // el mismo depósito.
             bidToCheck.blindedBid = bytes32(0);
         }
-        msg.sender.transfer(refund);
+        require(msg.sender).transfer(refund);
     }
 
      /// Retira una puja que ha sido superada.
@@ -608,4 +615,434 @@ Compra a distancia segura
 Canal de micropagos
 *******************
 
-Por escribir.
+En esta sección aprenderemos a desarrollar una implementación de ejemplo de un canal de pagos. Se usarán firmas criptográficas para realizar repetidas transferencias de Ether entre las mismas partes seguras, instantáneamente y sin comisiones de transacción. Para el ejemplo, necesitaremos entender cómo firmar y verificar las firmas, y configurar el canal.
+
+Crear y verificar firmas
+========================
+
+Imagina que Alice quiere mandar una cantidad de Ether a Bob, p.ej.: Alice es el emisor y Bob es el receptor.
+
+Alice solo necesita enviar un mensaje firmado cripográficamente off-chain (p.ej.: via email) a Bob y sería algo similar a llenar un cheque.
+
+Alice y Bob usan firmas para autorizar transacciones, las cuales son posibles en los contratos inteligentes de la red Ethereum. Alice puede crear un contrato inteligente sencillo que le permita transferir Ether, pero en vez de llamar una función ella misma para iniciar un pago, ella puede dejar que Bob lo realice y a la vez pagar la comisión de transacción.
+
+El contrato funciona de la siguiente forma:
+    - Alice despliega el ``receiverPays``, agregando el Ether necesario para cubrir el pago que ella realizó.
+    - Alice autoriza un pago al firmar un mensaje con su llave privada.
+    - Alice envía el mensaje firmado criptográficamente a Bob. El mensaje no necesita mantenerse en secreto (lo explicaremos luego), y el mecanismo para enviarlo no es necesario.
+    - Bob solicita su pago al presentar el mensaje firmado para el contrato inteligente, al verificar la autenticidad del mensaje, se liberan los fondos.
+    
+
+Creando la Firma
+================
+
+Alice no necesita interactuar con la red de Ethereum para firmar la transacción, el proceso es completamente offline. En este tutorial, firmaremos mensajes en el navegador usando `web3.js <https://github.com/ethereum/web3.js>`_ y `Metamask <https://metamask.io/>`_, usando el método descrito en `EIP-762 <https://github.com/ethereum/EIPs/pull/712>`_, ya que proporciona una serie de otros beneficios de seguridad.
+
+::
+
+    // El Hashing de primero hace las cosas más sencillas
+    var hash = web3.utils.sha3("message to sign");
+    web3.eth.personal.sign(hash, web3.eth.defaultAccount, function () {
+        console.log("Signed");
+    });
+    
+    ``web3.the.personal.sign`` antepone el tamaño del mensaje a los datos firmados. Desde que realizamos el hash primero, el mensaje siempre tendrá un tamaño de 32 Bytes. y por lo tanto este prefijo de longitud es siempre el mismo.
+    
+
+Qué Firmar
+==========
+
+Para un contrato que cumple con los pagos, el mensaje firmado debe de incuir:
+    - La dirección del destinatario.
+    - El monto a transferir.
+    - La proteccción contra un `Ataque de Replay <https://es.wikipedia.org/wiki/Ataque_de_REPLAY>`_.
+
+Un Ataque de Replay es cuando un mensaje firmado es reusado para reclamar autorización para una segunda acción. Para evitar una repetición de ataques usamos la misma técnica como en las mismas transacciones de Ethereum, un llamado nonce, el cual es un número de transacciones enviados por un cuenta. El contrato inteligente verifica si el nonce es usando varias veces.
+
+Otro tipo de Ataque de Replay puede suceder cuando el propietario despliega un contrato inteligente de ``ReceiverPays``, realizando algún otro pago y luego destruye el contrato. Luego, él decide desplegar el contrato inteligente ``RecipientPays`` otra vez, pero el nuevo contrato no sabe cual nonce se utilizó en el despliege anterior, así el atacante puede utilizar el viejo mensaje de nuevo.
+
+Alice puede protegerse contra estos ataques al incuir la dirección del contrato en el mensaje, y solamente los mensajes que estén en la dirección del contrato por sí mismo serán aceptados. Puedes encontrar un ejemplo en las primeras dos líneas de la función ``claimPayment()`` del contrato de ejemplo al final de esta sección
+
+Empaquetar Argumentos
+=====================
+
+Ahora que hemos identificado qué información incluir en el mensaje firmado, estamos preparados para poner el mensaje junto, hashearlo y firmarlo. Por simplicidad, concatenamos los datos. La librería `ethereumjs-abi <https://github.com/ethereumjs/ethereumjs-abi>`_ proporciona una función llamada ``soliditySHA3`` que imita el comportamiento de la función ``keccak256`` que se utiliza en los argumentos codificados usando ``abi.encodePacked``. Aquí es una función de JavaScript que crear una firma adecuada para el ejemplo del ``ReceiverPays``:
+
+
+::
+
+    // recipient es la dirección que debería recibir el pago.
+    // amount, en unidades wei, especifica cuanto ether debe ser enviado.
+    // nonce puede ser un único número para así evitar Ataques de Replay.
+    // contractAddress se usa para eveitar Ataque de Replay en contratos cruzados
+    function signPayment(recipient, amount, nonce, contractAddress, callback) {
+        var hash = "0x" + abi.soliditySHA3(
+            ["address", "uint256", "uint256", "address"],
+            [recipient, amount, nonce, contractAddress]
+        ).toString("hex");
+
+        web3.eth.personal.sign(hash, web3.eth.defaultAccount, callback);
+    }
+    
+
+Recuperar el firmante del mensaje en Solidity
+=============================================
+
+En términos generales, Las firmas `ECDSA <https://es.wikipedia.org/wiki/ECDSA>`_ consisten en dos parámetros, ``r`` y ``s``. Las firmas en Ethereum incluyen un tercer parámetro llamado ``v``, que puede ser usado para verificar cuál cuenta con llave privada fue usada para firmar el mensaje, y el emisor de la transacción. Solidity proporciona una función incorporada llamada `ecrecover <https://docs.soliditylang.org/en/v0.8.6/units-and-global-variables.html#mathematical-and-cryptographic-functions>`_ que acepta un mensaje junto con los parámetros ``r``, ``s`` y ``v``, luego devuelve la dirección que fue usada para firmar el mensaje.
+
+Extrayendo los Parámetros de Firma
+==================================
+
+Las firmas producidas por web3.js son la concatenación de ``r``, ``s``, y ``v``, así que el primer paso sería separar estos parámetros. Puedes hacer esto del lado del cliente, pero haciendo dentro del contrato inteligente, significa que solo necesitas enviar un parámetro de firma en vez de tres. Dividir un array de bytes en sus partes constituyentes es un desastre, así que usamos un ensamblador en línea (`inline assembly <https://docs.soliditylang.org/en/v0.8.6/assembly.html>`_) para realizar el trabajo en la fución ``SplitSignature`` (la tercera función en el contrato entero está al final de esta sección).
+
+Calcular el Mensaje de Hash
+===========================
+
+El contrato necesita saber con exactitud cuáles son los parámetros firmados, y así debe recrear el mensaje desde los parámetros y usarlos para verificar la firma. Las funciones ``prefixed`` y ``recoverSigner`` lo ejecuta dentro de la función ``claimPayment``.
+
+El Contrato Completo
+====================
+
+::
+
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.7.0 <0.9.0;
+contract ReceiverPays {
+    address owner = msg.sender;
+
+    mapping(uint256 => bool) usedNonces;
+
+    constructor() payable {}
+
+    function claimPayment(uint256 amount, uint256 nonce, bytes memory signature) public {
+        require(!usedNonces[nonce]);
+        usedNonces[nonce] = true;
+
+        // Esto recrea el mensaje que fue firmado por el cliente
+        bytes32 message = prefixed(keccak256(abi.encodePacked(msg.sender, amount, nonce, this)));
+
+        require(recoverSigner(message, signature) == owner);
+
+        payable(msg.sender).transfer(amount);
+    }
+
+    // Destruye el contrato y reclama los fondos que sobran.
+    function shutdown() public {
+        require(msg.sender == owner);
+        selfdestruct(payable(msg.sender));
+    }
+
+    // Métodos de firma.
+    function splitSignature(bytes memory sig)
+        internal
+        pure
+        returns (uint8 v, bytes32 r, bytes32 s)
+    {
+        require(sig.length == 65);
+
+        assembly {
+            // los primeros 32 bytes, luego el tamaño del prefijo.
+            r := mload(add(sig, 32))
+            // siguientes 32 bytes.
+            s := mload(add(sig, 64))
+            // último byte (primer byte de los siguientes 32 bytes).
+            v := byte(0, mload(add(sig, 96)))
+        }
+
+        return (v, r, s);
+    }
+
+    function recoverSigner(bytes32 message, bytes memory sig)
+        internal
+        pure
+        returns (address)
+    {
+        (uint8 v, bytes32 r, bytes32 s) = splitSignature(sig);
+
+        return ecrecover(message, v, r, s);
+    }
+
+    // crea un hash prefijado para imitar el comportamiento de eth_sign.
+    function prefixed(bytes32 hash) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
+    }
+}
+
+
+Escribiendo un Canal de Pago Simple
+===================================
+    
+Alice ahora crea una implementación simple y completa de un canal de pagos; los canales usan firmas criptográficas para hacer que las transferencias repetidas en Ether sean seguras, instantáneas y sin comisión de transferencia.
+
+¿Qué es un Canal de Pagos?
+==========================
+
+Los canales de pagos permite a los participantes hacer transferencias repetidas en Ether sin usar directamente las transacciones. Esto quiere decir que tu puedes evitar los atrasos y comisiones generadas por las transacciones. Exploraremos un canal de pago simple y unidireccional entre dos partes (Alice y Bob). Esto implica tres pasos:
+
+    - Alice paga con Ether a través de un contrato inteligente. Esto "Abre" el canal de pago.
+    - Alice firma los mensajes que especifican cuanto de Ether se le debe al destinario. Este paso se repite en cada pago.
+    - Bob "cierra" el canal de pago, retirando la parte que le corresponde en Ether y enviando el resto de vuelta al emisor (sender).
+
+Nota
+
+Solamente los pasos 1 y 3 requieren las transacciones de Ethereum, El paso 2 significa que el sender transmite un mensaje firmado criptográficamente al destinatario a través de métodos off-chain (p.ej.: email). Esto quiere decir que solamente dos transacciones se requieren para soportar cualquier cantidad de transferencias.
+
+Bob tiene la garantía de que recibirá sus pagos debido a que el contrato inteligente tiene custodia sobre el Ether y respeta el mensaje firmado valido. El contrato también impone un tiempo de espera, así que Alice tiene la garantía de recuperar sus fondos aunque el destinatario se niega a cerrar el canal. Depende de los participantes cuánto tiempo se mantiene abierto el canal de pago.
+
+Para una transacción corta, como el pago de un servicio de Internet por consumo por minuto, el canal de pago debe mantenerse abierto por un tiempo determinado. Por otra parete, para un pago recurrente, como el pago de un empleado por hora de trabajo, el canal de pago debe mantenerse abierto por algunos meses del año.
+
+Abriendo un Canal de Pago
+=========================
+
+Para abrir un canal de pago, Alice implementa el contrato inteligente, agregando el Ether que se depositará en custodia y especificará el destinatario y una duración máxima del canal. Esta es la función ``SimplePaymentChannel`` en el contrato al final de esta sección.
+
+Realizando Pagos
+================
+
+Alice realiza los pagos al envíar mensajes firmados a Bob. Este paso se realiza totalmente fuera de la red de Ethereum. Los mensajes son firmados criptográficamente por el sender y luego son transmitidos directamente al destinatario.
+
+Cada mensaje incluye la siguiente información:
+    - La dirección del contrato inteligente usada para prevenir Ataques de Replay en contratos cruzados.
+Making Payments
+    - El monto total en Ethere que enviado al destinatario.
+    
+Un canal de pago se cierra una sola vez, al final de una serie de transferencias. debido a esto, solamente se canjea uno de los mensajes enviados. Esta es la razón Por la que cada mensaje especifica una cantidad total acumulada de Ether que se debe, en vez del monto de cada micropago individual. El destinatario, por naturaleza, elegirá canjear el mensaje más reciente porque es el que tiene el monto total más elevado. El nonce por mensaje no se necesita más, porque el contrato inteligente solo respeta un único mensaje. La dirección del contrato inteligente se usa aún para evitar que un mensaje destinado a un canal de pago se use para un canal diferente.
+
+Aquí está el código modificado de JavaScript para firmar criptográficamente el mensaje de la sección anterior:
+
+::
+
+function constructPaymentMessage(contractAddress, amount) {
+    return abi.soliditySHA3(
+        ["address", "uint256"],
+        [contractAddress, amount]
+    );
+}
+
+function signMessage(message, callback) {
+    web3.eth.personal.sign(
+        "0x" + message.toString("hex"),
+        web3.eth.defaultAccount,
+        callback
+    );
+}
+
+// contractAddress se usa para evitar ataques de Replay en contratos cruzados.
+// amount, en unidades wei, especifica cuanto de Ethere debe de envíar.
+
+function signPayment(contractAddress, amount, callback) {
+    var message = constructPaymentMessage(contractAddress, amount);
+    signMessage(message, callback);
+}
+
+Cerrando el Canal de Pago
+=========================
+
+Cuando Bob esté listo para recibir sus fondos, es momento de cerrar el canal de pago, llamando una función ``close`` en el contrato inteligente. Al cerrar este canal, se realiza el pago al destinatario el Ether que se le debe y el contrato se destruye, mandando el sobrante del Ether de vuelta a Alice. Para cerrar el canal, Bob necesita entregar un mensaje firmado a Alice.
+
+Los contratos inteligentes deben verificar que el mensaje contiene una firma validad del emisor. El proceso para realizar esta verificación es el mismo como el proceso que el destinatario usa. Las funciones de Solidity ``isValidSignature`` y ``recoverSigner`` trabajan como sus contrapartes en JavaScript de la sección anterior, con la última sección tomada del contrato llamada ``ReceiverPays``.
+
+Solo el destinatario del canal de pago puede llamar la función ``close``, quien naturalmente pasa el mensaje de pago más reciente porque ese mensaje lleva el compromiso de pago total más alto. Si al emisor, se le permite llamar a esta función, podría enviar una cantidad menor y engañar al destinatario con la deuda que le corresponde.
+
+La función verifica que el mensaje firmado coincida con los parámetros dados. Si todo sale bien, se le envía la parte que le corresponde de Ether al destinatario, y el sender recibe el resto a través de ``selfdestruct``. Puedes ver la función ``close`` en el contrato completo.
+
+
+Caducidad del Canal
+===================
+
+Bob puede cerrar el canal de pago en cualquier momento, pero si no lo hace, Alice necesita una manera de recuperar sus fondos bloqueados. Se estableció un tiempo de expiración al momento de implementar el contrato. Una vez que pasa ese tiempo, Alice puede llamar la función ``claimTimeout`` para recuperar sus fondos. Puedes ver esta función ``claimTimeout`` en el contrato completo.
+
+Luego de llamar esta función, Bob no puede recibir ningún Ether, por lo tanto, es importante que Bob cierre el canal antes de que el tiempo de expiración llegué.
+
+
+El Contrato Completo
+
+::
+
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.7.0 <0.9.0;
+contract SimplePaymentChannel {
+    address payable public sender;      // La cuenta de quien envía el pago.
+    address payable public recipient;   // La cuenta de quién recibe el pago.
+    uint256 public expiration;  // Tiempo de expiración del contrato en caso de que el destinatario nunca lo cierre.
+
+    constructor (address payable _recipient, uint256 duration)
+        payable
+    {
+        sender = payable(msg.sender);
+        recipient = _recipient;
+        expiration = block.timestamp + duration;
+    }
+
+    // El destinatario puede cerrar el canal en cualquier momento al presentar un
+    // monto firmado al emisor (sender). Al destinatario se le enviará esa cantidad,
+    // y el resto se le regresará al sender
+    function close(uint256 amount, bytes memory signature) public {
+        require(msg.sender == recipient);
+        require(isValidSignature(amount, signature));
+
+        recipient.transfer(amount);
+        selfdestruct(sender);
+    }
+
+    // El sender puede extender el tiempo de expiración en cualquier momento
+    function extend(uint256 newExpiration) public {
+        require(msg.sender == sender);
+        require(newExpiration > expiration);
+
+        expiration = newExpiration;
+    }
+
+    // Si el tiempo de expiración es alcanzado sin que el destinatario cierre el canal,
+    // entonces todo el Ether es regresado al emisor (sender).
+    function claimTimeout() public {
+        require(block.timestamp >= expiration);
+        selfdestruct(sender);
+    }
+
+    function isValidSignature(uint256 amount, bytes memory signature)
+        internal
+        view
+        returns (bool)
+    {
+        bytes32 message = prefixed(keccak256(abi.encodePacked(this, amount)));
+
+        // verifica que la firma sea del emisor
+        return recoverSigner(message, signature) == sender;
+    }
+
+    // Todas las funciones siguientes son tomadas del capítulo
+    // 'Crear y verificar firmas' chapter.
+
+    function splitSignature(bytes memory sig)
+        internal
+        pure
+        returns (uint8 v, bytes32 r, bytes32 s)
+    {
+        require(sig.length == 65);
+
+        assembly {
+            // first 32 bytes, after the length prefix
+            r := mload(add(sig, 32))
+            // second 32 bytes
+            s := mload(add(sig, 64))
+            // final byte (first byte of the next 32 bytes)
+            v := byte(0, mload(add(sig, 96)))
+        }
+
+        return (v, r, s);
+    }
+
+    function recoverSigner(bytes32 message, bytes memory sig)
+        internal
+        pure
+        returns (address)
+    {
+        (uint8 v, bytes32 r, bytes32 s) = splitSignature(sig);
+
+        return ecrecover(message, v, r, s);
+    }
+
+    // Construye un hash prefijado para imitar el comportamiento de eth_sign.
+    function prefixed(bytes32 hash) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
+    }
+}
+
+
+Nota
+
+La función ``splitSignature`` no usa todos los pasos de verificación. Una implementación real sería usar una librería de testing más rigurosa, como la versión de `openZeppelin <https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/cryptography/ECDSA.sol>`_ en este código.
+
+Verificando Pagos
+=================
+
+A diferencia de la sección anterior, los mensajes en un canal de pago no son canjeados al instante. El destinatario realiza un seguimiento del último mensaje y lo canjea cuando es momento de cerrar el canal de pago. Esto quiere decir que es importante que el destinatario realice su propia verificación en cada mensaje. De otra forma, no habrá garantía que el destinatario pueda cobrar.
+
+El destinatario puede verificar cada mensaje realizando lo siguiente:
+    - Verificar que la dirección del contrato en el mensaje coincida con el canal de pago
+    - Verificando que el nuevo monto total sea el monto esperado.
+    - Verificar que el nuevo total no exceda el monto del Ethere depositado.
+    - Verificar que la firma sea validad y venga del canal del pago del emisor (sender).
+    
+Usaremos la librería `ethereumjs-util <https://github.com/ethereumjs/ethereumjs-util>`_ para escribir este proceso de verificación. El paso final se puede realizar de varias formas, pero nosotros usaremos JavaScript. El siguiente código toma prestado la función ``constructPaymentMessage`` desde el código escrito en JavaScript anteriormente:
+
+::
+
+// Esto imita el comportamiento prefijado del método JSON-RPC eth_sign.
+function prefixed(hash) {
+    return ethereumjs.ABI.soliditySHA3(
+        ["string", "bytes32"],
+        ["\x19Ethereum Signed Message:\n32", hash]
+    );
+}
+
+function recoverSigner(message, signature) {
+    var split = ethereumjs.Util.fromRpcSig(signature);
+    var publicKey = ethereumjs.Util.ecrecover(message, split.v, split.r, split.s);
+    var signer = ethereumjs.Util.pubToAddress(publicKey).toString("hex");
+    return signer;
+}
+
+function isValidSignature(contractAddress, amount, signature, expectedSigner) {
+    var message = prefixed(constructPaymentMessage(contractAddress, amount));
+    var signer = recoverSigner(message, signature);
+    return signer.toLowerCase() ==
+        ethereumjs.Util.stripHexPrefix(expectedSigner).toLowerCase();
+}
+
+
+Contratos Modulares
+===================
+
+Un enfoque por módulos para crear tus contratos ayuda a reducir la complejidad y mejorar la legibilidad, lo que ayudará a identificar posibles bugs y vulnerabilidades durante el desarrollo o revisión del código. Si especificas y controlas el comportamiento de cada módulo por separado, las interacciones que tienes que considerar serían solamente aquellas entre las especificaciones y no en cada parte dinámica del contrato. En el siguiente ejemplo, el contrato usa el método ``move`` de la `librería <https://docs.soliditylang.org/en/v0.8.6/contracts.html#libraries>`_ ``balances`` para verificar los balances envíados entre las direcciones que esperas que coincidad. De esta forma, la librería ``Blances`` proporciona un componente aislado que realiza un seguimiento apropiado de los balances entre cada cuenta. Es fácil verificar que la librería ``Balances`` nunca produce saldos negativo o excesivos al total y la suma de todos los balances o saldos es invariante durante la vigencia del contrato.
+
+::
+
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.5.0 <0.9.0;
+
+library Balances {
+    function move(mapping(address => uint256) storage balances, address from, address to, uint amount) internal {
+        require(balances[from] >= amount);
+        require(balances[to] + amount >= balances[to]);
+        balances[from] -= amount;
+        balances[to] += amount;
+    }
+}
+
+contract Token {
+    mapping(address => uint256) balances;
+    using Balances for *;
+    mapping(address => mapping (address => uint256)) allowed;
+
+    event Transfer(address from, address to, uint amount);
+    event Approval(address owner, address spender, uint amount);
+
+    function transfer(address to, uint amount) public returns (bool success) {
+        balances.move(msg.sender, to, amount);
+        emit Transfer(msg.sender, to, amount);
+        return true;
+
+    }
+
+    function transferFrom(address from, address to, uint amount) public returns (bool success) {
+        require(allowed[from][msg.sender] >= amount);
+        allowed[from][msg.sender] -= amount;
+        balances.move(from, to, amount);
+        emit Transfer(from, to, amount);
+        return true;
+    }
+
+    function approve(address spender, uint tokens) public returns (bool success) {
+        require(allowed[msg.sender][spender] == 0, "");
+        allowed[msg.sender][spender] = tokens;
+        emit Approval(msg.sender, spender, tokens);
+        return true;
+    }
+
+    function balanceOf(address tokenOwner) public view returns (uint balance) {
+        return balances[tokenOwner];
+    }
+}
+
