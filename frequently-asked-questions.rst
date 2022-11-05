@@ -1,5 +1,5 @@
 ####################
-Preguntas frequentes
+Preguntas frecuentes
 ####################
 
 Esta lista fue originalmente compilada por `fivedogit  <mailto:fivedogit@gmail.com>`_.
@@ -16,12 +16,12 @@ Hay algunos `ejemplos de contratos <https://github.com/fivedogit/solidity-baby-s
 y debe haber un `test contract <https://github.com/ethereum/solidity/blob/develop/test/libsolidity/SolidityEndToEndTest.cpp>`_ para cada funcionalidad de Solidity.
 
 
-Crear y publicar el contrato mas simple posible
+Crear y publicar el contrato más simple posible
 ===============================================
 
 Un contrato bastante simple es el `greeter <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/05_greeter.sol>`_
 
-¿Es posible hacer algo en un bloque específico? (ej. publicar un contrato o ejecutar una transaction)
+¿Es posible hacer algo en un bloque específico? (ej. publicar un contrato o ejecutar una transacción)
 =====================================================================================================
 
 Las transacciones no están garantizadas a ejecutarse en el próximo bloque o en cualquier
@@ -92,7 +92,7 @@ Ver `value_incrementer.sol <https://github.com/fivedogit/solidity-baby-steps/blo
 Obtener que un contrato te devuelva los fondos (sin usar ``selfdestruct(...)``).
 ================================================================================
 
-Este ejemplo demuestra como envíar fondos de un contrato a una address.
+Este ejemplo demuestra como enviar fondos de un contrato a una address.
 
 Ver `endowment_retriever <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/30_endowment_retriever.sol>`_.
 
@@ -105,7 +105,7 @@ Lo que sí es problemático es devolver cualquier data de tamaño variable (ej. 
 array de tamaño variable como ``uint[]``) desde una función **llamada desde Solidity**.
 Esto es una limitación de la EVM y será resuelto en la próxima versión del protocolo.
 
-Devolver data de tamaño variable está bien cuando es parte de una transaction o llamada externa.
+Devolver data de tamaño variable está bien cuando es parte de una transacción o llamada externa.
 
 ¿Cómo representas ``double``/``float``` en Solidity?
 ====================================================
@@ -115,7 +115,7 @@ Esto no es aún posible.
 Es posible de iniciar un array in-line (ej. ``string[] myarray = ["a", "b"];``)
 ===============================================================================
 
-Si. Sin embargo debiera notarse que esto sólo funciona con arrays de tamaño estático. Puedes incluso crear un array en memoria en línea en la declaración de devolución. Cool, ¿no?
+Si. Sin embargo, debiera notarse que esto sólo funciona con arrays de tamaño estático. Puedes incluso crear un array en memoria en línea en la declaración de devolución. Cool, ¿no?
 
 Example::
 
@@ -235,7 +235,7 @@ Ver `struct_and_for_loop_tester.sol <https://github.com/fivedogit/solidity-baby-
 ¿Qué set de caracteres usa Solidity?
 ====================================
 
-Solidity es agnostico de set de caracteres con respecto a strings en el código fuente,
+Solidity es agnóstico de set de caracteres con respecto a strings en el código fuente,
 aunque UTF-8 es recomendado. Los identificadores (variables, funciones, ...) Solo pueden
 usar ASCII.
 
@@ -267,7 +267,7 @@ debes siempre convertirlo en un ``bytes`` primero::
 
 Tienes que hacerlo manualmente por ahora.
 
-Por qué la función de bajo nivel ``.call()`` es menos favorable que instanciando un contrato con ua vaiable (``ContractBb;``) y ejecutando sus funcioens (``b.doSomething();``)?
+Por qué la función de bajo nivel ``.call()`` es menos favorable que instanciando un contrato con una vaiable (``ContractBb;``) y ejecutando sus funcioens (``b.doSomething();``)?
 ==========================================================================================================================================================================================
 
 TODO: 
@@ -293,7 +293,7 @@ Esto no es posible, porque todos los tipos usan el rango de valores totales.
 Tienes la opción de ``arrojar`` un error, que también revirtirá la transacción
 completa, que puede que sea una buena idea si obtuviste una situación inesperada.
 
-Si no quieres deolver un error, puedes devolver un par::
+Si no quieres devolver un error, puedes devolver un par::
 
     contract C {
         uint[] counters;
@@ -347,7 +347,7 @@ Cada contrato tiene su propio storage y es persistente entre llamdas de función
 y bastate caro usarlo.
 
 La segunda es "memory", esto es usado para guardar valores temporales. Es
-borrado entre llamdas de función (externas) y es más barato usar.
+borrado entre llamadas de función (externas) y es más barato usar.
 
 La tercera es en el stack, que es usado para guardar pequeñas variables locales.
 Es casi gratis para usar, pero sólo puede guardar una cantidad limitada de valores.
@@ -478,7 +478,7 @@ Usar el contructor. Cualquier cosa dentro de él será ejecutado cuando el contr
 
 Ver `replicator.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/50_replicator.sol>`_.
 
-¿Cómo se crea un array de dos dimenciones?
+¿Cómo se crea un array de dos dimensiones?
 ==========================================
 
 Ver `2D_array.sol <https://github.com/fivedogit/solidity-baby-steps/blob/master/contracts/55_2D_array.sol>`_.
@@ -613,7 +613,7 @@ A veces, cuando intento cambiar la longitud de un array con ej:  ``arrayname.len
 
 Puedes cambiar el tamaño de un array dinámico en almacenamiento (es decir, un array declarado en el
 nivel de contrato) con ``arrayname.length = <some new length>;``. Si consigues el
-error de "lvalue", probablemente estés haciendo una de dos cosas mal.
+error de "lvalue", probablemente estés haciendo una de las dos cosas mal.
 
 1. Es posible que estés tratando de redimensionar un array en "memoria", o
 
@@ -676,7 +676,7 @@ no cabe dentro de este rango, este es truncado. Estos truncamientos pueden tener
 `serias consecuencias <https://en.bitcoin.it/wiki/Value_overflow_incident>`_, asi que codifica como el de
 arriba es necesario para evitar ciertos ataques.
 
-Más Preguntas?
+¿Más Preguntas?
 ===============
 
 Si tienes más preguntas o tu pregunta no se ha contestada aquí, por favor contacta con nosotros en
