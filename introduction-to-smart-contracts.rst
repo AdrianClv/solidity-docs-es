@@ -20,11 +20,11 @@ Almacenamiento
     contract SimpleStorage {
         uint storedData;
 
-        function set(uint x) {
+        function set(uint x) public {
             storedData = x;
         }
 
-        function get() constant returns (uint) {
+        function get() public constant returns (uint) {
             return storedData;
         }
     }
@@ -47,7 +47,7 @@ El siguiente contrato va a implementar la forma más sencilla de una criptomoned
 
 ::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.21;
 
     contract Coin {
         // La palabra clave "public" hace que dichas variables
@@ -61,16 +61,16 @@ El siguiente contrato va a implementar la forma más sencilla de una criptomoned
 
         // Este es el constructor cuyo código
         // sólo se ejecutará cuando se cree el contrato.
-        function Coin() {
+        function Coin() public {
             minter = msg.sender;
         }
 
-        function mint(address receiver, uint amount) {
+        function mint(address receiver, uint amount) public {
             if (msg.sender != minter) return;
             balances[receiver] += amount;
         }
 
-        function send(address receiver, uint amount) {
+        function send(address receiver, uint amount) public {
             if (balances[msg.sender] < amount) return;
             balances[msg.sender] -= amount;
             balances[receiver] += amount;
@@ -93,7 +93,7 @@ La siguiente línea, ``mapping (address => uint) public balances;`` también cre
 Los mapeos (Mappings) pueden ser vistos como tablas hash `hash tables <https://en.wikipedia.org/wiki/Hash_table>`_ que son virtualmente inicializadas de tal forma que cada clave candidata existe y es mapeada a un valor cuya representación en bytes es todo ceros. 
 Esta anología no va mucho más allá, ya que no es posible obtener una lista de todas las claves de un mapeo, ni tampoco una lista de todos los valores. Por eso hay que tener en cuenta (o mejor, conservar una lista o usar un tipo de datos más avanzado) lo que se añade al mapping o usarlo en un contexto donde no es necesario, como este caso. La función getter creada mediante la palabra reservada ``public`` es un poco más compleja en este caso. De forma aproximada, es algo parecido a lo siguiente::
 
-    function balances(address _account) returns (uint) {
+    function balances(address _account) public view returns (uint) {
         return balances[_account];
     }
 
