@@ -1,4 +1,4 @@
-s.. index:: type
+.. index:: type
 
 .. _types:
 
@@ -298,14 +298,14 @@ revisan los valores de rangos en tiempo de ejecución y un fallo causa una excep
 
 ::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     contract test {
         enum ActionChoices { GoLeft, GoRight, GoStraight, SitStill }
         ActionChoices choice;
         ActionChoices constant defaultChoice = ActionChoices.GoStraight;
 
-        function setGoStraight() {
+        function setGoStraight() public {
             choice = ActionChoices.GoStraight;
         }
 
@@ -314,11 +314,11 @@ revisan los valores de rangos en tiempo de ejecución y un fallo causa una excep
         // para todo lo externo a Solidity. El tipo entero usado es apenas
         // suficientemente grande para guardar todos los valores enum, p.ej. si
         // tienes más valores, `unit16` será utilizado y así sucesivamente.
-        function getChoice() returns (ActionChoices) {
+        function getChoice() public view returns (ActionChoices) {
             return choice;
         }
 
-        function getDefaultChoice() returns (uint) {
+        function getDefaultChoice() public pure returns (uint) {
             return uint(defaultChoice);
         }
     }
@@ -327,8 +327,8 @@ revisan los valores de rangos en tiempo de ejecución y un fallo causa una excep
 
 .. _function_types:
 
-Función
--------
+Tipos de función
+----------------
 
 Los tipos función son tipos de función. Variables de tipo función
 pueden ser asignados desde funciones y parámetros de funciones de tipo función
@@ -372,16 +372,27 @@ Nótese que las funciones públicas del contrato actual pueden ser usadas tanto
 como una función interna como externa. Para usar ``f`` como función interna, sólo
 se le llama como ``f``, y si se quiere usar como externa, usar ``this.f``.
 
+Además, las funciones públicas (o externas) también tienen un miembro especial llamado ``selector``,
+que devuelve :ref:`ABI function selector <abi_function_selector>`::
+
+    pragma solidity ^0.4.16;
+
+    contract Selector {
+      function f() public view returns (bytes4) {
+        return this.f.selector;
+      }
+    }
 
 Ejemplo que muestra como usar tipos de función internas::
 
-    pragma solidity ^0.4.5;
+    pragma solidity ^0.4.16;
 
     library ArrayUtils {
-      // las funciones internas pueden ser usadas en funciones de librerías
-      // internas porque serán parte del mismo contexto de código.
-      function map(uint[] memory self, function (uint) returns (uint) f)
+        // las funciones internas pueden ser usadas en funciones de librerías
+        // internas porque serán parte del mismo contexto de código.
+      function map(uint[] memory self, function (uint) pure returns (uint) f)
         internal
+        pure
         returns (uint[] memory r)
       {
         r = new uint[](self.length);
@@ -391,9 +402,10 @@ Ejemplo que muestra como usar tipos de función internas::
       }
       function reduce(
         uint[] memory self,
-        function (uint x, uint y) returns (uint) f
+        function (uint, uint) pure returns (uint) f
       )
         internal
+        pure
         returns (uint r)
       {
         r = self[0];
@@ -401,7 +413,7 @@ Ejemplo que muestra como usar tipos de función internas::
           r = f(r, self[i]);
         }
       }
-      function range(uint length) internal returns (uint[] memory r) {
+      function range(uint length) internal pure returns (uint[] memory r) {
         r = new uint[](length);
         for (uint i = 0; i < r.length; i++) {
           r[i] = i;
@@ -411,20 +423,20 @@ Ejemplo que muestra como usar tipos de función internas::
 
     contract Pyramid {
       using ArrayUtils for *;
-      function pyramid(uint l) returns (uint) {
+      function pyramid(uint l) public pure returns (uint) {
         return ArrayUtils.range(l).map(square).reduce(sum);
       }
-      function square(uint x) internal returns (uint) {
+      function square(uint x) internal pure returns (uint) {
         return x * x;
       }
-      function sum(uint x, uint y) internal returns (uint) {
+      function sum(uint x, uint y) internal pure returns (uint) {
         return x + y;
       }
     }
 
 Otro ejemplo que usa tipos de función externa::
 
-    pragma solidity ^0.4.11;
+    pragma solidity ^0.4.21;
 
     contract Oracle {
       struct Request {
@@ -433,11 +445,11 @@ Otro ejemplo que usa tipos de función externa::
       }
       Request[] requests;
       event NewRequest(uint);
-      function query(bytes data, function(bytes memory) external callback) {
+      function query(bytes data, function(bytes memory) external callback) public {
         requests.push(Request(data, callback));
-        NewRequest(requests.length - 1);
+        emit NewRequest(requests.length - 1);
       }
-      function reply(uint requestID, bytes response) {
+      function reply(uint requestID, bytes response) public {
         // Aquí se revisa que la respuesta viene de una fuente de confianza
         requests[requestID].callback(response);
       }
@@ -448,13 +460,14 @@ Otro ejemplo que usa tipos de función externa::
       function buySomething() {
         oracle.query("USD", this.oracleResponse);
       }
-      function oracleResponse(bytes response) {
+      function oracleResponse(bytes response) public {
         require(msg.sender == address(oracle));
         // Usar los datos
       }
     }
 
-Nótese que las funciones lambda o inline están planeadas pero no están aún implementadas.
+.. Nótese::
+    Las funciones lambda o inline están planeadas pero no están aún implementadas.
 
 .. index:: ! type;reference, ! reference type, storage, memory, location, array, struct
 
@@ -500,7 +513,7 @@ no crea una copia.
         uint[] x; // la ubicación de los datos de x es storage
 
         // la ubicación de datos de memoryArray es memory
-        function f(uint[] memoryArray) {
+        function f(uint[] memoryArray) public {
             x = memoryArray; // funciona, copia el array entero al almacenamiento
             var y = x; // funciona, asigna una referencia, ubicación de datos de y es almacenamiento
             y[7]; // bien, devuelve el octavo elemento
@@ -517,7 +530,7 @@ no crea una copia.
         }
 
         function g(uint[] storage storageArray) internal {}
-        function h(uint[] memoryArray) {}
+        function h(uint[] memoryArray) public {}
     }
 
 
@@ -579,10 +592,10 @@ mediante asignación al miembro ``.length``.
 
 ::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     contract C {
-        function f(uint len) {
+        function f(uint len) public pure {
             uint[] memory a = new uint[](7);
             bytes memory b = new bytes(len);
             // Aquí tenemos a.length == 7 y b.length == len
@@ -600,13 +613,13 @@ asignados a una variable al momento.
 
 ::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     contract C {
         function f() {
             g([uint(1), 2, 3]);
         }
-        function g(uint[3] _data) {
+        function g(uint[3] _data) public pure {
             // ...
         }
     }
@@ -659,7 +672,7 @@ Miembros
 
 ::
 
-    pragma solidity ^0.4.0;
+    pragma solidity ^0.4.16;
 
     contract ArrayContract {
         uint[2**20] m_aLotOfIntegers;
@@ -668,23 +681,23 @@ Miembros
         bool[2][] m_pairsOfFlags;
         // newPairs es almacenado en memoria - por defecto para argumentos de función
 
-        function setAllFlagPairs(bool[2][] newPairs) {
+        function setAllFlagPairs(bool[2][] newPairs) public {
             // asignación a un array de almacenamiento reemplaza el array completo
             m_pairsOfFlags = newPairs;
         }
 
-        function setFlagPair(uint index, bool flagA, bool flagB) {
+        function setFlagPair(uint index, bool flagA, bool flagB) public {
             // acceso a un index que no existe arrojará una excepción
             m_pairsOfFlags[index][0] = flagA;
             m_pairsOfFlags[index][1] = flagB;
         }
 
-        function changeFlagArraySize(uint newSize) {
+        function changeFlagArraySize(uint newSize) public {
             // si el tamaño nuevo es más pequeño, los elementos eliminados del array serán limpiados
             m_pairsOfFlags.length = newSize;
         }
 
-        function clear() {
+        function clear() public {
             // éstos limpian los arrays completamente
             delete m_pairsOfFlags;
             delete m_aLotOfIntegers;
@@ -694,7 +707,7 @@ Miembros
 
         bytes m_byteData;
 
-        function byteArrays(bytes data) {
+        function byteArrays(bytes data) public {
             // byte arrays ("bytes") son diferentes ya que no son almacenados sin padding,
             // pero pueden ser tratados idénticamente a "uint8[]"
             m_byteData = data;
@@ -703,11 +716,11 @@ Miembros
             delete m_byteData[2];
         }
 
-        function addFlag(bool[2] flag) returns (uint) {
+        function addFlag(bool[2] flag) public returns (uint) {
             return m_pairsOfFlags.push(flag);
         }
 
-        function createMemoryArray(uint size) returns (bytes) {
+        function createMemoryArray(uint size) public pure returns (bytes) {
             // Arrays de memoria dinámicos son creados usando `new`:
             uint[2][] memory arrayOfPairs = new uint[2][](size);
             // Crear un byte array dinámico:
@@ -751,13 +764,13 @@ mostrado en el siguiente ejemplo:
         uint numCampaigns;
         mapping (uint => Campaign) campaigns;
 
-        function newCampaign(address beneficiary, uint goal) returns (uint campaignID) {
+        function newCampaign(address beneficiary, uint goal) public returns (uint campaignID) {
             campaignID = numCampaigns++; // campaignID es variable de retorno
             // Crea un nuevo struct y lo guarda en almacenamiento. Dejamos fuera el tipo mapping.
             campaigns[campaignID] = Campaign(beneficiary, goal, 0, 0);
         }
 
-        function contribute(uint campaignID) payable {
+        function contribute(uint campaignID) public payable {
             Campaign c = campaigns[campaignID];
             // Crea un nuevo struct de memoria temporal, inicializado con los valores dados
             // y lo copia al almacenamiento.
@@ -766,7 +779,7 @@ mostrado en el siguiente ejemplo:
             c.amount += msg.value;
         }
 
-        function checkGoalReached(uint campaignID) returns (bool reached) {
+        function checkGoalReached(uint campaignID) public returns (bool reached) {
             Campaign c = campaigns[campaignID];
             if (c.amount < c.fundingGoal)
                 return false;
@@ -827,13 +840,13 @@ para cada ``_KeyType``, recursivamente.
     contract MappingExample {
         mapping(address => uint) public balances;
 
-        function update(uint newBalance) {
+        function update(uint newBalance) public {
             balances[msg.sender] = newBalance;
         }
     }
 
     contract MappingUser {
-        function f() returns (uint) {
+        function f() public returns (uint) {
             return MappingExample(<address>).balances(this);
         }
     }
@@ -869,11 +882,11 @@ Es importante notar que ``delete a`` en realidad se comporta como una asignació
         uint data;
         uint[] dataArray;
 
-        function f() {
+        function f() public {
             uint x = data;
             delete x; // setea x to 0, no afecta a los datos
             delete data; // setea data a 0, no afecta a x que aún tiene una copia
-            uint[] y = dataArray;
+            uint[] storage y = dataArray;
             delete dataArray; // esto setea dataArray.length a cero, pero como uint[] es un objecto complejo,
             // también y es afectado que es un alias al objeto de almacenamiento
             // Por otra parte: "delete y" no es válido, ya que asignaciones a variables locales
